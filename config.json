@@ -1,7 +1,8 @@
 {
   "mapFolder": "map.w3x",
   "minifyScript": false,
-  "gameExecutable": "E:\\Games\\Warcraft III\\_retail_\\x86_64\\Warcraft III.exe",
+  "gameExecutable": "/Applications/Warcraft III/_retail_/x86_64/Warcraft III.app/Contents/MacOS/Warcraft III",
+  "gameExecutableold": "C:\\Program Files\\Warcraft III\\_retail_\\x86_64\\Warcraft III.exe",
   "outputFolder": "./dist/bin",
   "launchArgs": [
     "-launch",

@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES2019",                       // Specify ECMAScript target version
+    "module": "commonjs",                     // Specify module code generation
+    "strict": true,                           // Enable strict type-checking options
+    "esModuleInterop": true,                  // Enables CommonJS/AMD module imports to be compatible with ES6 imports
+    "skipLibCheck": true,                     // Skip type checking of declaration files
+    "forceConsistentCasingInFileNames": true, // Disallow inconsistently-cased references to the same file
+    "moduleResolution": "node",               // Use Node.js style module resolution
+    "resolveJsonModule": true,                // Allow JSON imports
+    "isolatedModules": true                   // Ensure each file can be safely transpiled without relying on other imports
+  },
+  "exclude": ["node_modules"]                 // Exclude node_modules from being compiled
+}
