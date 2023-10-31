@@ -5,8 +5,8 @@ import { GenericAbility } from '../GenericAbility';
 import { Defender } from '../../Players/Defender';
 import { WarcraftMaul } from '../../../WarcraftMaul';
 import { Tower } from '../../Tower/Specs/Tower';
-import {MapPlayer, Unit} from "w3ts";
-import Player from "mdx-m3-viewer-th/dist/cjs/parsers/w3x/w3i/player";
+import {Unit} from "w3ts";
+import {MapPlayer} from "../../../../lib/player";
 
 
 export class AwakenDormantPheonixEgg extends GenericAbility implements AbilityOnEffectTargetsUnit {

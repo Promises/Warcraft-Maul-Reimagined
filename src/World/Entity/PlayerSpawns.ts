@@ -9,8 +9,9 @@ import { CreepAbility } from './CreepAbilities/specs/CreepAbility';
 import { Log } from '../../lib/Serilog/Serilog';
 import { WaveCreep } from './WaveCreep';
 import { AbstractGameRound } from '../Game/BaseMaul/AbstractGameRound';
-import {MapPlayer, Trigger, Unit} from "w3ts";
+import {Trigger, Unit} from "w3ts";
 import {COLOUR} from "../../lib/translators";
+import {MapPlayer} from "../../lib/player";
 
 export class PlayerSpawns {
     private _spawnOne: CheckPoint | undefined;

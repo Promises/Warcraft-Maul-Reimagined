@@ -1,7 +1,7 @@
 import {COLOUR_CODES} from '../../GlobalSettings';
 import {Log} from '../../../lib/Serilog/Serilog';
-import {MapPlayer} from "w3ts";
 import {COLOUR, Util} from "../../../lib/translators";
+import {MapPlayer} from "../../../lib/player";
 
 export abstract class AbstractPlayer extends MapPlayer {
     private battleTag: string;

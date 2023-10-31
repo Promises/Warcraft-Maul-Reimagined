@@ -4,8 +4,8 @@ import {Defender} from '../../../Entity/Players/Defender';
 import {AdvancedHoloMaze} from '../../../Holograms/AdvancedHoloMaze';
 import {CheckPoint} from '../../../Entity/CheckPoint';
 import {AbstractPlayer} from '../../../Entity/Players/AbstractPlayer';
-import {Log} from '../../../../lib/Serilog/Serilog';
-import {Frame, MapPlayer} from "w3ts";
+import {Frame} from "w3ts";
+import {MapPlayer} from "../../../../lib/player";
 
 export class ExampleMaze extends AbstractActionButton {
     private static enabledIcon: string = 'uiImport/CommandButtonsDisabled/DISBTNMAZEAlpha.dds';

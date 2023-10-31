@@ -27,8 +27,9 @@ import {IMapSettings} from './IMapSettings';
 import {EventQueue} from "../lib/WCEventQueue/EventQueue";
 import {SafeEventQueue} from "../lib/WCEventQueue/SafeEventQueue";
 import {TimedEventQueue} from "../lib/WCEventQueue/TimedEventQueue";
-import {Effect, MapPlayer} from "w3ts";
+import {Effect} from "w3ts";
 import {COLOUR, SendMessage, SendMessageUnlogged, Util} from "../lib/translators";
+import {MapPlayer} from "../lib/player";
 
 export class WarcraftMaul {
 

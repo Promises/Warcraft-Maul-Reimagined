@@ -2,7 +2,8 @@ import { AbstractActionButton } from './AbstractActionButton';
 import { WarcraftMaul } from '../../../WarcraftMaul';
 import { Defender } from '../../../Entity/Players/Defender';
 import { AbstractPlayer } from '../../../Entity/Players/AbstractPlayer';
-import {Frame, MapPlayer} from "w3ts";
+import {Frame} from "w3ts";
+import {MapPlayer} from "../../../../lib/player";
 
 export class ClaimButton extends AbstractActionButton {
     private static Icon: string = 'uiImport/CommandButtons/BTNClaim.dds';

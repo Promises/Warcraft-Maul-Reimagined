@@ -7,7 +7,8 @@ import { WarcraftMaul } from '../../../WarcraftMaul';
 import { Defender } from '../../Players/Defender';
 import { Tower } from '../../Tower/Specs/Tower';
 import { AOB_ITEM_LOOT_LEVEL_ONE, AOB_ITEM_LOOT_LEVEL_TWO } from '../../../GlobalSettings';
-import {Item, MapPlayer, Unit} from "w3ts";
+import {Item, Unit} from "w3ts";
+import {MapPlayer} from "../../../../lib/player";
 
 
 export class Enchantment extends GenericAbility implements AbilityOnEffectTargetsUnit {

@@ -16,8 +16,9 @@ import { ArchimondeTeleport } from './Game/ArchimondeTeleport';
 import { AbstractGameRound } from './Game/BaseMaul/AbstractGameRound';
 import { GameTurn } from './Game/BaseMaul/GameTurn';
 import { TimedEvent } from '../lib/WCEventQueue/TimedEvent';
-import {Group, MapPlayer, Trigger, Unit} from "w3ts";
+import {Group, Trigger, Unit} from "w3ts";
 import {COLOUR} from "../lib/translators";
+import {MapPlayer} from "../lib/player";
 
 export class WorldMap {
     public game: WarcraftMaul;
