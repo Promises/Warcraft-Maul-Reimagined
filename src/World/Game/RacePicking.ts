@@ -12,11 +12,10 @@ import {
     HybridTierThree,
     HybridTierTwo,
 } from '../../Generated/hybridRandomGEN';
-import {Trigger, Unit} from "w3ts";
+import {MapPlayer,Trigger, Unit} from "w3ts";
 import {SendMessage, Util} from "../../lib/translators";
 import {Log} from "../../lib/Serilog/Serilog";
 import {HybridTower} from "../../Generated/hybridRandomGEN.types";
-import {MapPlayer} from "../../lib/player";
 
 export class RacePicking {
     raceSelectTrigger: Trigger;

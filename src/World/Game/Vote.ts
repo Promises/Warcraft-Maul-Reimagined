@@ -5,9 +5,8 @@ import {Log} from '../../lib/Serilog/Serilog';
 import {ClassicGameRound} from './ClassicMaul/ClassicGameRound';
 import {BlitzGameRound} from './BlitzMaul/BlitzGameRound';
 import {AbstractPlayer} from '../Entity/Players/AbstractPlayer';
-import {Dialog, DialogButton, Timer, Trigger} from "w3ts";
+import {MapPlayer,Dialog, DialogButton, Timer, Trigger} from "w3ts";
 import {SendMessage, Util} from "../../lib/translators";
-import {MapPlayer} from "../../lib/player";
 
 export class Vote {
     public initializeVotesTrigger: Trigger;

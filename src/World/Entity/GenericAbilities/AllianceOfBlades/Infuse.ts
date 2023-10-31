@@ -7,8 +7,7 @@ import { WarcraftMaul } from '../../../WarcraftMaul';
 import { Defender } from '../../Players/Defender';
 import { Tower } from '../../Tower/Specs/Tower';
 import { AOB_ITEM_LOOT_LEVEL_THREE, AOB_ITEM_LOOT_LEVEL_TWO } from '../../../GlobalSettings';
-import {Item, Unit} from "w3ts";
-import {MapPlayer} from "../../../../lib/player";
+import {MapPlayer,Item, Unit} from "w3ts";
 
 
 export class Infuse extends GenericAbility implements AbilityOnEffectTargetsUnit {

@@ -1,4 +1,4 @@
-import {Timer, Trigger, Unit} from "w3ts";
+import {Timer,MapPlayer, Trigger, Unit} from "w3ts";
 import {Players} from "w3ts/globals";
 import {W3TS_HOOK, addScriptHook} from "w3ts/hooks";
 import {PatchNatives} from "./JassOverrides/NativePatcher";
@@ -7,7 +7,6 @@ import {StringSink} from "./lib/Serilog/Sinks/StringSink";
 import {CreepAbilityHandler} from "./World/Entity/CreepAbilities/CreepAbilityHandler";
 import {WarcraftMaul} from "./World/WarcraftMaul";
 import {SendMessageUnlogged} from "./lib/translators";
-import {MapPlayer} from "./lib/player";
 
 const BUILD_DATE = compiletime(() => new Date().toUTCString());
 const TS_VERSION = compiletime(() => require("typescript").version);

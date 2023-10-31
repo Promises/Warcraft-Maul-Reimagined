@@ -1,0 +1,13 @@
+diff --git a/node_modules/w3ts/handles/player.d.ts b/node_modules/w3ts/handles/player.d.ts
+index afbceb7..c141d81 100644
+--- a/node_modules/w3ts/handles/player.d.ts
++++ b/node_modules/w3ts/handles/player.d.ts
+@@ -8,7 +8,7 @@ export declare class MapPlayer extends Handle<player> {
+     /**
+      * @deprecated use `MapPlayer.create` instead.
+      */
+-    private constructor();
++    constructor(id: number);
+     private static create;
+     set color(color: playercolor);
+     get color(): playercolor;

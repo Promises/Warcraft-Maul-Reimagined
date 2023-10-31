@@ -12,10 +12,9 @@ import {TimedEvent} from '../../lib/WCEventQueue/TimedEvent';
 import {DummyPlayer} from '../Entity/EmulatedPlayer/DummyPlayer';
 import {Maze, Walkable} from '../Antiblock/Maze';
 import {COLOUR, SendMessage, Util} from "../../lib/translators";
-import {Trigger, Unit} from "w3ts";
+import {MapPlayer,Trigger, Unit} from "w3ts";
 import {HybridTower} from "../../Generated/hybridRandomGEN.types";
 import {Image} from "../../JassOverrides/Image";
-import {MapPlayer} from "../../lib/player";
 
 export class Commands {
 

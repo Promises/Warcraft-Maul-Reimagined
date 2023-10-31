@@ -1,8 +1,7 @@
 import { CreepAbility } from './specs/CreepAbility';
 import { AttackActionCreepAbility } from './specs/AttackActionCreepAbility';
-import {Unit} from "w3ts";
+import {MapPlayer,Unit} from "w3ts";
 import {Util} from "../../../lib/translators";
-import {MapPlayer} from "../../../lib/player";
 
 export class CrippleAura extends CreepAbility implements AttackActionCreepAbility {
     constructor(abilityUnit: Unit) {
