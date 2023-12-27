@@ -1,106 +1,65 @@
+// Define log levels
 export enum LogLevel {
     None = -1,
-    Message = 0,
-    Verbose = 1,
+    Debug = 0,
+    Information = 1,
     Event = 2,
-    Debug = 3,
-    Information = 4,
-    Warning = 5,
-    Error = 6,
-    Fatal = 7,
+    Warning = 3,
+    Error = 4,
+    Fatal = 5
 }
 
-export enum LogEventType {
-    Text,
-    Parameter,
-}
-
+// Define log event type
 export class LogEvent {
-    constructor(public readonly Type: LogEventType, public readonly Text: string, public readonly Value: any) {
+    constructor(public level: LogLevel, public message: string) {
     }
 }
 
+// Define the logging system
+export class Log {
+    private static sinks: ILogSink[] = [];
+
+    public static addSink(sink: ILogSink): void {
+        this.sinks.push(sink);
+    }
+
+    public static write(level: LogLevel, message: string): void {
+        const event = new LogEvent(level, message);
+        this.sinks.forEach(sink => {
+            if (sink.isEnabled(level)) {
+                sink.emit(event);
+            }
+        });
+    }
+
+    // Shortcut methods for each log level
+    public static Debug(message: string): void {
+        this.write(LogLevel.Debug, message);
+    }
+
+    public static Info(message: string): void {
+        this.write(LogLevel.Information, message);
+    }
+
+    public static Warning(message: string): void {
+        this.write(LogLevel.Warning, message);
+    }
+    public static Event(id: number, message: string): void {
+        this.write(LogLevel.Event, `{"event":${id}, "data": ${message}}`);
+    }
+
+    public static Error(message: string): void {
+        this.write(LogLevel.Error, message);
+    }
+
+    public static Fatal(message: string): void {
+        this.write(LogLevel.Fatal, message);
+    }
+}
+
+// Define the log sink interface
 export interface ILogSink {
-    LogLevel(): LogLevel;
+    isEnabled(level: LogLevel): boolean;
 
-    Log(level: LogLevel, events: LogEvent[]): void;
-}
-
-export module Log {
-    let _sinks: ILogSink[];
-
-    export function Init(this: void, sinks: ILogSink[]): void {
-        _sinks = sinks;
-    }
-
-    function Parse(this: void, message: string, ...args: any[]): LogEvent[] {
-        let logEvents: LogEvent[] = [];
-
-        const matcher = string.gmatch(message, '{.-}');
-        let match: string;
-        let text: string;
-        let n: number = 0;
-        let i: number = 0;
-        // @ts-ignore
-        while (match = matcher()) {
-            let [s, e] = string.find(message, match, 1, true);
-            if (!s || !e) {
-                continue;
-            } // this should never happen
-            text = message.substring(i, s - 1);
-            if (text != '') {
-                logEvents.push(new LogEvent(LogEventType.Text, text, null));
-            }
-            logEvents.push(new LogEvent(LogEventType.Parameter, match, args[n]));
-            i = e;
-            n += 1;
-        }
-        text = message.substring(i);
-        if (text != '') {
-            logEvents.push(new LogEvent(LogEventType.Text, text, null));
-        }
-
-        return logEvents;
-    }
-
-    export function Log(this: void, level: LogLevel, message: string, ...args: any[]): void {
-        const logEvents = Parse(message, ...args);
-        for (let index = 0; index < _sinks.length; index++) {
-            if (_sinks[index].LogLevel() <= level) {
-                _sinks[index].Log(level, logEvents);
-            }
-        }
-    }
-
-    export function Fatal(this: void, message: string, ...args: any[]): void {
-        Log(LogLevel.Fatal, message, ...args);
-    }
-
-    export function Error(this: void, message: string, ...args: any[]): void {
-        Log(LogLevel.Error, message, ...args);
-    }
-
-    export function Warning(this: void, message: string, ...args: any[]): void {
-        Log(LogLevel.Warning, message, ...args);
-    }
-
-    export function Information(this: void, message: string, ...args: any[]): void {
-        Log(LogLevel.Information, message, ...args);
-    }
-
-    export function Debug(this: void, message: string, ...args: any[]): void {
-        Log(LogLevel.Debug, message, ...args);
-    }
-
-    export function Message(this: void, message: string, ...args: any[]): void {
-        Log(LogLevel.Message, message, ...args);
-    }
-
-    export function Event(this: void, id: number, message: string): void {
-        Log(LogLevel.Event, `{"event":${id}, "data": ${message}}`);
-    }
-
-    export function Verbose(this: void, message: string, ...args: any[]): void {
-        Log(LogLevel.Verbose, message, ...args);
-    }
+    emit(event: LogEvent): void;
 }

@@ -43,6 +43,7 @@ export class SellTower {
             return;
         }
 
+
         const owningPlayer = unit.owner;
         const player: Defender | undefined = this._game.players.get(owningPlayer.id);
         if (player) {
@@ -79,6 +80,7 @@ export class SellTower {
             PlaySoundOnUnitBJ(settings.Sounds.goldSound.handle, 100, unit.handle);
             // }
             //
+
             const isWaveInProgress: boolean =
                 this._game.worldMap.gameRoundHandler ? this._game.worldMap.gameRoundHandler.isWaveInProgress : false;
             const x: number = unit.x;

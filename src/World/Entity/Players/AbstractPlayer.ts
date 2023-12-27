@@ -62,7 +62,7 @@ export abstract class AbstractPlayer extends MapPlayer {
     }
 
     public sendMessage(message: string): void {
-        Log.Message(`{"s":"${this.getPlayerName()}", "m":"${message}"}`);
+        Log.Info(`{"s":"${this.getPlayerName()}", "m":"${message}"}`);
         DisplayTimedTextToPlayer(this.handle, 0, 0, 10, message);
     }
 

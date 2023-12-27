@@ -87,10 +87,10 @@ export class WarcraftMaul {
         //     this.debugMode = true;
         // }
         if (this.debugMode) {
-            Log.Init([
-                new StringSink(LogLevel.Debug, SendMessageUnlogged),
-                // new PreloadSink(LogLevel.Message, `WCMAUL\\${os.time()}.txt`),
-            ]);
+            // Log.addSink(
+            //     new StringSink(LogLevel.Debug),
+            //     // new PreloadSink(LogLevel.Message, `WCMAUL\\${os.time()}.txt`),
+            // );
         }
         // this.mmd.DefineSettingBoolean('debug_mode', this.debugMode);
         this.gameCommandHandler = new Commands(this);

@@ -1,81 +1,25 @@
-import { ILogSink, Log, LogEvent, LogEventType, LogLevel } from '../Serilog';
-import {SendMessageUnlogged} from "../../translators";
+import { ILogSink, LogEvent, LogLevel } from "../Serilog";
 
 export class StringSink implements ILogSink {
-    static Prefix: Record<LogLevel, string> =
-        {
-            [LogLevel.None]: '|cffffffffNON|r',
-            [LogLevel.Verbose]: '|cff9d9d9dVRB|r',
-            [LogLevel.Debug]: '|cff9d9d9dDBG|r',
-            [LogLevel.Information]: '|cffe6cc80INF|r',
-            [LogLevel.Message]: '|cffe6cc80MSG|r',
-            [LogLevel.Event]: '|cffe6cc80EVT|r',
-            [LogLevel.Warning]: '|cffffcc00WRN|r',
-            [LogLevel.Error]: '|cffff8000ERR|r',
-            [LogLevel.Fatal]: '|cffff0000FTL|r',
-        };
+    private static readonly Colours: Record<LogLevel, string> = {
+        [LogLevel.None]: '|cffffffff',
+        // [LogLevel.Verbose]: '|cff9d9d9dVRB|r',
+        [LogLevel.Debug]: '|cff9d9d9d',
+        [LogLevel.Information]: '|cffe6cc80',
+        // [LogLevel.Message]: '|cffe6cc80MSG|r',
+        [LogLevel.Event]: '|cffe6cc80',
+        [LogLevel.Warning]: '|cffffcc00',
+        [LogLevel.Error]: '|cffff8000',
+        [LogLevel.Fatal]: '|cffff0000',
+    }
+    constructor(private minLevel: LogLevel = LogLevel.Debug) {}
 
-    static Colors: Record<string, string> =
-        {
-            ['nil']: '9d9d9d',
-            ['boolean']: '1eff00',
-            ['number']: '00ccff',
-            ['string']: 'ff8000',
-            ['table']: 'ffcc00',
-            ['function']: 'ffcc00',
-            ['userdata']: 'ffcc00',
-        };
-
-    static Brackets: Record<string, boolean> =
-        {
-            ['nil']: false,
-            ['boolean']: false,
-            ['number']: false,
-            ['string']: false,
-            ['table']: true,
-            ['function']: true,
-            ['userdata']: true,
-        };
-
-    constructor(private readonly logLevel: LogLevel, private printer: (this: void, message: string) => void) {
-        // @ts-ignore
-        _G.SendMessage = function (this: void, msg: any): void {
-            Log.Message(`{"s":"BROADCAST", "m":"${msg}"}`);
-            SendMessageUnlogged(msg);
-        };
-
+    public isEnabled(level: LogLevel): boolean {
+        return level >= this.minLevel;
     }
 
-    LogLevel(): LogLevel {
-        return this.logLevel;
-    }
-
-    Log(level: LogLevel, events: LogEvent[]): void {
-        let message: string = '';
-
-        for (let index = 0; index < events.length; index++) {
-            const event = events[index];
-            if (event.Type == LogEventType.Text) {
-                message += event.Text;
-            } else if (event.Type == LogEventType.Parameter) {
-                const whichType = type(event.Value);
-                const color = StringSink.Colors[whichType];
-                if (color) {
-                    message += '|cff' + color;
-                }
-                if (StringSink.Brackets[whichType]) {
-                    message += '{ ';
-                }
-                message += event.Value;
-                if (StringSink.Brackets[whichType]) {
-                    message += ' }';
-                }
-                if (color) {
-                    message += '|r';
-                }
-            }
-        }
-
-        this.printer(string.format('[%s]: %s', StringSink.Prefix[level], message));
+    public emit(event: LogEvent): void {
+        const colour = StringSink.Colours[event.level];
+        print(`${colour}[${LogLevel[event.level].toUpperCase()}]|r ${event.message}`);
     }
 }

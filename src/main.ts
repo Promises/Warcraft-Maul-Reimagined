@@ -1,12 +1,10 @@
-import {Timer,MapPlayer, Trigger, Unit} from "w3ts";
-import {Players} from "w3ts/globals";
-import {W3TS_HOOK, addScriptHook} from "w3ts/hooks";
+import {MapPlayer, Trigger, Unit} from "w3ts";
+import {addScriptHook, W3TS_HOOK} from "w3ts/hooks";
 import {PatchNatives} from "./JassOverrides/NativePatcher";
 import {Log, LogLevel} from "./lib/Serilog/Serilog";
 import {StringSink} from "./lib/Serilog/Sinks/StringSink";
 import {CreepAbilityHandler} from "./World/Entity/CreepAbilities/CreepAbilityHandler";
 import {WarcraftMaul} from "./World/WarcraftMaul";
-import {SendMessageUnlogged} from "./lib/translators";
 
 const BUILD_DATE = compiletime(() => new Date().toUTCString());
 const TS_VERSION = compiletime(() => require("typescript").version);
@@ -27,10 +25,7 @@ compiletime(({objectData, constants}) => {
 function tsMain() {
     PatchNatives();
     BlzLoadTOCFile('uiImport\\Templates.toc');
-    Log.Init([
-        new StringSink(LogLevel.Warning, SendMessageUnlogged),
-        // new PreloadSink(LogLevel.Message, `WCMAUL\\${os.time()}.txt`),
-    ]);
+    Log.addSink((new StringSink(LogLevel.Debug)));
     try {
         // print(`Build: ${BUILD_DATE}`);
         // print(`Typescript: v${TS_VERSION}`);
@@ -56,7 +51,7 @@ export class InitGame {
     private static Main(this: void, creepAbilityHandler: CreepAbilityHandler/*, mmd: MMD*/): void {
         const maul: WarcraftMaul = new WarcraftMaul(creepAbilityHandler/*, mmd*/);
         if (maul.debugMode) {
-            Log.Information('Initialisation finished');
+            Log.Debug('Initialisation finished');
         }
     }
 
