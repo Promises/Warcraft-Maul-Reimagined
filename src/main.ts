@@ -25,7 +25,7 @@ compiletime(({objectData, constants}) => {
 function tsMain() {
     PatchNatives();
     BlzLoadTOCFile('uiImport\\Templates.toc');
-    Log.addSink((new StringSink(LogLevel.Debug)));
+    Log.addSink((new StringSink(LogLevel.Error)));
     try {
         // print(`Build: ${BUILD_DATE}`);
         // print(`Typescript: v${TS_VERSION}`);

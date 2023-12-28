@@ -22,6 +22,9 @@ export class Log {
     public static addSink(sink: ILogSink): void {
         this.sinks.push(sink);
     }
+    public static replaceSinks(sink: ILogSink): void {
+        this.sinks = [sink];
+    }
 
     public static write(level: LogLevel, message: string): void {
         const event = new LogEvent(level, message);

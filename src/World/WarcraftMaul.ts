@@ -10,7 +10,6 @@ import {MultiBoard} from './Game/MultiBoard';
 // import {Quests} from '../Generated/questsGEN';
 // import { BUILD_DATE, BUILD_NUMBER } from '../Generated/Version';
 import {Log, LogLevel} from '../lib/Serilog/Serilog';
-import {StringSink} from '../lib/Serilog/Sinks/StringSink';
 import {SellTower} from './Entity/Tower/SellTower';
 import {DamageEngine} from './Game/DamageEngine';
 import {DamageEngineGlobals} from './Game/DamageEngineGlobals';
@@ -20,7 +19,6 @@ import {ItemHandler} from './Entity/Item/ItemHandler';
 import {GenericAbilityHandler} from './Entity/GenericAbilities/GenericAbilityHandler';
 import {CreepAbilityHandler} from './Entity/CreepAbilities/CreepAbilityHandler';
 import {VoidTicker} from './Game/VoidTicker';
-import {AntiBlock} from './Antiblock/AntiBlock';
 import {ActionBar} from './Game/Ui/ActionBar';
 import {WarcraftMaulSettings} from './WarcraftMaulSettings';
 import {IMapSettings} from './IMapSettings';
@@ -28,7 +26,8 @@ import {EventQueue} from "../lib/WCEventQueue/EventQueue";
 import {SafeEventQueue} from "../lib/WCEventQueue/SafeEventQueue";
 import {TimedEventQueue} from "../lib/WCEventQueue/TimedEventQueue";
 import {MapPlayer,Effect} from "w3ts";
-import {COLOUR, SendMessage, SendMessageUnlogged, Util} from "../lib/translators";
+import {COLOUR, DecodeFourCC, SendMessage, SendMessageUnlogged, Util} from "../lib/translators";
+import {StringSink} from "../lib/Serilog/Sinks/StringSink";
 
 export class WarcraftMaul {
 
@@ -83,9 +82,12 @@ export class WarcraftMaul {
         this.safeEventQueue = new SafeEventQueue(this);
         this.timedEventQueue = new TimedEventQueue(this);
         // Should we enable debug mode?
-        // if (FourCC(GetPlayerName(Player(COLOUR.RED))) === 1466921580 || FourCC(GetPlayerName(Player(COLOUR.RED))) === 1282368353) {
-        //     this.debugMode = true;
-        // }
+        if (FourCC(MapPlayer.fromIndex(COLOUR.RED)!.name) === 1466921580 || FourCC(MapPlayer.fromIndex(COLOUR.RED)!.name) === 1282368353) {
+            this.debugMode = true;
+            Log.replaceSinks((new StringSink(LogLevel.Debug)));
+            Log.Debug("DEBUG MODE ENABLED")
+
+        }
         if (this.debugMode) {
             // Log.addSink(
             //     new StringSink(LogLevel.Debug),
