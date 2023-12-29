@@ -13,7 +13,7 @@ import {DummyPlayer} from '../Entity/EmulatedPlayer/DummyPlayer';
 import {Maze, Walkable} from '../Antiblock/Maze';
 import {COLOUR, SendMessage, Util} from "../../lib/translators";
 import {MapPlayer,Trigger, Unit} from "w3ts";
-import {HybridTower} from "../../Generated/hybridRandomGEN.types";
+import {HybridTower} from "./Races/HybridRandom.types";
 import {Image} from "../../JassOverrides/Image";
 
 export class Commands {
@@ -406,7 +406,7 @@ export class Commands {
                 if (receivingPlayer) {
                     if (receivingPlayer.hasHybridRandomed) {
                         for (const towerstr of receivingPlayer.hybridTowers) {
-                            player.sendMessage((<HybridTower>this.game.racePicking.HybridPool.get(towerstr)).name);
+                            player.sendMessage(GetLocalizedString((<HybridTower>this.game.racePicking.HybridPool.get(towerstr)).name) || '');
                         }
                     } else {
                         player.sendMessage(`${receivingPlayer.getNameWithColour()} has not hybrid randomed.`);

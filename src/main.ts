@@ -10,18 +10,6 @@ const BUILD_DATE = compiletime(() => new Date().toUTCString());
 const TS_VERSION = compiletime(() => require("typescript").version);
 const TSTL_VERSION = compiletime(() => require("typescript-to-lua").version);
 
-compiletime(({objectData, constants}) => {
-    const unit = objectData.units.get(constants.units.Footman);
-
-    if (!unit) {
-        return;
-    }
-
-    unit.modelFile = "units\\human\\TheCaptain\\TheCaptain.mdl";
-
-    objectData.save();
-});
-
 function tsMain() {
     PatchNatives();
     BlzLoadTOCFile('uiImport\\Templates.toc');

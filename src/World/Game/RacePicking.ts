@@ -11,11 +11,11 @@ import {
     HybridTierSix,
     HybridTierThree,
     HybridTierTwo,
-} from '../../Generated/hybridRandomGEN';
+} from './Races/HybridRandom';
 import {MapPlayer,Trigger, Unit} from "w3ts";
 import {SendMessage, Util} from "../../lib/translators";
 import {Log} from "../../lib/Serilog/Serilog";
-import {HybridTower} from "../../Generated/hybridRandomGEN.types";
+import {HybridTower} from "./Races/HybridRandom.types";
 
 export class RacePicking {
     raceSelectTrigger: Trigger;
@@ -224,6 +224,9 @@ export class RacePicking {
         }
 
         player.hasHybridRandomed = true;
+
+        print(player.hybridBuilder?.name)
+        print(BlzGetUnitStringField(player.hybridBuilder!.handle, ConvertUnitStringField(FourCC('ubui'))!))
 
         for (const tower of HybridTierOne) {
             if (tower.id !== t1) {

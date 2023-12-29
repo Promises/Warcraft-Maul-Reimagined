@@ -13,7 +13,7 @@ import {
     HybridTierSix,
     HybridTierThree,
     HybridTierTwo,
-} from "../../../../../Generated/hybridRandomGEN";
+} from "../../../../Game/Races/HybridRandom";
 
 export class LootBoxerHandler {
     private abilityUpgradeTrigger: Trigger;
