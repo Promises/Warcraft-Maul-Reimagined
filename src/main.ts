@@ -15,9 +15,14 @@ const TSTL_VERSION = compiletime(() => require("typescript-to-lua").version);
 
 // Replace ground texture of undead acolite
 const testData = compiletime(({objectData}) => {
+    // const units = objectData.units
+    // const builders = Object.values(units.map).filter(x => !x.isABuilding)
+    // builders.forEach(x => {
+    //     x.groundTexture = '';
+    // })
 
-    const builder = objectData.units.get('oC22')
-    builder!.groundTexture = '';
+    // const builder = objectData.units.get('oC22')
+    // builder!.groundTexture = '';
     // objectData.save()
     // const tower = objectData.abilities.copy('AIbt') as AbilityTypes.BuildTinyScoutTower | undefined;
     // const tower = objectData.abilities.get('AIbt') as BuildTinyScoutTower | undefined;
