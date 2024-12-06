@@ -9,9 +9,11 @@ import {Trigger, Unit} from "w3ts";
 import {Rectangle} from "../../../JassOverrides/Rectangle";
 import {COLOUR, SendMessage, Util} from "../../../lib/translators";
 import {TimedEvent} from "../../../lib/WCEventQueue/TimedEvent";
+import {HybridTower} from "../../Game/Races/HybridRandom.types";
 
 export class Defender extends AbstractPlayer {
 
+    public metadata: Record<string, any> = {};
     public chimeraCount: number = 0;
     public zerglings: number = 0;
     // private towerKeys: IterableIterator<number> | undefined = undefined;
@@ -51,7 +53,7 @@ export class Defender extends AbstractPlayer {
     private _voidBuilder: Unit | undefined;
     private _lootBoxer: Unit | undefined;
     private _hybridBuilder: Unit | undefined;
-    private _hybridTowers: any[] = [];
+    private _hybridTowers: HybridTower[] = [];
     private leaveTrigger: Trigger;
     private selectUnitTrigger: Trigger;
     private deniedPlayers: Map<number, boolean> = new Map<number, boolean>();
@@ -230,11 +232,11 @@ export class Defender extends AbstractPlayer {
         return undefined;
     }
 
-    get hybridTowers(): string[] {
+    get hybridTowers(): HybridTower[] {
         return this._hybridTowers;
     }
 
-    set hybridTowers(value: string[]) {
+    set hybridTowers(value: HybridTower[]) {
         this._hybridTowers = value;
     }
 

@@ -1,4 +1,12 @@
 import {HybridTower} from "./HybridRandom.types";
+import {AbilityTypes, Unit} from "war3-objectdata-th";
+
+interface DummyTowersEntry {
+    playerId: number;
+    tier: number;
+    id: string;
+}
+
 
 /**
  * Generates the hybrid random settings during build time
@@ -13,8 +21,13 @@ export const {
     HybridTierSix,
     HybridTierSeven,
     HybridTierEight,
-    HybridTierNine
+    HybridTierNine,
+    DummyTowers,
+    DummyTowersMap
+    // HybridSpells
 } = compiletime(({objectData, constants}) => {
+    const PLAYER_COUNT = 13;
+
     const TEMP_HYBRID_RANDOM_ARR = [
         'u00C', // [Forsaken] - Tombstone
         'u00D', // [Forsaken] - Necromancer
@@ -222,34 +235,25 @@ export const {
         'o001', // [Giants] - Giant King
 
         // Seems limit is 204 building, leaving this here for now
-        // 'o00Z', // [High Elven] - Ballista
-        // 'h01M', // [Void Cult] - Void Fissure
-        // 'h01A', // [Void Cult] - Void Corrupter
-        // 'h03G', // [Workers Union] - Naga Slave
-        // 'h03H', // [Workers Union] - Night Elf Wisp
-        // 'h00B', // [Night Elves] - Ancient of Wind
-        // 'h00G', // [Night Elves] - Warden
-        // 'e008', // [Night Elves] - Illidan
-        // 'h04N', // [Cavernous Creatures] - Cavern Turtle
-        // 'h04Q', // [Cavernous Creatures] - Cavern Druid
-        // 'h04O', // [Cavernous Creatures] - Cavern Revenant
-        // 'n019', // [Ice Trolls] - Ice Troll High Priest
-        // 'n01A', // [Ice Trolls] - Ice Troll Joker
-        // 'n01B', // [Ice Trolls] - Ice Troll King
-        // 'n01C', // [Ice Trolls] - Ice Troll Emperor
-        // 'o00V', // [Outland] - Chaos Raider
+        'o00Z', // [High Elven] - Ballista
+        'h01M', // [Void Cult] - Void Fissure
+        'h01A', // [Void Cult] - Void Corrupter
+        'h03G', // [Workers Union] - Naga Slave
+        'h03H', // [Workers Union] - Night Elf Wisp
+        'h00B', // [Night Elves] - Ancient of Wind
+        'h00G', // [Night Elves] - Warden
+        'e008', // [Night Elves] - Illidan
+        'h04N', // [Cavernous Creatures] - Cavern Turtle
+        'h04Q', // [Cavernous Creatures] - Cavern Druid
+        'h04O', // [Cavernous Creatures] - Cavern Revenant
+        'n019', // [Ice Trolls] - Ice Troll High Priest
+        'n01A', // [Ice Trolls] - Ice Troll Joker
+        'n01B', // [Ice Trolls] - Ice Troll King
+        'n01C', // [Ice Trolls] - Ice Troll Emperor
+        'o00V', // [Outland] - Chaos Raider
     ];
-    const unit = objectData.units.get('e00I'); // WEEIZ
 
-    if (!unit) {
-        return;
-    }
 
-    unit.structuresBuilt = TEMP_HYBRID_RANDOM_ARR.join(',');
-
-    objectData.save();
-
-    const weeiz: string[] = ['e00I'];
     const numbers: string[] = ['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
     const tier_limits: number[] = [15, 99, 149, 299, 399, 499, 699, 899, 0];
     const tier_towers: string[][] = [];
@@ -289,27 +293,88 @@ export const {
 
     for (let tier = 0; tier < tier_limits.length; tier++) {
         const tierString = numbers[tier];
-        // generatedHybridList.push(`export const HybridTier${tierString}: HybridTower[] = [`);
-
-        tier_towers[tier].forEach(towerKey => {
+        tier_towers[tier].forEach((towerKey) => {
             const unit = objectData.units.get(towerKey)
 
             returnTiers[`HybridTier${tierString}` as keyof typeof returnTiers].push({
                 name: unit?.name || 'UNKNOWN NAME',
-                id: towerKey
+                id: towerKey,
+                level: returnTiers[`HybridTier${tierString}` as keyof typeof returnTiers].length + 2,
+                icon: unit?.iconGameInterface,
+                goldCost: unit?.goldCostundefined || 5,
+                toolTipExtended: unit?.tooltipExtended || '',
+                toolTipBasic: unit?.tooltipBasic || unit?.name || 'UNKNOWN NAME'
             })
-            // const unitId = towerKey.split(":")[0];
-            // const unitNameProp = jsonData.custom[towerKey].find((property: any) => property.id === 'unam');
-            // if (unitNameProp) {
-            //     const unitName = unitNameProp.value;
-            //     generatedHybridList.push(`    { id: '${unitId}', name: \`${unitName}\` }, // ${unitName}`);
-            // }
         });
-        // generatedHybridList.push("];");
+    }
+    const hotKeys = [
+        'q', 'w', 'e',
+        'a', 's', 'd',
+        'z', 'x', 'c',
+    ]
+    const buttonPositions = [
+        [0,0], [1,0], [2,0],
+        [0,1], [1,1], [2,1],
+        [0,2], [1,2], [2,2],
+    ]
+
+    // {playerId: {tier: dummyTowerId}}
+    const hybridBuilding:  Record<string, Record<string, string>> = {}
+    const hybridBuildingsMap: Record<string, DummyTowersEntry> = {}
+    for (let playerNum = 0; playerNum < PLAYER_COUNT; playerNum++) {
+        const playerTowers: Record<string, string> = {};
+        for (let tier = 0; tier < tier_limits.length; tier++) {
+            const building = objectData.units.copy('nntg')!;
+            building.name = `Player ${playerNum +1} tier ${tier+1} tower`;
+            building.tooltipBasic = `Build ${building.name}`;
+            building.iconGameInterface = "ReplaceableTextures\\CommandButtons\\BTNHumanWatchTower.blp";
+            building.buildTime = 1;
+            building.repairGoldCost = 110
+            building.modelFile = "buildings\\human\\HumanTower\\HumanTower"
+            building.armorTypeundefined = "Wood"
+            building.scalingValueundefined = 0.75
+            building.lumberCostundefined = 0;
+            building.goldCostundefined = 0;
+
+            building.hotkey = hotKeys[tier];
+            [building.buttonPositionX, building.buttonPositionY] = buttonPositions[tier]
+            hybridBuildingsMap[building.newId] = {
+                playerId: playerNum,
+                tier: tier,
+                id: building.newId
+            }
+            playerTowers[`${tier + 1 }`] = building.newId;
+        }
+        hybridBuilding[`${playerNum + 1}`] = playerTowers;
     }
 
-    return returnTiers;
+    const hybridBuilder: Unit | undefined = objectData.units.get('e00I'); // WEEIZ
+
+    if (!hybridBuilder) {
+        return;
+    }
+
+    hybridBuilder.structuresBuilt = Object.keys(hybridBuildingsMap).join(',');
+
+    objectData.save();
+    return {
+        DummyTowers: hybridBuilding,
+        DummyTowersMap: hybridBuildingsMap,
+        // HybridSpells: abilitites,
+        HybridTierOne: returnTiers.HybridTierOne,
+        HybridTierTwo: returnTiers.HybridTierTwo,
+        HybridTierThree: returnTiers.HybridTierThree,
+        HybridTierFour: returnTiers.HybridTierFour,
+        HybridTierFive: returnTiers.HybridTierFive,
+        HybridTierSix: returnTiers.HybridTierSix,
+        HybridTierSeven: returnTiers.HybridTierSeven,
+        HybridTierEight: returnTiers.HybridTierEight,
+        HybridTierNine: returnTiers.HybridTierNine,
+    };
 }) as {
+    DummyTowers: Record<string, Record<string, string>>;
+    DummyTowersMap: Record<string, DummyTowersEntry>
+    // HybridSpells: Record<string, AbilityTypes.BuildTinyScoutTower<any>>,
     HybridTierOne: HybridTower[],
     HybridTierTwo: HybridTower[],
     HybridTierThree: HybridTower[],

@@ -1,0 +1,93 @@
+IncludeFile "UI\FrameDef\UI\EscMenuTemplates.fdf",
+IncludeFile "UI\FrameDef\Glue\BattleNetTemplates.fdf",
+IncludeFile "UI\FrameDef\Glue\StandardTemplates.fdf",
+
+Frame "GLUEBUTTON" "CustomRadioButtonNotActive" {
+    Height 0.016,
+    Width 0.016,
+    ControlStyle "AUTOTRACK",
+
+    ControlBackdrop "CustomRadioButtonNotActiveBackdrop",
+    Frame "BACKDROP" "CustomRadioButtonNotActiveBackdrop" {
+        BackdropBlendAll,
+        BackdropBackground  "ui\widgets\escmenu\human\radiobutton-background.dds",
+    }
+
+    ControlPushedBackdrop "CustomRadioButtonNotActivePushedBackdrop",
+    Frame "BACKDROP" "CustomRadioButtonNotActivePushedBackdrop" {
+        BackdropBlendAll,
+        BackdropBackground  "ui\widgets\escmenu\human\radiobutton-backgroundpressed.dds",
+    }
+
+    ControlDisabledBackdrop "CustomRadioButtonNotActiveDisabledBackdrop",
+    Frame "BACKDROP" "CustomRadioButtonNotActiveDisabledBackdrop" {
+        BackdropBlendAll,
+        BackdropBackground  "ui\widgets\escmenu\human\radiobutton-background-disabled.dds",
+    }
+}
+
+Frame "FRAME" "CustomRadioButtonActive" {
+    Height 0.016,
+    Width 0.016,
+
+    Frame "BACKDROP" "CustomRadioButtonActiveBackdrop" {
+        UseActiveContext,
+        SetAllPoints,
+        Height 0.016,
+        Width 0.016,
+        BackdropBlendAll,
+        BackdropBackground  "ui\widgets\escmenu\human\radiobutton-background.dds",
+    }
+
+    Frame "GLUEBUTTON" "CustomRadioButtonActiveGlueButton" {
+        UseActiveContext,
+        SetAllPoints,
+        Height 0.016,
+        Width 0.016,
+        ControlStyle "AUTOTRACK",
+
+        ControlBackdrop "CustomRadioButtonActiveGlueButtonBackdrop",
+        Frame "BACKDROP" "CustomRadioButtonActiveGlueButtonBackdrop" {
+            BackdropBlendAll,
+            BackdropBackground  "ui\widgets\escmenu\human\radiobutton-button.dds",
+        }
+
+        ControlPushedBackdrop "CustomRadioButtonActiveGlueButtonPushedBackdrop",
+        Frame "BACKDROP" "CustomRadioButtonActiveGlueButtonPushedBackdrop" {
+            BackdropBlendAll,
+            BackdropBackground  "ui\widgets\escmenu\human\radiobutton-buttonpressed.dds",
+        }
+
+        ControlDisabledBackdrop "CustomRadioButtonActiveGlueButtonDisabledBackdrop",
+        Frame "BACKDROP" "CustomRadioButtonActiveGlueButtonDisabledBackdrop" {
+            BackdropBlendAll,
+            BackdropBackground  "ui\widgets\escmenu\human\radiobutton-buttondisabled.dds",
+        }
+    }
+}
+
+Frame "EDITBOX" "CustomEditBox" INHERITS WITHCHILDREN "EscMenuEditBoxTemplate" {
+    DecorateFileNames,
+    FrameFont "MasterFont", 0.015, "",
+
+    ControlDisabledBackdrop "CustomEditBoxDisabledBackdrop",
+    Frame "BACKDROP" "CustomEditBoxDisabledBackdrop" {
+        BackdropTileBackground,
+        BackdropBackground  "ui\widgets\escmenu\human\editbox-background.dds",
+        BackdropCornerFlags "UL|UR|BL|BR|T|L|B|R",
+        BackdropCornerSize  0.0125,
+        BackdropBackgroundSize  0.256,
+        BackdropBackgroundInsets 0.005 0.005 0.005 0.005,
+        BackdropEdgeFile  "war3mapImported\ui\editbox-border-disabled.blp",
+        BackdropBlendAll,
+    }
+
+    EditTextFrame "CustomEditBoxText",
+    Frame "TEXT" "CustomEditBoxText" {
+        DecorateFileNames,
+        FrameFont "MasterFont", 0.012, "",
+        FontColor 1.0 1.0 1.0,
+        FontFlags "FIXEDSIZE",
+    }
+}
+

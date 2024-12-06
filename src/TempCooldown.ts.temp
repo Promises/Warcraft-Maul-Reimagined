@@ -1,0 +1,230 @@
+// Assuming the existence of Warcraft III specific types and functions
+interface Spell {
+    SpellId: number;
+    TextFrame?: any;
+    TextFrameIndex?: number;
+}
+
+let CommandButtonOverLayText: { [key: string]: any } = {};
+let UnitCastAbleSpells: { [key: string]: { [key: string]: Spell } } = {};
+let CurrentSelectedUnit: { [key: string]: any } = {};
+
+
+/**
+ * Updates the text overlay for abilities and items.
+ */
+function UpdateTextOverLay(): void {
+    const playerIndex = GetLocalPlayer();
+    if (UnitCastAbleSpells[CurrentSelectedUnit[playerIndex]]) {
+        for (const [k, v] of Object.entries(UnitCastAbleSpells[CurrentSelectedUnit[playerIndex]])) {
+            const spellId = v.SpellId;
+            if (spellId) {
+                const fh = v.TextFrame;
+                if (fh && BlzFrameIsVisible(BlzGetOriginFrame(ORIGIN_FRAME_COMMAND_BUTTON, v.TextFrameIndex))) {
+                    const cd = BlzGetUnitAbilityCooldownRemaining(CurrentSelectedUnit[playerIndex], spellId);
+                    if (cd > 0.0) {
+                        if (cd < 10) {
+                            BlzFrameSetText(fh, R2SW(cd, 1, 1));
+                        } else {
+                            BlzFrameSetText(fh, I2S(R2I(cd)));
+                        }
+                        BlzFrameSetVisible(fh, true);
+                    } else {
+                        BlzFrameSetVisible(fh, false);
+                    }
+                } else {
+                    BlzFrameSetVisible(fh, false);
+                }
+            }
+        }
+    }
+
+    // Item cooldowns
+    let index = 0;
+    do {
+        const itemAtIndex = UnitItemInSlot(CurrentSelectedUnit[playerIndex], index);
+        if (itemAtIndex) {
+            const spell = BlzGetItemAbilityByIndex(itemAtIndex, 0);
+            if (UnitCastAbleSpells[CurrentSelectedUnit[playerIndex]][spell]) {
+                const spellId = UnitCastAbleSpells[CurrentSelectedUnit[playerIndex]][spell].SpellId;
+                const cd = BlzGetUnitAbilityCooldownRemaining(CurrentSelectedUnit[playerIndex], spellId);
+                const fh = CommandButtonOverLayText[BlzGetOriginFrame(ORIGIN_FRAME_ITEM_BUTTON, index)];
+                if (cd > 0.0) {
+                    if (cd < 10) {
+                        BlzFrameSetText(fh, R2SW(cd, 1, 1));
+                    } else {
+                        BlzFrameSetText(fh, I2S(R2I(cd)));
+                    }
+                    BlzFrameSetVisible(fh, true);
+                } else {
+                    BlzFrameSetVisible(fh, false);
+                }
+            }
+        } else {
+            BlzFrameSetVisible(CommandButtonOverLayText[BlzGetOriginFrame(ORIGIN_FRAME_ITEM_BUTTON, index)], false);
+        }
+        index += 1;
+    } while (index !== bj_MAX_INVENTORY);
+}
+
+
+/**
+ * Updates the current selection of the unit.
+ */
+function UpdateSelection(): void {
+    CurrentSelectedUnit[GetTriggerPlayer()] = GetTriggerUnit();
+    for (const v of Object.values(CommandButtonOverLayText)) {
+        if (GetLocalPlayer() === GetTriggerPlayer()) {
+            BlzFrameSetVisible(v, false);
+        }
+    }
+}
+
+/**
+ * Updates the position of unit spells.
+ * @param caster The unit whose spell positions are being updated.
+ */
+function UpdateUnitSpellPos(caster: any): void {
+    let spellCount = -1;
+    let spell: any;
+    const table: { [key: number]: boolean } = {};
+    const unallowed: { [key: string]: boolean } = {};
+
+    let index = 0;
+    UnitCastAbleSpells[caster] = {};
+
+    // Check for spells from items and mark them as unallowed
+    do {
+        const itemAtIndex = UnitItemInSlot(caster, index);
+        if (itemAtIndex) {
+            let itemSpellIndex = 0;
+            do {
+                spell = BlzGetItemAbilityByIndex(itemAtIndex, itemSpellIndex);
+                if (spell) {
+                    unallowed[spell] = true;
+                }
+                itemSpellIndex++;
+            } while (spell !== null);
+        }
+        index++;
+    } while (index !== bj_MAX_INVENTORY);
+
+    // Find max index of spells
+    do {
+        spellCount++;
+        spell = BlzGetUnitAbilityByIndex(caster, spellCount);
+    } while (spell !== null);
+
+    // Rearrange spell position
+    do {
+        spellCount--;
+        spell = BlzGetUnitAbilityByIndex(caster, spellCount);
+
+        const indexWanted = BlzGetAbilityIntegerField(spell, ABILITY_IF_BUTTON_POSITION_NORMAL_X) +
+            BlzGetAbilityIntegerField(spell, ABILITY_IF_BUTTON_POSITION_NORMAL_Y) * 4;
+        if (indexWanted !== -44 && indexWanted !== 0 && !unallowed[spell]) {
+            let indexTry = indexWanted;
+
+            while (table[indexTry]) {
+                indexTry++;
+                if (indexTry > 11) break;
+            }
+            if (indexTry > 11 || table[indexTry]) {
+                indexTry = indexWanted;
+                while (table[indexTry] && indexTry > -1) {
+                    indexTry--;
+                }
+            }
+            if (indexTry >= 0) {
+                console.log(BlzGetAbilityStringLevelField(spell, ABILITY_SLF_TOOLTIP_NORMAL, 0));
+                console.log(" -> " + I2S(indexTry));
+                table[indexTry] = true;
+                UnitCastAbleSpells[caster][spell] = {
+                    TextFrame: CommandButtonOverLayText[BlzGetOriginFrame(ORIGIN_FRAME_COMMAND_BUTTON, indexTry)],
+                    TextFrameIndex: indexTry
+                };
+            }
+        }
+    } while (spellCount !== 0);
+}
+
+
+/**
+ * Remembers the casting of a spell.
+ */
+function RememberCasting(): void {
+    const spell = GetSpellAbility();
+    const spellId = GetSpellAbilityId();
+    const caster = GetTriggerUnit();
+
+    if (!UnitCastAbleSpells[caster]) UnitCastAbleSpells[caster] = {};
+    if (!UnitCastAbleSpells[caster][spell]) UnitCastAbleSpells[caster][spell] = {};
+    UnitCastAbleSpells[caster][spell].SpellId = spellId;
+
+    // Logging spell details
+    console.log(GetUnitName(caster));
+    console.log(GetObjectName(spellId));
+    console.log(spell);
+}
+
+/**
+ * Creates text overlays for UI elements and initializes triggers for updating overlays and spell casting.
+ */
+function CreateTextOverLay(): void {
+    // Create a trigger for spell casting
+    let trig = CreateTrigger();
+    TriggerRegisterAnyUnitEventBJ(trig, EVENT_PLAYER_UNIT_SPELL_EFFECT);
+    TriggerAddAction(trig, RememberCasting);
+
+    // Create a trigger for unit selection
+    trig = CreateTrigger();
+    TriggerRegisterPlayerSelectionEventBJ(trig, Player(0), true);
+    TriggerRegisterPlayerSelectionEventBJ(trig, Player(1), true);
+    TriggerAddAction(trig, UpdateSelection);
+
+    // Load the texture or component file for the cooldown text
+    BlzLoadTOCFile("war3mapImported\\CDText.toc");
+
+    // Initialize text overlays for command buttons
+    let index = 0;
+    do {
+        const fh = BlzCreateFrame("CDText", BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0), 0, 0);
+        CommandButtonOverLayText[BlzGetOriginFrame(ORIGIN_FRAME_COMMAND_BUTTON, index)] = fh;
+        BlzFrameSetAllPoints(fh, BlzGetOriginFrame(ORIGIN_FRAME_COMMAND_BUTTON, index));
+        BlzFrameSetText(fh, I2S(index));
+        index++;
+    } while (index < 12); // Assuming 12 command buttons
+
+    // Initialize text overlays for item buttons
+    index = 0;
+    do {
+        const fh = BlzCreateFrame("CDText", BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0), 0, 0);
+        CommandButtonOverLayText[BlzGetOriginFrame(ORIGIN_FRAME_ITEM_BUTTON, index)] = fh;
+        BlzFrameSetAllPoints(fh, BlzGetOriginFrame(ORIGIN_FRAME_ITEM_BUTTON, index));
+        BlzFrameSetText(fh, I2S(index));
+        index++;
+    } while (index < bj_MAX_INVENTORY); // bj_MAX_INVENTORY should be defined as the max number of inventory slots
+
+    // Start a timer to periodically update text overlays
+    TimerStart(CreateTimer(), 0.1, true, UpdateTextOverLay);
+}
+
+/**
+ * Checks if the player is in targeting mode, typically for spell casting.
+ * @returns {boolean} `true` if the player is in targeting mode, otherwise `false`.
+ */
+function isInTargetingMode(): boolean {
+    let index = 0;
+    do {
+        if (BlzFrameIsVisible(BlzGetOriginFrame(ORIGIN_FRAME_COMMAND_BUTTON, index))) {
+            break;
+        }
+        index++;
+    } while (index < 12); // Assuming 12 is the total number of command buttons
+
+    return index === 11;
+}
+
+
+// Additional functions and variables like R2SW, I2S, R2I, GetLocalPlayer, etc.
+// should be defined or imported as needed.

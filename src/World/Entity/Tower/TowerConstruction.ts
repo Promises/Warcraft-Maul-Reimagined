@@ -10,8 +10,8 @@ import {TowerMap} from './Specs/TowerMap';
 import {RaceTowers} from './Races/RaceTowers';
 import {InitialiseAllRaceTowers} from './Races/RaceInitialiser';
 import {Trigger, Unit} from "w3ts";
-import {COLOUR, DecodeFourCC} from "../../../lib/translators";
-
+import {COLOUR, DecodeFourCC, ReplaceUnit} from "../../../lib/translators";
+import {DummyTowersMap} from "../../Game/Races/HybridRandom";
 
 export class TowerConstruction {
     private races: RaceTowers[] = [];
@@ -21,6 +21,7 @@ export class TowerConstruction {
     }
 
     private towerConstructTrigger: Trigger;
+    private towerStartConstructTrigger: Trigger;
     private towerUpgradeTrigger: Trigger;
     private readonly _towerTypes: TowerMap<number, object>;
     public genericAttacks: Map<number, GenericAutoAttackTower> = new Map<number, GenericAutoAttackTower>();
@@ -45,6 +46,10 @@ export class TowerConstruction {
         this.game = game;
         this._towerTypes = InitialiseAllRaceTowers();
         this.lootBoxerHander = new LootBoxerHandler(this, game);
+        this.towerStartConstructTrigger = Trigger.create();
+        this.towerStartConstructTrigger.registerAnyUnitEvent(EVENT_PLAYER_UNIT_CONSTRUCT_START);
+        this.towerStartConstructTrigger.addAction(() => this.ConstructionStarted());
+
         this.towerConstructTrigger = Trigger.create();
         this.towerConstructTrigger.registerAnyUnitEvent(EVENT_PLAYER_UNIT_CONSTRUCT_FINISH);
         this.towerConstructTrigger.registerAnyUnitEvent(EVENT_PLAYER_UNIT_UPGRADE_FINISH);
@@ -87,6 +92,67 @@ export class TowerConstruction {
             instance.Sell();
             const newTower: Tower = this.game.worldMap.towerConstruction.SetupTower(tower, owner);
             newTower.towerValue += instance.towerValue;
+        }
+    }
+
+    /**
+     * This method is triggered when construction of a building starts. For hybrid builder.
+     * It checks the constructing unit against the `DummyTowersMap` map, which contains predefined 'dummy' buildings.
+     * If the building is a 'dummy' Tower, it will be replaced with the player's hybrid Tower of the corresponding tier by using the `ReplaceUnit` function.
+     * After replacing the 'dummy' Tower, `SetupTower` method is called to finalize setting up the Tower.
+     * If the constructing unit is not a 'dummy' Tower or if replacing the tower failed, no further action will be taken.
+     */
+    private ConstructionStarted() {
+        // Output debug log
+        Log.Debug('Start construction');
+
+        // Get the unit from the triggered event
+        const unit = Unit.fromEvent();
+
+        // Check if unit exists and if its type ID is in the DummyTowersMap
+        if (unit && DummyTowersMap[DecodeFourCC(unit.typeId)]) {
+            Log.Debug('Found unit');
+
+            // Get the dummy tower info based on unit type ID
+            const dummyTower = DummyTowersMap[DecodeFourCC(unit.typeId)];
+
+            // Get owner ID of the unit
+            const ownerId = unit.owner.id;
+
+            // Output debug log with owner ID and expected player ID of the tower
+            Log.Debug(`owner id: ${ownerId}, tower expects: ${dummyTower.playerId}`);
+
+            // If the unit's owner's ID matches the one expected by the tower
+            if (ownerId === dummyTower.playerId) {
+                Log.Debug('Found owner');
+
+                // Get the owner player data
+                const owner = this.game.players.get(ownerId);
+                if(!owner) {
+                    Log.Error('Could not find owner');
+                    return;
+                }
+                const tierTower = owner.hybridTowers[dummyTower.tier];
+                if(owner.getGold() < tierTower.goldCost) {
+                    unit.destroy();
+                    return;
+                }
+                owner.giveGold(tierTower.goldCost * -1);
+
+
+                // Replace the unit with a new tower, based on the owner's tower tier
+                const newUnit = ReplaceUnit(unit, FourCC(tierTower.id), bj_UNIT_STATE_METHOD_DEFAULTS)
+
+                // If the unit failed to get replaced, terminate the function
+                if(!newUnit) {
+                    return;
+                }
+
+                Log.Debug('Setup');
+
+                // Call the method to setup the new tower
+                this.SetupTower(newUnit, owner!);
+            }
         }
     }
 
@@ -141,7 +207,7 @@ export class TowerConstruction {
         }
         if (ObjectExtendsTower.IsLimitedTower()) {
             if (owner.hasHybridRandomed) {
-                if (owner.hybridTowers.findIndex(elem => elem === DecodeFourCC(ObjectExtendsTower.GetTypeID())) >= 0 ||
+                if (owner.hybridTowers.findIndex(elem => elem.id === DecodeFourCC(ObjectExtendsTower.GetTypeID())) >= 0 ||
                     owner.hybridTowers.findIndex(() => 'h03T' === DecodeFourCC(ObjectExtendsTower.GetTypeID())) >= 0) {
                     // SetPlayerTechMaxAllowedSwap(GetUnitTypeId(ObjectExtendsTower.tower), ObjectExtendsTower.MaxCount(), owner);
                     owner.setTechMaxAllowed(ObjectExtendsTower.unit.typeId, ObjectExtendsTower.MaxCount())

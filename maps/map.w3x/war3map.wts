@@ -17549,6 +17549,36 @@ STRING 2911
 X
 }
 
+STRING 2912
+// Abilities: A0FI (Builder Spell Book), Name (Name)
+{
+Builder Spell Book
+}
+
+STRING 2913
+// Abilities: A0FI (Builder Spell Book), Hotkey (Hotkey - Normal)
+{
+B
+}
+
+STRING 2914
+// Abilities: A0FI (Builder Spell Book), Tip (Tooltip - Normal)
+{
+|cffffcc00B|ruild Structure
+}
+
+STRING 2915
+// Abilities: A0FI (Builder Spell Book), Ubertip (Tooltip - Normal - Extended)
+{
+Brings up a list of the available buildings that you may choose to construct.
+}
+
+STRING 2916
+// Abilities: A0FJ (Build Tiny Tower ), Name (Name)
+{
+Build Tiny Tower
+}
+
 STRING 2920
 // Abilities: A01R (Raining Death), Name (Name)
 {
@@ -28725,8 +28755,3 @@ STRING 9999
 Can attack 5 enemies at once, attacks increase damage taken by the target by 25%.
 }
 
-STRING 990001
-// MAPMODE
-{
-WCM
-}

@@ -11,10 +11,16 @@ import {SpawnedCreeps} from '../Entity/SpawnedCreeps';
 import {TimedEvent} from '../../lib/WCEventQueue/TimedEvent';
 import {DummyPlayer} from '../Entity/EmulatedPlayer/DummyPlayer';
 import {Maze, Walkable} from '../Antiblock/Maze';
-import {COLOUR, SendMessage, Util} from "../../lib/translators";
-import {MapPlayer,Trigger, Unit} from "w3ts";
-import {HybridTower} from "./Races/HybridRandom.types";
+import {COLOUR, DecodeFourCC, SendMessage, Util} from "../../lib/translators";
+import {Frame, MapPlayer, Timer, Trigger, Unit} from "w3ts";
 import {Image} from "../../JassOverrides/Image";
+
+/**
+ * Gets a random number between a range.
+ */
+function RandomChoice<T>(a: Array<T>): T {
+    return a[Math.floor(Math.random() * a.length)];
+}
 
 export class Commands {
 
@@ -26,6 +32,7 @@ export class Commands {
     private voteKickTimer: timer = CreateTimer();
     private drawings: Image[][] = [];
     private points: Image[] = [];
+
 
     constructor(game: WarcraftMaul) {
         this.game = game;
@@ -103,6 +110,325 @@ export class Commands {
                 this.CloseAllSpawns();
 
                 break;
+            // case 'item':
+            //     // player.hybridBuilder?.useItem(player.hybridBuilder?.getItemInSlot(1)!);
+            //
+            //     print(BlzGetUnitStringField(player.hybridBuilder!.handle, ConvertUnitStringField(FourCC('ubui'))!))
+            //     print(BlzSetUnitStringField(player.hybridBuilder!.handle, ConvertUnitStringField(FourCC('ubui'))!, ''))
+            //
+            //
+            //
+            //     break;
+            // case 'up':
+            //     Log.Debug('Keys')
+            //     const whichToEnable = Object.keys(HybridSpells);
+            //     Log.Debug(`Choice ${whichToEnable}`)
+            //
+            //     const randomChoice = RandomChoice(whichToEnable);
+            //     Log.Debug(`Grab ${randomChoice}`)
+            //
+            //     const toEnable = HybridSpells[randomChoice]
+            //     Log.Debug(`Should enable`)
+            //     Log.Debug(`Should enable ${toEnable.newId}`)
+            //
+            //     for (const spell of Object.values(HybridSpells)) {
+            //         let ability = player.hybridBuilder?.getAbility(FourCC(spell.newId));
+            //         Log.Debug(`Setting ${spell.newId} ${spell.newId === toEnable.newId ? 'enable': 'disable'}`)
+            //         player.hybridBuilder?.removeAbility(BlzGetAbilityId(ability!));
+            //         if(spell.newId === toEnable.newId) {
+            //             // player.hybridBuilder?.addAbility(FourCC(spell.newId))
+            //             // player.hybridBuilder?.setAbilityLevel(FourCC(spell.newId), player.hybridTowers[parseInt(randomChoice)].level)
+            //         }
+            //     }
+            //     // player.hybridBuilder?.issueImmediateOrder('cannibalize');
+            //     const ability = HybridSpells['0']
+            //     player.hybridBuilder?.addAbility(FourCC(toEnable.newId));
+            //     // player.hybridBuilder?.disableAbility()
+            //     player.hybridBuilder?.setAbilityLevel(FourCC(toEnable.newId), player.hybridTowers[parseInt(randomChoice)].level)
+            //     // player.hybridBuilder?.addAbility(FourCC('AIbt'));
+            //     // player.hybridBuilder?.addAbility(FourCC('AIbl'));
+            //     // player.hybridBuilder?.addAbility(FourCC('AIbg'));
+            //     // player.hybridBuilder?.addAbility(FourCC('AIbb'));
+            //     // player.hybridBuilder?.addAbility(FourCC('AIbf'));
+            //     // player.hybridBuilder?.addAbility(FourCC('AIbr'));
+            //     // player.hybridBuilder?.addAbility(FourCC('AIbs'));
+            //     // player.hybridBuilder?.addAbility(FourCC('AIbh'));
+            //     player.hybridBuilder?.addItemById(FourCC('itxb'));
+            //     player.hybridBuilder?.addItemById(FourCC('itxb'));
+            //     player.hybridBuilder?.addItemById(FourCC('itxb'));
+            //     player.hybridBuilder?.addItemById(FourCC('itxb'));
+            //     player.hybridBuilder?.addItemById(FourCC('itxb'));
+            //     player.hybridBuilder?.addItemById(FourCC('itxb'));
+            //
+            //
+            //
+            //
+            //     // const abilityId = HybridSpells['1'].newId;
+            //     // const newValue = !player.metadata['abilityEnabled'];
+            //
+            //     if (player.isLocal()) {
+            //         // BlzFrameClick(BlzGetFrameByName("InventoryButton_0", 0)!);
+            //
+            //         // Log.Debug(BlzGetOriginFrame(ORIGIN_FRAME_COMMAND_BUTTON, 0))
+            //         // let commandButtonFrame = BlzGetOriginFrame(ORIGIN_FRAME_COMMAND_BUTTON, 0);
+            //         // const childCount =BlzFrameGetChildrenCount(commandButtonFrame!);
+            //         const numberOfButtons = 12; // This is a typical number, but it may vary
+            //
+            //         for (let i = 0; i < numberOfButtons; i++) {
+            //             let abilityButton = Frame.fromName("CommandButton_" + i, 0);
+            //             Log.Debug(abilityButton?.id && `${abilityButton?.id}` || `${i} not found`);
+            //         }
+            //         //
+            //         //     // Perform your operations with the abilityButton here
+            //         //     // For example, checking if this ability is the one you're looking for
+            //         // }
+            //
+            //
+            //     }
+            //
+            //
+            //     // print(abilityId);
+            //     // player.hybridBuilder?.incAbilityLevel(FourCC(abilityId))
+            //     // const level = player.hybridBuilder?.getAbilityLevel(FourCC(abilityId))
+            //     // print(level);
+            //     //
+            //     // BlzSetAbilityIcon(BlzGetAbilityId(ability!), HybridTierOne.find(a => a.level === level)?.icon!);
+            //     break;
+
+            case "test":
+                // for (let i = 0; i <= 11; i++) {
+                //     const button = Frame.fromOrigin(ORIGIN_FRAME_COMMAND_BUTTON, i);
+                //     if (button) {
+                //         const frame = Frame.createSimple("commandButtonTooltip" + i, button, 0);
+                //         if (frame) {
+                //             frame.setVisible(false);
+                //             frame.setText('YOLO'
+                //             )
+                //             button.setTooltip(frame);
+                //             // this.commandButtonTooltip[i] = frame;
+                //         }
+                //     }
+                //     // const frame = Frame.createSimple('SIMPLEFRAME', button);
+                //     // frame.setTooltip(button);
+                //     // frame.setVisible(false);
+                //     // CommandButtonTooltip.commandButtonTooltip[i] = frame;
+                // }
+
+                // const TT = Frame.fromOrigin(ORIGIN_FRAME_UBERTOOLTIP, 0);
+                //
+                // print(TT?.setVisible(false))
+
+                // const frame = Frame.fromName('CommandButton_0', 0);
+                // const button = Frame.createType("MyIconButton", Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0)!, 0, "BUTTON", "ScoreScreenTabButtonTemplate");
+                // Log.Debug('Created btn');
+                // const buttonIconFrame = Frame.createType("MyIconButtonIcon", button!, 0, "BACKDROP", "");
+                // Log.Debug('Created icon');
+                //
+                // buttonIconFrame?.setAllPoints(button!);
+                // Log.Debug('Set all points');
+                //
+                // button?.setAbsPoint(FRAMEPOINT_CENTER, 0.1, 0.3);
+                // Log.Debug('Set abs points');
+                // //
+                // button?.setSize(0.3, 0.3)
+                // Log.Debug('Set size points');
+                //
+                // buttonIconFrame?.setTexture("Replaceabletextures\\CommandButtons\\BTNArthas", 0, false)
+                // Log.Debug('Set texture points');
+
+                // Log.Debug(`${frame?.childrenCount}`);
+                // // Log.Debug(`${frame?.setTexture()}`);
+                // Log.Debug(BlzFrameGetName(frame!.handle)!)
+                // Log.Debug(BlzFrameGetName(frame?.getChild(0)!.handle!)!)
+                // frame?.getChild(0)?.setAlpha(125);
+                // print(frame?.text)
+                // print(frame?.getChild(0)?.text)
+                // print(frame?.getChild(0)?.id)
+                // let index = 0;
+                // // Assuming there are 12 command buttons
+                // do {
+                //     const frame = BlzCreateFrame("CDText", BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0)!, 0, 0);
+                //     // CommandButtonOverLayText[BlzGetOriginFrame(ORIGIN_FRAME_COMMAND_BUTTON, index)] = frame;
+                //     BlzFrameSetAllPoints(frame!, BlzGetOriginFrame(ORIGIN_FRAME_COMMAND_BUTTON, index)!);
+                //     BlzFrameSetText(frame!, "A"); // Set text to "A"
+                //     BlzFrameSetVisible(frame!, true);
+                //     index++;
+                // } while (index < 12);
+
+            // function addShortcutTextToButton(): void {
+            //     const playerIndex = Defender.fromLocal();
+            //     const firstButtonFrameName = `CommandButton_0`;
+            //
+            //     // Try finding the first command button
+            //     const firstCommandButton = Frame.fromName(firstButtonFrameName, 0);
+            //
+            //     // Verify if the first command button was found
+            //     if (!firstCommandButton) {
+            //         Log.Error(`Could not find command button with name: ${firstButtonFrameName}`);
+            //         return; // Early exit if the target button was not found
+            //     }
+            //     // Create a new text frame as a child of the first command button
+            //     const firstButtonShortcutTextFrame = Frame.createType("FirstButtonShortcut", firstCommandButton, 0, "TEXT", "");
+            //
+            //     // Set the text for the shortcut key
+            //     firstButtonShortcutTextFrame?.setText('Q');
+            // // }
+
+                //
+
+                let currentSelectedButtonIndex: number | null = null;
+                const commandButtonTooltip: Frame[] = [];
+
+                // Create one tooltip frame for each command button
+                for (let i = 0; i < 12; i++) {
+                    const button = Frame.fromOrigin(ORIGIN_FRAME_COMMAND_BUTTON, i);
+                    if (button) {
+                        const frame = Frame.createType('', button, 0, "SIMPLEFRAME", '');
+                        // const frame = Frame.createSimple('', button, 0);
+                        button.setTooltip(frame!);
+                        frame!.visible = false;
+                        print(`${i} set hidden`);
+                        commandButtonTooltip[i] = frame!;
+                    }
+                }
+
+
+                const frame  = BlzCreateFrameByType("BACKDROP", "", BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0)!, "", 0)
+                BlzFrameSetAllPoints(frame!, BlzGetOriginFrame(ORIGIN_FRAME_COMMAND_BUTTON, 0)!)
+                BlzFrameSetTexture(frame!, 'ReplaceableTextures\\WorldEditUI\\Doodad-Cinematic.blp', 0, true);
+
+                // iconFrame!.setSize(0.03, 0.03);
+
+                // iconFrame!.setAbsPoint(FRAMEPOINT_TOPLEFT, 0.1, 0.45);
+
+                print(`Create timer`);
+                // Create the BoxedText frame
+                let tooltip = Frame.create("BoxedText", Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0)!, 0, 0);
+                if (!tooltip) {
+                    throw new Error('Could not create the tooltip frame.');
+                }
+
+                tooltip.setAbsPoint(FRAMEPOINT_BOTTOMRIGHT, 0.825, 0.16);
+                tooltip.setSize(0.315, 0);
+                tooltip.visible = false;
+
+                let tooltipValueFrame = Frame.fromName("BoxedTextValue", 0);
+                if (!tooltipValueFrame) {
+                    throw new Error('Could not find the tooltip value frame.');
+                }
+
+                tooltipValueFrame.text = "Human Paladin Face, but it is not uther.";
+
+                let tooltipTitleFrame = Frame.fromName("BoxedTextTitle", 0);
+                if (!tooltipTitleFrame) {
+                    throw new Error('Could not find the tooltip title frame.');
+                }
+
+                tooltipTitleFrame.text = "Paladin";
+                // If the currently selected button is not null or undefined, create a timer loop
+                const hoversCommandButton = (commandButtonIndex: number | null) => {
+
+                    // let tooltip = Frame.fromName("BoxedText", 0);
+
+                    if (tooltip != null) {
+                        if (commandButtonIndex == null) {
+                            tooltip.visible = false;
+                        } else {
+                            // let unit = Unit.fromHandle(GetEnumUnit());
+                            // let item = unit.itemInSlot(commandButtonIndex);
+                            //
+                            // if (item != null) {
+                            const TT = Frame.fromOrigin(ORIGIN_FRAME_UBERTOOLTIP, 0);
+                            TT?.setVisible(false)
+                            tooltip.visible = true;
+                            const tow = player.hybridTowers[0];
+                            // assuming Equipment is a custom class and getByHandle is a method of that class
+                            let itemName = GetLocalizedString(tow.toolTipBasic) || '';
+                            let itemDesc = GetLocalizedString(tow.toolTipExtended) || '';
+                            let goldValue = tow.goldCost;
+
+                            let childTitle = Frame.fromName("BoxedTextTitle", 0);
+                            if (childTitle) {
+                                childTitle.text = itemName;
+                            }
+
+                            let childValue = Frame.fromName("BoxedTextValue", 0);
+                            if (childValue) {
+                                childValue.text = itemDesc;
+                            }
+
+                            let childGoldValue = Frame.fromName("BoxedTextGoldValue", 0);
+                            if (childGoldValue) {
+                                childGoldValue.text = `${goldValue}`;
+                            }
+                            // }
+                        }
+                    }
+                }
+
+                Timer.create().start(1.0 / 32, true, () => {
+                    let selectedAnything = false;
+
+                    // Loop all tooltips and check for the visible one
+                    for (let i = 0; i < 12; i++) {
+                        if (commandButtonTooltip[i].visible) {
+                            selectedAnything = true;
+
+                            // The new selected is not the same as the current one?
+                            if (currentSelectedButtonIndex !== i) {
+
+                                hoversCommandButton(i);
+                            }
+                            currentSelectedButtonIndex = i;
+                        }
+                    }
+
+                    // Now selects nothing?
+                    if (!selectedAnything && currentSelectedButtonIndex != null) {
+                        hoversCommandButton(null);
+                        currentSelectedButtonIndex = null;
+                    }
+                });
+                print(`Timer created`);
+
+
+
+
+                // frame?.setTexture("ReplaceableTextures\\CommandButtons\\BTNHeroPaladin", 0, true)
+                // frame?.getChild(0)?.setTexture("ReplaceableTextures\\CommandButtons\\BTNHeroPaladin", 0, true)
+                // const t = new Trigger()
+                // t.registerGameEvent(EVENT_GAME_BUILD_SUBMENU)
+                // t.addAction(() => {
+                //     for (let i = 0; i <= 11; i++) {
+                //         const button = Frame.fromOrigin(ORIGIN_FRAME_COMMAND_BUTTON, i);
+                //         if (button) {
+                //             const frame = Frame.createSimple("commandButtonTooltip" + i, button, 0);
+                //             if (frame) {
+                //                 frame.setVisible(false);
+                //                 frame.setText('YOLO'
+                //                 )
+                //                 button.setTooltip(frame);
+                //                 // this.commandButtonTooltip[i] = frame;
+                //             }
+                //         }
+                //         // const frame = Frame.createSimple('SIMPLEFRAME', button);
+                //         // frame.setTooltip(button);
+                //         // frame.setVisible(false);
+                //         // CommandButtonTooltip.commandButtonTooltip[i] = frame;
+                //     }
+                // })
+                //     TriggerRegisterGameEvent(udg_BuildTrigger[i], EVENT_GAME_BUILD_SUBMENU)
+                //     const t = new Trigger();
+                //     // t.registerAnyUnitEvent(EVENT_PLAYER_UNIT_ISSUED_POINT_ORDER)
+                //     t.registerPlayerEvent()
+                //     t.registerAnyUnitEvent(EVENT_PLAYER_UNIT_SPELL_CAST)
+                //     t.addAction(() => {
+                //         print(DecodeFourCC(GetSpellAbilityId()))
+                //         print(GetSpellAbility())
+                //         print(GetSpellTargetX(), GetSpellTargetY())
+                //
+                //     })
+                break;
             case 'diff':
                 amount = Util.ParsePositiveInt(command[1]);
                 if (!amount) {
@@ -171,7 +497,7 @@ export class Commands {
                 break;
             case 'killall':
                 const spawnedCreeps: SpawnedCreeps | undefined = this.game.worldMap.spawnedCreeps;
-                if (spawnedCreeps!==undefined) {
+                if (spawnedCreeps !== undefined) {
                     spawnedCreeps.unitMap.forEach(u => u.unit.destroy());
                 }
                 break;
@@ -405,8 +731,8 @@ export class Commands {
                 const receivingPlayer: Defender | undefined = this.game.players.get(receiver);
                 if (receivingPlayer) {
                     if (receivingPlayer.hasHybridRandomed) {
-                        for (const towerstr of receivingPlayer.hybridTowers) {
-                            player.sendMessage(GetLocalizedString((<HybridTower>this.game.racePicking.HybridPool.get(towerstr)).name) || '');
+                        for (const tower of receivingPlayer.hybridTowers) {
+                            player.sendMessage(GetLocalizedString(tower.name) || '');
                         }
                     } else {
                         player.sendMessage(`${receivingPlayer.getNameWithColour()} has not hybrid randomed.`);

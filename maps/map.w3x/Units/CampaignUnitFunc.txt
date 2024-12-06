@@ -225,7 +225,7 @@ Builds=n05H,n05I,n05J,n05K,n05L,n05M,n05N,n05O,n05Q
 
 [e00I]
 Art=ReplaceableTextures\CommandButtons\BTNSelectHeroOn
-Name="[Builder] - Weeiz"
+Name="[Builder] - WeeizAAARRRDDD"
 Hotkey=-
 Ubertip="An advanced high tier Hybrid Builder."
 EditorSuffix= (Tier 1-9)
@@ -668,7 +668,7 @@ Animprops=upgrade,first
 Art=ReplaceableTextures\CommandButtons\BTNHeroWarden.blp
 Name="[Night Elves] - Warden"
 Hotkey=S
-Tip=Build Warden 
+Tip=Build Warden
 Ubertip="|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 6.00|n|cffffcc00Damage:|r 1|n|cffffcc00Range:|r 800|n|cffffcc00Ability:|r Splash; the area of effect is 250|n|cffffcc00Ability (2):|r Shadow Bomb; enemies damaged by this tower are hit by a shadow bolt dealing damage on hit and damage over time"
 EditorSuffix=[T6]
 Buttonpos=0,0
@@ -2583,7 +2583,7 @@ Animprops=upgrade,second
 Art=ReplaceableTextures\CommandButtons\BTNTreant.blp
 Name="[Night Elves] - Ancient Protector"
 Hotkey=E
-Tip=Build Ancient Protector 
+Tip=Build Ancient Protector
 Ubertip="|cffffcc00Attack:|r Siege|n|cffffcc00Cooldown:|r 2.00|n|cffffcc00Damage:|r 200 - 300|n|cffffcc00Range:|r 800 (ground only)|n|cffffcc00Ability:|r Splash; the area of effect is 250|n|cffffcc00Ability (2):|r Natures Nourishment; generates a random enhancement item when it attacks whilst having 30 mana"
 EditorSuffix=[T3]
 Buttonpos=2,0

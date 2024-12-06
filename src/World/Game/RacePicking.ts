@@ -1,7 +1,8 @@
-import { WarcraftMaul } from '../WarcraftMaul';
-import { Defender } from '../Entity/Players/Defender';
-import { Race } from './Races/Race';
+import {WarcraftMaul} from '../WarcraftMaul';
+import {Defender} from '../Entity/Players/Defender';
+import {Race} from './Races/Race';
 import {
+    DummyTowers,
     HybridTierEight,
     HybridTierFive,
     HybridTierFour,
@@ -12,7 +13,7 @@ import {
     HybridTierThree,
     HybridTierTwo,
 } from './Races/HybridRandom';
-import {MapPlayer,Trigger, Unit} from "w3ts";
+import {MapPlayer, Trigger, Unit} from "w3ts";
 import {SendMessage, Util} from "../../lib/translators";
 import {Log} from "../../lib/Serilog/Serilog";
 import {HybridTower} from "./Races/HybridRandom.types";
@@ -30,7 +31,7 @@ export class RacePicking {
         this.raceSelectTrigger.addAction(() => this.RaceSelectionActions());
         this.CreateHybridPool();
         const neutralPlayer = MapPlayer.fromIndex(PLAYER_NEUTRAL_PASSIVE);
-        if(!neutralPlayer) {
+        if (!neutralPlayer) {
             Log.Fatal("Neutral player not assignable");
             return;
         }
@@ -115,7 +116,7 @@ export class RacePicking {
 
     private RaceSelectionActions(): void {
         const buyingUnit = Unit.fromHandle(GetBuyingUnit());
-        if(!buyingUnit) {
+        if (!buyingUnit) {
             return;
         }
         const player: Defender | undefined = this.game.players.get(buyingUnit.owner.id);
@@ -197,15 +198,15 @@ export class RacePicking {
     }
 
     private HybridRandomRace(player: Defender) {
-        const t1 = this.randomChoice(HybridTierOne, player.hybridTowers).id;
-        const t2 = this.randomChoice(HybridTierTwo, player.hybridTowers).id;
-        const t3 = this.randomChoice(HybridTierThree, player.hybridTowers).id;
-        const t4 = this.randomChoice(HybridTierFour, player.hybridTowers).id;
-        const t5 = this.randomChoice(HybridTierFive, player.hybridTowers).id;
-        const t6 = this.randomChoice(HybridTierSix, player.hybridTowers).id;
-        const t7 = this.randomChoice(HybridTierSeven, player.hybridTowers).id;
-        const t8 = this.randomChoice(HybridTierEight, player.hybridTowers).id;
-        const t9 = this.randomChoice(HybridTierNine, player.hybridTowers).id;
+        const t1 = this.randomChoice(HybridTierOne, player.hybridTowers);
+        const t2 = this.randomChoice(HybridTierTwo, player.hybridTowers);
+        const t3 = this.randomChoice(HybridTierThree, player.hybridTowers);
+        const t4 = this.randomChoice(HybridTierFour, player.hybridTowers);
+        const t5 = this.randomChoice(HybridTierFive, player.hybridTowers);
+        const t6 = this.randomChoice(HybridTierSix, player.hybridTowers);
+        const t7 = this.randomChoice(HybridTierSeven, player.hybridTowers);
+        const t8 = this.randomChoice(HybridTierEight, player.hybridTowers);
+        const t9 = this.randomChoice(HybridTierNine, player.hybridTowers);
         player.hybridTowers = [];
         player.hybridTowers.push(t1);
         player.hybridTowers.push(t2);
@@ -225,72 +226,95 @@ export class RacePicking {
 
         player.hasHybridRandomed = true;
 
-        print(player.hybridBuilder?.name)
-        print(BlzGetUnitStringField(player.hybridBuilder!.handle, ConvertUnitStringField(FourCC('ubui'))!))
+        // print(player.hybridBuilder?.name)
 
-        for (const tower of HybridTierOne) {
-            if (tower.id !== t1) {
-                player.setTechMaxAllowed(FourCC(tower.id), 0)
-            } else {
-                player.setTechMaxAllowed(FourCC(tower.id), -1)
+        for (let playerNum = 0; playerNum < 13; playerNum++) {
+            for (let tier = 0; tier < 9; tier++) {
+                player.setTechMaxAllowed(FourCC(DummyTowers[`${playerNum + 1}`][`${tier + 1}`]), playerNum === player.id ? -1 : 0)
             }
         }
-        for (const tower of HybridTierTwo) {
-            if (tower.id !== t2) {
-                player.setTechMaxAllowed(FourCC(tower.id), 0)
-            } else {
-                player.setTechMaxAllowed(FourCC(tower.id), -1)
-            }
-        }
-        for (const tower of HybridTierThree) {
-            if (tower.id !== t3) {
-                player.setTechMaxAllowed(FourCC(tower.id), 0)
-            } else {
-                player.setTechMaxAllowed(FourCC(tower.id), -1)
-            }
-        }
-        for (const tower of HybridTierFour) {
-            if (tower.id !== t4) {
-                player.setTechMaxAllowed(FourCC(tower.id), 0)
-            } else {
-                player.setTechMaxAllowed(FourCC(tower.id), -1)
-            }
-        }
-        for (const tower of HybridTierFive) {
-            if (tower.id !== t5) {
-                player.setTechMaxAllowed(FourCC(tower.id), 0)
-            } else {
-                player.setTechMaxAllowed(FourCC(tower.id), -1)
-            }
-        }
-        for (const tower of HybridTierSix) {
-            if (tower.id !== t6) {
-                player.setTechMaxAllowed(FourCC(tower.id), 0)
-            } else {
-                player.setTechMaxAllowed(FourCC(tower.id), -1)
-            }
-        }
-        for (const tower of HybridTierSeven) {
-            if (tower.id !== t7) {
-                player.setTechMaxAllowed(FourCC(tower.id), 0)
-            } else {
-                player.setTechMaxAllowed(FourCC(tower.id), -1)
-            }
-        }
-        for (const tower of HybridTierEight) {
-            if (tower.id !== t8) {
-                player.setTechMaxAllowed(FourCC(tower.id), 0)
-            } else {
-                player.setTechMaxAllowed(FourCC(tower.id), -1)
-            }
-        }
-        for (const tower of HybridTierNine) {
-            if (tower.id !== t9) {
-                player.setTechMaxAllowed(FourCC(tower.id), 0)
-            } else {
-                player.setTechMaxAllowed(FourCC(tower.id), -1)
-            }
-        }
+
+        // Object.keys(HybridSpells).forEach((hybridSpell) => {
+        //     const spell = HybridSpells[hybridSpell as any]
+        //     const tower = player.hybridTowers[parseInt(hybridSpell, 10)-1];
+        //
+        //     const ability = player.hybridBuilder?.getAbility(FourCC(spell.newId));
+        //     player.hybridBuilder?.setAbilityLevel(FourCC(spell.newId),tower.level);
+        //     if(tower.icon) {
+        //         BlzSetAbilityIcon(BlzGetAbilityId(ability!), tower.icon);
+        //     }
+        // })
+        // print(player.hybridBuilder?.addAbility(FourCC('Ax02')))
+        // print(player.hybridBuilder?.addAbility(FourCC('Ax01')))
+        // print(player.hybridBuilder?.addAbility(FourCC('A02D')))
+        // print(player.hybridBuilder?.addAbility(FourCC('Avul')))
+        // print(player.hybridBuilder?.getAbility(FourCC('Ax01')))
+        // print(player.hybridBuilder?.getAbility(FourCC('Ax01')))
+        // print(BlzGetUnitStringField(player.hybridBuilder!.handle, ConvertUnitStringField(FourCC('ubui'))!))
+
+        // for (const tower of HybridTierOne) {
+        //     if (tower.id !== t1) {
+        //         player.setTechMaxAllowed(FourCC(tower.id), 0)
+        //     } else {
+        //         player.setTechMaxAllowed(FourCC(tower.id), -1)
+        //     }
+        // }
+        // for (const tower of HybridTierTwo) {
+        //     if (tower.id !== t2) {
+        //         player.setTechMaxAllowed(FourCC(tower.id), 0)
+        //     } else {
+        //         player.setTechMaxAllowed(FourCC(tower.id), -1)
+        //     }
+        // }
+        // for (const tower of HybridTierThree) {
+        //     if (tower.id !== t3) {
+        //         player.setTechMaxAllowed(FourCC(tower.id), 0)
+        //     } else {
+        //         player.setTechMaxAllowed(FourCC(tower.id), -1)
+        //     }
+        // }
+        // for (const tower of HybridTierFour) {
+        //     if (tower.id !== t4) {
+        //         player.setTechMaxAllowed(FourCC(tower.id), 0)
+        //     } else {
+        //         player.setTechMaxAllowed(FourCC(tower.id), -1)
+        //     }
+        // }
+        // for (const tower of HybridTierFive) {
+        //     if (tower.id !== t5) {
+        //         player.setTechMaxAllowed(FourCC(tower.id), 0)
+        //     } else {
+        //         player.setTechMaxAllowed(FourCC(tower.id), -1)
+        //     }
+        // }
+        // for (const tower of HybridTierSix) {
+        //     if (tower.id !== t6) {
+        //         player.setTechMaxAllowed(FourCC(tower.id), 0)
+        //     } else {
+        //         player.setTechMaxAllowed(FourCC(tower.id), -1)
+        //     }
+        // }
+        // for (const tower of HybridTierSeven) {
+        //     if (tower.id !== t7) {
+        //         player.setTechMaxAllowed(FourCC(tower.id), 0)
+        //     } else {
+        //         player.setTechMaxAllowed(FourCC(tower.id), -1)
+        //     }
+        // }
+        // for (const tower of HybridTierEight) {
+        //     if (tower.id !== t8) {
+        //         player.setTechMaxAllowed(FourCC(tower.id), 0)
+        //     } else {
+        //         player.setTechMaxAllowed(FourCC(tower.id), -1)
+        //     }
+        // }
+        // for (const tower of HybridTierNine) {
+        //     if (tower.id !== t9) {
+        //         player.setTechMaxAllowed(FourCC(tower.id), 0)
+        //     } else {
+        //         player.setTechMaxAllowed(FourCC(tower.id), -1)
+        //     }
+        // }
 
         SendMessage(player.getNameWithColour() + ' has |cFFB0F442hy|r|cFF8CF442b|r|cFF42F4C5r|r|cFF42F4F1id|r randomed!');
 
@@ -305,7 +329,7 @@ export class RacePicking {
         HybridTierOne.forEach((d: HybridTower) => this.HybridPool.set(d.id, d));
         HybridTierSeven.forEach((d: HybridTower) => this.HybridPool.set(d.id, d));
         HybridTierSix.forEach((d: HybridTower) => this.HybridPool.set(d.id, d));
-        HybridTierThree.forEach((d:HybridTower) => this.HybridPool.set(d.id, d));
+        HybridTierThree.forEach((d: HybridTower) => this.HybridPool.set(d.id, d));
         HybridTierTwo.forEach((d: HybridTower) => this.HybridPool.set(d.id, d));
     }
 }

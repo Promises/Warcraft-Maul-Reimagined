@@ -1,0 +1,11 @@
+Frame "TEXT" "CDText" {
+    DecorateFileNames,
+    FrameFont "EscMenuTextFont", 0.020, "",
+    FontJustificationH JUSTIFYCENTER,
+    FontJustificationV JUSTIFYMIDDLE,
+    FontFlags "FIXEDSIZE",
+	LayerStyle "NOSHADING|IGNORETRACKEVENTS",
+    FontColor 0.99 0.827 0.0705 1.0,
+	FontShadowColor 0.0 0.0 0.0 0.9,
+    FontShadowOffset 0.002 -0.002,
+}

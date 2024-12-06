@@ -1,0 +1,33 @@
+import {Frame} from "w3ts";
+
+
+const frameSlots = [
+    0, 1, 2,
+    4, 5, 6,
+    8, 9, 10,
+]
+
+export class HybridRandomUI {
+    toolTipFrame: Frame;
+    iconFrames: Frame[];
+
+    constructor() {
+        const iconFramesTMP = [];
+
+        for (const frameSlot of frameSlots) {
+            const parentFrame = Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0);
+            const cmdBTN = Frame.fromOrigin(ORIGIN_FRAME_COMMAND_BUTTON, frameSlot);
+            const frame = Frame.createType('', parentFrame!, 0, "BACKDROP", '');
+            frame?.setAllPoints(cmdBTN!)
+            frame?.setTexture('ReplaceableTextures\\WorldEditUI\\Doodad-Cinematic.blp', 0, true);
+            iconFramesTMP.push(frame!);
+        }
+        this.iconFrames = iconFramesTMP;
+
+        // const frame = BlzCreateFrameByType("BACKDROP", "", BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0)!, "", 0)
+        // BlzFrameSetAllPoints(frame!, BlzGetOriginFrame(ORIGIN_FRAME_COMMAND_BUTTON, 0)!)
+        // BlzFrameSetTexture(frame!, 'ReplaceableTextures\\WorldEditUI\\Doodad-Cinematic.blp', 0, true);
+    }
+
+}
+}
