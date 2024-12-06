@@ -11,17 +11,24 @@ import BuildTinyScoutTower = AbilityTypes.BuildTinyScoutTower;
 const BUILD_DATE = compiletime(() => new Date().toUTCString());
 const TS_VERSION = compiletime(() => require("typescript").version);
 const TSTL_VERSION = compiletime(() => require("typescript-to-lua").version);
-// const testData = compiletime(({objectData}) => {
-//     const tower = objectData.abilities.copy('AIbt') as AbilityTypes.BuildTinyScoutTower | undefined;
-//     // const tower = objectData.abilities.get('AIbt') as BuildTinyScoutTower | undefined;
-//     const booktest = objectData.abilities.copy('Aspb') as AbilityTypes.SpellBook | undefined;
-//     // console.log((booktest))
-//     if(tower && booktest) {
-//         booktest.spellList = tower.newId
-//         tower.unitCreatedPerPlayerRace = 'h00Z'
-//     }
-//     return tower?.unitCreatedPerPlayerRace
-// })
+
+
+// Replace ground texture of undead acolite
+const testData = compiletime(({objectData}) => {
+
+    const builder = objectData.units.get('oC22')
+    builder!.groundTexture = '';
+    // objectData.save()
+    // const tower = objectData.abilities.copy('AIbt') as AbilityTypes.BuildTinyScoutTower | undefined;
+    // const tower = objectData.abilities.get('AIbt') as BuildTinyScoutTower | undefined;
+    // const booktest = objectData.abilities.copy('Aspb') as AbilityTypes.SpellBook | undefined;
+    // console.log((booktest))
+    // if(tower && booktest) {
+    //     booktest.spellList = tower.newId
+    //     tower.unitCreatedPerPlayerRace = 'h00Z'
+    // }
+    // return tower?.unitCreatedPerPlayerRace
+})
 function tsMain() {
     PatchNatives();
     BlzLoadTOCFile('uiImport\\Templates.toc');
