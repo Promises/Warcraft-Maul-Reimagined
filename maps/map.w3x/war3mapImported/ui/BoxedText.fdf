@@ -1,0 +1,20 @@
+// -- Frames -------------------------------------------------------
+Frame "BACKDROP" "BoxedText" {
+   UseActiveContext,
+   DecorateFileNames, //Look-Up Names in some String table (for example gameinterface)
+   BackdropTileBackground, //Tile mode enabled
+   BackdropBackground  "ToolTipBackground", //BackgroundFile
+   BackdropCornerFlags "UL|UR|BL|BR|T|L|B|R",
+   BackdropCornerSize  0.008, //higher numbers make the corners bigger.
+   BackdropBackgroundInsets 0.0022 0.0022 0.0022 0.0022, //makes the background smaller, from the outside.
+   BackdropEdgeFile  "ToolTipBorder", //the border File
+   BackdropBlendAll,
+
+   Frame "BACKDROP" "BoxedTextSeparator" {
+      Height 0.02,
+      Width 0.09083,
+      BackdropBackground "UI\Widgets\BattleNet\bnet-tab-up.blp",
+      BackdropBlendAll,
+      SetPoint TOPLEFT, "TabbedPanel", TOPLEFT, 0.0, 0.0,
+   }
+}

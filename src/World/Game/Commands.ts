@@ -1,5 +1,5 @@
 import {WarcraftMaul} from '../WarcraftMaul';
-import {COLOUR_CODES} from '../GlobalSettings';
+import {COLOUR_CODES, NO_LIVES_LOST} from '../GlobalSettings';
 import {Defender} from '../Entity/Players/Defender';
 import {Log} from '../../lib/Serilog/Serilog';
 import {CheckPoint} from '../Entity/CheckPoint';
@@ -14,7 +14,6 @@ import {Maze, Walkable} from '../Antiblock/Maze';
 import {COLOUR, DecodeFourCC, SendMessage, Util} from "../../lib/translators";
 import {Frame, MapPlayer, Timer, Trigger, Unit} from "w3ts";
 import {Image} from "../../JassOverrides/Image";
-import {CustomBuildMenu} from "./Ui/BuildMenu";
 import {BoxText} from "./Ui/BoxText";
 
 /**
@@ -65,11 +64,9 @@ export class Commands {
 
                 break;
             case 'ui':
-                const b = new BoxText('DUMMY')
+                const b = new BoxText(NO_LIVES_LOST + '|n|nDoes this text work as expected then? :DD');
 
-                b.setTitle('TiTLTLTTL')
-                    .setValue('DESCIRPTION')
-                    .setPosition(0.4, 0.3)    // Center of screen
+                b.setPosition(0.4, 0.3)    // Center of screen
                     .setSize(0.25, 0.15)      // 25% width, 15% height
                     .show();
                 break;
@@ -324,8 +321,6 @@ export class Commands {
                 const box = new BoxText('Test')
 
                 box
-                    .setTitle('TiTLTLTTL')
-                    .setValue('DESCIRPTION')
                     .setPosition(0.4, 0.3)    // Center of screen
                     .setSize(0.25, 0.15)      // 25% width, 15% height
                     .show();

@@ -2,13 +2,9 @@ import { Frame } from "w3ts";
 
 export class BoxText {
     private frame: Frame | undefined;
-    private titleFrame: Frame | undefined;
-    private valueFrame: Frame | undefined;
+    private textFrame: Frame | undefined;
 
-    constructor(name: string) {
-        // Load the template if not already loaded
-        const loadToc = Frame.loadTOC("uiImport\\BoxText.toc");
-        print(`loadToc: ${loadToc ? 'true' : 'false'}`)
+    constructor(description: string) {
         // Get the game UI as parent
         const gameUI = Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0);
         if (!gameUI) {
@@ -17,38 +13,31 @@ export class BoxText {
         };
 
         // Create the main frame
-        this.frame = Frame.createType(
-            name,                // Unique name for this instance
-            gameUI,             // Parent frame
-            0,                  // Create context
-            "BoxedText",        // The frame type from FDF
-            ""                  // No inheritance needed since it's defined in FDF
+        this.frame = Frame.create("BoxedText", gameUI, 0, 0);
+        this.textFrame = Frame.createType(
+            "textFrame",
+            this.frame!,
+            0,
+            "TEXT",
+            ""
         );
 
+        // this.textFrame?.setSize(0.25, 0);
+        this.textFrame?.setPoint(FRAMEPOINT_BOTTOM, this.frame!, FRAMEPOINT_TOP, 0, -0.015);
+        this.textFrame?.setEnabled(false);
+        this.textFrame?.setText(description);
+
         print('Mainframe ' + BlzFrameGetName(this.frame?.handle!))
+        print('TextFrame ' + BlzFrameGetName(this.textFrame?.handle!) + this.textFrame?.text);
 
         if (!this.frame) {
             print('NO FRAME')
             return;
         };
-
-        // Get the child frames defined in the FDF
-        this.titleFrame = Frame.fromName("BoxedTextTitle", 0);
-        this.valueFrame = Frame.fromName("BoxedTextValue", 0);
-
-        print(`tittle: ${!!this.titleFrame ? 'true' : 'false'}, value: ${!!this.valueFrame ? 'true' : 'false'}`)
-        print('TitleFrame: ' + BlzFrameGetName(this.titleFrame!.handle!))
-        print('childcount: ' + this.frame.childrenCount)
-
     }
 
-    public setTitle(text: string): this {
-        this.titleFrame?.setText(text);
-        return this;
-    }
-
-    public setValue(text: string): this {
-        this.valueFrame?.setText(text);
+    public setText(text: string): this {
+        this.textFrame?.setText(text);
         return this;
     }
 
@@ -75,9 +64,9 @@ export class BoxText {
     }
 
     public destroy(): void {
+        this.textFrame?.destroy();
         this.frame?.destroy();
         this.frame = undefined;
-        this.titleFrame = undefined;
-        this.valueFrame = undefined;
+        this.textFrame = undefined;
     }
 }
