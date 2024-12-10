@@ -1,7 +1,7 @@
 target
 package-lock.json
 dist
-
+.idea
 # Logs
 logs
 *.log

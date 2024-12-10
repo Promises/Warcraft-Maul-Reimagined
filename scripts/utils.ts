@@ -55,6 +55,60 @@ export function toBuffer(ab: ArrayBuffer) {
   return buf;
 }
 
+function isBinaryFile(buffer: Buffer): boolean {
+  // Check for null bytes which typically indicate binary content
+  const suspicious_bytes = buffer.slice(0, 24).filter(byte => byte === 0).length;
+  return suspicious_bytes > 0;
+}
+
+function ensureCRLF(content: Buffer): Buffer {
+  // Only process if it's not a binary file
+  if (!isBinaryFile(content)) {
+    // Convert content to string
+    let text = content.toString('utf-8');
+    // Normalize to LF first (in case of mixed endings)
+    text = text.replace(/\r\n|\r/g, '\n');
+    // Convert to CRLF
+    text = text.replace(/\n/g, '\r\n');
+    return Buffer.from(text);
+  }
+  return content;
+}
+
+function copyWithCRLF(src: string, dest: string) {
+  // Create destination directory if it doesn't exist
+  fs.mkdirpSync(path.dirname(dest));
+
+  // Read the source file
+  const content = fs.readFileSync(src);
+
+  // Process and write the file
+  fs.writeFileSync(dest, ensureCRLF(content));
+}
+
+function copyFolderWithCRLF(srcDir: string, destDir: string) {
+  // Ensure destination directory exists
+  fs.mkdirpSync(destDir);
+
+  // Read all files in source directory
+  const items = fs.readdirSync(srcDir);
+
+  for (const item of items) {
+    const srcPath = path.join(srcDir, item);
+    const destPath = path.join(destDir, item);
+
+    const stats = fs.statSync(srcPath);
+
+    if (stats.isDirectory()) {
+      // Recursively copy directories
+      copyFolderWithCRLF(srcPath, destPath);
+    } else {
+      // Copy individual files with CRLF handling
+      copyWithCRLF(srcPath, destPath);
+    }
+  }
+}
+
 /**
  * Recursively retrieve a list of files in a directory.
  * @param dir The path of the directory
@@ -102,7 +156,7 @@ export function compileMap(config: IProjectConfig) {
   }
 
   logger.info(`Building "${config.mapFolder}"...`);
-  fs.copySync(`./maps/${config.mapFolder}`, `./dist/${config.mapFolder}`);
+  copyFolderWithCRLF(`./maps/${config.mapFolder}`, `./dist/${config.mapFolder}`);
 
   logger.info("Modifying tsconfig.json to work with war3-transformer...");
   updateTSConfig(config.mapFolder);
