@@ -64,11 +64,13 @@ export class Commands {
 
                 break;
             case 'ui':
-                const b = new BoxText(NO_LIVES_LOST + '|n|nDoes this text work as expected then? :DD');
+                // const b = new BoxText(NO_LIVES_LOST + '|n|nDoes this text work as expected then? :DD');
+                //
+                // b.setPosition(0.4, 0.3)    // Center of screen
+                //     .setSize(0.25, 0.15)      // 25% width, 15% height
+                //     .show();
+                // const b = new BoxText(0, player.hybridTowers[0])
 
-                b.setPosition(0.4, 0.3)    // Center of screen
-                    .setSize(0.25, 0.15)      // 25% width, 15% height
-                    .show();
                 break;
             case 'openall':
                 player.sendMessage('All spawns are now open!');
@@ -288,105 +290,46 @@ export class Commands {
                         // const frame = Frame.createSimple('', button, 0);
                         button.setTooltip(frame!);
                         frame!.visible = false;
-                        print(`${i} set hidden`);
                         commandButtonTooltip[i] = frame!;
                     }
                 }
 
                 const indexes = [0, 1, 2, 4, 5, 6, 8, 9, 10];
-                const hybridFrames: Frame[] = []
+                const hybridFrames: Record<number, BoxText> = {}
                 for (let i = 0; i < player.hybridTowers.length; i++) {
                     const hybridTower = player.hybridTowers[i];
                     const renderIndx = indexes[i];
-                    const frame = Frame.createType("", Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0)!, 0, "BACKDROP", "");
-                    frame?.setAllPoints(Frame.fromOrigin(ORIGIN_FRAME_COMMAND_BUTTON, renderIndx)!)
-                    frame?.setTexture(hybridTower.icon ? hybridTower.icon : '', 0, true)
-                    frame?.setVisible(false);
-                    hybridFrames.push(frame!);
+
+                    hybridFrames[renderIndx] = (new BoxText(renderIndx, hybridTower));
                 }
 
-
-                // const frame = BlzCreateFrameByType("BACKDROP", "", BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0)!, "", 0)
-                // BlzFrameSetAllPoints(frame!, BlzGetOriginFrame(ORIGIN_FRAME_COMMAND_BUTTON, 0)!)
-                // BlzFrameSetTexture(frame!, 'ReplaceableTextures\\WorldEditUI\\Doodad-Cinematic.blp', 0, true);
-
-                // iconFrame!.setSize(0.03, 0.03);
-
-                // iconFrame!.setAbsPoint(FRAMEPOINT_TOPLEFT, 0.1, 0.45);
 
                 print(`Create timer`);
 
 
-                // Create the main frame
-                const box = new BoxText('Test')
-
-                box
-                    .setPosition(0.4, 0.3)    // Center of screen
-                    .setSize(0.25, 0.15)      // 25% width, 15% height
-                    .show();
-                // Create the BoxedText frame
-                // let tooltip = Frame.create("BoxedText", Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0)!, 0, 0);
-                // if (!tooltip) {
-                //     throw new Error('Could not create the tooltip frame.');
-                // }
-                //
-                // tooltip.setAbsPoint(FRAMEPOINT_BOTTOMRIGHT, 0.825, 0.16);
-                // tooltip.setSize(0.315, 0);
-                // tooltip.visible = false;
-                //
-                // let tooltipValueFrame = Frame.fromName("BoxedTextValue", 0);
-                // if (!tooltipValueFrame) {
-                //     throw new Error('Could not find the tooltip value frame.');
-                // }
-                //
-                // tooltipValueFrame.text = "Human Paladin Face, but it is not uther.";
-                //
-                // let tooltipTitleFrame = Frame.fromName("BoxedTextTitle", 0);
-                // if (!tooltipTitleFrame) {
-                //     throw new Error('Could not find the tooltip title frame.');
-                // }
-                //
-                // tooltipTitleFrame.text = "Paladin";
-                // If the currently selected button is not null or undefined, create a timer loop
                 const hoversCommandButton = (commandButtonIndex: number | null) => {
 
-                    // let tooltip = Frame.fromName("BoxedText", 0);
                     Log.Debug("Hover button " + commandButtonIndex);
+                    hideTooltips(commandButtonIndex)
 
-                    if (box != null) {
-                        if (commandButtonIndex == null) {
-                            box.hide();
-                        } else {
-                            // let unit = Unit.fromHandle(GetEnumUnit());
-                            // let item = unit.itemInSlot(commandButtonIndex);
-                            //
-                            // if (item != null) {
-                            const TT = Frame.fromOrigin(ORIGIN_FRAME_UBERTOOLTIP, 0);
-                            TT?.setVisible(false)
+                    if (commandButtonIndex == null) {
+                        // box?.hideToolTip();
+                    } else {
+                        const TT = Frame.fromOrigin(ORIGIN_FRAME_UBERTOOLTIP, 0);
+                        TT?.setVisible(false)
 
-                            box.show()
-                            // const tow = player.hybridTowers[0];
-                            // // assuming Equipment is a custom class and getByHandle is a method of that class
-                            // let itemName = GetLocalizedString(tow.toolTipBasic) || '';
-                            // let itemDesc = GetLocalizedString(tow.toolTipExtended) || '';
-                            // let goldValue = tow.goldCost;
-                            //
-                            // let childTitle = Frame.fromName("BoxedTextTitle", 0);
-                            // if (childTitle) {
-                            //     childTitle.text = itemName;
-                            // }
-                            //
-                            // let childValue = Frame.fromName("BoxedTextValue", 0);
-                            // if (childValue) {
-                            //     childValue.text = itemDesc;
-                            // }
-                            //
-                            // let childGoldValue = Frame.fromName("BoxedTextGoldValue", 0);
-                            // if (childGoldValue) {
-                            //     childGoldValue.text = `${goldValue}`;
-                            // }
-                            // }
+                    }
+                }
+
+                const hideTooltips = (except?: number | null) => {
+                    for (const hybridIndex of indexes) {
+
+                        const btn = hybridFrames[hybridIndex];
+                        if(hybridIndex === except) {
+                            btn.showToolTip();
+                            continue;
                         }
+                        btn.hideToolTip();
                     }
                 }
 
@@ -409,14 +352,16 @@ export class Commands {
                     let selectedAnything = false;
                     let shouldBeVisible = areButtonsVisible();
 
-                    for (const hybridFrame of hybridFrames) {
-                        if (hybridFrame.visible !== shouldBeVisible) {
-                            hybridFrame.setVisible(shouldBeVisible);
+                    for (const hybridIndex of indexes) {
+                        const btn = hybridFrames[hybridIndex];
+
+                        if (btn.visible !== shouldBeVisible) {
+                            shouldBeVisible ? hybridFrames[hybridIndex].show() : hybridFrames[hybridIndex].hide();
                         }
                     }
-
-                    if(!shouldBeVisible) {
-                        if(currentSelectedButtonIndex != null) {
+                    print(`shouldBe: ${shouldBeVisible ? 'visible' : 'hidden'}`);
+                    if (!shouldBeVisible) {
+                        if (currentSelectedButtonIndex != null) {
                             hoversCommandButton(null);
                         }
                         currentSelectedButtonIndex = null;
