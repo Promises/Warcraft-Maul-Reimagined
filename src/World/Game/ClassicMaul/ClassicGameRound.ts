@@ -191,12 +191,12 @@ export class ClassicGameRound extends AbstractGameRound {
             if (player.id === COLOUR.GRAY) {
                 player.giveGold(2 * this.roundOverGoldReward);
                 player.sendMessage(
-                    `|c0000cdf9You recieved|r ${2 * this.roundOverGoldReward} |c0000cdf9` +
+                    `|c0000cdf9You received|r ${2 * this.roundOverGoldReward} |c0000cdf9` +
                     `extra gold for completing level as the last defender|r ${(this.currentWave - 1)}`);
             } else {
                 player.giveGold(this.roundOverGoldReward);
                 player.sendMessage(
-                    `|c0000cdf9You recieved|r ${this.roundOverGoldReward} |c0000cdf9` +
+                    `|c0000cdf9You received|r ${this.roundOverGoldReward} |c0000cdf9` +
                     `extra gold for completing level|r ${(this.currentWave - 1)}`);
 
             }
