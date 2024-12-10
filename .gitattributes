@@ -1,2 +1,10 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+*.wts text eol=crlf
+*.slk text eol=crlf
+*.toc text eol=crlf
+*.fdf text eol=crlf
+
+*.j text eol=crlf
+*.j linguist-language=TypeScript
+./maps/* text eol=crlf
