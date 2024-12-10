@@ -4,3 +4,4 @@ UI\FrameDef\Glue\battlenettemplates.fdf
 war3mapImported\UI\CustomTextButton.fdf
 war3mapImported\UI\DungeonDialog.fdf
 war3mapImported\UI\CdText.fdf
+

@@ -14,6 +14,8 @@ import {Maze, Walkable} from '../Antiblock/Maze';
 import {COLOUR, DecodeFourCC, SendMessage, Util} from "../../lib/translators";
 import {Frame, MapPlayer, Timer, Trigger, Unit} from "w3ts";
 import {Image} from "../../JassOverrides/Image";
+import {CustomBuildMenu} from "./Ui/BuildMenu";
+import {BoxText} from "./Ui/BoxText";
 
 /**
  * Gets a random number between a range.
@@ -59,16 +61,17 @@ export class Commands {
                 // const dummy8: DummyPlayer = new DummyPlayer(this.game, 5);
                 // const dummy9: DummyPlayer = new DummyPlayer(this.game, 4);
                 // const dummy10: DummyPlayer = new DummyPlayer(this.game, 3);
-                const dummy11: DummyPlayer = new DummyPlayer(this.game, 2);
+                // const dummy11: DummyPlayer = new DummyPlayer(this.game, 2);
+
                 break;
             case 'ui':
-                // const bool: boolean = BlzLoadTOCFile('uiImport\\MyBar.toc');
-                // player.sendMessage(`ui! ${bool}`);
-                // this.TestUi();
-                CreateDestructable(FourCC('YTpc'), 0.0, 0.0, bj_UNIT_FACING, 1.0, 0);
-                CreateDestructable(FourCC('YTpc'), 0.0 + 128, 0.0, bj_UNIT_FACING, 1.0, 0);
-                CreateDestructable(FourCC('YTpc'), 0.0 - 128, 0.0, bj_UNIT_FACING, 1.0, 0);
+                const b = new BoxText('DUMMY')
 
+                b.setTitle('TiTLTLTTL')
+                    .setValue('DESCIRPTION')
+                    .setPosition(0.4, 0.3)    // Center of screen
+                    .setSize(0.25, 0.15)      // 25% width, 15% height
+                    .show();
                 break;
             case 'openall':
                 player.sendMessage('All spawns are now open!');
@@ -255,28 +258,29 @@ export class Commands {
                 //     index++;
                 // } while (index < 12);
 
-            // function addShortcutTextToButton(): void {
-            //     const playerIndex = Defender.fromLocal();
-            //     const firstButtonFrameName = `CommandButton_0`;
-            //
-            //     // Try finding the first command button
-            //     const firstCommandButton = Frame.fromName(firstButtonFrameName, 0);
-            //
-            //     // Verify if the first command button was found
-            //     if (!firstCommandButton) {
-            //         Log.Error(`Could not find command button with name: ${firstButtonFrameName}`);
-            //         return; // Early exit if the target button was not found
-            //     }
-            //     // Create a new text frame as a child of the first command button
-            //     const firstButtonShortcutTextFrame = Frame.createType("FirstButtonShortcut", firstCommandButton, 0, "TEXT", "");
-            //
-            //     // Set the text for the shortcut key
-            //     firstButtonShortcutTextFrame?.setText('Q');
-            // // }
+                // function addShortcutTextToButton(): void {
+                //     const playerIndex = Defender.fromLocal();
+                //     const firstButtonFrameName = `CommandButton_0`;
+                //
+                //     // Try finding the first command button
+                //     const firstCommandButton = Frame.fromName(firstButtonFrameName, 0);
+                //
+                //     // Verify if the first command button was found
+                //     if (!firstCommandButton) {
+                //         Log.Error(`Could not find command button with name: ${firstButtonFrameName}`);
+                //         return; // Early exit if the target button was not found
+                //     }
+                //     // Create a new text frame as a child of the first command button
+                //     const firstButtonShortcutTextFrame = Frame.createType("FirstButtonShortcut", firstCommandButton, 0, "TEXT", "");
+                //
+                //     // Set the text for the shortcut key
+                //     firstButtonShortcutTextFrame?.setText('Q');
+                // // }
 
                 //
 
                 let currentSelectedButtonIndex: number | null = null;
+                let currentbuttoncount: number | null = null;
                 const commandButtonTooltip: Frame[] = [];
 
                 // Create one tooltip frame for each command button
@@ -292,47 +296,71 @@ export class Commands {
                     }
                 }
 
+                const indexes = [0, 1, 2, 4, 5, 6, 8, 9, 10];
+                const hybridFrames: Frame[] = []
+                for (let i = 0; i < player.hybridTowers.length; i++) {
+                    const hybridTower = player.hybridTowers[i];
+                    const renderIndx = indexes[i];
+                    const frame = Frame.createType("", Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0)!, 0, "BACKDROP", "");
+                    frame?.setAllPoints(Frame.fromOrigin(ORIGIN_FRAME_COMMAND_BUTTON, renderIndx)!)
+                    frame?.setTexture(hybridTower.icon ? hybridTower.icon : '', 0, true)
+                    frame?.setVisible(false);
+                    hybridFrames.push(frame!);
+                }
 
-                const frame  = BlzCreateFrameByType("BACKDROP", "", BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0)!, "", 0)
-                BlzFrameSetAllPoints(frame!, BlzGetOriginFrame(ORIGIN_FRAME_COMMAND_BUTTON, 0)!)
-                BlzFrameSetTexture(frame!, 'ReplaceableTextures\\WorldEditUI\\Doodad-Cinematic.blp', 0, true);
+
+                // const frame = BlzCreateFrameByType("BACKDROP", "", BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0)!, "", 0)
+                // BlzFrameSetAllPoints(frame!, BlzGetOriginFrame(ORIGIN_FRAME_COMMAND_BUTTON, 0)!)
+                // BlzFrameSetTexture(frame!, 'ReplaceableTextures\\WorldEditUI\\Doodad-Cinematic.blp', 0, true);
 
                 // iconFrame!.setSize(0.03, 0.03);
 
                 // iconFrame!.setAbsPoint(FRAMEPOINT_TOPLEFT, 0.1, 0.45);
 
                 print(`Create timer`);
+
+
+                // Create the main frame
+                const box = new BoxText('Test')
+
+                box
+                    .setTitle('TiTLTLTTL')
+                    .setValue('DESCIRPTION')
+                    .setPosition(0.4, 0.3)    // Center of screen
+                    .setSize(0.25, 0.15)      // 25% width, 15% height
+                    .show();
                 // Create the BoxedText frame
-                let tooltip = Frame.create("BoxedText", Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0)!, 0, 0);
-                if (!tooltip) {
-                    throw new Error('Could not create the tooltip frame.');
-                }
-
-                tooltip.setAbsPoint(FRAMEPOINT_BOTTOMRIGHT, 0.825, 0.16);
-                tooltip.setSize(0.315, 0);
-                tooltip.visible = false;
-
-                let tooltipValueFrame = Frame.fromName("BoxedTextValue", 0);
-                if (!tooltipValueFrame) {
-                    throw new Error('Could not find the tooltip value frame.');
-                }
-
-                tooltipValueFrame.text = "Human Paladin Face, but it is not uther.";
-
-                let tooltipTitleFrame = Frame.fromName("BoxedTextTitle", 0);
-                if (!tooltipTitleFrame) {
-                    throw new Error('Could not find the tooltip title frame.');
-                }
-
-                tooltipTitleFrame.text = "Paladin";
+                // let tooltip = Frame.create("BoxedText", Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0)!, 0, 0);
+                // if (!tooltip) {
+                //     throw new Error('Could not create the tooltip frame.');
+                // }
+                //
+                // tooltip.setAbsPoint(FRAMEPOINT_BOTTOMRIGHT, 0.825, 0.16);
+                // tooltip.setSize(0.315, 0);
+                // tooltip.visible = false;
+                //
+                // let tooltipValueFrame = Frame.fromName("BoxedTextValue", 0);
+                // if (!tooltipValueFrame) {
+                //     throw new Error('Could not find the tooltip value frame.');
+                // }
+                //
+                // tooltipValueFrame.text = "Human Paladin Face, but it is not uther.";
+                //
+                // let tooltipTitleFrame = Frame.fromName("BoxedTextTitle", 0);
+                // if (!tooltipTitleFrame) {
+                //     throw new Error('Could not find the tooltip title frame.');
+                // }
+                //
+                // tooltipTitleFrame.text = "Paladin";
                 // If the currently selected button is not null or undefined, create a timer loop
                 const hoversCommandButton = (commandButtonIndex: number | null) => {
 
                     // let tooltip = Frame.fromName("BoxedText", 0);
+                    Log.Debug("Hover button " + commandButtonIndex);
 
-                    if (tooltip != null) {
+                    if (box != null) {
                         if (commandButtonIndex == null) {
-                            tooltip.visible = false;
+                            box.hide();
                         } else {
                             // let unit = Unit.fromHandle(GetEnumUnit());
                             // let item = unit.itemInSlot(commandButtonIndex);
@@ -340,43 +368,74 @@ export class Commands {
                             // if (item != null) {
                             const TT = Frame.fromOrigin(ORIGIN_FRAME_UBERTOOLTIP, 0);
                             TT?.setVisible(false)
-                            tooltip.visible = true;
-                            const tow = player.hybridTowers[0];
-                            // assuming Equipment is a custom class and getByHandle is a method of that class
-                            let itemName = GetLocalizedString(tow.toolTipBasic) || '';
-                            let itemDesc = GetLocalizedString(tow.toolTipExtended) || '';
-                            let goldValue = tow.goldCost;
 
-                            let childTitle = Frame.fromName("BoxedTextTitle", 0);
-                            if (childTitle) {
-                                childTitle.text = itemName;
-                            }
-
-                            let childValue = Frame.fromName("BoxedTextValue", 0);
-                            if (childValue) {
-                                childValue.text = itemDesc;
-                            }
-
-                            let childGoldValue = Frame.fromName("BoxedTextGoldValue", 0);
-                            if (childGoldValue) {
-                                childGoldValue.text = `${goldValue}`;
-                            }
+                            box.show()
+                            // const tow = player.hybridTowers[0];
+                            // // assuming Equipment is a custom class and getByHandle is a method of that class
+                            // let itemName = GetLocalizedString(tow.toolTipBasic) || '';
+                            // let itemDesc = GetLocalizedString(tow.toolTipExtended) || '';
+                            // let goldValue = tow.goldCost;
+                            //
+                            // let childTitle = Frame.fromName("BoxedTextTitle", 0);
+                            // if (childTitle) {
+                            //     childTitle.text = itemName;
+                            // }
+                            //
+                            // let childValue = Frame.fromName("BoxedTextValue", 0);
+                            // if (childValue) {
+                            //     childValue.text = itemDesc;
+                            // }
+                            //
+                            // let childGoldValue = Frame.fromName("BoxedTextGoldValue", 0);
+                            // if (childGoldValue) {
+                            //     childGoldValue.text = `${goldValue}`;
+                            // }
                             // }
                         }
                     }
                 }
 
+                const areButtonsVisible = (): boolean => {
+                    for (let i = 0; i < 12; i++) {
+                        // Skip indices 3 and 7
+                        if (i === 3 || i === 7) {
+                            continue;
+                        }
+                        const button = Frame.fromOrigin(ORIGIN_FRAME_COMMAND_BUTTON, i)!;
+
+
+                        if (!button.visible) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
                 Timer.create().start(1.0 / 32, true, () => {
                     let selectedAnything = false;
+                    let shouldBeVisible = areButtonsVisible();
 
+                    for (const hybridFrame of hybridFrames) {
+                        if (hybridFrame.visible !== shouldBeVisible) {
+                            hybridFrame.setVisible(shouldBeVisible);
+                        }
+                    }
+
+                    if(!shouldBeVisible) {
+                        if(currentSelectedButtonIndex != null) {
+                            hoversCommandButton(null);
+                        }
+                        currentSelectedButtonIndex = null;
+                        return;
+                    }
                     // Loop all tooltips and check for the visible one
-                    for (let i = 0; i < 12; i++) {
+                    for (let i = 0; i < 11; i++) {
+
                         if (commandButtonTooltip[i].visible) {
                             selectedAnything = true;
 
                             // The new selected is not the same as the current one?
                             if (currentSelectedButtonIndex !== i) {
-
+                                print(shouldBeVisible ? 'Visible' : 'Not Visible');
                                 hoversCommandButton(i);
                             }
                             currentSelectedButtonIndex = i;
@@ -390,8 +449,6 @@ export class Commands {
                     }
                 });
                 print(`Timer created`);
-
-
 
 
                 // frame?.setTexture("ReplaceableTextures\\CommandButtons\\BTNHeroPaladin", 0, true)
