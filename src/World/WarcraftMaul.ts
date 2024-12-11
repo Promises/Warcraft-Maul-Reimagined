@@ -28,6 +28,7 @@ import {TimedEventQueue} from "../lib/WCEventQueue/TimedEventQueue";
 import {MapPlayer,Effect} from "w3ts";
 import {COLOUR, DecodeFourCC, SendMessage, SendMessageUnlogged, Util} from "../lib/translators";
 import {StringSink} from "../lib/Serilog/Sinks/StringSink";
+import {HybridRandomUI} from "./Game/Ui/HybridRandomUI";
 
 export class WarcraftMaul {
 
@@ -60,6 +61,7 @@ export class WarcraftMaul {
     public eventQueue: EventQueue;
     public safeEventQueue: SafeEventQueue;
     public timedEventQueue: TimedEventQueue;
+    public hybridUI: HybridRandomUI;
     public racePicking: RacePicking;
     private TeleportMovement: boolean = false;
     public readonly mapSettings: IMapSettings;
@@ -137,6 +139,7 @@ export class WarcraftMaul {
 
 
         this.diffVote = new Vote(this);
+        this.hybridUI = new HybridRandomUI(this);
         this.racePicking = new RacePicking(this);
         this.sellTower = new SellTower(this);
 

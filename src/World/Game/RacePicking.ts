@@ -315,7 +315,7 @@ export class RacePicking {
         //         player.setTechMaxAllowed(FourCC(tower.id), -1)
         //     }
         // }
-
+        this.game.hybridUI.updateHybridTowers(player);
         SendMessage(player.getNameWithColour() + ' has |cFFB0F442hy|r|cFF8CF442b|r|cFF42F4C5r|r|cFF42F4F1id|r randomed!');
 
 

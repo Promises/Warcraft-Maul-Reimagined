@@ -317,14 +317,23 @@ export const {
         [0,1], [1,1], [2,1],
         [0,2], [1,2], [2,2],
     ]
+    // const towers = objectData.units.map
+    // const towersToDel = Object.values(towers).filter(a => a.name.startsWith('Player '))
+    // towersToDel.forEach(c  => {delete towers[c.newId]})
+    // //
+    // objectData.units.map = towers
+    //
+    // towersToDel.forEach(a => console.log(a.newId, a.name,))
 
-    // {playerId: {tier: dummyTowerId}}
+
+    // {playerId: {tier: dummyTowerId}}objectData.units
     const hybridBuilding:  Record<string, Record<string, string>> = {}
     const hybridBuildingsMap: Record<string, DummyTowersEntry> = {}
     for (let playerNum = 0; playerNum < PLAYER_COUNT; playerNum++) {
         const playerTowers: Record<string, string> = {};
         for (let tier = 0; tier < tier_limits.length; tier++) {
             const building = objectData.units.copy('nntg')!;
+            // const building: Partial<Unit> = {newId: 'nnnnnn'};
             building.name = `Player ${playerNum +1} tier ${tier+1} tower`;
             building.tooltipBasic = `Build ${building.name}`;
             building.iconGameInterface = "ReplaceableTextures\\CommandButtons\\BTNHumanWatchTower.blp";
@@ -338,12 +347,12 @@ export const {
 
             building.hotkey = hotKeys[tier];
             [building.buttonPositionX, building.buttonPositionY] = buttonPositions[tier]
-            hybridBuildingsMap[building.newId] = {
+            hybridBuildingsMap[building.newId!] = {
                 playerId: playerNum,
                 tier: tier,
-                id: building.newId
+                id: building.newId!
             }
-            playerTowers[`${tier + 1 }`] = building.newId;
+            playerTowers[`${tier + 1 }`] = building.newId!;
         }
         hybridBuilding[`${playerNum + 1}`] = playerTowers;
     }
