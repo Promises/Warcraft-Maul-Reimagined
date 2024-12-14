@@ -17574,7 +17574,7 @@ Brings up a list of the available buildings that you may choose to construct.
 }
 
 STRING 2916
-// Abilities: A0FJ (Build Tiny Tower ), Name (Name)
+// Abilities: A0FJ (Build Tiny Tower), Name (Name)
 {
 Build Tiny Tower
 }
