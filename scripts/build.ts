@@ -2,6 +2,7 @@ import * as fs from "fs-extra";
 import * as path from "path";
 import War3Map from "mdx-m3-viewer-th/dist/cjs/parsers/w3x/map"
 import { compileMap, getFilesInDirectory, loadJsonFile, logger, toArrayBuffer, IProjectConfig } from "./utils";
+import {execFile, execSync} from "child_process";
 
 function main() {
   const config: IProjectConfig = loadJsonFile("config.json");
@@ -26,6 +27,23 @@ function main() {
   }
 
   createMapFromDir(`${config.outputFolder}/${config.mapFolder}`, `./dist/${config.mapFolder}`);
+  //
+  // const cwd = process.cwd();
+  // const filename = `${cwd}/dist/bin/map.w3x`;
+  //
+  // logger.info(`Launching map "${filename.replace(/\\/g, "/")}"...`);
+  //
+  // if(config.winePath) {
+  //   const wineFilename = `"Z:${filename}"`
+  //   const prefix = config.winePrefix ? `WINEPREFIX=${config.winePrefix}` : ''
+  //   execSync(`${prefix} ${config.winePath} "${config.gameExecutable}" ${["-loadfile", wineFilename, ...config.launchArgs].join(' ')}`, { stdio: 'ignore' });
+  // } else {
+  //   execFile(config.gameExecutable, ["-loadfile", filename, ...config.launchArgs], (err: any) => {
+  //     if (err && err.code === 'ENOENT') {
+  //       logger.error(`No such file or directory "${config.gameExecutable}". Make sure gameExecutable is configured properly in config.json.`);
+  //     }
+  //   });
+  // }
 }
 
 /**

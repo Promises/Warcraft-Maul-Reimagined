@@ -61,7 +61,7 @@ export class WarcraftMaul {
     public eventQueue: EventQueue;
     public safeEventQueue: SafeEventQueue;
     public timedEventQueue: TimedEventQueue;
-    public hybridUI: HybridRandomUI;
+    // public hybridUI: HybridRandomUI;
     public racePicking: RacePicking;
     private TeleportMovement: boolean = false;
     public readonly mapSettings: IMapSettings;
@@ -139,7 +139,7 @@ export class WarcraftMaul {
 
 
         this.diffVote = new Vote(this);
-        this.hybridUI = new HybridRandomUI(this);
+        // this.hybridUI = new HybridRandomUI(this);
         this.racePicking = new RacePicking(this);
         this.sellTower = new SellTower(this);
 

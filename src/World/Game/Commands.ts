@@ -12,7 +12,7 @@ import {TimedEvent} from '../../lib/WCEventQueue/TimedEvent';
 import {DummyPlayer} from '../Entity/EmulatedPlayer/DummyPlayer';
 import {Maze, Walkable} from '../Antiblock/Maze';
 import {COLOUR, DecodeFourCC, SendMessage, Util} from "../../lib/translators";
-import {Frame, MapPlayer, Timer, Trigger, Unit} from "w3ts";
+import {Effect, Frame, MapPlayer, Timer, Trigger, Unit} from "w3ts";
 import {Image} from "../../JassOverrides/Image";
 import {HybridRandomCommandButton} from "./Ui/HybridRandomCommandButton";
 
@@ -256,7 +256,7 @@ export class Commands {
                 this.DestroyDrawings();
                 break;
             case 'point':
-                this.drawPoint(player.builders[0]!);
+                this.drawPoint(player!);
                 break;
             case 'bird':
                 SetCameraField(CAMERA_FIELD_ANGLE_OF_ATTACK, 270, 1);
@@ -478,6 +478,8 @@ export class Commands {
             if (player.isDeveloper) {
                 this.game.diffVote.forceBlitz = true;
             }
+        } else if (command[0] === 'build') {
+            player.buildMode = !player.buildMode;
         } else if (command[0] === 'zoom' || command[0] === 'cam') {
             if (GetLocalPlayer() === player.handle) {
                 const amount: number = Util.ParsePositiveInt(command[1]);
@@ -810,7 +812,7 @@ export class Commands {
         this.drawings.push(sfx);
         sfx.forEach((img: Image) => {
             img.SetImageRenderAlways(true);
-            img.ShowImage(true);
+            img.visible = true;
         });
     }
 
@@ -841,23 +843,59 @@ export class Commands {
         this.drawings.push(sfx);
         sfx.forEach((img: Image) => {
             img.SetImageRenderAlways(true);
-            img.ShowImage(true);
+            img.visible = true;
         });
     }
 
-    private drawPoint(builder: Unit): void {
-        const x: number = Math.round(builder.x / 64) * 64;
-        const y: number = Math.round(builder.y / 64) * 64;
-        Log.Debug(`(${x}, ${y})`);
+    private drawPoint(player: Defender): void {
+        let playerSpawnId: number | undefined;
+        // Find which maze belongs to the player
+        // for (let i: number = 0; i < this.game.mapSettings.PLAYER_AREAS.length; i++) {
+        //     if (this.game.mapSettings.PLAYER_AREAS[i].ContainsUnit(player.builders[0])) {
+        //         playerSpawnId = i;
+        //         break;
+        //     }
+        // }
+        //
+        // if (playerSpawnId === undefined) {
+        //     Log.Debug('Could not find player maze');
+        //     return;
+        // }
 
+        const playerMouseX = player.mouseX;
+        const playerMouseY = player.mouseY;
         const imagePath: string = 'ReplaceableTextures\\Splats\\SuggestedPlacementSplat.blp';
 
+        // const img: Image = new Image(imagePath, 128, player.mouseX-32, player.mouseY-32, 0.00);
+        // img.setColour(255, 255, 255, 153);
+        // img.SetImageRenderAlways(true);
+        // img.ShowImage(true);
+        // this.points.push(img);
+        const effect = Effect.create('units\\nightelf\\Chimaera\\Chimaera', playerMouseX, playerMouseY);
+        effect?.setColor(128, 128, 128);
+        effect?.setAlpha(153);
+        effect?.setYaw(Deg2Rad(270));
+        effect?.setTimeScale(0.01);
 
-        const img: Image = new Image(imagePath, 96, x, y, 0.00);
-        img.SetImageRenderAlways(true);
-        img.ShowImage(true);
 
-        this.points.push(img);
+        // const maze: Maze = this.game.worldMap.playerMazes[playerSpawnId];
+        // const imagePath: string = 'ReplaceableTextures\\Splats\\SuggestedPlacementSplat.blp';
+        //
+        // // Draw grid points at cell centers
+        // for (let x: number = 0; x < maze.width; x++) {
+        //     for (let y: number = 0; y < maze.height; y++) {
+        //         const xPos = maze.minX + (x * 64) + 32; // Add 32 to center in cell
+        //         const yPos = maze.minY + (y * 64) + 32; // Add 32 to center in cell
+        //         const img: Image = new Image(imagePath, 64, xPos, yPos, 0.00);
+        //
+        //         img.setColour(0, 0, 255, 153);
+        //         img.SetImageRenderAlways(true);
+        //         img.ShowImage(true);
+        //         this.points.push(img);
+        //     }
+        // }
+        //
+        // player.sendMessage(`Maze dimensions: ${maze.width}x${maze.height}`);
     }
 
 

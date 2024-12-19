@@ -1,15 +1,17 @@
-import { AbstractPlayer } from './AbstractPlayer';
-import { Point } from '../../GlobalSettings';
-import { Race } from '../../Game/Races/Race';
-import { WarcraftMaul } from '../../WarcraftMaul';
-import { AbstractHologramMaze } from '../../Holograms/AbstractHologramMaze';
-import { Tower } from '../Tower/Specs/Tower';
-import { CitadelOfNaxxramas } from '../Tower/Races/Naxxramas/CitadelOfNaxxramas';
-import {Trigger, Unit} from "w3ts";
+import {AbstractPlayer} from './AbstractPlayer';
+import {Point} from '../../GlobalSettings';
+import {Race} from '../../Game/Races/Race';
+import {WarcraftMaul} from '../../WarcraftMaul';
+import {AbstractHologramMaze} from '../../Holograms/AbstractHologramMaze';
+import {Tower} from '../Tower/Specs/Tower';
+import {CitadelOfNaxxramas} from '../Tower/Races/Naxxramas/CitadelOfNaxxramas';
+import {Effect, Timer, Trigger, Unit} from "w3ts";
 import {Rectangle} from "../../../JassOverrides/Rectangle";
 import {COLOUR, SendMessage, Util} from "../../../lib/translators";
 import {TimedEvent} from "../../../lib/WCEventQueue/TimedEvent";
-import {HybridTower} from "../../Game/Races/HybridRandom.types";
+import {GameTowerDef} from "../../Game/Races/HybridRandom.types";
+import {Maze, Walkable} from "../../Antiblock/Maze";
+import {HybridTierOne} from "../../Game/Races/HybridRandom";
 
 export class Defender extends AbstractPlayer {
 
@@ -23,17 +25,98 @@ export class Defender extends AbstractPlayer {
     public goldReward: number = 0;
     public citadelOfNaxxramas: CitadelOfNaxxramas | undefined;
 
-    get towerForces(): Map<number, number> {
-        return this._towerForces;
+
+    private mouseMoveTrigger: Trigger | undefined;
+    private mousePressDownTrigger: Trigger | undefined;
+    private mouseReleaseTrigger: Trigger | undefined;
+    leftMouse: boolean = false;
+    mouseX: number = 0;
+    mouseY: number = 0;
+    private _highlightedPoints: { x: number, y: number }[] = [];
+    private _currentHighlightedMaze: number = -1;
+
+    private _buildMode: boolean = false;
+    private toBuild: GameTowerDef | undefined;
+    private buildEffect: Effect | undefined;
+
+    get highlightedPoints(): { x: number, y: number }[] {
+        return this._highlightedPoints;
     }
 
-    get builders(): Unit[] {
-        return this._builders;
+    set highlightedPoints(value: { x: number, y: number }[]) {
+        this._highlightedPoints = value;
     }
 
-    set builders(value: Unit[]) {
-        this._builders = value;
+
+    get currentHighlightedMaze(): number {
+        return this._currentHighlightedMaze;
     }
+
+    set currentHighlightedMaze(value: number) {
+        this._currentHighlightedMaze = value;
+    }
+
+    set buildMode(buildMode: boolean) {
+        const playerMazes = this.game.worldMap.playerMazes;
+
+        if (buildMode !== this._buildMode) {
+            for (let i = 0; i < playerMazes.length; i++) {
+                playerMazes[i].setBuildmode(this, buildMode)
+            }
+
+            if(buildMode) {
+                this.toBuild = HybridTierOne[1];
+                let effectModel = "";
+                if (this.isLocal()) {
+                    effectModel = this.toBuild.model;
+                }
+                const currentHighlightedMaze = this.currentHighlightedMaze;
+                const maze = currentHighlightedMaze !== -1 && playerMazes[currentHighlightedMaze];
+                let x = 0;
+                let y = 0;
+
+                if (maze && this.highlightedPoints) {
+                    const center = maze.getHighlightedPointsCenter(this.highlightedPoints)
+                    if (center) {
+                        x = center.x;
+                        y = center.y;
+                    }
+                    // Use center.x and center.y which will be in world coordinates
+                }
+                this.buildEffect = Effect.create(effectModel, x, y);
+                this.buildEffect?.setColor(128, 128, 128);
+                this.buildEffect?.setAlpha(153);
+                this.buildEffect?.setYaw(Deg2Rad(270));
+                this.buildEffect?.setTimeScale(0.01);
+            } else {
+                this.buildEffect?.destroy();
+            }
+        }
+        this._buildMode = buildMode;
+    }
+
+    get buildMode() {
+        return this._buildMode;
+    }
+
+    public clearHighlightedPoints(maze: Maze): void {
+        // Reset previously highlighted points to their original colors
+        for (const point of this._highlightedPoints) {
+            let col = maze.gridPoints[point.x][point.y].colour;
+            if (this.isLocal()) {
+                if (maze.maze[point.x][point.y] === Walkable.Walkable) {
+                    col = {red: 0, green: 0, blue: 255, alpha: 153}; // Blue
+                } else {
+                    col = {red: 255, green: 0, blue: 0, alpha: 153}; // Red
+                }
+            }
+            maze.gridPoints[point.x][point.y].colour = col;
+
+        }
+        this._highlightedPoints = [];
+        this._currentHighlightedMaze = -1;
+    }
+
 
     private _voidFragments: number = 0;
     private _voidFragmentTick: number = 0;
@@ -53,7 +136,7 @@ export class Defender extends AbstractPlayer {
     private _voidBuilder: Unit | undefined;
     private _lootBoxer: Unit | undefined;
     private _hybridBuilder: Unit | undefined;
-    private _hybridTowers: HybridTower[] = [];
+    private _hybridTowers: GameTowerDef[] = [];
     private leaveTrigger: Trigger;
     private selectUnitTrigger: Trigger;
     private deniedPlayers: Map<number, boolean> = new Map<number, boolean>();
@@ -89,8 +172,73 @@ export class Defender extends AbstractPlayer {
         this.selectUnitTrigger.registerPlayerUnitEvent(this, EVENT_PLAYER_UNIT_SELECTED, undefined);
         this.selectUnitTrigger.addAction(() => this.SelectUnit());
 
+        const t = new Timer().start(0.1, false, () => {
+            t.destroy();
+            this.mouseMoveTrigger = Trigger.create();
+            this.mouseMoveTrigger.registerPlayerMouseEvent(this, bj_MOUSEEVENTTYPE_MOVE)
+            this.mouseMoveTrigger.addAction(() => this.mouseMoved())
+            this.mousePressDownTrigger = Trigger.create();
+            this.mouseReleaseTrigger = Trigger.create();
+            this.mousePressDownTrigger.registerPlayerMouseEvent(this, bj_MOUSEEVENTTYPE_DOWN)
+            this.mouseReleaseTrigger.registerPlayerMouseEvent(this, bj_MOUSEEVENTTYPE_UP)
+            this.mousePressDownTrigger.addAction(() => this.mousePressed(true))
+            this.mouseReleaseTrigger.addAction(() => this.mousePressed(false))
+
+        });
+
 
         this.game.gameCommandHandler.commandTrigger.registerPlayerChatEvent(this, '', false);
+    }
+
+
+    private mouseMoved() {
+        this.mouseX = BlzGetTriggerPlayerMouseX();
+        this.mouseY = BlzGetTriggerPlayerMouseY();
+        // TODO: should mouse "reaction" be here?
+
+        // Check if mouse is in any maze
+        const playerMazes = this.game.worldMap.playerMazes;
+        let foundMaze = false;
+        for (let i = 0; i < playerMazes.length; i++) {
+            const maze = playerMazes[i];
+            if (maze.isPointInMaze(this.mouseX, this.mouseY)) {
+                foundMaze = true;
+                // If we were in a different maze before, clear those highlights
+                if (this.currentHighlightedMaze !== i && this.currentHighlightedMaze !== -1) {
+                    const oldMaze = playerMazes[this.currentHighlightedMaze];
+                    this.clearHighlightedPoints(oldMaze);
+                }
+                // Update current maze and highlight new points
+                this.currentHighlightedMaze = i;
+                maze.highlightGridPoints(this.mouseX, this.mouseY, this);
+                break; // Only highlight the first maze we're in
+            }
+        }
+
+        // If we're not in any maze, clear highlights from the last maze we were in
+        if (!foundMaze && this.currentHighlightedMaze !== -1) {
+            const oldMaze = playerMazes[this.currentHighlightedMaze];
+            this.clearHighlightedPoints(oldMaze);
+        }
+
+    }
+
+
+    private mousePressed(pressed: boolean) {
+        const button = BlzGetTriggerPlayerMouseButton();
+        if (button == MOUSE_BUTTON_TYPE_LEFT) {
+            this.leftMouse = pressed;
+            // TODO:  Could check past state here, and fire event?
+            // this.currentWeapon.fire();
+        }
+        this.mouseMoved();
+
+        // if (button == MOUSE_BUTTON_TYPE_LEFT) {
+        //     this.pressedButtons[MouseKey.LEFT] = pressed;
+        // }
+        // if (button == MOUSE_BUTTON_TYPE_RIGHT) {
+        //     this.pressedButtons[MouseKey.RIGHT] = pressed;
+        // }
     }
 
     public setHoloMaze(holoMaze: AbstractHologramMaze | undefined): void {
@@ -103,6 +251,19 @@ export class Defender extends AbstractPlayer {
 
     get holoMaze(): AbstractHologramMaze | undefined {
         return this._holoMaze;
+    }
+
+
+    get towerForces(): Map<number, number> {
+        return this._towerForces;
+    }
+
+    get builders(): Unit[] {
+        return this._builders;
+    }
+
+    set builders(value: Unit[]) {
+        this._builders = value;
     }
 
     private setUpPlayerVariables(): void {
@@ -232,11 +393,11 @@ export class Defender extends AbstractPlayer {
         return undefined;
     }
 
-    get hybridTowers(): HybridTower[] {
+    get hybridTowers(): GameTowerDef[] {
         return this._hybridTowers;
     }
 
-    set hybridTowers(value: HybridTower[]) {
+    set hybridTowers(value: GameTowerDef[]) {
         this._hybridTowers = value;
     }
 
@@ -506,5 +667,28 @@ export class Defender extends AbstractPlayer {
         if (unit?.owner.id === this.id) {
             unit.paused = false;
         }
+    }
+
+    updateBuildEffect() {
+        if(!this.buildEffect) {
+            return;
+        }
+        const playerMazes = this.game.worldMap.playerMazes;
+
+        const currentHighlightedMaze = this.currentHighlightedMaze;
+        const maze = playerMazes[currentHighlightedMaze];
+        let x = 0;
+        let y = 0;
+
+        if (maze && this.highlightedPoints) {
+            const center = maze.getHighlightedPointsCenter(this.highlightedPoints)
+            if (center) {
+                x = center.x;
+                y = center.y;
+            }
+            // Use center.x and center.y which will be in world coordinates
+        }
+        this.buildEffect.setPosition(x,y,0);
+
     }
 }

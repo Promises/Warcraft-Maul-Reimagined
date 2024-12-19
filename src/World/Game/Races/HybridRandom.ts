@@ -1,4 +1,4 @@
-import {HybridTower} from "./HybridRandom.types";
+import {GameTowerDef} from "./HybridRandom.types";
 import {AbilityTypes, Unit} from "war3-objectdata-th";
 
 interface DummyTowersEntry {
@@ -279,7 +279,7 @@ export const {
         }
     });
 
-    const returnTiers: Record<string, HybridTower[]> = {
+    const returnTiers: Record<string, GameTowerDef[]> = {
         HybridTierOne: [],
         HybridTierTwo: [],
         HybridTierThree: [],
@@ -303,7 +303,9 @@ export const {
                 icon: unit?.iconGameInterface,
                 goldCost: unit?.goldCostundefined || 5,
                 toolTipExtended: unit?.tooltipExtended || '',
-                toolTipBasic: unit?.tooltipBasic || unit?.name || 'UNKNOWN NAME'
+                toolTipBasic: unit?.tooltipBasic || unit?.name || 'UNKNOWN NAME',
+                model: unit?.modelFile || 'units\\nightelf\\Chimaera\\Chimaera',
+                modelScale: unit?.scalingValueundefined || 1
             })
         });
     }
@@ -313,9 +315,9 @@ export const {
         'z', 'x', 'c',
     ]
     const buttonPositions = [
-        [0,0], [1,0], [2,0],
-        [0,1], [1,1], [2,1],
-        [0,2], [1,2], [2,2],
+        [-1,-1], [1,-1], [2,-1],
+        [-1,1], [1,1], [2,1],
+        [-1,2], [1,2], [2,2],
     ]
     // const towers = objectData.units.map
     // const towersToDel = Object.values(towers).filter(a => a.name.startsWith('Player '))
@@ -364,7 +366,6 @@ export const {
     }
 
     hybridBuilder.structuresBuilt = Object.keys(hybridBuildingsMap).join(',');
-
     objectData.save();
     return {
         DummyTowers: hybridBuilding,
@@ -384,14 +385,14 @@ export const {
     DummyTowers: Record<string, Record<string, string>>;
     DummyTowersMap: Record<string, DummyTowersEntry>
     // HybridSpells: Record<string, AbilityTypes.BuildTinyScoutTower<any>>,
-    HybridTierOne: HybridTower[],
-    HybridTierTwo: HybridTower[],
-    HybridTierThree: HybridTower[],
-    HybridTierFour: HybridTower[],
-    HybridTierFive: HybridTower[],
-    HybridTierSix: HybridTower[],
-    HybridTierSeven: HybridTower[],
-    HybridTierEight: HybridTower[],
-    HybridTierNine: HybridTower[],
+    HybridTierOne: GameTowerDef[],
+    HybridTierTwo: GameTowerDef[],
+    HybridTierThree: GameTowerDef[],
+    HybridTierFour: GameTowerDef[],
+    HybridTierFive: GameTowerDef[],
+    HybridTierSix: GameTowerDef[],
+    HybridTierSeven: GameTowerDef[],
+    HybridTierEight: GameTowerDef[],
+    HybridTierNine: GameTowerDef[],
 };
 

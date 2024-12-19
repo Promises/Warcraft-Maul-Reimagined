@@ -105,7 +105,7 @@ export class HybridRandomUI {
 
     private hoverCommandButton(commandButtonIndex: number | null) {
 
-        // Log.Debug("Hover button " + commandButtonIndex);
+        print("Hover button " + commandButtonIndex);
         this.hideTooltips(commandButtonIndex)
 
         if (commandButtonIndex == null) {
@@ -145,15 +145,11 @@ export class HybridRandomUI {
         return true;
     }
 
-    public updateHybridTowers(player: Defender) {
-        if(!player.isLocal()) {
-            return;
-        }
+    public updateHybridTowers(player: Defender, players: Map<number, Defender>) {
         for (let i = 0; i < player.hybridTowers.length; i++) {
-            const hybridTower = player.hybridTowers[i];
             const renderIndx = this.commandButtonIndexes[i];
 
-            this.hybridFrames[renderIndx].setTower(hybridTower);
+            this.hybridFrames[renderIndx].setTower(players, i);
         }
     }
 

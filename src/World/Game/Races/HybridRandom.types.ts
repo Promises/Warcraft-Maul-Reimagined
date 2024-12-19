@@ -1,4 +1,4 @@
-export interface HybridTower {
+export interface GameTowerDef {
     id: string;
     name: string;
     icon?: string;
@@ -8,5 +8,7 @@ export interface HybridTower {
     toolTipBasic: string;
     // tool tip description
     toolTipExtended: string;
+    model: string;
+    modelScale: number;
 }
 

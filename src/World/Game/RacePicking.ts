@@ -16,12 +16,12 @@ import {
 import {MapPlayer, Trigger, Unit} from "w3ts";
 import {SendMessage, Util} from "../../lib/translators";
 import {Log} from "../../lib/Serilog/Serilog";
-import {HybridTower} from "./Races/HybridRandom.types";
+import {GameTowerDef} from "./Races/HybridRandom.types";
 
 export class RacePicking {
     raceSelectTrigger: Trigger;
     private game: WarcraftMaul;
-    public HybridPool: Map<string, HybridTower> = new Map<string, HybridTower>();
+    public HybridPool: Map<string, GameTowerDef> = new Map<string, GameTowerDef>();
 
     constructor(game: WarcraftMaul) {
         this.game = game;
@@ -315,21 +315,21 @@ export class RacePicking {
         //         player.setTechMaxAllowed(FourCC(tower.id), -1)
         //     }
         // }
-        this.game.hybridUI.updateHybridTowers(player);
+        // this.game.hybridUI.updateHybridTowers(player, this.game.players);
         SendMessage(player.getNameWithColour() + ' has |cFFB0F442hy|r|cFF8CF442b|r|cFF42F4C5r|r|cFF42F4F1id|r randomed!');
 
 
     }
 
     private CreateHybridPool(): void {
-        HybridTierEight.forEach((d: HybridTower) => this.HybridPool.set(d.id, d));
-        HybridTierFive.forEach((d: HybridTower) => this.HybridPool.set(d.id, d));
-        HybridTierFour.forEach((d: HybridTower) => this.HybridPool.set(d.id, d));
-        HybridTierNine.forEach((d: HybridTower) => this.HybridPool.set(d.id, d));
-        HybridTierOne.forEach((d: HybridTower) => this.HybridPool.set(d.id, d));
-        HybridTierSeven.forEach((d: HybridTower) => this.HybridPool.set(d.id, d));
-        HybridTierSix.forEach((d: HybridTower) => this.HybridPool.set(d.id, d));
-        HybridTierThree.forEach((d: HybridTower) => this.HybridPool.set(d.id, d));
-        HybridTierTwo.forEach((d: HybridTower) => this.HybridPool.set(d.id, d));
+        HybridTierEight.forEach((d: GameTowerDef) => this.HybridPool.set(d.id, d));
+        HybridTierFive.forEach((d: GameTowerDef) => this.HybridPool.set(d.id, d));
+        HybridTierFour.forEach((d: GameTowerDef) => this.HybridPool.set(d.id, d));
+        HybridTierNine.forEach((d: GameTowerDef) => this.HybridPool.set(d.id, d));
+        HybridTierOne.forEach((d: GameTowerDef) => this.HybridPool.set(d.id, d));
+        HybridTierSeven.forEach((d: GameTowerDef) => this.HybridPool.set(d.id, d));
+        HybridTierSix.forEach((d: GameTowerDef) => this.HybridPool.set(d.id, d));
+        HybridTierThree.forEach((d: GameTowerDef) => this.HybridPool.set(d.id, d));
+        HybridTierTwo.forEach((d: GameTowerDef) => this.HybridPool.set(d.id, d));
     }
 }

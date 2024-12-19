@@ -1,5 +1,5 @@
 import {Frame} from "w3ts";
-import {HybridTower} from "../Races/HybridRandom.types";
+import {Defender} from "../../Entity/Players/Defender";
 
 export class HybridRandomCommandButton {
     private tooltipFrame: Frame | undefined;
@@ -44,11 +44,27 @@ export class HybridRandomCommandButton {
         this.resetHeight();
     }
 
-    public setTower(hybridTower: HybridTower): this {
-        this.buttonFrame?.setTexture(hybridTower.icon ? hybridTower.icon : '', 0, true)
-        this.titleTextFrame?.setText(GetLocalizedString(hybridTower.toolTipBasic) || '');
-        this.expandedToolTipTextFrame?.setText(GetLocalizedString(hybridTower.toolTipExtended) || '');
-        this.goldFrameTextFrame?.setText(`${hybridTower.goldCost}`);
+    public setTower(players: Map<number, Defender>, hybridIndx: number): this {
+        let icon = '';
+        let tooltip = 'YOu should not see this';
+        let tooltipExtended = 'This should never be visible';
+        let goldCost: number | string ='666';
+
+        for (const player of players.values()) {
+            if(player.hasHybridRandomed && player.isLocal()) {
+                icon = player.hybridTowers[hybridIndx].icon || '';
+                tooltip = GetLocalizedString(player.hybridTowers[hybridIndx].toolTipBasic || 'YOu should not see this')!;
+                tooltipExtended = GetLocalizedString(player.hybridTowers[hybridIndx].toolTipExtended || 'This should never be visible')!;
+                goldCost = player.hybridTowers[hybridIndx].goldCost || '666';
+            }
+        }
+
+
+        this.buttonFrame?.setTexture(icon, 0, true)
+        this.titleTextFrame?.setText(tooltip || '');
+        this.expandedToolTipTextFrame?.setText(tooltipExtended || '');
+        this.goldFrameTextFrame?.setText(`${goldCost}`);
+        this.resetHeight();
         return this;
     }
 
