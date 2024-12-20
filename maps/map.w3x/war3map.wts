@@ -17579,6 +17579,24 @@ STRING 2916
 Build Tiny Tower
 }
 
+STRING 2917
+// Abilities: A0FK (Build), Name (Name)
+{
+Build
+}
+
+STRING 2918
+// Abilities: A0FK (Build), EditorSuffix (Editor Suffix)
+{
+(Spell Book)
+}
+
+STRING 2919
+// Abilities: A0FL (Build Test Tower), Hotkey (Hotkey - Normal)
+{
+Q
+}
+
 STRING 2920
 // Abilities: A01R (Raining Death), Name (Name)
 {
@@ -17589,6 +17607,24 @@ STRING 2921
 // Abilities: A01R (Raining Death), Tip (Tooltip - Normal)
 {
 Raining Death
+}
+
+STRING 2922
+// Abilities: A0FL (Build Test Tower), Name (Name)
+{
+Build Test Tower
+}
+
+STRING 2923
+// Abilities: A0FL (Build Test Tower), Tip (Tooltip - Normal)
+{
+Build Test Tower
+}
+
+STRING 2924
+// Abilities: A0FL (Build Test Tower), Ubertip (Tooltip - Normal - Extended)
+{
+Builds a test tower for testing purposes.
 }
 
 STRING 2927
