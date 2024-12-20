@@ -479,7 +479,7 @@ export class Commands {
                 this.game.diffVote.forceBlitz = true;
             }
         } else if (command[0] === 'build') {
-            player.buildMode = !player.buildMode;
+            player.setBuildMode(!player.buildMode);
         } else if (command[0] === 'zoom' || command[0] === 'cam') {
             if (GetLocalPlayer() === player.handle) {
                 const amount: number = Util.ParsePositiveInt(command[1]);

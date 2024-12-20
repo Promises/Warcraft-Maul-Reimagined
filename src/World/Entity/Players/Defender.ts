@@ -56,7 +56,7 @@ export class Defender extends AbstractPlayer {
         this._currentHighlightedMaze = value;
     }
 
-    set buildMode(buildMode: boolean) {
+    setBuildMode(buildMode: boolean, hybridTower?: GameTowerDef) {
         const playerMazes = this.game.worldMap.playerMazes;
 
         if (buildMode !== this._buildMode) {
@@ -65,7 +65,7 @@ export class Defender extends AbstractPlayer {
             }
 
             if(buildMode) {
-                this.toBuild = HybridTierOne[1];
+                this.toBuild =hybridTower || HybridTierOne[1];
                 let effectModel = "";
                 if (this.isLocal()) {
                     effectModel = this.toBuild.model;
@@ -680,7 +680,7 @@ export class Defender extends AbstractPlayer {
         let x = 0;
         let y = 0;
 
-        if (maze && this.highlightedPoints) {
+        if (maze !== undefined && this.highlightedPoints.length > 0) {
             const center = maze.getHighlightedPointsCenter(this.highlightedPoints)
             if (center) {
                 x = center.x;

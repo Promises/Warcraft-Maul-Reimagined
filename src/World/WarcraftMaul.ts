@@ -29,6 +29,7 @@ import {MapPlayer,Effect} from "w3ts";
 import {COLOUR, DecodeFourCC, SendMessage, SendMessageUnlogged, Util} from "../lib/translators";
 import {StringSink} from "../lib/Serilog/Sinks/StringSink";
 import {HybridRandomUI} from "./Game/Ui/HybridRandomUI";
+import {BuildTowerSpell} from "./Entity/Tower/BuildTowerSpell";
 
 export class WarcraftMaul {
 
@@ -50,6 +51,7 @@ export class WarcraftMaul {
     public scoreBoard: MultiBoard | undefined;
     private itemHandler: ItemHandler;
     public sellTower: SellTower;
+    public buildTower: BuildTowerSpell;
     public abilityHandler: GenericAbilityHandler;
 
 
@@ -142,6 +144,7 @@ export class WarcraftMaul {
         // this.hybridUI = new HybridRandomUI(this);
         this.racePicking = new RacePicking(this);
         this.sellTower = new SellTower(this);
+        this.buildTower = new BuildTowerSpell(this);
 
         // this.gameRoundHandler = new AbstractGameRound(this);
 
