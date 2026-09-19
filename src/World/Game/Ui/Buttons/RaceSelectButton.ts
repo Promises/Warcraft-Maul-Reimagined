@@ -16,9 +16,9 @@ export class RaceSelectButton extends AbstractActionButton {
     }
 
     public clickAction(): void {
-        // Local frame event: the toggle itself runs on every client via PlayerSync
+        // Opening the panel is local UI; only picking a race is synced
         this.disable();
-        this.game.playerSync.send('race-toggle');
+        this.game.raceSelectPanel.toggleLocal();
         this.enable();
     }
 }

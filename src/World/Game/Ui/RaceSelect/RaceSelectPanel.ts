@@ -45,13 +45,13 @@ export class RaceSelectPanel {
     private readonly infoName: Frame;
     private readonly infoText: Frame;
     private readonly pickButton: Frame;
-    private readonly openFor: Set<number> = new Set<number>();
     // Local client state
     private selectedTier: RaceTier = 'Beginner';
     private currentItems: RaceItemDef[] = [];
     private scrollOffset: number = 0;
     private settingScroll: boolean = false;
     private highlightedItem: string | undefined;
+    private visibleLocally: boolean = false;
 
     constructor(private readonly game: WarcraftMaul) {
         const gameUi = Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0)!;
@@ -64,9 +64,11 @@ export class RaceSelectPanel {
         this.panel.setAbsPoint(FRAMEPOINT_CENTER, PANEL_CENTER_X, PANEL_CENTER_Y);
         trackHover(game, this.panel);
 
-        // Categories
+        // Categories: the normal tiers, plus a Dev tab in debug builds for the races you cannot
+        // normally select (disabled races and the random-only Loot Boxer)
+        const tiers: RaceTier[] = game.debugMode ? [...RACE_TIERS, 'Dev'] : RACE_TIERS;
         const categoryLeft = left + PADDING;
-        RACE_TIERS.forEach((tier, index) => {
+        tiers.forEach((tier, index) => {
             const button = Frame.create('CustomTextButton', this.panel, 0, 0)!;
             button.setSize(CATEGORY_WIDTH, CATEGORY_HEIGHT);
             button.setAbsPoint(FRAMEPOINT_TOPLEFT, categoryLeft, top - PADDING - index * CATEGORY_SPACING);
@@ -88,7 +90,8 @@ export class RaceSelectPanel {
         for (const index of Array.from({length: VISIBLE_ROWS}, (_, i) => i)) {
             this.rows.push(new RaceListRow(game, `raceSelectRow${index}`, this.panel,
                 listLeft, listTop - index * ROW_HEIGHT, LIST_WIDTH, ROW_HEIGHT,
-                itemId => this.highlight(itemId)));
+                itemId => this.highlight(itemId),
+                up => this.scrollTo(this.scrollOffset + (up ? -1 : 1))));
         }
 
         // Scrollbar down the right of the list, and a mouse-wheel catcher over it
@@ -107,18 +110,6 @@ export class RaceSelectPanel {
                 }
             });
         }
-        // Only over the rows, so clicks on the scrollbar are not swallowed
-        const wheelCatcher = Frame.createType('raceSelectWheel', this.panel, 0, 'BUTTON', '')!;
-        wheelCatcher.setSize(LIST_WIDTH, VISIBLE_ROWS * ROW_HEIGHT);
-        wheelCatcher.setAbsPoint(FRAMEPOINT_TOPLEFT, listLeft, listTop);
-        wheelCatcher.setAlpha(0);
-        wheelCatcher.setLevel(1);
-        if (this.scrollbar) {
-            this.scrollbar.setLevel(3);
-        }
-        const wheelTrigger = Trigger.create();
-        wheelTrigger.triggerRegisterFrameEvent(wheelCatcher, FRAMEEVENT_MOUSE_WHEEL);
-        wheelTrigger.addAction(() => this.scrollTo(this.scrollOffset + (Frame.getEventValue() > 0 ? -1 : 1)));
 
         // Information
         const infoLeft = scrollbarLeft + SCROLLBAR_WIDTH + PADDING;
@@ -151,7 +142,7 @@ export class RaceSelectPanel {
         // Close: just outside the top-right corner so it never overlaps the race name
         const close = new IconButton(game, 'raceSelectClose', this.panel,
             left + PANEL_WIDTH - CLOSE_BUTTON / 2, top + PADDING + CLOSE_BUTTON / 2, CLOSE_BUTTON,
-            () => game.playerSync.send('race-close'), false);
+            () => this.closeLocal(), false);
         for (const player of game.players.values()) {
             close.setContent(player, {
                 icon: 'ReplaceableTextures\\CommandButtons\\BTNCancel.blp',
@@ -160,29 +151,39 @@ export class RaceSelectPanel {
             });
         }
 
-        game.playerSync.on('race-toggle', player => this.toggle(player));
-        game.playerSync.on('race-close', player => this.close(player));
+        // Opening/closing is local UI; only the pick changes game state and is synced
         game.playerSync.on('race-pick', (player, itemId) => this.pick(player, itemId));
 
         this.showTier(this.selectedTier);
         this.panel.setVisible(false);
     }
 
-    public toggle(player: Defender): void {
-        if (this.openFor.has(player.id)) {
-            this.close(player);
+    /** Local toggle for the button; each client controls its own panel visibility. */
+    public toggleLocal(): void {
+        const player = this.game.players.get(GetPlayerId(GetLocalPlayer()));
+        if (!player) {
+            return;
+        }
+        if (this.visibleLocally) {
+            this.closeLocal();
         } else {
             this.open(player);
         }
     }
 
+    public closeLocal(): void {
+        const player = this.game.players.get(GetPlayerId(GetLocalPlayer()));
+        if (player) {
+            this.close(player);
+        }
+    }
+
+    /** Opens for a player (local visibility); used at game start and after repick. */
     public open(player: Defender): void {
-        this.openFor.add(player.id);
         this.setVisible(player, true);
     }
 
     public close(player: Defender): void {
-        this.openFor.delete(player.id);
         this.setVisible(player, false);
     }
 
@@ -192,7 +193,8 @@ export class RaceSelectPanel {
         const race: Race | undefined = this.game.worldMap.races.find(candidate => candidate.itemid === itemId);
         const isRandomPick = itemId === RANDOM_PICK_ITEMS.normal || itemId === RANDOM_PICK_ITEMS.hardcore
             || itemId === RANDOM_PICK_ITEMS.hybrid;
-        if (!item || !this.openFor.has(player.id) || (!isRandomPick && !race?.enabled)) {
+        // Debug builds may pick disabled / random-only races from the Dev tab
+        if (!item || (!isRandomPick && !race?.enabled && !this.game.debugMode)) {
             return;
         }
         // The shops charged for the item before the pick rules ran, and those rules refund
@@ -216,12 +218,22 @@ export class RaceSelectPanel {
         for (const [buttonTier, button] of this.categoryButtons) {
             button.setEnabled(buttonTier !== tier);
         }
-        this.currentItems = this.game.worldMap.races
-            .filter(race => race.enabled && RaceItems[race.itemid]?.tier === tier)
-            .map(race => RaceItems[race.itemid]);
-        if (tier === 'Random') {
-            this.currentItems.push(RaceItems[RANDOM_PICK_ITEMS.normal], RaceItems[RANDOM_PICK_ITEMS.hardcore],
-                RaceItems[RANDOM_PICK_ITEMS.hybrid]);
+        if (tier === 'Dev') {
+            // Every race with panel data that a normal tab does not show: disabled races and
+            // the random-only Loot Boxer
+            const normalTiers: RaceTier[] = ['Beginner', 'Intermediate', 'Advanced'];
+            this.currentItems = this.game.worldMap.races
+                .filter(race => RaceItems[race.itemid] !== undefined
+                    && !(race.enabled && normalTiers.indexOf(RaceItems[race.itemid].tier) !== -1))
+                .map(race => RaceItems[race.itemid]);
+        } else {
+            this.currentItems = this.game.worldMap.races
+                .filter(race => race.enabled && RaceItems[race.itemid]?.tier === tier)
+                .map(race => RaceItems[race.itemid]);
+            if (tier === 'Random') {
+                this.currentItems.push(RaceItems[RANDOM_PICK_ITEMS.normal], RaceItems[RANDOM_PICK_ITEMS.hardcore],
+                    RaceItems[RANDOM_PICK_ITEMS.hybrid]);
+            }
         }
         if (this.scrollbar) {
             this.scrollbar.setMinMaxValue(0, this.maxScroll());
@@ -267,6 +279,7 @@ export class RaceSelectPanel {
         if (!player.isLocal()) {
             return;
         }
+        this.visibleLocally = visible;
         this.panel.setVisible(visible);
         if (!visible) {
             player.pointerOverUi = false;
