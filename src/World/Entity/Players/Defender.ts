@@ -105,7 +105,21 @@ export class Defender extends AbstractPlayer {
             maze.setBuildmode(this, false);
         }
         this.destroyMouseTriggers();
-        this.buildEffect?.destroy();
+        this.discardGhost();
+    }
+
+    /**
+     * DestroyEffect plays the model's death animation at the effect's time scale, and the ghost
+     * is frozen at 0.01, so it would linger for minutes. Hide it completely before destroying.
+     */
+    private discardGhost(): void {
+        if (!this.buildEffect) {
+            return;
+        }
+        this.buildEffect.setTimeScale(1);
+        this.buildEffect.scale = 0;
+        this.buildEffect.setAlpha(0);
+        this.buildEffect.destroy();
         this.buildEffect = undefined;
     }
 
