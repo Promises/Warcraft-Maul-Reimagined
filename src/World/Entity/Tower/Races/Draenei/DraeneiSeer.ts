@@ -5,11 +5,11 @@ import {Unit} from "w3ts";
 export class DraeneiSeer extends Tower implements GenericAutoAttackTower {
 
     public GenericAttack(): void {
-        `const attacker: Unit | undefined = Unit.fromHandle(GetAttacker());
+        const attacker: Unit | undefined = Unit.fromHandle(GetAttacker());
         const attackedUnit: Unit | undefined = Unit.fromHandle(GetAttackedUnitBJ());
-        if(attackedUnit) {
+        if (attackedUnit) {
             attacker?.issueTargetOrder('lightningshield', attackedUnit);
-        }`
+        }
     }
 
 }

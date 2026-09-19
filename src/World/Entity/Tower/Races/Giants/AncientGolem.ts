@@ -7,7 +7,7 @@ export class AncientGolem extends Tower implements TickingTower {
         const mana: number = this.unit.mana + 1;
         this.unit.mana = mana;
 
-        this.unit.setBaseDamage(0, this.unit.getBaseDamage(0) + 75);
+        this.unit.setBaseDamage(this.unit.getBaseDamage(0) + 75, 0);
         this.unit.setScale(30.0 + (mana * 10), 30.0 + (mana * 10), 30.0 + (mana * 10));
 
         if (mana > 6) {

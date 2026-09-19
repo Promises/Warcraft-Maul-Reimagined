@@ -39,6 +39,27 @@ export class PlayerSpawns {
     }
 
 
+    /**
+     * True if the rectangle overlaps any of this spawn's checkpoints (the creep entry/exit
+     * cells). Used to stop hybrid towers being built on top of a checkpoint.
+     */
+    public overlapsCheckpoint(minX: number, minY: number, maxX: number, maxY: number): boolean {
+        for (const start of [this._spawnOne, this._spawnTwo]) {
+            let checkpoint: CheckPoint | undefined = start;
+            let guard = 0;
+            while (checkpoint && guard < 64) {
+                const rect = checkpoint.rectangle;
+                if (minX < GetRectMaxX(rect) && maxX > GetRectMinX(rect)
+                    && minY < GetRectMaxY(rect) && maxY > GetRectMinY(rect)) {
+                    return true;
+                }
+                checkpoint = checkpoint.next;
+                guard++;
+            }
+        }
+        return false;
+    }
+
     get spawnOne(): CheckPoint | undefined {
         return this._spawnOne;
     }
@@ -206,7 +227,7 @@ export class PlayerSpawns {
                 const dummy = Unit.create(MapPlayer.fromIndex(PLAYER_NEUTRAL_PASSIVE)!, FourCC('u008'), 0.0, -5300.0, bj_UNIT_FACING);
                 dummy?.addAbility(FourCC('A068'));
                 dummy?.issueTargetOrder('bloodlust', enteringUnit);
-                dummy?.applyTimedLife(1.00, FourCC('BTLF'));
+                dummy?.applyTimedLife(FourCC('BTLF'), 1.00);
             } else {
                 UnitRemoveBuffBJ(FourCC('Bblo'),enteringUnit.handle);
             }

@@ -12,7 +12,7 @@ export class Adventurer extends Tower implements KillingActionTower { // n02T
 
         if (killer === this.unit && victim) {
             if (!killer.getItemInSlot(1)) {
-                const lootIndex: number = Util.RandomInt(0, AOB_ITEM_LOOT_LEVEL_ONE.length);
+                const lootIndex: number = Util.RandomInt(0, AOB_ITEM_LOOT_LEVEL_ONE.length - 1);
                 killer.addItemById(AOB_ITEM_LOOT_LEVEL_ONE[lootIndex]);
             }
         }

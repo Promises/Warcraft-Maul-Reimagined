@@ -7,7 +7,7 @@ export class Bubbles extends Tower implements EndOfRoundTower {
         if (this.unit.getBaseDamage(0) <= 4) {
             this.Upgrade(FourCC('n027'));
         } else {
-            this.unit.setBaseDamage(0, this.unit.getBaseDamage(0) - 5);
+            this.unit.setBaseDamage(this.unit.getBaseDamage(0) - 5, 0);
         }
     }
 

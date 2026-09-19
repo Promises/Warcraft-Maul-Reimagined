@@ -20,7 +20,7 @@ export class CavernHermit extends Tower implements AttackActionTower, GenericAut
             const tempUnit = Unit.create(this.owner, FourCC('u008'), sourceUnit.x, sourceUnit.y, bj_UNIT_FACING);
             tempUnit?.applyTimedLife(FourCC('BTLF'), 3.00);
             tempUnit?.addAbility(FourCC('A0CC'));
-            tempUnit?.issueOrderAt("lightningshield", targetUnit.x, targetUnit.y);
+            tempUnit?.issueTargetOrder("lightningshield", targetUnit);
         }
     }
 
