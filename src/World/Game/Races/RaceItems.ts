@@ -1,4 +1,4 @@
-export type RaceTier = 'Beginner' | 'Intermediate' | 'Advanced' | 'Random' | 'Other';
+export type RaceTier = 'Beginner' | 'Intermediate' | 'Advanced' | 'Random' | 'Dev' | 'Other';
 
 export interface RaceItemDef {
     /** Object data item id, e.g. 'I02G' */
@@ -51,9 +51,9 @@ export const RaceItems: Record<string, RaceItemDef> = compiletime(({objectData})
         return ['Beginner', 'Intermediate', 'Advanced'].indexOf(first) !== -1 ? first : 'Other';
     };
 
-    // Everything the race shops sold, plus the random picks
+    // Everything the race shops sold, plus the random picks and the random-only Loot Boxer
     const shops = ['h03Q', 'h00H', 'h00O', 'h03C', 'h03K'];
-    const ids: string[] = [];
+    const ids: string[] = ['I02D'];
     for (const shop of shops) {
         const unit = objectData.units.get(shop);
         for (const id of String(unit?.itemsSold ?? '').split(',')) {

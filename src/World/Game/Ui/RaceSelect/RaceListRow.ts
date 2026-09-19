@@ -17,7 +17,7 @@ export class RaceListRow {
     private itemId: string | undefined;
 
     constructor(game: WarcraftMaul, name: string, parent: Frame, x: number, y: number,
-                width: number, height: number, onClick: (itemId: string) => void) {
+                width: number, height: number, onClick: (itemId: string) => void, onWheel: (up: boolean) => void) {
         this.button = Frame.createType(name, parent, 0, 'GLUEBUTTON', 'ScriptDialogButton')!;
         this.button.setSize(width, height);
         this.button.setAbsPoint(FRAMEPOINT_TOPLEFT, x, y);
@@ -47,6 +47,10 @@ export class RaceListRow {
                 onClick(this.itemId);
             }
         });
+        const wheel = Trigger.create();
+        wheel.triggerRegisterFrameEvent(this.button, FRAMEEVENT_MOUSE_WHEEL);
+        wheel.addAction(() => onWheel(Frame.getEventValue() > 0));
+
         trackHover(game, this.button);
     }
 
