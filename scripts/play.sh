@@ -50,7 +50,8 @@ mkdir -p "$MAPS_DIR"
 cp "$map" "$STAGED_MAP"
 echo "Staged $(basename "$map") -> Maps/WarcraftMaulDev/WarcraftMaulDev.w3x"
 
-"$GAME" -editor -launch -windowmode windowed &
+# -nowfpause: keep the game running when the window is not focused (tiling WM, scripted input)
+"$GAME" -editor -launch -windowmode windowed -nowfpause &
 game_pid=$!
 echo "Warcraft III started (pid $game_pid)"
 

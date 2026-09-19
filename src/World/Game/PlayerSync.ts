@@ -36,7 +36,13 @@ export class PlayerSync {
                 Log.Warning(`Unhandled sync message '${message}'`);
                 return;
             }
-            handler(player, data);
+            Log.Debug(`sync ${message} from player ${player.id}`);
+            // A Lua error inside a trigger action is otherwise swallowed without a trace
+            try {
+                handler(player, data);
+            } catch (error) {
+                Log.Error(`sync '${message}' failed: ${error}`);
+            }
         });
     }
 

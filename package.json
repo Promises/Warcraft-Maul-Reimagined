@@ -14,7 +14,8 @@
     "build:defs": "ts-node scripts/dev",
     "postinstall": "patch-package",
     "play": "bash scripts/play.sh",
-    "dev:play": "npm run build && bash scripts/play.sh"
+    "dev:play": "npm run build:dev && bash scripts/play.sh",
+    "build:dev": "WCM_DEV=1 npm run build"
   },
   "dependencies": {
     "w3ts": "^3.0.2"
