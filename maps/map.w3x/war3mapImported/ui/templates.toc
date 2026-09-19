@@ -1,7 +1,7 @@
 UI\FrameDef\Glue\standardtemplates.fdf
 UI\FrameDef\UI\escmenutemplates.fdf
 UI\FrameDef\Glue\battlenettemplates.fdf
-war3mapImported\UI\CustomTextButton.fdf
-war3mapImported\UI\DungeonDialog.fdf
-war3mapImported\UI\CdText.fdf
+war3mapImported\ui\CustomTextButton.fdf
+war3mapImported\ui\DungeonDialog.fdf
+war3mapImported\ui\CdText.fdf
 

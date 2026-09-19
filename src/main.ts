@@ -3,6 +3,7 @@ import {addScriptHook, W3TS_HOOK} from "w3ts/hooks";
 import {PatchNatives} from "./JassOverrides/NativePatcher";
 import {Log, LogLevel} from "./lib/Serilog/Serilog";
 import {StringSink} from "./lib/Serilog/Sinks/StringSink";
+import {FileSink} from './lib/Serilog/Sinks/FileSink';
 import {CreepAbilityHandler} from "./World/Entity/CreepAbilities/CreepAbilityHandler";
 import {WarcraftMaul} from "./World/WarcraftMaul";
 import {AbilityTypes} from "war3-objectdata-th";
@@ -39,8 +40,9 @@ const testData = compiletime(({objectData}) => {
 function tsMain() {
     PatchNatives();
     BlzLoadTOCFile('uiImport\\Templates.toc');
-    BlzLoadTOCFile("war3mapImported/ui/templates.toc")
+    BlzLoadTOCFile('war3mapImported\\ui\\templates.toc');
     Log.addSink((new StringSink(LogLevel.Error)));
+    Log.addSink(new FileSink('warcraft-maul.txt'));
     try {
         // print(`Build: ${BUILD_DATE}`);
         // print(`Typescript: v${TS_VERSION}`);

@@ -59,7 +59,9 @@ export function createMapFromDir(output: string, dir: string) {
 
   for (const fileName of files) {
     const contents = toArrayBuffer(fs.readFileSync(fileName));
-    const archivePath = path.relative(dir, fileName);
+    // The game looks map files up by the exact path string (no separator normalisation), so
+    // the archive, TOC entries and every path in code use backslashes like Blizzard's tools.
+    const archivePath = path.relative(dir, fileName).split(path.sep).join('\\');
     const imported = map.import(archivePath, contents);
 
     if (!imported) {

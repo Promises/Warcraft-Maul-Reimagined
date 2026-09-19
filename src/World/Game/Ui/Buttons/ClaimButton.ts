@@ -5,7 +5,7 @@ import { AbstractPlayer } from '../../../Entity/Players/AbstractPlayer';
 import {MapPlayer, Frame} from "w3ts";
 
 export class ClaimButton extends AbstractActionButton {
-    private static Icon: string = 'uiImport/CommandButtons/BTNClaim.dds';
+    private static Icon: string = 'uiImport\\CommandButtons\\BTNClaim.dds';
     private readonly toolTip: Frame;
     private players: Map<number, AbstractPlayer> = new Map<number, AbstractPlayer>();
 
