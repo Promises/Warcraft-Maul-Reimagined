@@ -2,7 +2,7 @@ import { AbstractActionButton } from './AbstractActionButton';
 import { WarcraftMaul } from '../../../WarcraftMaul';
 import { Defender } from '../../../Entity/Players/Defender';
 import { AbstractPlayer } from '../../../Entity/Players/AbstractPlayer';
-import {MapPlayer, Frame} from "w3ts";
+import {Frame} from "w3ts";
 
 export class ClaimButton extends AbstractActionButton {
     private static Icon: string = 'uiImport\\CommandButtons\\BTNClaim.dds';
@@ -21,16 +21,13 @@ export class ClaimButton extends AbstractActionButton {
             this.players.set(player.id, player);
         }
 
+        game.playerSync.on('claim', player => player.ClaimTowers());
     }
 
     public clickAction(): void {
-        const nativePlayer = MapPlayer.fromEvent()!;
-        const player: Defender | undefined = this.game.players.get(nativePlayer.id);
-        if (!player) {
-            return;
-        }
+        // Local frame event: claiming changes unit ownership, so it runs on every client via PlayerSync
         this.disable();
-        player.ClaimTowers();
+        this.game.playerSync.send('claim');
         this.enable();
     }
 

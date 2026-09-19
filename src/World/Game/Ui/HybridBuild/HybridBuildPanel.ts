@@ -16,8 +16,9 @@ const TIERS = 9;
 const CANCEL_SLOT = COLUMNS * ROWS - 1;
 
 /**
- * Tower picker for hybrid random players. Picking a tower enters build mode;
- * placement itself is handled by Defender.
+ * Tower picker for hybrid random players. Picking a tower enters build mode; placement
+ * itself is handled by Defender. Button clicks are local frame events, so they only send
+ * sync messages; open/close/pick run on every client through PlayerSync.
  */
 export class HybridBuildPanel {
     private readonly panel: Frame;
@@ -49,11 +50,15 @@ export class HybridBuildPanel {
             const slot = Math.floor(tier / (COLUMNS - 1)) * COLUMNS + tier % (COLUMNS - 1);
             const [x, y] = slotCenter(slot);
             this.tierButtons.push(new HybridBuildPanelButton(game, `hybridBuildTier${tier}`, this.panel, x, y, BUTTON_SIZE,
-                player => this.pickTower(player, tier)));
+                () => game.playerSync.send('hybrid-pick', `${tier}`)));
         }
         const [cancelX, cancelY] = slotCenter(CANCEL_SLOT);
         this.cancelButton = new HybridBuildPanelButton(game, 'hybridBuildCancel', this.panel, cancelX, cancelY, BUTTON_SIZE,
-            player => this.close(player));
+            () => game.playerSync.send('hybrid-close'));
+
+        game.playerSync.on('hybrid-toggle', player => this.toggle(player));
+        game.playerSync.on('hybrid-close', player => this.close(player));
+        game.playerSync.on('hybrid-pick', (player, data) => this.pickTower(player, Number(data)));
 
         this.panel.setVisible(false);
     }
@@ -89,7 +94,7 @@ export class HybridBuildPanel {
     }
 
     private pickTower(player: Defender, tier: number): void {
-        if (player.hybridTowers[tier]) {
+        if (this.openFor.has(player.id) && player.hybridTowers[tier]) {
             player.startBuilding(tier);
         }
     }

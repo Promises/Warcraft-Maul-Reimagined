@@ -28,12 +28,10 @@ export class Defender extends AbstractPlayer {
 
 
     private mouseMoveTrigger: Trigger | undefined;
-    private mousePressDownTrigger: Trigger | undefined;
-    private mouseReleaseTrigger: Trigger | undefined;
+    private mousePressTrigger: Trigger | undefined;
     private escapeTrigger: Trigger | undefined;
-    /** Set from frame hover events so clicks on our UI are not treated as map clicks */
+    /** Set from frame hover events so clicks on our UI are not treated as map clicks (local only) */
     public pointerOverUi: boolean = false;
-    leftMouse: boolean = false;
     mouseX: number = 0;
     mouseY: number = 0;
     private _highlightedPoints: { x: number, y: number }[] = [];
@@ -64,7 +62,11 @@ export class Defender extends AbstractPlayer {
         return this._buildMode;
     }
 
-    /** Enters build mode for one of the player's hybrid tiers: shows the maze grid and a ghost of the tower. */
+    /**
+     * Enters build mode for one of the player's hybrid tiers: shows the maze grids and a ghost
+     * of the tower. Runs on every client (from a sync message, chat or a key event), so the
+     * handles it creates stay in step.
+     */
     public startBuilding(tier: number): void {
         const tower: GameTowerDef | undefined = this.hybridTowers[tier];
         if (!tower || !this.hybridBuilder) {
@@ -73,7 +75,10 @@ export class Defender extends AbstractPlayer {
         this.stopBuilding();
         this._buildMode = true;
         this.buildTier = tier;
-        this.game.worldMap.playerMazes[this.id].setBuildmode(this, true);
+        for (const maze of this.game.worldMap.playerMazes) {
+            maze.setBuildmode(this, true);
+        }
+        this.registerMouseTriggers();
 
         // The ghost is a local visual; other clients get an empty model at the same handle
         const center = this.highlightedCenter();
@@ -93,31 +98,75 @@ export class Defender extends AbstractPlayer {
         }
         this._buildMode = false;
         this.buildTier = undefined;
-        this.game.worldMap.playerMazes[this.id].setBuildmode(this, false);
+        if (this.currentHighlightedMaze !== -1) {
+            this.clearHighlightedPoints(this.game.worldMap.playerMazes[this.currentHighlightedMaze]);
+        }
+        for (const maze of this.game.worldMap.playerMazes) {
+            maze.setBuildmode(this, false);
+        }
+        this.destroyMouseTriggers();
         this.buildEffect?.destroy();
         this.buildEffect = undefined;
     }
 
-    /** Orders the hybrid builder to build the dummy for the chosen tier at the highlighted cells. */
-    private tryPlaceTower(): void {
-        if (!this._buildMode || this.buildTier === undefined || !this.hybridBuilder || this.pointerOverUi) {
+    /**
+     * Mouse events are sent over the network for every registered player, so they are only
+     * registered while the player is placing towers.
+     */
+    private registerMouseTriggers(): void {
+        this.mouseMoveTrigger = Trigger.create();
+        this.mouseMoveTrigger.registerPlayerMouseEvent(this, bj_MOUSEEVENTTYPE_MOVE);
+        this.mouseMoveTrigger.addAction(() => this.mouseMoved());
+        this.mousePressTrigger = Trigger.create();
+        this.mousePressTrigger.registerPlayerMouseEvent(this, bj_MOUSEEVENTTYPE_DOWN);
+        this.mousePressTrigger.addAction(() => this.mousePressed());
+    }
+
+    private destroyMouseTriggers(): void {
+        this.mouseMoveTrigger?.destroy();
+        this.mousePressTrigger?.destroy();
+        this.mouseMoveTrigger = undefined;
+        this.mousePressTrigger = undefined;
+    }
+
+    /**
+     * Decides on this player's own client whether a click places a tower. The pointer being
+     * over the UI and the highlighted cells are local knowledge, so the decision is sent as a
+     * sync message and placeTower runs everywhere with the same input.
+     */
+    private requestTowerPlacement(): void {
+        if (!this.isLocal() || this.pointerOverUi || this.buildTier === undefined) {
             return;
         }
-        if (this.currentHighlightedMaze === -1) {
-            return;
-        }
-        if (this.currentHighlightedMaze !== this.id) {
-            this.sendMessage('You can only build in your own maze');
-            return;
-        }
-        const maze = this.game.worldMap.playerMazes[this.id];
-        const center = maze.getHighlightedPointsCenter(this.highlightedPoints);
-        if (this.highlightedPoints.length !== 4 || !center) {
+        if (this.currentHighlightedMaze === -1 || this.highlightedPoints.length !== 4) {
             this.sendMessage('The tower does not fit there');
             return;
         }
+        const maze = this.game.worldMap.playerMazes[this.currentHighlightedMaze];
         if (this.highlightedPoints.some(point => maze.getWalkable(point.x, point.y) !== Walkable.Walkable)) {
             this.sendMessage('You cannot build there');
+            return;
+        }
+        const cornerX = Math.min(...this.highlightedPoints.map(point => point.x));
+        const cornerY = Math.min(...this.highlightedPoints.map(point => point.y));
+        // Holding shift keeps build mode for the next tower, like the native build command
+        const keepBuilding = BlzIsMetaKeyPressed(METAKEY_SHIFT) ? 1 : 0;
+        this.game.playerSync.send('build', `${this.currentHighlightedMaze}:${cornerX}:${cornerY}:${keepBuilding}`);
+    }
+
+    /** Applies a placement sent by requestTowerPlacement; runs on every client. */
+    public placeTower(data: string): void {
+        const [mazeIndex, cornerX, cornerY, keepBuilding] = data.split(':').map(value => Number(value));
+        const maze = this.game.worldMap.playerMazes[mazeIndex];
+        if (!this._buildMode || this.buildTier === undefined || !this.hybridBuilder || !maze) {
+            return;
+        }
+        const points = [
+            {x: cornerX, y: cornerY}, {x: cornerX + 1, y: cornerY},
+            {x: cornerX, y: cornerY + 1}, {x: cornerX + 1, y: cornerY + 1},
+        ];
+        if (points.some(point => point.x < 0 || point.x >= maze.width || point.y < 0 || point.y >= maze.height
+            || maze.getWalkable(point.x, point.y) !== Walkable.Walkable)) {
             return;
         }
         const tower = this.hybridTowers[this.buildTier];
@@ -125,9 +174,15 @@ export class Defender extends AbstractPlayer {
             this.sendMessage(`Not enough gold, ${tower.name} costs |cffffcc00${tower.goldCost}|r`);
             return;
         }
+        const center = maze.getHighlightedPointsCenter(points)!;
         const dummyId = DummyTowers[`${this.id + 1}`][`${this.buildTier + 1}`];
         if (!this.hybridBuilder.issueBuildOrder(FourCC(dummyId), center.x, center.y)) {
             this.sendMessage('The builder could not start building there');
+            return;
+        }
+        // Explicit compare: 0 is truthy in the generated Lua, so !keepBuilding would never fire
+        if (keepBuilding !== 1) {
+            this.game.hybridBuildPanel.close(this);
         }
     }
 
@@ -206,19 +261,9 @@ export class Defender extends AbstractPlayer {
 
         const t = new Timer().start(0.1, false, () => {
             t.destroy();
-            this.mouseMoveTrigger = Trigger.create();
-            this.mouseMoveTrigger.registerPlayerMouseEvent(this, bj_MOUSEEVENTTYPE_MOVE)
-            this.mouseMoveTrigger.addAction(() => this.mouseMoved())
-            this.mousePressDownTrigger = Trigger.create();
-            this.mouseReleaseTrigger = Trigger.create();
-            this.mousePressDownTrigger.registerPlayerMouseEvent(this, bj_MOUSEEVENTTYPE_DOWN)
-            this.mouseReleaseTrigger.registerPlayerMouseEvent(this, bj_MOUSEEVENTTYPE_UP)
-            this.mousePressDownTrigger.addAction(() => this.mousePressed(true))
-            this.mouseReleaseTrigger.addAction(() => this.mousePressed(false))
             this.escapeTrigger = Trigger.create();
             this.escapeTrigger.registerPlayerKeyEvent(this, OSKEY_ESCAPE, 0, true);
             this.escapeTrigger.addAction(() => this.game.hybridBuildPanel.close(this));
-
         });
 
 
@@ -259,19 +304,13 @@ export class Defender extends AbstractPlayer {
     }
 
 
-    private mousePressed(pressed: boolean) {
+    private mousePressed(): void {
         const button = BlzGetTriggerPlayerMouseButton();
-        if (button === MOUSE_BUTTON_TYPE_LEFT) {
-            this.leftMouse = pressed;
-        }
         this.mouseMoved();
-        if (!pressed) {
-            return;
-        }
-        if (button === MOUSE_BUTTON_TYPE_LEFT) {
-            this.tryPlaceTower();
-        } else if (button === MOUSE_BUTTON_TYPE_RIGHT) {
+        if (button === MOUSE_BUTTON_TYPE_RIGHT) {
             this.stopBuilding();
+        } else if (button === MOUSE_BUTTON_TYPE_LEFT) {
+            this.requestTowerPlacement();
         }
     }
 

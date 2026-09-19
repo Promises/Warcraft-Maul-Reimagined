@@ -24,7 +24,8 @@ export class Maze {
     public readonly height: number;
     public readonly maze: Walkable[][];
     private antiJugglers: AntiJuggleTower[] = [];
-    private _gridPoints: Image[][] | undefined;
+    /** One hidden image per cell, created on every client at init so handle ids stay in sync. */
+    public readonly gridPoints: Image[][];
 
     private static readonly WALKABLE_COLOUR: ImageColour = {red: 0, green: 220, blue: 255, alpha: 170};
     private static readonly BLOCKED_COLOUR: ImageColour = {red: 255, green: 0, blue: 0, alpha: 170};
@@ -46,18 +47,7 @@ export class Maze {
         this.width = width;
         this.height = height;
         this.maze = maze;
-    }
-
-    /**
-     * Grid images are created on first use rather than at map init: creating every maze's
-     * grid at once (over 11k images) during initialisation is heavy, and images created
-     * that early have shown up as invisible.
-     */
-    public get gridPoints(): Image[][] {
-        if (!this._gridPoints) {
-            this._gridPoints = this.createGridPoints();
-        }
-        return this._gridPoints;
+        this.gridPoints = this.createGridPoints();
     }
 
 

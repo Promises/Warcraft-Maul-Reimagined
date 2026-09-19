@@ -1,6 +1,6 @@
 import {AbstractActionButton} from './AbstractActionButton';
 import {WarcraftMaul} from '../../../WarcraftMaul';
-import {Frame, MapPlayer} from 'w3ts';
+import {Frame} from 'w3ts';
 
 export class HybridBuildButton extends AbstractActionButton {
     private static Icon: string = 'ReplaceableTextures\\CommandButtons\\BTNBasicStruct.blp';
@@ -16,12 +16,9 @@ export class HybridBuildButton extends AbstractActionButton {
     }
 
     public clickAction(): void {
-        const player = this.game.players.get(MapPlayer.fromEvent()!.id);
-        if (!player) {
-            return;
-        }
+        // Local frame event: the toggle itself runs on every client via PlayerSync
         this.disable();
-        this.game.hybridBuildPanel.toggle(player);
+        this.game.playerSync.send('hybrid-toggle');
         this.enable();
     }
 }

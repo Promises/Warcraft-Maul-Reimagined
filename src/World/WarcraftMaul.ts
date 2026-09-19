@@ -21,6 +21,7 @@ import {CreepAbilityHandler} from './Entity/CreepAbilities/CreepAbilityHandler';
 import {VoidTicker} from './Game/VoidTicker';
 import {ActionBar} from './Game/Ui/ActionBar';
 import {HybridBuildPanel} from './Game/Ui/HybridBuild/HybridBuildPanel';
+import {PlayerSync} from './Game/PlayerSync';
 import {WarcraftMaulSettings} from './WarcraftMaulSettings';
 import {IMapSettings} from './IMapSettings';
 import {EventQueue} from "../lib/WCEventQueue/EventQueue";
@@ -55,6 +56,7 @@ export class WarcraftMaul {
 
     public players: Map<number, Defender> = new Map<number, Defender>();
     public hybridBuildPanel: HybridBuildPanel;
+    public playerSync: PlayerSync;
 
     public enemies: Attacker[] = [];
     private readonly _creepAbilityHandler: CreepAbilityHandler;
@@ -151,6 +153,8 @@ export class WarcraftMaul {
 
         SendMessage('Welcome to Warcraft Maul Reimagined');
         // SendMessage(`This is build: ${BUILD_NUMBER}, built ${BUILD_DATE}.`);
+        this.playerSync = new PlayerSync(this);
+        this.playerSync.on('build', (player, data) => player.placeTower(data));
         this.hybridBuildPanel = new HybridBuildPanel(this);
         new ActionBar(this);
     }

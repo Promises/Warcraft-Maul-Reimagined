@@ -1,9 +1,8 @@
-import {Frame, MapPlayer, Trigger} from 'w3ts';
+import {Frame, Trigger} from 'w3ts';
 import {WarcraftMaul} from '../../../WarcraftMaul';
 import {Defender} from '../../../Entity/Players/Defender';
 import {GameTowerDef} from '../../Races/HybridRandom.types';
 import {trackHover} from '../UiHover';
-import {Log} from '../../../../lib/Serilog/Serilog';
 
 const TOOLTIP_WIDTH = 0.29;
 const TOOLTIP_PADDING = 0.0315;
@@ -21,7 +20,7 @@ export class HybridBuildPanelButton {
     private readonly goldCost: Frame | undefined;
 
     constructor(game: WarcraftMaul, name: string, parent: Frame, x: number, y: number, size: number,
-                onClick: (player: Defender) => void) {
+                onClick: () => void) {
         this.button = Frame.createType(name, parent, 0, 'BUTTON', 'StandardButtonTemplate')!;
         this.button.setSize(size, size);
         this.button.setAbsPoint(FRAMEPOINT_CENTER, x, y);
@@ -39,22 +38,14 @@ export class HybridBuildPanelButton {
             this.goldCost = this.tooltip.getChild(3);
         }
 
+        // Frame events only fire on the clicking client, so onClick must not touch game state
         const trigger = Trigger.create();
         trigger.triggerRegisterFrameEvent(this.button, FRAMEEVENT_CONTROL_CLICK);
         trigger.addAction(() => {
             // Drop keyboard focus so the button does not swallow hotkeys afterwards
             this.button.setEnabled(false);
             this.button.setEnabled(true);
-            const player = game.players.get(MapPlayer.fromEvent()!.id);
-            if (!player) {
-                return;
-            }
-            // Trigger actions die silently on a Lua error; surface it instead
-            try {
-                onClick(player);
-            } catch (error) {
-                Log.Error(`Build menu button ${name}: ${error}`);
-            }
+            onClick();
         });
         trackHover(game, this.button);
     }
