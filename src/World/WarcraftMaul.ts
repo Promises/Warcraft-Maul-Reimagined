@@ -22,6 +22,7 @@ import {VoidTicker} from './Game/VoidTicker';
 import {ActionBar} from './Game/Ui/ActionBar';
 import {HybridBuildPanel} from './Game/Ui/HybridBuild/HybridBuildPanel';
 import {PlayerSync} from './Game/PlayerSync';
+import {HostDetection} from './Game/HostDetection';
 import {RaceSelectPanel} from './Game/Ui/RaceSelect/RaceSelectPanel';
 import {WarcraftMaulSettings} from './WarcraftMaulSettings';
 import {IMapSettings} from './IMapSettings';
@@ -61,6 +62,7 @@ export class WarcraftMaul {
     public players: Map<number, Defender> = new Map<number, Defender>();
     public hybridBuildPanel: HybridBuildPanel;
     public playerSync: PlayerSync;
+    public hostDetection: HostDetection;
     public raceSelectPanel: RaceSelectPanel;
 
     public enemies: Attacker[] = [];
@@ -148,7 +150,6 @@ export class WarcraftMaul {
         creepAbilityHandler.SetupGame(this);
 
 
-        this.diffVote = new Vote(this);
         this.racePicking = new RacePicking(this);
         this.sellTower = new SellTower(this);
 
@@ -162,13 +163,12 @@ export class WarcraftMaul {
         SendMessage('Welcome to Warcraft Maul Reimagined');
         // SendMessage(`This is build: ${BUILD_NUMBER}, built ${BUILD_DATE}.`);
         this.playerSync = new PlayerSync(this);
+        this.hostDetection = new HostDetection(this);
         this.playerSync.on('build', (player, data) => player.placeTower(data));
         this.hybridBuildPanel = new HybridBuildPanel(this);
         this.raceSelectPanel = new RaceSelectPanel(this);
+        this.diffVote = new Vote(this);
         new ActionBar(this);
-        for (const player of this.players.values()) {
-            this.raceSelectPanel.open(player);
-        }
     }
 
     public DefeatAllPlayers(): void {
