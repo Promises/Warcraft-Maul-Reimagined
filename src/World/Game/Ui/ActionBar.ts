@@ -6,6 +6,7 @@ import { AbstractActionButton } from './Buttons/AbstractActionButton';
 import { WarcraftMaul } from '../../WarcraftMaul';
 import { ExampleMaze } from './Buttons/ExampleMaze';
 import { ClaimButton } from './Buttons/ClaimButton';
+import { HybridBuildButton } from './Buttons/HybridBuildButton';
 import {Frame} from "w3ts";
 
 export class ActionBar {
@@ -24,7 +25,7 @@ export class ActionBar {
         const barHeight: number = 0.03;
         actionbar.setSize(barHeightOffset * barHeight, barHeight)
         actionbar.setAbsPoint( FRAMEPOINT_CENTER, 0.4, this.actionBarY);
-        actionbar.setTexture( 'uiImport/CommandButtons/actionbar.dds', 0, true);
+        actionbar.setTexture( 'uiImport\\CommandButtons\\actionbar.dds', 0, true);
 
         this.initializeButtons();
     }
@@ -35,6 +36,7 @@ export class ActionBar {
         // }
         this.buttons.push(new ExampleMaze(this.game, this.getNextX(), this.getNextY(), this.actionBarHeight, this.buttons.length));
         this.buttons.push(new ClaimButton(this.game, this.getNextX(), this.getNextY(), this.actionBarHeight, this.buttons.length));
+        this.buttons.push(new HybridBuildButton(this.game, this.getNextX(), this.getNextY(), this.actionBarHeight, this.buttons.length));
 
     }
 

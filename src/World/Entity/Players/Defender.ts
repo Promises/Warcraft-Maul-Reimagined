@@ -7,11 +7,12 @@ import {Tower} from '../Tower/Specs/Tower';
 import {CitadelOfNaxxramas} from '../Tower/Races/Naxxramas/CitadelOfNaxxramas';
 import {Effect, Timer, Trigger, Unit} from "w3ts";
 import {Rectangle} from "../../../JassOverrides/Rectangle";
-import {COLOUR, SendMessage, Util} from "../../../lib/translators";
+import {COLOUR, DecodeFourCC, SendMessage, Util} from "../../../lib/translators";
+import {Log} from "../../../lib/Serilog/Serilog";
 import {TimedEvent} from "../../../lib/WCEventQueue/TimedEvent";
 import {GameTowerDef} from "../../Game/Races/HybridRandom.types";
 import {Maze, Walkable} from "../../Antiblock/Maze";
-import {HybridTierOne} from "../../Game/Races/HybridRandom";
+import {DummyTowers} from "../../Game/Races/HybridRandom";
 
 export class Defender extends AbstractPlayer {
 
@@ -29,6 +30,9 @@ export class Defender extends AbstractPlayer {
     private mouseMoveTrigger: Trigger | undefined;
     private mousePressDownTrigger: Trigger | undefined;
     private mouseReleaseTrigger: Trigger | undefined;
+    private escapeTrigger: Trigger | undefined;
+    /** Set from frame hover events so clicks on our UI are not treated as map clicks */
+    public pointerOverUi: boolean = false;
     leftMouse: boolean = false;
     mouseX: number = 0;
     mouseY: number = 0;
@@ -36,7 +40,7 @@ export class Defender extends AbstractPlayer {
     private _currentHighlightedMaze: number = -1;
 
     private _buildMode: boolean = false;
-    private toBuild: GameTowerDef | undefined;
+    private buildTier: number | undefined;
     private buildEffect: Effect | undefined;
 
     get highlightedPoints(): { x: number, y: number }[] {
@@ -56,62 +60,90 @@ export class Defender extends AbstractPlayer {
         this._currentHighlightedMaze = value;
     }
 
-    setBuildMode(buildMode: boolean, hybridTower?: GameTowerDef) {
-        const playerMazes = this.game.worldMap.playerMazes;
-
-        if (buildMode !== this._buildMode) {
-            for (let i = 0; i < playerMazes.length; i++) {
-                playerMazes[i].setBuildmode(this, buildMode)
-            }
-
-            if(buildMode) {
-                this.toBuild =hybridTower || HybridTierOne[1];
-                let effectModel = "";
-                if (this.isLocal()) {
-                    effectModel = this.toBuild.model;
-                }
-                const currentHighlightedMaze = this.currentHighlightedMaze;
-                const maze = currentHighlightedMaze !== -1 && playerMazes[currentHighlightedMaze];
-                let x = 0;
-                let y = 0;
-
-                if (maze && this.highlightedPoints) {
-                    const center = maze.getHighlightedPointsCenter(this.highlightedPoints)
-                    if (center) {
-                        x = center.x;
-                        y = center.y;
-                    }
-                    // Use center.x and center.y which will be in world coordinates
-                }
-                this.buildEffect = Effect.create(effectModel, x, y);
-                this.buildEffect?.setColor(128, 128, 128);
-                this.buildEffect?.setAlpha(153);
-                this.buildEffect?.setYaw(Deg2Rad(270));
-                this.buildEffect?.setTimeScale(0.01);
-            } else {
-                this.buildEffect?.destroy();
-            }
-        }
-        this._buildMode = buildMode;
-    }
-
-    get buildMode() {
+    get buildMode(): boolean {
         return this._buildMode;
     }
 
-    public clearHighlightedPoints(maze: Maze): void {
-        // Reset previously highlighted points to their original colors
-        for (const point of this._highlightedPoints) {
-            let col = maze.gridPoints[point.x][point.y].colour;
-            if (this.isLocal()) {
-                if (maze.maze[point.x][point.y] === Walkable.Walkable) {
-                    col = {red: 0, green: 0, blue: 255, alpha: 153}; // Blue
-                } else {
-                    col = {red: 255, green: 0, blue: 0, alpha: 153}; // Red
-                }
-            }
-            maze.gridPoints[point.x][point.y].colour = col;
+    /** Enters build mode for one of the player's hybrid tiers: shows the maze grid and a ghost of the tower. */
+    public startBuilding(tier: number): void {
+        const tower: GameTowerDef | undefined = this.hybridTowers[tier];
+        if (!tower || !this.hybridBuilder) {
+            return;
+        }
+        this.stopBuilding();
+        this._buildMode = true;
+        this.buildTier = tier;
+        this.game.worldMap.playerMazes[this.id].setBuildmode(this, true);
 
+        // The ghost is a local visual; other clients get an empty model at the same handle
+        const center = this.highlightedCenter();
+        this.buildEffect = Effect.create(this.isLocal() ? tower.model : '', center?.x ?? 0, center?.y ?? 0);
+        if (this.buildEffect) {
+            this.buildEffect.scale = tower.modelScale;
+            this.buildEffect.setColor(128, 128, 128);
+            this.buildEffect.setAlpha(153);
+            this.buildEffect.setYaw(Deg2Rad(270));
+            this.buildEffect.setTimeScale(0.01);
+        }
+    }
+
+    public stopBuilding(): void {
+        if (!this._buildMode) {
+            return;
+        }
+        this._buildMode = false;
+        this.buildTier = undefined;
+        this.game.worldMap.playerMazes[this.id].setBuildmode(this, false);
+        this.buildEffect?.destroy();
+        this.buildEffect = undefined;
+    }
+
+    /** Orders the hybrid builder to build the dummy for the chosen tier at the highlighted cells. */
+    private tryPlaceTower(): void {
+        if (!this._buildMode || this.buildTier === undefined || !this.hybridBuilder || this.pointerOverUi) {
+            return;
+        }
+        if (this.currentHighlightedMaze === -1) {
+            return;
+        }
+        if (this.currentHighlightedMaze !== this.id) {
+            this.sendMessage('You can only build in your own maze');
+            return;
+        }
+        const maze = this.game.worldMap.playerMazes[this.id];
+        const center = maze.getHighlightedPointsCenter(this.highlightedPoints);
+        if (this.highlightedPoints.length !== 4 || !center) {
+            this.sendMessage('The tower does not fit there');
+            return;
+        }
+        if (this.highlightedPoints.some(point => maze.getWalkable(point.x, point.y) !== Walkable.Walkable)) {
+            this.sendMessage('You cannot build there');
+            return;
+        }
+        const tower = this.hybridTowers[this.buildTier];
+        if (this.getGold() < tower.goldCost) {
+            this.sendMessage(`Not enough gold, ${tower.name} costs |cffffcc00${tower.goldCost}|r`);
+            return;
+        }
+        const dummyId = DummyTowers[`${this.id + 1}`][`${this.buildTier + 1}`];
+        if (!this.hybridBuilder.issueBuildOrder(FourCC(dummyId), center.x, center.y)) {
+            this.sendMessage('The builder could not start building there');
+        }
+    }
+
+    private highlightedCenter(): { x: number, y: number } | undefined {
+        if (this.currentHighlightedMaze === -1) {
+            return undefined;
+        }
+        return this.game.worldMap.playerMazes[this.currentHighlightedMaze].getHighlightedPointsCenter(this.highlightedPoints);
+    }
+
+    public clearHighlightedPoints(maze: Maze): void {
+        // Reset previously highlighted points to their original colours
+        for (const point of this._highlightedPoints) {
+            if (this.isLocal()) {
+                maze.gridPoints[point.x][point.y].colour = maze.gridColour(point.x, point.y);
+            }
         }
         this._highlightedPoints = [];
         this._currentHighlightedMaze = -1;
@@ -183,6 +215,9 @@ export class Defender extends AbstractPlayer {
             this.mouseReleaseTrigger.registerPlayerMouseEvent(this, bj_MOUSEEVENTTYPE_UP)
             this.mousePressDownTrigger.addAction(() => this.mousePressed(true))
             this.mouseReleaseTrigger.addAction(() => this.mousePressed(false))
+            this.escapeTrigger = Trigger.create();
+            this.escapeTrigger.registerPlayerKeyEvent(this, OSKEY_ESCAPE, 0, true);
+            this.escapeTrigger.addAction(() => this.game.hybridBuildPanel.close(this));
 
         });
 
@@ -226,19 +261,18 @@ export class Defender extends AbstractPlayer {
 
     private mousePressed(pressed: boolean) {
         const button = BlzGetTriggerPlayerMouseButton();
-        if (button == MOUSE_BUTTON_TYPE_LEFT) {
+        if (button === MOUSE_BUTTON_TYPE_LEFT) {
             this.leftMouse = pressed;
-            // TODO:  Could check past state here, and fire event?
-            // this.currentWeapon.fire();
         }
         this.mouseMoved();
-
-        // if (button == MOUSE_BUTTON_TYPE_LEFT) {
-        //     this.pressedButtons[MouseKey.LEFT] = pressed;
-        // }
-        // if (button == MOUSE_BUTTON_TYPE_RIGHT) {
-        //     this.pressedButtons[MouseKey.RIGHT] = pressed;
-        // }
+        if (!pressed) {
+            return;
+        }
+        if (button === MOUSE_BUTTON_TYPE_LEFT) {
+            this.tryPlaceTower();
+        } else if (button === MOUSE_BUTTON_TYPE_RIGHT) {
+            this.stopBuilding();
+        }
     }
 
     public setHoloMaze(holoMaze: AbstractHologramMaze | undefined): void {
@@ -345,6 +379,7 @@ export class Defender extends AbstractPlayer {
             builder.destroy();
         }
 
+        this.stopBuilding();
         if (this.hybridBuilder) {
             this.hybridBuilder.destroy();
         }
@@ -670,25 +705,9 @@ export class Defender extends AbstractPlayer {
     }
 
     updateBuildEffect() {
-        if(!this.buildEffect) {
-            return;
+        const center = this.highlightedCenter();
+        if (this.buildEffect && center) {
+            this.buildEffect.setPosition(center.x, center.y, 0);
         }
-        const playerMazes = this.game.worldMap.playerMazes;
-
-        const currentHighlightedMaze = this.currentHighlightedMaze;
-        const maze = playerMazes[currentHighlightedMaze];
-        let x = 0;
-        let y = 0;
-
-        if (maze !== undefined && this.highlightedPoints.length > 0) {
-            const center = maze.getHighlightedPointsCenter(this.highlightedPoints)
-            if (center) {
-                x = center.x;
-                y = center.y;
-            }
-            // Use center.x and center.y which will be in world coordinates
-        }
-        this.buildEffect.setPosition(x,y,0);
-
     }
 }

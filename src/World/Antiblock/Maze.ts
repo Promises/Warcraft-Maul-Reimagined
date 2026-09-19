@@ -2,7 +2,7 @@ import {Node} from './Node';
 import {NodeQueue} from './NodeQueue';
 import {Log} from '../../lib/Serilog/Serilog';
 import {AntiJuggleTower} from '../Entity/AntiJuggle/AntiJuggleTower';
-import {Image} from "../../JassOverrides/Image";
+import {Image, IMAGE_TEXTURES, ImageColour} from "../../JassOverrides/Image";
 import {Defender} from "../Entity/Players/Defender";
 
 export enum Walkable {
@@ -24,7 +24,19 @@ export class Maze {
     public readonly height: number;
     public readonly maze: Walkable[][];
     private antiJugglers: AntiJuggleTower[] = [];
-    public gridPoints: Image[][] = [];
+    private _gridPoints: Image[][] | undefined;
+
+    private static readonly WALKABLE_COLOUR: ImageColour = {red: 0, green: 220, blue: 255, alpha: 170};
+    private static readonly BLOCKED_COLOUR: ImageColour = {red: 255, green: 0, blue: 0, alpha: 170};
+    private static readonly HIGHLIGHT_COLOUR: ImageColour = {red: 0, green: 255, blue: 0, alpha: 200};
+
+    /** Colour of a grid cell for the local player, based on whether it can be built on. */
+    public gridColour(x: number, y: number, highlighted: boolean = false): ImageColour {
+        if (this.maze[x][y] !== Walkable.Walkable) {
+            return Maze.BLOCKED_COLOUR;
+        }
+        return highlighted ? Maze.HIGHLIGHT_COLOUR : Maze.WALKABLE_COLOUR;
+    }
 
     constructor(minX: number, minY: number, maxX: number, maxY: number, width: number, height: number, maze: Walkable[][]) {
         this.minX = minX;
@@ -34,40 +46,41 @@ export class Maze {
         this.width = width;
         this.height = height;
         this.maze = maze;
-        this.initializeGridPoints();
+    }
 
+    /**
+     * Grid images are created on first use rather than at map init: creating every maze's
+     * grid at once (over 11k images) during initialisation is heavy, and images created
+     * that early have shown up as invisible.
+     */
+    public get gridPoints(): Image[][] {
+        if (!this._gridPoints) {
+            this._gridPoints = this.createGridPoints();
+        }
+        return this._gridPoints;
     }
 
 
-    private initializeGridPoints(): void {
-        const imagePath: string = 'ReplaceableTextures\\Splats\\SuggestedPlacementSplat.blp';
-
-        // Initialize the 2D array
-        // this.gridPoints = Array(this.width);
-        // for (let x = 0; x < this.width; x++) {
-        //     this.gridPoints[x] = Array(this.height);
-        // }
+    private createGridPoints(): Image[][] {
+        const imagePath: string = IMAGE_TEXTURES.placementSplat;
+        const gridPoints: Image[][] = [];
 
         // Create grid points at cell centers with matching maze structure
         for (let x: number = 0; x < this.width; x++) {
-            this.gridPoints[x] = [];
+            gridPoints[x] = [];
             for (let y: number = 0; y < this.height; y++) {
                 const xPos = this.minX + (x * 64) + 32; // Add 32 to center in cell
                 const yPos = this.minY + (y * 64) + 32; // Add 32 to center in cell
                 const img: Image = new Image(imagePath, 64, xPos, yPos, 0.00);
 
-                // SetImageColor(img.img, 0, 0, 255, 153); // Blue with ~60% opacity
-                if (this.maze[x][y] === Walkable.Walkable) {
-                    img.colour = {red: 0, green: 0, blue: 255, alpha: 153}; // Blue
-                } else {
-                    img.colour = {red: 255, green: 0, blue: 0, alpha: 153}; // Red
-                }
+                img.colour = this.gridColour(x, y);
 
                 img.SetImageRenderAlways(true);
                 img.visible = false; // Initially hidden
-                this.gridPoints[x][y] = img;
+                gridPoints[x][y] = img;
             }
         }
+        return gridPoints;
     }
 
     public showGridPoints(): void {
@@ -235,17 +248,11 @@ export class Maze {
         const cellX = Math.floor(relativeX / 64);
         const cellY = Math.floor(relativeY / 64) - 1;  // Subtract 1 to shift up one cell
 
-        // Reset previously highlighted points to their original colors
+        // Reset previously highlighted points to their original colours
         for (const point of defender.highlightedPoints) {
-            let col = this.gridPoints[point.x][point.y].colour;
             if (defender.isLocal()) {
-                if (this.maze[point.x][point.y] === Walkable.Walkable) {
-                    col = {red: 0, green: 0, blue: 255, alpha: 153}; // Blue
-                } else {
-                    col = {red: 255, green: 0, blue: 0, alpha: 153}; // Red
-                }
+                this.gridPoints[point.x][point.y].colour = this.gridColour(point.x, point.y);
             }
-            this.gridPoints[point.x][point.y].colour = col
         }
 
         // Calculate new points to highlight
@@ -261,11 +268,9 @@ export class Maze {
 
         // Highlight new points
         for (const point of newPoints) {
-            let col = this.gridPoints[point.x][point.y].colour;
-            if (defender.isLocal() && this.maze[point.x][point.y] === Walkable.Walkable) {
-                col = {red: 0, green: 255, blue: 0, alpha: 153}; // green
+            if (defender.isLocal()) {
+                this.gridPoints[point.x][point.y].colour = this.gridColour(point.x, point.y, true);
             }
-            this.gridPoints[point.x][point.y].colour = col;
         }
 
         // Update defender's highlighted points
@@ -278,7 +283,6 @@ export class Maze {
     }
 
     setBuildmode(player: Defender, buildMode: boolean) {
-
         for (let x: number = 0; x < this.width; x++) {
             for (let y: number = 0; y < this.height; y++) {
                 let showImg = this.gridPoints[x][y].visible;

@@ -14,7 +14,6 @@ import {Maze, Walkable} from '../Antiblock/Maze';
 import {COLOUR, DecodeFourCC, SendMessage, Util} from "../../lib/translators";
 import {Effect, Frame, MapPlayer, Timer, Trigger, Unit} from "w3ts";
 import {Image} from "../../JassOverrides/Image";
-import {HybridRandomCommandButton} from "./Ui/HybridRandomCommandButton";
 
 /**
  * Gets a random number between a range.
@@ -479,20 +478,7 @@ export class Commands {
                 this.game.diffVote.forceBlitz = true;
             }
         } else if (command[0] === 'build') {
-            player.setBuildMode(!player.buildMode);
-        } else if (command[0] === 'zoom' || command[0] === 'cam') {
-            if (GetLocalPlayer() === player.handle) {
-                const amount: number = Util.ParsePositiveInt(command[1]);
-                if (!amount) {
-                    player.sendMessage(Util.ColourString(COLOUR_CODES[COLOUR.RED], 'Invalid Amount'));
-                    return;
-
-                }
-                SetCameraField(CAMERA_FIELD_TARGET_DISTANCE, amount, 1);
-            }
-        } else if (command[0] === 'dt' || command[0] === 'disabletowers') {
-            // player.DisableTowers();
-            player.sendMessage('This command has been removed.');
+            this.game.hybridBuildPanel.toggle(player);
         } else if (command[0] === 'buildings' || command[0] === 'towers') {
             if (command[1]) {
                 const receiver: number = this.getPlayerIdFromColourName(command[1]);

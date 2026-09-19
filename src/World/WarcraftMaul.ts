@@ -20,6 +20,7 @@ import {GenericAbilityHandler} from './Entity/GenericAbilities/GenericAbilityHan
 import {CreepAbilityHandler} from './Entity/CreepAbilities/CreepAbilityHandler';
 import {VoidTicker} from './Game/VoidTicker';
 import {ActionBar} from './Game/Ui/ActionBar';
+import {HybridBuildPanel} from './Game/Ui/HybridBuild/HybridBuildPanel';
 import {WarcraftMaulSettings} from './WarcraftMaulSettings';
 import {IMapSettings} from './IMapSettings';
 import {EventQueue} from "../lib/WCEventQueue/EventQueue";
@@ -28,8 +29,6 @@ import {TimedEventQueue} from "../lib/WCEventQueue/TimedEventQueue";
 import {MapPlayer,Effect} from "w3ts";
 import {COLOUR, DecodeFourCC, SendMessage, SendMessageUnlogged, Util} from "../lib/translators";
 import {StringSink} from "../lib/Serilog/Sinks/StringSink";
-import {HybridRandomUI} from "./Game/Ui/HybridRandomUI";
-import {BuildTowerSpell} from "./Entity/Tower/BuildTowerSpell";
 
 export class WarcraftMaul {
 
@@ -51,11 +50,11 @@ export class WarcraftMaul {
     public scoreBoard: MultiBoard | undefined;
     private itemHandler: ItemHandler;
     public sellTower: SellTower;
-    public buildTower: BuildTowerSpell;
     public abilityHandler: GenericAbilityHandler;
 
 
     public players: Map<number, Defender> = new Map<number, Defender>();
+    public hybridBuildPanel: HybridBuildPanel;
 
     public enemies: Attacker[] = [];
     private readonly _creepAbilityHandler: CreepAbilityHandler;
@@ -63,7 +62,6 @@ export class WarcraftMaul {
     public eventQueue: EventQueue;
     public safeEventQueue: SafeEventQueue;
     public timedEventQueue: TimedEventQueue;
-    // public hybridUI: HybridRandomUI;
     public racePicking: RacePicking;
     private TeleportMovement: boolean = false;
     public readonly mapSettings: IMapSettings;
@@ -141,10 +139,8 @@ export class WarcraftMaul {
 
 
         this.diffVote = new Vote(this);
-        // this.hybridUI = new HybridRandomUI(this);
         this.racePicking = new RacePicking(this);
         this.sellTower = new SellTower(this);
-        this.buildTower = new BuildTowerSpell(this);
 
         // this.gameRoundHandler = new AbstractGameRound(this);
 
@@ -155,6 +151,7 @@ export class WarcraftMaul {
 
         SendMessage('Welcome to Warcraft Maul Reimagined');
         // SendMessage(`This is build: ${BUILD_NUMBER}, built ${BUILD_DATE}.`);
+        this.hybridBuildPanel = new HybridBuildPanel(this);
         new ActionBar(this);
     }
 
