@@ -183,6 +183,12 @@ export class Defender extends AbstractPlayer {
             || maze.getWalkable(point.x, point.y) !== Walkable.Walkable)) {
             return;
         }
+        const footprint = maze.getHighlightedPointsCenter(points)!;
+        if (this.game.worldMap.playerSpawns[mazeIndex].overlapsCheckpoint(
+            footprint.x - 64, footprint.y - 64, footprint.x + 64, footprint.y + 64)) {
+            this.sendMessage('You cannot build on a checkpoint');
+            return;
+        }
         const tower = this.hybridTowers[this.buildTier];
         if (this.getGold() < tower.goldCost) {
             this.sendMessage(`Not enough gold, ${tower.name} costs |cffffcc00${tower.goldCost}|r`);
