@@ -1,7 +1,7 @@
 import {Frame} from 'w3ts';
 import {WarcraftMaul} from '../../../WarcraftMaul';
 import {Defender} from '../../../Entity/Players/Defender';
-import {HybridBuildPanelButton} from './HybridBuildPanelButton';
+import {IconButton} from '../IconButton';
 
 // Layout: a 4x3 grid like the command card, sitting above the action bar. The console
 // area itself never passes mouse input to custom frames, so the panel cannot overlay it.
@@ -22,8 +22,8 @@ const CANCEL_SLOT = COLUMNS * ROWS - 1;
  */
 export class HybridBuildPanel {
     private readonly panel: Frame;
-    private readonly tierButtons: HybridBuildPanelButton[] = [];
-    private readonly cancelButton: HybridBuildPanelButton;
+    private readonly tierButtons: IconButton[] = [];
+    private readonly cancelButton: IconButton;
     private readonly openFor: Set<number> = new Set<number>();
 
     constructor(game: WarcraftMaul) {
@@ -49,11 +49,11 @@ export class HybridBuildPanel {
             // Three towers per row; the right column is kept for cancel
             const slot = Math.floor(tier / (COLUMNS - 1)) * COLUMNS + tier % (COLUMNS - 1);
             const [x, y] = slotCenter(slot);
-            this.tierButtons.push(new HybridBuildPanelButton(game, `hybridBuildTier${tier}`, this.panel, x, y, BUTTON_SIZE,
+            this.tierButtons.push(new IconButton(game, `hybridBuildTier${tier}`, this.panel, x, y, BUTTON_SIZE,
                 () => game.playerSync.send('hybrid-pick', `${tier}`)));
         }
         const [cancelX, cancelY] = slotCenter(CANCEL_SLOT);
-        this.cancelButton = new HybridBuildPanelButton(game, 'hybridBuildCancel', this.panel, cancelX, cancelY, BUTTON_SIZE,
+        this.cancelButton = new IconButton(game, 'hybridBuildCancel', this.panel, cancelX, cancelY, BUTTON_SIZE,
             () => game.playerSync.send('hybrid-close'));
 
         game.playerSync.on('hybrid-toggle', player => this.toggle(player));
@@ -65,9 +65,17 @@ export class HybridBuildPanel {
 
     /** Refreshes the local player's buttons after their towers were rolled. */
     public refresh(player: Defender): void {
-        player.hybridTowers.forEach((tower, tier) => this.tierButtons[tier].setTower(player, tower));
-        this.cancelButton.setStatic(player, 'ReplaceableTextures\\CommandButtons\\BTNCancel.blp',
-            'Close', 'Close the build menu and stop building');
+        player.hybridTowers.forEach((tower, tier) => this.tierButtons[tier].setContent(player, {
+            icon: tower.icon ?? '',
+            title: tower.name,
+            description: tower.toolTipExtended,
+            goldCost: tower.goldCost,
+        }));
+        this.cancelButton.setContent(player, {
+            icon: 'ReplaceableTextures\\CommandButtons\\BTNCancel.blp',
+            title: 'Close',
+            description: 'Close the build menu and stop building',
+        });
     }
 
     public toggle(player: Defender): void {

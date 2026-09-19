@@ -7,6 +7,7 @@ import { WarcraftMaul } from '../../WarcraftMaul';
 import { ExampleMaze } from './Buttons/ExampleMaze';
 import { ClaimButton } from './Buttons/ClaimButton';
 import { HybridBuildButton } from './Buttons/HybridBuildButton';
+import { RaceSelectButton } from './Buttons/RaceSelectButton';
 import {Frame} from "w3ts";
 
 export class ActionBar {
@@ -37,6 +38,7 @@ export class ActionBar {
         this.buttons.push(new ExampleMaze(this.game, this.getNextX(), this.getNextY(), this.actionBarHeight, this.buttons.length));
         this.buttons.push(new ClaimButton(this.game, this.getNextX(), this.getNextY(), this.actionBarHeight, this.buttons.length));
         this.buttons.push(new HybridBuildButton(this.game, this.getNextX(), this.getNextY(), this.actionBarHeight, this.buttons.length));
+        this.buttons.push(new RaceSelectButton(this.game, this.getNextX(), this.getNextY(), this.actionBarHeight, this.buttons.length));
 
     }
 

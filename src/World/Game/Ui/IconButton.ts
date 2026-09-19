@@ -1,17 +1,25 @@
 import {Frame, Trigger} from 'w3ts';
-import {WarcraftMaul} from '../../../WarcraftMaul';
-import {Defender} from '../../../Entity/Players/Defender';
-import {GameTowerDef} from '../../Races/HybridRandom.types';
-import {trackHover} from '../UiHover';
+import {WarcraftMaul} from '../../WarcraftMaul';
+import {Defender} from '../../Entity/Players/Defender';
+import {trackHover} from './UiHover';
 
 const TOOLTIP_WIDTH = 0.29;
 const TOOLTIP_PADDING = 0.0315;
 
+export interface IconButtonContent {
+    icon: string;
+    title: string;
+    description: string;
+    /** Shown on the gold line of the tooltip; omit to leave it empty */
+    goldCost?: number;
+}
+
 /**
- * One slot of the hybrid build panel. Content is per player, so it is only ever
- * set for the local player.
+ * A square icon button with a BoxedText tooltip (title, description, gold cost).
+ * Frames are shared by all clients, so content is only ever set for the local player.
+ * Clicks are local frame events: onClick must not touch game state, only send sync messages.
  */
-export class HybridBuildPanelButton {
+export class IconButton {
     private readonly button: Frame;
     private readonly icon: Frame;
     private readonly tooltip: Frame | undefined;
@@ -38,7 +46,6 @@ export class HybridBuildPanelButton {
             this.goldCost = this.tooltip.getChild(3);
         }
 
-        // Frame events only fire on the clicking client, so onClick must not touch game state
         const trigger = Trigger.create();
         trigger.triggerRegisterFrameEvent(this.button, FRAMEEVENT_CONTROL_CLICK);
         trigger.addAction(() => {
@@ -51,26 +58,26 @@ export class HybridBuildPanelButton {
     }
 
     /** Local UI only: call for every player, it applies to the local one. */
-    public setTower(player: Defender, tower: GameTowerDef): void {
+    public setContent(player: Defender, content: IconButtonContent): void {
         if (!player.isLocal()) {
             return;
         }
-        this.icon.setTexture(tower.icon ?? '', 0, true);
-        this.title?.setText(GetLocalizedString(tower.name) ?? tower.name);
-        this.description?.setText(GetLocalizedString(tower.toolTipExtended) ?? tower.toolTipExtended);
-        this.goldCost?.setText(`${tower.goldCost}`);
+        this.icon.setTexture(content.icon, 0, true);
+        this.title?.setText(GetLocalizedString(content.title) ?? content.title);
+        this.description?.setText(GetLocalizedString(content.description) ?? content.description);
+        this.goldCost?.setText(content.goldCost === undefined ? '' : `${content.goldCost}`);
         this.fitTooltip();
     }
 
-    public setStatic(player: Defender, icon: string, title: string, description: string): void {
-        if (!player.isLocal()) {
-            return;
+    public setVisible(visible: boolean): void {
+        this.button.setVisible(visible);
+    }
+
+    /** Dim the icon, e.g. for an unavailable choice; local UI only. */
+    public setDimmed(player: Defender, dimmed: boolean): void {
+        if (player.isLocal()) {
+            this.icon.setAlpha(dimmed ? 90 : 255);
         }
-        this.icon.setTexture(icon, 0, true);
-        this.title?.setText(title);
-        this.description?.setText(description);
-        this.goldCost?.setText('');
-        this.fitTooltip();
     }
 
     private fitTooltip(): void {

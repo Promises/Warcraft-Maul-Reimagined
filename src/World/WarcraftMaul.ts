@@ -22,14 +22,18 @@ import {VoidTicker} from './Game/VoidTicker';
 import {ActionBar} from './Game/Ui/ActionBar';
 import {HybridBuildPanel} from './Game/Ui/HybridBuild/HybridBuildPanel';
 import {PlayerSync} from './Game/PlayerSync';
+import {RaceSelectPanel} from './Game/Ui/RaceSelect/RaceSelectPanel';
 import {WarcraftMaulSettings} from './WarcraftMaulSettings';
 import {IMapSettings} from './IMapSettings';
 import {EventQueue} from "../lib/WCEventQueue/EventQueue";
 import {SafeEventQueue} from "../lib/WCEventQueue/SafeEventQueue";
 import {TimedEventQueue} from "../lib/WCEventQueue/TimedEventQueue";
-import {MapPlayer,Effect} from "w3ts";
+import {Effect, MapPlayer, Timer} from "w3ts";
 import {COLOUR, DecodeFourCC, SendMessage, SendMessageUnlogged, Util} from "../lib/translators";
 import {StringSink} from "../lib/Serilog/Sinks/StringSink";
+
+/** True when built with WCM_DEV=1 (npm run build:dev); enables debug mode regardless of player names. */
+const DEV_BUILD = compiletime(() => process.env.WCM_DEV === '1') as boolean;
 
 export class WarcraftMaul {
 
@@ -57,6 +61,7 @@ export class WarcraftMaul {
     public players: Map<number, Defender> = new Map<number, Defender>();
     public hybridBuildPanel: HybridBuildPanel;
     public playerSync: PlayerSync;
+    public raceSelectPanel: RaceSelectPanel;
 
     public enemies: Attacker[] = [];
     private readonly _creepAbilityHandler: CreepAbilityHandler;
@@ -85,10 +90,13 @@ export class WarcraftMaul {
         this.eventQueue = new EventQueue();
         this.safeEventQueue = new SafeEventQueue(this);
         this.timedEventQueue = new TimedEventQueue(this);
-        // Should we enable debug mode?
-        if (FourCC(MapPlayer.fromIndex(COLOUR.RED)!.name) === 1466921580 || FourCC(MapPlayer.fromIndex(COLOUR.RED)!.name) === 1282368353) {
+        // Debug mode: dev builds (npm run build:dev), or player red is the World Editor / offline test player
+        const redName = FourCC(MapPlayer.fromIndex(COLOUR.RED)!.name);
+        if (DEV_BUILD || redName === FourCC('Worl') || redName === FourCC('Loca')) {
             this.debugMode = true;
             Log.replaceSinks((new StringSink(LogLevel.Debug)));
+            // Keep the log file current so it can be read while the game runs
+            Timer.create().start(2, true, () => Log.flush());
             Log.Debug("DEBUG MODE ENABLED")
 
         }
@@ -156,7 +164,11 @@ export class WarcraftMaul {
         this.playerSync = new PlayerSync(this);
         this.playerSync.on('build', (player, data) => player.placeTower(data));
         this.hybridBuildPanel = new HybridBuildPanel(this);
+        this.raceSelectPanel = new RaceSelectPanel(this);
         new ActionBar(this);
+        for (const player of this.players.values()) {
+            this.raceSelectPanel.open(player);
+        }
     }
 
     public DefeatAllPlayers(): void {

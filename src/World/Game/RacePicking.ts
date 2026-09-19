@@ -13,56 +13,17 @@ import {
     HybridTierThree,
     HybridTierTwo,
 } from './Races/HybridRandom';
-import {MapPlayer, Trigger, Unit} from "w3ts";
+import {Unit} from "w3ts";
 import {SendMessage, Util} from "../../lib/translators";
-import {Log} from "../../lib/Serilog/Serilog";
 import {GameTowerDef} from "./Races/HybridRandom.types";
 
 export class RacePicking {
-    raceSelectTrigger: Trigger;
     private game: WarcraftMaul;
     public HybridPool: Map<string, GameTowerDef> = new Map<string, GameTowerDef>();
 
     constructor(game: WarcraftMaul) {
         this.game = game;
-        this.raceSelectTrigger = Trigger.create();
-        TriggerRegisterAnyUnitEventBJ(this.raceSelectTrigger.handle, EVENT_PLAYER_UNIT_SELL_ITEM);
-        this.raceSelectTrigger.addCondition(() => this.RaceSelectionConditions());
-        this.raceSelectTrigger.addAction(() => this.RaceSelectionActions());
         this.CreateHybridPool();
-        const neutralPlayer = MapPlayer.fromIndex(PLAYER_NEUTRAL_PASSIVE);
-        if (!neutralPlayer) {
-            Log.Fatal("Neutral player not assignable");
-            return;
-        }
-
-        Unit.create(neutralPlayer, FourCC('h03Q'), -1920.00, 3000.00, 0.00);
-        Unit.create(neutralPlayer, FourCC('h00H'), -1920.00, 2624.00, 0.00);
-        Unit.create(neutralPlayer, FourCC('h00O'), -1920.00, 2240.00, 0.00);
-        Unit.create(neutralPlayer, FourCC('h03C'), -1920.00, 1856.00, 0.00);
-        Unit.create(neutralPlayer, FourCC('h03K'), -1920.00, 1472.00, 0.00);
-        for (const player of this.game.players.values()) {
-            Unit.create(player, FourCC('e00C'), -1920.00, 3000.00, 0.00);
-            Unit.create(player, FourCC('e00C'), -1920.00, 2624.00, 0.00);
-            Unit.create(player, FourCC('e00C'), -1920.00, 2240.00, 0.00);
-            Unit.create(player, FourCC('e00C'), -1920.00, 1856.00, 0.00);
-            Unit.create(player, FourCC('e00C'), -1920.00, 1472.00, 0.00);
-        }
-    }
-
-    private RaceSelectionConditions() {
-        const soldUnit = Unit.fromHandle(GetSellingUnit());
-
-        switch (soldUnit?.typeId) {
-            case FourCC('h03Q'):
-            case FourCC('h00H'):
-            case FourCC('h00O'):
-            case FourCC('h03C'):
-            case FourCC('h03K'):
-                return true;
-            default:
-                return false;
-        }
     }
 
     public PickRaceForPlayerByItem(player: Defender, raceItem: number): void {
@@ -112,20 +73,6 @@ export class RacePicking {
                 this.GetSelectedRace(player, raceItem);
             }
         }
-    }
-
-    private RaceSelectionActions(): void {
-        const buyingUnit = Unit.fromHandle(GetBuyingUnit());
-        if (!buyingUnit) {
-            return;
-        }
-        const player: Defender | undefined = this.game.players.get(buyingUnit.owner.id);
-        if (!player) {
-            return;
-        }
-        this.game.worldMap.playerSpawns[player.id].isOpen = true;
-        const soldItem: number = GetItemTypeId(GetSoldItem()!);
-        this.PickRaceForPlayerByItem(player, soldItem);
     }
 
     private HardCoreRandomRace(player: Defender) {

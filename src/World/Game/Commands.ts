@@ -479,6 +479,8 @@ export class Commands {
             }
         } else if (command[0] === 'build') {
             this.game.hybridBuildPanel.toggle(player);
+        } else if (command[0] === 'race') {
+            this.game.raceSelectPanel.toggle(player);
         } else if (command[0] === 'buildings' || command[0] === 'towers') {
             if (command[1]) {
                 const receiver: number = this.getPlayerIdFromColourName(command[1]);
@@ -588,6 +590,7 @@ export class Commands {
         player.setLumber(1);
         ForGroupBJ(grp, () => this.RemovePlayerUnits(player));
         DestroyGroup(grp);
+        this.game.raceSelectPanel.open(player);
     }
 
     public RepickConditions(player: Defender): boolean {
