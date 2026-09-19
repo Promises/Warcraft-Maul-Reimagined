@@ -28,7 +28,7 @@ export class IconButton {
     private readonly goldCost: Frame | undefined;
 
     constructor(game: WarcraftMaul, name: string, parent: Frame, x: number, y: number, size: number,
-                onClick: () => void) {
+                onClick: () => void, showTooltip: boolean = true) {
         this.button = Frame.createType(name, parent, 0, 'BUTTON', 'StandardButtonTemplate')!;
         this.button.setSize(size, size);
         this.button.setAbsPoint(FRAMEPOINT_CENTER, x, y);
@@ -36,8 +36,9 @@ export class IconButton {
         this.icon = Frame.createType(`${name}Icon`, this.button, 0, 'BACKDROP', 'ButtonBackdropTemplate')!;
         this.icon.setAllPoints(this.button);
 
-        // BoxedText comes from war3mapImported\ui\CustomTextButton.fdf: title, description, gold icon, gold value
-        this.tooltip = Frame.create('BoxedText', this.button, 0, 0);
+        // BoxedText comes from war3mapImported\ui\CustomTextButton.fdf: title, description, gold icon, gold value.
+        // A panel with its own details pane passes showTooltip=false to avoid a hover box over it.
+        this.tooltip = showTooltip ? Frame.create('BoxedText', this.button, 0, 0) : undefined;
         if (this.tooltip) {
             this.tooltip.setPoint(FRAMEPOINT_BOTTOM, this.button, FRAMEPOINT_TOP, 0, 0.006);
             this.button.setTooltip(this.tooltip);
