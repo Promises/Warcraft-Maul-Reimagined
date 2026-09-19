@@ -49,7 +49,6 @@ export class RaceSelectPanel {
     private selectedTier: RaceTier = 'Beginner';
     private currentItems: RaceItemDef[] = [];
     private scrollOffset: number = 0;
-    private settingScroll: boolean = false;
     private highlightedItem: string | undefined;
     private visibleLocally: boolean = false;
 
@@ -91,10 +90,12 @@ export class RaceSelectPanel {
             this.rows.push(new RaceListRow(game, `raceSelectRow${index}`, this.panel,
                 listLeft, listTop - index * ROW_HEIGHT, LIST_WIDTH, ROW_HEIGHT,
                 itemId => this.highlight(itemId),
-                up => this.scrollTo(this.scrollOffset + (up ? -1 : 1))));
+                up => this.wheelScroll(up)));
         }
 
-        // Scrollbar down the right of the list, and a mouse-wheel catcher over it
+        // Scrollbar down the right of the list. Flow is one-directional to avoid a feedback
+        // loop: the wheel and showTier move the slider value, and only the slider's
+        // value-changed event scrolls the rows. scrollTo never writes the slider.
         const scrollbarLeft = listLeft + LIST_WIDTH;
         this.scrollbar = Frame.createType('raceSelectScroll', this.panel, 0, 'SLIDER', 'EscMenuScrollBarTemplate');
         if (this.scrollbar) {
@@ -104,11 +105,7 @@ export class RaceSelectPanel {
             const scrollTrigger = Trigger.create();
             scrollTrigger.triggerRegisterFrameEvent(this.scrollbar, FRAMEEVENT_SLIDER_VALUE_CHANGED);
             // The scrollbar runs top=max, so the offset is the inverted value
-            scrollTrigger.addAction(() => {
-                if (!this.settingScroll) {
-                    this.scrollTo(this.maxScroll() - Math.floor(Frame.getEventValue() + 0.5));
-                }
-            });
+            scrollTrigger.addAction(() => this.scrollTo(this.maxScroll() - Math.floor(Frame.getEventValue() + 0.5)));
         }
 
         // Information
@@ -237,8 +234,9 @@ export class RaceSelectPanel {
         }
         if (this.scrollbar) {
             this.scrollbar.setMinMaxValue(0, this.maxScroll());
-            this.scrollbar.setValue(this.maxScroll());
             this.scrollbar.setVisible(this.maxScroll() > 0);
+            // Slider at max = top of the list; fires value-changed -> scrollTo(0)
+            this.scrollbar.setValue(this.maxScroll());
         }
         this.scrollTo(0);
         this.highlight(this.currentItems[0]?.id);
@@ -249,18 +247,22 @@ export class RaceSelectPanel {
     }
 
     /** Local: shows the window of items starting at offset. */
+    /** Moves the slider by one step; the slider's value-changed event does the actual scroll. */
+    private wheelScroll(up: boolean): void {
+        const target = Math.max(0, Math.min(this.scrollOffset + (up ? -1 : 1), this.maxScroll()));
+        if (this.scrollbar) {
+            this.scrollbar.setValue(this.maxScroll() - target);
+        } else {
+            this.scrollTo(target);
+        }
+    }
+
     private scrollTo(offset: number): void {
         this.scrollOffset = Math.max(0, Math.min(offset, this.maxScroll()));
         this.rows.forEach((row, index) => {
             row.setItem(this.currentItems[this.scrollOffset + index]);
             row.setSelected(this.currentItems[this.scrollOffset + index]?.id === this.highlightedItem);
         });
-        // Keep the thumb in sync with the wheel; guard against the resulting value-change event
-        if (this.scrollbar && !this.settingScroll) {
-            this.settingScroll = true;
-            this.scrollbar.setValue(this.maxScroll() - this.scrollOffset);
-            this.settingScroll = false;
-        }
     }
 
     /** Local: shows an item in the information pane and marks its row. */
