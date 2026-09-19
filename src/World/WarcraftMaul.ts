@@ -97,8 +97,6 @@ export class WarcraftMaul {
         if (DEV_BUILD || redName === FourCC('Worl') || redName === FourCC('Loca')) {
             this.debugMode = true;
             Log.replaceSinks((new StringSink(LogLevel.Debug)));
-            // Keep the log file current so it can be read while the game runs
-            Timer.create().start(2, true, () => Log.flush());
             Log.Debug("DEBUG MODE ENABLED")
 
         }

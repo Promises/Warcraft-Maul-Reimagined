@@ -483,6 +483,9 @@ export class Commands {
             this.game.raceSelectPanel.toggleLocal();
         } else if (command[0] === 'host') {
             this.game.hostDetection.report(player);
+        } else if (command[0] === 'log') {
+            Log.flush();
+            player.sendMessage('Log flushed');
         } else if (command[0] === 'buildings' || command[0] === 'towers') {
             if (command[1]) {
                 const receiver: number = this.getPlayerIdFromColourName(command[1]);
