@@ -108,10 +108,10 @@ export class HostSettingsPanel {
 
         // CustomTextButton comes from war3mapImported\ui\CustomTextButton.fdf. Both actions
         // are sent from the clicker's client only; the vote logic checks it is the host.
-        this.addButton(game, 'hostSettingsConfirm', 'Confirm', left + PADDING, bottom + PADDING,
-            () => onConfirm(this.modes.selection, this.difficulties.selection));
-        this.addButton(game, 'hostSettingsVote', 'Let players vote', left + width - PADDING - BUTTON_WIDTH, bottom + PADDING,
+        this.addButton(game, 'hostSettingsVote', 'Let players vote', left + PADDING, bottom + PADDING,
             () => onVote());
+        this.addButton(game, 'hostSettingsConfirm', 'Confirm', left + width - PADDING - BUTTON_WIDTH, bottom + PADDING,
+            () => onConfirm(this.modes.selection, this.difficulties.selection));
 
         this.panel.setVisible(false);
     }
