@@ -6,19 +6,23 @@ import {trackHover} from '../UiHover';
 const ICON_INSET = 0.003;
 
 /**
- * One row of the race list: an icon and the race name, clickable. Rows are reused as the
- * list scrolls, so setItem repoints an existing row rather than creating frames.
+ * One row of the race list: an icon and the race name on a text button. Rows are reused as
+ * the list scrolls, so setItem repoints an existing row rather than creating frames.
  */
 export class RaceListRow {
     private readonly button: Frame;
     private readonly icon: Frame;
-    private readonly label: Frame;
     private readonly highlight: Frame;
     private itemId: string | undefined;
+    private name: string = '';
+    private selected: boolean = false;
 
     constructor(game: WarcraftMaul, name: string, parent: Frame, x: number, y: number,
                 width: number, height: number, onClick: (itemId: string) => void, onWheel: (up: boolean) => void) {
-        this.button = Frame.createType(name, parent, 0, 'GLUEBUTTON', 'ScriptDialogButton')!;
+        // CustomListButton (war3mapImported\\ui\\CustomTextButton.fdf): a text button whose own
+        // text is left-justified past the icon. Its hit area matches what is drawn, and the
+        // name is the button's text rather than a child TEXT frame, which would swallow clicks.
+        this.button = Frame.create('CustomListButton', parent, 0, 0)!;
         this.button.setSize(width, height);
         this.button.setAbsPoint(FRAMEPOINT_TOPLEFT, x, y);
 
@@ -32,11 +36,6 @@ export class RaceListRow {
         this.icon = Frame.createType(`${name}Icon`, this.button, 0, 'BACKDROP', '')!;
         this.icon.setSize(height - 2 * ICON_INSET, height - 2 * ICON_INSET);
         this.icon.setAbsPoint(FRAMEPOINT_TOPLEFT, x + ICON_INSET, y - ICON_INSET);
-
-        this.label = Frame.createType(`${name}Label`, this.button, 0, 'TEXT', '')!;
-        this.label.setSize(width - height - 0.006, height);
-        this.label.setAbsPoint(FRAMEPOINT_LEFT, x + height, y - height / 2);
-        BlzFrameSetTextAlignment(this.label.handle, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
 
         // Frame events fire on every client with the acting player; the row only ever shows
         // and changes the local player's view, so other clients ignore the event entirely
@@ -70,14 +69,20 @@ export class RaceListRow {
         this.button.setVisible(item !== undefined);
         if (item) {
             this.icon.setTexture(item.icon, 0, true);
-            this.label.setText(GetLocalizedString(item.name) ?? item.name);
+            this.name = GetLocalizedString(item.name) ?? item.name;
+            this.refreshText();
         }
     }
 
     public setSelected(selected: boolean): void {
-        const on = selected && this.itemId !== undefined;
-        this.highlight.setVisible(on);
-        this.label.setTextColor(on ? BlzConvertColor(255, 255, 204, 0) : BlzConvertColor(255, 255, 255, 255));
+        this.selected = selected && this.itemId !== undefined;
+        this.highlight.setVisible(this.selected);
+        this.refreshText();
+    }
+
+    /** The selected name is gold; a colour code in the text is what works on a text button. */
+    private refreshText(): void {
+        this.button.setText(this.selected ? `|cffffcc00${this.name}|r` : this.name);
     }
 
     public get item(): string | undefined {

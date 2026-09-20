@@ -10,6 +10,21 @@ Frame "GLUETEXTBUTTON" "CustomTextButton" INHERITS WITHCHILDREN "EscMenuButtonTe
 	}
 }
 
+// A list row: the same button with its text left-justified and indented past an icon that
+// the script places at the left edge. The text is the button's own, so clicks land anywhere
+// on the row (a separate TEXT child frame would swallow them).
+Frame "GLUETEXTBUTTON" "CustomListButton" INHERITS WITHCHILDREN "EscMenuButtonTemplate" {
+    UseActiveContext,
+    ButtonText "CustomListButtonText",
+	Frame "TEXT" "CustomListButtonText" INHERITS "EscMenuButtonTextTemplate" {
+		Text "",
+		FontJustificationH JUSTIFYLEFT,
+		FontJustificationOffset 0.028 0.0,
+		FontFlags "FIXEDSIZE",
+		FrameFont "MasterFont", 0.010, "",
+	}
+}
+
 // -- LOCAL TEMPLATES -------------------------------------------------------
 Frame "BACKDROP" "BoxedTextBackgroundTemplate" {
         DecorateFileNames, //Look-Up Names in some String table (for example gameinterface)
