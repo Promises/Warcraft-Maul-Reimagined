@@ -5,14 +5,20 @@ import {ILogSink, LogEvent, LogLevel} from '../Serilog';
  * log can be read outside the game. The file is rewritten as a whole on every flush, so
  * events are buffered and only written on request (see Log.flush) or on an error.
  * The game only writes whitelisted extensions (use .txt) and each line ends up inside a
- * quoted string, so quotes are replaced.
+ * quoted string, so quotes are replaced. Lines carry the local wall-clock time: Reforged
+ * leaves os.date in the map sandbox (io, debug and package are stripped, os stays).
  */
 export class FileSink implements ILogSink {
     private static readonly MAX_LINES = 400;
     private readonly lines: string[] = [];
     private dirty: boolean = false;
+    private readonly timestamps: boolean;
 
-    constructor(private readonly fileName: string, private readonly minLevel: LogLevel = LogLevel.Debug) {}
+    constructor(private readonly fileName: string, private readonly minLevel: LogLevel = LogLevel.Debug) {
+        // Checked once rather than assumed, in case a platform strips os as well
+        const [available] = pcall(() => os.date('%H:%M:%S'));
+        this.timestamps = available;
+    }
 
     public isEnabled(level: LogLevel): boolean {
         return level >= this.minLevel;
@@ -20,7 +26,8 @@ export class FileSink implements ILogSink {
 
     public emit(event: LogEvent): void {
         const [message] = string.gsub(event.message, '["\r\n]', "'");
-        this.lines.push(`[${LogLevel[event.level]}] ${message}`);
+        const stamp = this.timestamps ? `${os.date('%H:%M:%S')} ` : '';
+        this.lines.push(`${stamp}[${LogLevel[event.level]}] ${message}`);
         if (this.lines.length > FileSink.MAX_LINES) {
             this.lines.shift();
         }
