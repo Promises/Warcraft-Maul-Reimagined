@@ -3,7 +3,7 @@ import {WarcraftMaul} from '../WarcraftMaul';
 import {Defender} from '../Entity/Players/Defender';
 import {Tower} from '../Entity/Tower/Specs/Tower';
 import {Walkable} from '../Antiblock/Maze';
-import {COLOUR, SendMessage} from '../../lib/translators';
+import {COLOUR, DecodeFourCC, SendMessage} from '../../lib/translators';
 import {Log} from '../../lib/Serilog/Serilog';
 
 const GRID = 64;
@@ -61,6 +61,9 @@ class LaneFrame {
 
 interface CarriedTower {
     typeId: number;
+    name: string;
+    fromX: number;
+    fromY: number;
     x: number;
     y: number;
 }
@@ -108,15 +111,23 @@ export class LaneTransfer {
         for (const tower of player.towersArray.filter(candidate => oldArea.ContainsUnit(candidate.unit))) {
             const local = from.toLocal(tower.unit.x, tower.unit.y);
             const position = to.fromLocal(local.along, local.across);
-            carried.push({typeId: tower.unit.typeId, x: this.snap(position.x), y: this.snap(position.y)});
-            this.removeTower(tower, oldLane);
+            carried.push({
+                typeId: tower.unit.typeId,
+                name: tower.unit.name,
+                fromX: tower.unit.x,
+                fromY: tower.unit.y,
+                x: this.snap(position.x),
+                y: this.snap(position.y),
+            });
         }
-
-        for (const builder of this.builders(player)) {
-            if (oldArea.ContainsUnit(builder)) {
-                const local = from.toLocal(builder.x, builder.y);
-                const position = to.fromLocal(local.along, local.across);
-                builder.setPosition(position.x, position.y);
+        // Every tower is removed before any is rebuilt, so a rebuilt one cannot land on a
+        // cell an old one still occupies; an error in one tower must not abandon the rest
+        // half-moved, so each step is caught and logged
+        for (const tower of player.towersArray.filter(candidate => oldArea.ContainsUnit(candidate.unit))) {
+            try {
+                this.removeTower(tower, oldLane);
+            } catch (error) {
+                Log.Error(`Removing ${tower.unit.name} at ${tower.unit.x}, ${tower.unit.y} failed: ${error}`);
             }
         }
 
@@ -125,13 +136,32 @@ export class LaneTransfer {
         spawns[oldLane].isOpen = false;
         player.moveToLane(target);
 
+        let rebuilt = 0;
         for (const tower of carried) {
-            this.rebuildTower(player, tower, target);
+            try {
+                if (this.rebuildTower(player, tower, target)) {
+                    rebuilt++;
+                }
+            } catch (error) {
+                Log.Error(`Rebuilding ${tower.name} at ${tower.x}, ${tower.y} failed: ${error}`);
+            }
+        }
+
+        // Builders walk over last, so none of them stands where a tower is about to be rebuilt
+        for (const builder of this.builders(player)) {
+            if (oldArea.ContainsUnit(builder)) {
+                const local = from.toLocal(builder.x, builder.y);
+                const position = to.fromLocal(local.along, local.across);
+                builder.setPosition(position.x, position.y);
+            }
         }
 
         PanCameraToTimedForPlayer(player.handle, player.getCenterX(), player.getCenterY(), 0.00);
         SendMessage(`${player.getNameWithColour()} moved into the gray lane and is now the last defender`);
-        Log.Info(`${player.getPlayerName()} moved ${carried.length} towers from lane ${oldLane} to gray`);
+        if (rebuilt < carried.length) {
+            player.sendMessage(`${carried.length - rebuilt} of ${carried.length} towers could not be rebuilt, see -log`);
+        }
+        Log.Info(`${player.getPlayerName()} moved ${rebuilt}/${carried.length} towers from lane ${oldLane} to gray`);
     }
 
     /** Sells every remaining tower in a lane to its owner, so the lane is clear to move into. */
@@ -154,16 +184,28 @@ export class LaneTransfer {
         tower.unit.destroy();
     }
 
-    private rebuildTower(player: Defender, tower: CarriedTower, lane: number): void {
+    /** Returns whether the tower stands where it was meant to. */
+    private rebuildTower(player: Defender, tower: CarriedTower, lane: number): boolean {
         const unit = Unit.create(player, tower.typeId, tower.x, tower.y, 270.00);
+        Log.Info(`Rebuild ${tower.name} (${DecodeFourCC(tower.typeId)}) ${tower.fromX},${tower.fromY} -> ${tower.x},${tower.y}`
+            + (unit ? ` landed ${unit.x},${unit.y}` : ' failed: no unit'));
         if (!unit) {
-            Log.Error(`Could not rebuild tower ${tower.typeId} at ${tower.x}, ${tower.y}`);
-            return;
+            Log.Error(`Could not rebuild ${tower.name} at ${tower.x}, ${tower.y}`);
+            return false;
         }
         // Same as a finished construction: no rally point, then the tower logic is attached
         unit.removeAbility(FourCC('ARal'));
         this.game.worldMap.towerConstruction.SetupTower(unit, player);
-        this.game.worldMap.playerMazes[lane].setFootprint(tower.x, tower.y, Walkable.Blocked);
+        // CreateUnit shifts a building whose footprint is not free; the maze must follow the
+        // unit, and a shifted tower is reported so the cause can be found
+        const x = this.snap(unit.x);
+        const y = this.snap(unit.y);
+        this.game.worldMap.playerMazes[lane].setFootprint(x, y, Walkable.Blocked);
+        if (x !== tower.x || y !== tower.y) {
+            Log.Error(`${tower.name} was shifted from ${tower.x},${tower.y} to ${x},${y}`);
+            return false;
+        }
+        return true;
     }
 
     private builders(player: Defender): Unit[] {
