@@ -129,10 +129,8 @@ export class Vote {
 
         const diffIndex: number = R2I((this.difficulty - 100.00) / 100.00 + ModuloReal((this.difficulty - 100.00) / 100.00, 1.00));
         this.difficulty = Math.floor(this.difficulty);
-        const passive = MapPlayer.fromIndex(PLAYER_NEUTRAL_PASSIVE);
-        if (passive) {
-            passive.handicap = this.difficulty;
-        }
+        // Percentage: the BJ divides by 100, the raw handicap setter would not
+        SetPlayerHandicapBJ(Player(PLAYER_NEUTRAL_PASSIVE)!, this.difficulty);
         SendMessage(`Difficulty was set to ${this.difficulty}% (${Util.ColourString(settings.DIFFICULTY_COLOURS[diffIndex],
             settings.DIFFICULTY_STRINGS[diffIndex])})`);
 

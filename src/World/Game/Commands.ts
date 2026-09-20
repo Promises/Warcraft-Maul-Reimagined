@@ -204,7 +204,7 @@ export class Commands {
                 player.sendMessage(`Difficulty was set to ${amount}%`);
                 this.game.diffVote.difficulty = amount;
                 for (const enemy of this.game.enemies) {
-                    enemy.handicap = amount;
+                    enemy.setHandicap(amount);
                 }
                 break;
             case 'wave':

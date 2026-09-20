@@ -66,6 +66,14 @@ export abstract class AbstractPlayer extends MapPlayer {
         DisplayTimedTextToPlayer(this.handle, 0, 0, 10, message);
     }
 
+    /**
+     * Difficulty as a percentage (100 = normal). The w3ts `handicap` setter is the raw native
+     * and takes a ratio, so 250 there would be 250x health rather than 250%.
+     */
+    public setHandicap(percentage: number): void {
+        SetPlayerHandicapBJ(this.handle, percentage);
+    }
+
     public setGold(amount: number): void {
         this.setState(PLAYER_STATE_RESOURCE_GOLD, amount)
     }
