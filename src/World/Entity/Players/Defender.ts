@@ -13,6 +13,7 @@ import {TimedEvent} from "../../../lib/WCEventQueue/TimedEvent";
 import {GameTowerDef} from "../../Game/Races/HybridRandom.types";
 import {Maze, Walkable} from "../../Antiblock/Maze";
 import {DummyTowers} from "../../Game/Races/HybridRandom";
+import {VOID_FRAGMENT_CAP} from "../Tower/Races/Void/VoidFragmentCosts";
 
 export class Defender extends AbstractPlayer {
 
@@ -695,6 +696,14 @@ export class Defender extends AbstractPlayer {
 
     public GetVoidFragmentTick(): number {
         return this._voidFragmentTick;
+    }
+
+    /** Gives fragments back (a cancelled purchase), capped, and keeps the builder's mana in step. */
+    public refundVoidFragments(amount: number): void {
+        this.SetVoidFragments(Math.min(this.GetVoidFragments() + amount, VOID_FRAGMENT_CAP));
+        if (this._voidBuilder) {
+            this._voidBuilder.mana = this.GetVoidFragments();
+        }
     }
 
     public SetVoidFragments(value: number): void {

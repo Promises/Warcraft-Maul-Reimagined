@@ -8,7 +8,8 @@ import { PlayerSpawns } from '../Entity/PlayerSpawns';
 import { CheckPoint } from '../Entity/CheckPoint';
 import { AbstractGameRound } from '../Game/BaseMaul/AbstractGameRound';
 import {Group, Timer, Trigger, Unit} from "w3ts";
-import {COLOUR} from "../../lib/translators";
+import {COLOUR, DecodeFourCC} from "../../lib/translators";
+import {VOID_FRAGMENT_COSTS} from "../Entity/Tower/Races/Void/VoidFragmentCosts";
 
 export class AntiBlock {
 
@@ -167,9 +168,25 @@ export class AntiBlock {
     private CanceledBuilding(): void {
         const u: Unit|undefined = Unit.fromHandle(GetCancelledStructure());
         if(u) {
+            this.refundVoidFragments(u);
             this.CleanUpRemovedConstruction(u);
         }
 
+    }
+
+    /**
+     * A void building bought with fragments: the native cancel refunds the gold only, so the
+     * fragments (and the builder's matching mana) are given back here. Covers the anti-block,
+     * anti-juggle and homesick cancels as well as the player's own cancel.
+     */
+    private refundVoidFragments(construction: Unit): void {
+        const cost: number | undefined = VOID_FRAGMENT_COSTS[DecodeFourCC(construction.typeId)];
+        const owner: Defender | undefined = this._worldMap.game.players.get(construction.owner.id);
+        if (cost === undefined || !owner) {
+            return;
+        }
+        owner.refundVoidFragments(cost);
+        owner.sendMessage(`|cFFAA66FF${cost} void fragments|r were refunded`);
     }
 
     public CleanUpRemovedConstruction(u: Unit): void {

@@ -1,5 +1,6 @@
 import { WarcraftMaul } from '../WarcraftMaul';
 import {Trigger} from "w3ts";
+import {VOID_FRAGMENT_CAP} from "../Entity/Tower/Races/Void/VoidFragmentCosts";
 
 export class VoidTicker {
     private readonly trig: Trigger;
@@ -18,8 +19,8 @@ export class VoidTicker {
             if (player.getVoidBuilder()) {
                 player.getVoidBuilder()!.mana = player.GetVoidFragments()
             }
-            if (player.GetVoidFragments() > 2000) {
-                player.SetVoidFragments(2000);
+            if (player.GetVoidFragments() > VOID_FRAGMENT_CAP) {
+                player.SetVoidFragments(VOID_FRAGMENT_CAP);
             }
         });
 
