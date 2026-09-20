@@ -319,6 +319,10 @@ export class Commands {
                 }
                 break;
             }
+            case 'lanecheck':
+                this.game.laneTransfer.reportLaneDifferences();
+                player.sendMessage('Lane differences written to the log');
+                break;
             case 'fillmaze':
                 this.fillMaze(player, command[1] ?? '3', FourCC(command2[2] ?? 'hC66'));
                 break;

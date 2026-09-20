@@ -178,6 +178,57 @@ export class LaneTransfer {
         Log.Info(`${player.getPlayerName()} moved ${rebuilt}/${carried.length} towers from lane ${oldLane} to ${target}`);
     }
 
+    /**
+     * Debug: writes to the log every tower cell that is not buildable in a lane although it
+     * is in most other lanes - the terrain differences that make a transfer refund towers.
+     * Cells are given in lane-local terms (along/across the checkpoint frame, so lanes can
+     * be compared) and as world coordinates of the tower centre for the World Editor.
+     */
+    public reportLaneDifferences(): void {
+        const lanes = this.game.mapSettings.PLAYER_AREAS.length;
+        const frames: LaneFrame[] = [];
+        for (let lane = 0; lane < lanes; lane++) {
+            frames.push(new LaneFrame(this.game, lane));
+        }
+        // Tower centres whose 2x2 footprint lies inside the area: along -640..1792, across +-768
+        const alongs: number[] = [];
+        for (let along = -640 + GRID; along <= 1792 - GRID; along += GRID) {
+            alongs.push(along);
+        }
+        const acrosses: number[] = [];
+        for (let across = -768 + GRID; across <= 768 - GRID; across += GRID) {
+            acrosses.push(across);
+        }
+        const construction = this.game.worldMap.towerConstruction;
+        const buildable: boolean[][][] = frames.map(frame => alongs.map(along => acrosses.map(across => {
+            const point = frame.fromLocal(along, across);
+            return construction.isBuildable(snapToGrid(point.x), snapToGrid(point.y));
+        })));
+
+        for (let lane = 0; lane < lanes; lane++) {
+            let missing = 0;
+            alongs.forEach((along, i) => {
+                const cells: string[] = [];
+                acrosses.forEach((across, j) => {
+                    if (buildable[lane][i][j]) {
+                        return;
+                    }
+                    const buildableElsewhere = buildable.filter((other, otherLane) => otherLane !== lane && other[i][j]).length;
+                    if (buildableElsewhere > (lanes - 1) / 2) {
+                        const point = frames[lane].fromLocal(along, across);
+                        cells.push(`across ${across} (${snapToGrid(point.x)},${snapToGrid(point.y)})`);
+                    }
+                });
+                if (cells.length > 0) {
+                    missing += cells.length;
+                    Log.Info(`Lane ${lane} ${Util.COLOUR_NAMES[lane]} along ${along}: not buildable at ${cells.join(', ')}`);
+                }
+            });
+            Log.Info(`Lane ${lane} ${Util.COLOUR_NAMES[lane]}: ${missing} cells not buildable that other lanes have`);
+        }
+        Log.flush();
+    }
+
     /** Sells every remaining tower in a lane to its owner, so the lane is clear to move into. */
     private sellTowersIn(lane: number): void {
         const rectangle: rect = this.game.mapSettings.PLAYER_AREAS[lane].toRect();

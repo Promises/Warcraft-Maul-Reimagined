@@ -204,7 +204,7 @@ export class TowerConstruction {
     }
 
     /** Whether all four cells of a 2x2 footprint centred on the grid corner (x, y) are buildable. */
-    private isBuildable(x: number, y: number): boolean {
+    public isBuildable(x: number, y: number): boolean {
         for (const dx of [-32, 32]) {
             for (const dy of [-32, 32]) {
                 // The native answers whether the point is NOT pathable for the given type
