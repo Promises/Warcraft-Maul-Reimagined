@@ -275,6 +275,7 @@ export class Defender extends AbstractPlayer {
         super(id);
         this.game = game;
         this._lane = id;
+        game.laneHolders.set(id, this);
         this.setUpPlayerVariables();
         this.leaveTrigger = Trigger.create();
         TriggerRegisterPlayerEventLeave
@@ -395,7 +396,9 @@ export class Defender extends AbstractPlayer {
 
     /** Takes over another lane; the towers and builders are carried over by LaneTransfer. */
     public moveToLane(lane: number): void {
+        this.game.laneHolders.delete(this._lane);
         this._lane = lane;
+        this.game.laneHolders.set(lane, this);
         this.setHoloMaze(undefined);
         const location: Point = this.game.mapSettings.ALLOW_PLAYER_TOWER_LOCATIONS[lane];
         if (this.allowPlayerTower) {
@@ -449,6 +452,7 @@ export class Defender extends AbstractPlayer {
 
         // TriggerSleepAction(2.00);
         this.game.worldMap.playerSpawns[this.lane].isOpen = false;
+        this.game.laneHolders.delete(this.lane);
         if (this.game.scoreBoard && this._scoreSlot > -1) {
 
             MultiboardSetItemValueBJ(

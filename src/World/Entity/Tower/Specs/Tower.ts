@@ -190,6 +190,35 @@ export class Tower {
 
     }
 
+    /**
+     * Moves the standing tower to another cell, keeping the unit and everything on it
+     * (attached effects, buffs, ability levels, tower state). SetUnitPosition re-places a
+     * building's pathing footprint, unlike SetUnitX/Y. The area-effect registration follows
+     * the unit into the new lane. Returns false when the unit did not land on (x, y).
+     */
+    public Relocate(x: number, y: number): boolean {
+        const from = this.areaIndex();
+        this._unit.setPosition(x, y);
+        if (Math.abs(this._unit.x - x) > 1 || Math.abs(this._unit.y - y) > 1) {
+            return false;
+        }
+        const to = this.areaIndex();
+        if (this.IsAreaEffectTower() && from !== to) {
+            if (from !== undefined) {
+                this.game.worldMap.playerSpawns[from].areaTowers.delete(this.UniqueID);
+            }
+            if (to !== undefined) {
+                this.game.worldMap.playerSpawns[to].areaTowers.set(this.UniqueID, this);
+            }
+        }
+        return true;
+    }
+
+    private areaIndex(): number | undefined {
+        const index = this.game.mapSettings.PLAYER_AREAS.findIndex(area => area.ContainsUnit(this._unit));
+        return index === -1 ? undefined : index;
+    }
+
     public CastSpellOnAttackedUnitLocation(spell: string): void {
         const attackedUnit = Unit.fromEvent()!;
         const attacker = Unit.fromHandle(GetAttacker())!;

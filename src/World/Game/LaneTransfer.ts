@@ -1,13 +1,16 @@
-import {Unit} from 'w3ts';
+import {Timer, Unit} from 'w3ts';
 import {WarcraftMaul} from '../WarcraftMaul';
 import {Defender} from '../Entity/Players/Defender';
 import {Tower} from '../Entity/Tower/Specs/Tower';
 import {Walkable} from '../Antiblock/Maze';
-import {COLOUR, DecodeFourCC, SendMessage, Util} from '../../lib/translators';
+import {COLOUR, SendMessage, Util} from '../../lib/translators';
 import {COLOUR_CODES} from '../GlobalSettings';
 import {Log} from '../../lib/Serilog/Serilog';
+import {Rectangle} from '../../JassOverrides/Rectangle';
 
 const GRID = 64;
+// Any standard item works as a pathing probe; it exists for a single tick and is never seen
+const PROBE_ITEM = FourCC('ches');
 
 /** Tower centres sit on grid corners; snapping removes float error from the frame maths. */
 function snapToGrid(value: number): number {
@@ -66,6 +69,7 @@ class LaneFrame {
 }
 
 interface CarriedTower {
+    tower: Tower;
     typeId: number;
     name: string;
     value: number;
@@ -100,11 +104,10 @@ export class LaneTransfer {
             player.sendMessage(`You already hold the ${laneName} lane`);
             return;
         }
-        for (const other of this.game.players.values()) {
-            if (other.lane === target && other.slotState === PLAYER_SLOT_STATE_PLAYING) {
-                player.sendMessage(`${other.getNameWithColour()} holds the ${laneName} lane`);
-                return;
-            }
+        const holder = this.game.laneHolders.get(target);
+        if (holder) {
+            player.sendMessage(`${holder.getNameWithColour()} holds the ${laneName} lane`);
+            return;
         }
         if (this.game.worldMap.gameRoundHandler?.isWaveInProgress) {
             player.sendMessage(`Wait until the wave is over before moving to the ${laneName} lane`);
@@ -118,12 +121,14 @@ export class LaneTransfer {
 
         this.sellTowersIn(target);
 
-        // Towers the player has in their own lane; towers built elsewhere stay where they are
+        // Towers the player has in their own lane; towers built elsewhere stay where they are.
+        // Old and new lane are disjoint areas, so each tower can move straight to its cell.
         const carried: CarriedTower[] = [];
         for (const tower of player.towersArray.filter(candidate => oldArea.ContainsUnit(candidate.unit))) {
             const local = from.toLocal(tower.unit.x, tower.unit.y);
             const position = to.fromLocal(local.along, local.across);
             carried.push({
+                tower,
                 typeId: tower.unit.typeId,
                 name: tower.unit.name,
                 value: tower.GetSellValue(),
@@ -133,49 +138,62 @@ export class LaneTransfer {
                 y: snapToGrid(position.y),
             });
         }
-        // Every tower is removed before any is rebuilt, so a rebuilt one cannot land on a
-        // cell an old one still occupies; an error in one tower must not abandon the rest
-        // half-moved, so each step is caught and logged
-        for (const tower of player.towersArray.filter(candidate => oldArea.ContainsUnit(candidate.unit))) {
-            try {
-                this.removeTower(tower, oldLane);
-            } catch (error) {
-                Log.Error(`Removing ${tower.unit.name} at ${tower.unit.x}, ${tower.unit.y} failed: ${error}`);
-            }
-        }
 
         const spawns = this.game.worldMap.playerSpawns;
         spawns[target].isOpen = spawns[oldLane].isOpen;
         spawns[oldLane].isOpen = false;
         player.moveToLane(target);
 
-        let rebuilt = 0;
-        for (const tower of carried) {
-            try {
-                if (this.rebuildTower(player, tower, target)) {
-                    rebuilt++;
-                }
-            } catch (error) {
-                Log.Error(`Rebuilding ${tower.name} at ${tower.x}, ${tower.y} failed: ${error}`);
-            }
+        // Validates the pathing probe itself: a standing tower's own footprint must read blocked
+        if (carried.length > 0) {
+            const first = carried[0];
+            Log.Info(`Probe: ${first.name} standing at ${first.fromX},${first.fromY} blocks walking: ${this.footprintBlocked(first.fromX, first.fromY)}`);
         }
 
-        // Builders walk over last, so none of them stands where a tower is about to be rebuilt
-        for (const builder of this.builders(player)) {
-            if (oldArea.ContainsUnit(builder)) {
-                const local = from.toLocal(builder.x, builder.y);
-                const position = to.fromLocal(local.along, local.across);
-                builder.setPosition(position.x, position.y);
+        // An error in one tower must not abandon the rest half-moved
+        const moved: CarriedTower[] = [];
+        for (const tower of carried) {
+            try {
+                if (this.moveTower(player, tower, oldLane, target)) {
+                    moved.push(tower);
+                }
+            } catch (error) {
+                Log.Error(`Moving ${tower.name} to ${tower.x}, ${tower.y} failed: ${error}`);
             }
         }
+        // The pathing map may only reflect a moved building on a later tick, so the moves are
+        // verified after a short delay; a tower whose footprint still does not block is rebuilt
+        Timer.create().start(0.10, false, () => this.verifyMoves(player, moved, target, carried.length, laneName));
+
+        // Every other unit of the player in the old lane comes along: builders, and the units
+        // some towers spawn or summon. Towers were moved first, so nothing lands on their cells
+        // before they stand there.
+        this.moveUnits(player, oldArea, from, to);
 
         PanCameraToTimedForPlayer(player.handle, player.getCenterX(), player.getCenterY(), 0.00);
         SendMessage(`${player.getNameWithColour()} moved into the ${laneName} lane`
             + (target === COLOUR.GRAY ? ' and is now the last defender' : ''));
-        if (rebuilt < carried.length) {
-            player.sendMessage(`${carried.length - rebuilt} of ${carried.length} towers had no room in the ${laneName} lane and were refunded`);
+        Log.Info(`${player.getPlayerName()} moved ${moved.length}/${carried.length} towers from lane ${oldLane} to ${target}`);
+    }
+
+    private verifyMoves(player: Defender, moved: CarriedTower[], lane: number, total: number, laneName: string): void {
+        let standing = 0;
+        let rebuilt = 0;
+        for (const tower of moved) {
+            if (this.footprintBlocked(tower.x, tower.y)) {
+                standing++;
+                continue;
+            }
+            Log.Error(`${tower.name} at ${tower.x},${tower.y}: pathing did not follow the move; rebuilding`);
+            if (this.rebuildTower(player, tower, lane)) {
+                rebuilt++;
+            }
         }
-        Log.Info(`${player.getPlayerName()} moved ${rebuilt}/${carried.length} towers from lane ${oldLane} to ${target}`);
+        const refunded = total - standing - rebuilt;
+        if (refunded > 0) {
+            player.sendMessage(`${refunded} of ${total} towers had no room in the ${laneName} lane and were refunded`);
+        }
+        Log.Info(`Verified: ${standing} moved intact, ${rebuilt} rebuilt, ${refunded} refunded`);
     }
 
     /**
@@ -240,35 +258,71 @@ export class LaneTransfer {
         RemoveRect(rectangle);
     }
 
-    private removeTower(tower: Tower, lane: number): void {
-        tower.Sell();
-        this.game.worldMap.playerMazes[lane].setFootprint(tower.unit.x, tower.unit.y, Walkable.Walkable);
-        tower.unit.destroy();
+    /**
+     * Moves a standing tower to its cell in the new lane, keeping the unit and everything
+     * on it. When the cell is not buildable (the lanes match in shape, not entirely in
+     * terrain) or the unit did not land there, the tower is rebuilt from scratch at the
+     * target, and refunded in full if even that has no room.
+     */
+    private moveTower(player: Defender, carried: CarriedTower, oldLane: number, lane: number): boolean {
+        const mazes = this.game.worldMap.playerMazes;
+        mazes[oldLane].setFootprint(carried.fromX, carried.fromY, Walkable.Walkable);
+        if (this.game.worldMap.towerConstruction.isBuildable(carried.x, carried.y) && carried.tower.Relocate(carried.x, carried.y)) {
+            mazes[lane].setFootprint(carried.x, carried.y, Walkable.Blocked);
+            Log.Info(`Moved ${carried.name} ${carried.fromX},${carried.fromY} -> ${carried.x},${carried.y}`);
+            return true;
+        }
+        Log.Info(`${carried.name} cannot stand at ${carried.x},${carried.y} (unit at ${carried.tower.unit.x},${carried.tower.unit.y}); rebuilding`);
+        this.rebuildTower(player, carried, lane);
+        return false;
+    }
+
+    /** Replaces the tower's unit with a fresh one at the target, or refunds it; returns whether it stands. */
+    private rebuildTower(player: Defender, carried: CarriedTower, lane: number): boolean {
+        carried.tower.Sell();
+        carried.tower.unit.destroy();
+        if (this.game.worldMap.towerConstruction.placeTower(player, carried.typeId, carried.x, carried.y)) {
+            return true;
+        }
+        this.game.worldMap.playerMazes[lane].setFootprint(carried.x, carried.y, Walkable.Walkable);
+        Log.Info(`${carried.name} has no room at ${carried.x},${carried.y}, refunded`);
+        player.giveGold(carried.value);
+        return false;
     }
 
     /**
-     * Rebuilds a tower at its target cell, or refunds it in full when it cannot stand exactly
-     * there: the lanes match in shape but not entirely in terrain (the last row of the gray
-     * lane, by the ship, is not buildable).
+     * Whether a building's 2x2 footprint centred on (x, y) blocks walking, i.e. its pathing
+     * is in place. IsTerrainPathable only reads the static map and never sees buildings, so
+     * this drops an item on each cell instead: the game pushes an item off any cell that is
+     * not walkable, buildings included, so an item that stays put means the cell is open.
      */
-    private rebuildTower(player: Defender, tower: CarriedTower, lane: number): boolean {
-        const unit = this.game.worldMap.towerConstruction.placeTower(player, tower.typeId, tower.x, tower.y);
-        Log.Info(`Rebuild ${tower.name} (${DecodeFourCC(tower.typeId)}) ${tower.fromX},${tower.fromY} -> ${tower.x},${tower.y}`
-            + (unit ? '' : ' has no room, refunded'));
-        if (!unit) {
-            player.giveGold(tower.value);
-            return false;
+    private footprintBlocked(x: number, y: number): boolean {
+        for (const dx of [-GRID / 2, GRID / 2]) {
+            for (const dy of [-GRID / 2, GRID / 2]) {
+                const probe = CreateItem(PROBE_ITEM, x + dx, y + dy)!;
+                const stayed = Math.abs(GetItemX(probe) - (x + dx)) < 1 && Math.abs(GetItemY(probe) - (y + dy)) < 1;
+                RemoveItem(probe);
+                if (stayed) {
+                    return false;
+                }
+            }
         }
         return true;
     }
 
-    private builders(player: Defender): Unit[] {
-        const builders: Unit[] = player.builders.slice();
-        for (const special of [player.hybridBuilder, player.getVoidBuilder(), player.getLootBoxer()]) {
-            if (special) {
-                builders.push(special);
+    private moveUnits(player: Defender, area: Rectangle, from: LaneFrame, to: LaneFrame): void {
+        const rectangle: rect = area.toRect();
+        const group = GetUnitsInRectAll(rectangle)!;
+        ForGroupBJ(group, () => {
+            const unit = Unit.fromEnum();
+            if (!unit || unit.owner.id !== player.id || unit.isUnitType(UNIT_TYPE_STRUCTURE) || !unit.isAlive()) {
+                return;
             }
-        }
-        return builders;
+            const local = from.toLocal(unit.x, unit.y);
+            const position = to.fromLocal(local.along, local.across);
+            unit.setPosition(position.x, position.y);
+        });
+        DestroyGroup(group);
+        RemoveRect(rectangle);
     }
 }

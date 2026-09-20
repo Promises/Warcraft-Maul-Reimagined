@@ -736,6 +736,7 @@ export class Commands {
                         Util.ColourString(this.voteAgainstPlayer.getColourCode(), '<Kicked>'));
                 }
                 this.game.players.delete(this.voteAgainstPlayer.id);
+                this.game.laneHolders.delete(this.voteAgainstPlayer.lane);
 
                 SendMessage(`Votekick for ${this.voteAgainstPlayer.getNameWithColour()} has succeeded!`);
                 CustomDefeatBJ(this.voteAgainstPlayer.handle, 'Kicked!');

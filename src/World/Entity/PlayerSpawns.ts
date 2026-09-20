@@ -238,20 +238,24 @@ export class PlayerSpawns {
         }
     }
 
+    /** The player defending this lane: its colour's player unless someone took the lane over. */
+    private laneHolder(): Defender | undefined {
+        return this.worldMap.game.laneHolders.get(this.colourId);
+    }
+
+    /** A summoned unit of another player is sent to the lane centre, out of the maze. */
     private handleSummonedUnitEntry(enteringUnit: Unit): void {
-        if (enteringUnit.typeId !== FourCC('u008') && enteringUnit.getOwner() !== MapPlayer.fromIndex(this.colourId)) {
+        if (enteringUnit.typeId !== FourCC('u008') && enteringUnit.getOwner()?.id !== this.laneHolder()?.id) {
             enteringUnit.setPosition(this.area.GetCenterX(), this.area.GetCenterY());
         }
     }
 
+    /** A unit of a player the lane holder denied is sent back to its owner's own lane. */
     private handleOtherUnitEntry(enteringUnit: Unit): void {
-        if (this.worldMap.game.players.get(this.colourId) && !IsUnitType(enteringUnit.handle, UNIT_TYPE_STRUCTURE)) {
-            const areaPlayer: Defender = <Defender>this.worldMap.game.players.get(this.colourId);
-            if (areaPlayer.HasDenied(enteringUnit.getOwner()!.id)) {
-                enteringUnit.setPosition(
-                    this.worldMap.game.mapSettings.PLAYER_AREAS[enteringUnit.getOwner()!.id].GetCenterX(),
-                    this.worldMap.game.mapSettings.PLAYER_AREAS[enteringUnit.getOwner()!.id].GetCenterY());
-            }
+        const holder = this.laneHolder();
+        const owner = this.worldMap.game.players.get(enteringUnit.getOwner()!.id);
+        if (holder && owner && !IsUnitType(enteringUnit.handle, UNIT_TYPE_STRUCTURE) && holder.HasDenied(owner.id)) {
+            enteringUnit.setPosition(owner.getCenterX(), owner.getCenterY());
         }
     }
 

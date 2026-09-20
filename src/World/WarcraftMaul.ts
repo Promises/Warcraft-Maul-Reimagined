@@ -61,6 +61,8 @@ export class WarcraftMaul {
 
 
     public players: Map<number, Defender> = new Map<number, Defender>();
+    // Who defends each lane, by lane index: a player's own colour unless they took another lane over
+    public laneHolders: Map<number, Defender> = new Map<number, Defender>();
     public hybridBuildPanel: HybridBuildPanel;
     public playerSync: PlayerSync;
     public hostDetection: HostDetection;
