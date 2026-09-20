@@ -102,6 +102,11 @@ export class HostDetection {
         return this._host;
     }
 
+    /** Whether a real source found the host; the lowest-slot fallback does not count. */
+    public get detected(): boolean {
+        return this.source !== undefined && this.source !== 'fallback';
+    }
+
     public isHost(player: MapPlayer): boolean {
         return this._host !== undefined && this._host.id === player.id;
     }

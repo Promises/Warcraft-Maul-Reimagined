@@ -7,16 +7,29 @@ import {BlitzGameRound} from './BlitzMaul/BlitzGameRound';
 import {MapPlayer, Timer} from "w3ts";
 import {SendMessage, Util} from "../../lib/translators";
 import {VotePanel} from './Ui/VotePanel';
+import {HostSettingsPanel} from './Ui/HostSettingsPanel';
+import {Defender} from '../Entity/Players/Defender';
+
+// Host detection answers within a second or two; after this the players vote instead
+const HOST_WAIT = 3.00;
+// A host who never confirms must not stall the game
+const HOST_DECISION_TIMEOUT = 45.00;
+const VOTE_LENGTH = 10.00;
 
 /**
- * Mode and difficulty voting. The vote UI is a left-side frame panel (VotePanel) rather than
- * the native modal dialogs, so it never covers the centred race panel. A vote button click is
- * a local frame event, so it sends a sync message; the tally is applied on every client in the
- * sync handler. The two 10s timers resolve each phase deterministically on all clients.
+ * Game mode and difficulty. When the host is known they choose both on a settings panel and
+ * the game goes straight to race selection. Otherwise (no host detected, the host prefers a
+ * vote, or the host never answers) the players vote: mode first, then difficulty - with race
+ * selection already open, since the difficulty does not change what can be picked.
+ *
+ * Panel clicks are frame events; the acting client sends a sync message and every client
+ * applies the result in the handler, so the outcome is identical everywhere.
  */
 export class Vote {
     public game: WarcraftMaul;
     private readonly panel: VotePanel;
+    private readonly hostPanel: HostSettingsPanel;
+    private awaitingHost: Defender | undefined;
 
     private votedMode: number[] = [];
     private hasVotedMode: boolean[] = [];
@@ -28,24 +41,79 @@ export class Vote {
     constructor(game: WarcraftMaul) {
         this.game = game;
         this.panel = new VotePanel(game);
+        this.hostPanel = new HostSettingsPanel(game,
+            (mode, difficulty) => game.playerSync.send('game-settings', `${mode}:${difficulty}`),
+            () => game.playerSync.send('game-vote'));
 
+        game.playerSync.on('game-settings', (player, data) => this.applyHostSettings(player, data));
+        game.playerSync.on('game-vote', player => this.hostChoseVote(player));
         game.playerSync.on('vote-mode', (player, data) => this.recordModeVote(player, Number(data)));
         game.playerSync.on('vote-diff', (player, data) => this.recordDiffVote(player, Number(data)));
 
-        const start = Timer.create();
-        start.start(1.00, false, () => this.startModeVote());
+        Timer.create().start(HOST_WAIT, false, () => this.begin());
+    }
+
+    private begin(): void {
+        for (const player of this.game.players.values()) {
+            PanCameraToTimedForPlayer(player.handle, -1900.00, 2100.00, 0.00);
+        }
+        const host = this.game.hostDetection.detected ? this.game.hostDetection.host : undefined;
+        const hostDefender = host ? this.game.players.get(host.id) : undefined;
+        if (hostDefender) {
+            this.askHost(hostDefender);
+        } else {
+            this.startModeVote();
+        }
+    }
+
+    private askHost(host: Defender): void {
+        this.awaitingHost = host;
+        this.hostPanel.show(host);
+        SendMessage(`${host.getNameWithColour()} is choosing the game mode and difficulty`);
+        Timer.create().start(HOST_DECISION_TIMEOUT, false, () => {
+            if (this.awaitingHost) {
+                this.hostPanel.hide(this.awaitingHost);
+                this.awaitingHost = undefined;
+                SendMessage('The host did not choose, the players vote instead');
+                this.startModeVote();
+            }
+        });
+    }
+
+    private applyHostSettings(player: Defender, data: string): void {
+        if (!this.awaitingHost || player.id !== this.awaitingHost.id) {
+            return;
+        }
+        const [mode, difficultyIndex] = data.split(':').map(value => Number(value));
+        if (!(mode >= 0 && mode < settings.GAME_MODE_STRINGS.length)
+            || !(difficultyIndex >= 0 && difficultyIndex < settings.DIFFICULTIES.length)) {
+            return;
+        }
+        this.awaitingHost = undefined;
+        this.hostPanel.hide(player);
+        SendMessage(`${player.getNameWithColour()} set the game mode to ${this.modeName(mode)}`);
+        this.applyMode(mode);
+        this.applyDifficulty(settings.DIFFICULTIES[difficultyIndex]);
+        this.openRaceSelection();
+    }
+
+    private hostChoseVote(player: Defender): void {
+        if (!this.awaitingHost || player.id !== this.awaitingHost.id) {
+            return;
+        }
+        this.awaitingHost = undefined;
+        this.hostPanel.hide(player);
+        SendMessage(`${player.getNameWithColour()} left the choice to a vote`);
+        this.startModeVote();
     }
 
     private startModeVote(): void {
         for (let i = 0; i < settings.GAME_MODE_STRINGS.length; i++) {
             this.votedMode[i] = 0;
         }
-        const labels = settings.GAME_MODE_STRINGS.map((mode, i) => Util.ColourString(settings.GAME_MODE_COLOURS[i], mode));
+        const labels = settings.GAME_MODE_STRINGS.map((_, i) => this.modeName(i));
         this.panel.show('Game mode vote', labels, index => this.game.playerSync.send('vote-mode', `${index}`));
-        for (const player of this.game.players.values()) {
-            PanCameraToTimedForPlayer(player.handle, -1900.00, 2100.00, 0.00);
-        }
-        Timer.create().start(10.00, false, () => this.resolveModeVote());
+        Timer.create().start(VOTE_LENGTH, false, () => this.resolveModeVote());
     }
 
     private recordModeVote(player: MapPlayer, index: number): void {
@@ -55,7 +123,7 @@ export class Vote {
         this.hasVotedMode[player.id] = true;
         this.votedMode[index]++;
         this.panel.hide(this.game.players.get(player.id)!);
-        SendMessage(`${this.playerName(player)} voted for: ${Util.ColourString(settings.GAME_MODE_COLOURS[index], settings.GAME_MODE_STRINGS[index])}`);
+        SendMessage(`${this.playerName(player)} voted for: ${this.modeName(index)}`);
     }
 
     private resolveModeVote(): void {
@@ -65,17 +133,20 @@ export class Vote {
                 winningMode = i;
             }
         }
-        if (this.forceBlitz) {
-            winningMode = settings.GAME_MODES.BLITZ;
-        }
+        SendMessage(`${this.modeName(winningMode)} won with ${this.votedMode[winningMode]} votes.`);
+        this.applyMode(winningMode);
 
-        const colouredMode: string = Util.ColourString(settings.GAME_MODE_COLOURS[winningMode], settings.GAME_MODE_STRINGS[winningMode]);
+        // Difficulty is voted on while the race selection is already open
+        this.startDiffVote();
+        this.openRaceSelection();
+    }
+
+    private applyMode(mode: number): void {
         if (this.forceBlitz) {
-            SendMessage(`Developer forced gamemode to be: ${colouredMode}.`);
-        } else {
-            SendMessage(`${colouredMode} won with ${this.votedMode[winningMode]} votes.`);
+            mode = settings.GAME_MODES.BLITZ;
+            SendMessage(`Developer forced gamemode to be: ${this.modeName(mode)}.`);
         }
-        switch (winningMode) {
+        switch (mode) {
             case settings.GAME_MODES.CLASSIC:
                 this.game.worldMap.gameRoundHandler = new ClassicGameRound(this.game);
                 break;
@@ -87,15 +158,13 @@ export class Vote {
                 this.game.worldMap.gameRoundHandler = new ClassicGameRound(this.game);
                 break;
         }
-
-        this.startDiffVote();
     }
 
     private startDiffVote(): void {
         const labels = settings.DIFFICULTIES.map((diff, i) =>
             Util.ColourString(settings.DIFFICULTY_COLOURS[i], `${diff}% ${settings.DIFFICULTY_STRINGS[i]}`));
         this.panel.show('Difficulty vote', labels, index => this.game.playerSync.send('vote-diff', `${index}`));
-        Timer.create().start(10.00, false, () => this.resolveDiffVote());
+        Timer.create().start(VOTE_LENGTH, false, () => this.resolveDiffVote());
     }
 
     private recordDiffVote(player: MapPlayer, index: number): void {
@@ -118,20 +187,22 @@ export class Vote {
                 this.totalVotedDiff += this.votedDiff[player.id];
             }
         }
-        this.game.scoreBoard = new MultiBoard(this.game);
-
         if (voteCount === 0) {
             SendMessage('Nobody voted, difficulty will automatically be set to Normal');
-            this.difficulty = settings.DIFFICULTIES[0];
+            this.applyDifficulty(settings.DIFFICULTIES[0]);
         } else {
-            this.difficulty = this.totalVotedDiff / voteCount;
+            this.applyDifficulty(this.totalVotedDiff / voteCount);
         }
+    }
 
-        const diffIndex: number = R2I((this.difficulty - 100.00) / 100.00 + ModuloReal((this.difficulty - 100.00) / 100.00, 1.00));
-        this.difficulty = Math.floor(this.difficulty);
+    /** Sets the difficulty (a percentage, possibly a vote average) and everything that hangs off it. */
+    private applyDifficulty(difficulty: number): void {
+        this.game.scoreBoard = new MultiBoard(this.game);
+        const diffIndex: number = R2I((difficulty - 100.00) / 100.00 + ModuloReal((difficulty - 100.00) / 100.00, 1.00));
+        this.difficulty = Math.floor(difficulty);
+        const colouredDifficulty = Util.ColourString(settings.DIFFICULTY_COLOURS[diffIndex], settings.DIFFICULTY_STRINGS[diffIndex]);
         // No player handicap: creeps are scaled per unit in Creep (HP, armor, abilities)
-        SendMessage(`Difficulty was set to ${this.difficulty}% (${Util.ColourString(settings.DIFFICULTY_COLOURS[diffIndex],
-            settings.DIFFICULTY_STRINGS[diffIndex])})`);
+        SendMessage(`Difficulty was set to ${this.difficulty}% (${colouredDifficulty})`);
 
         for (const player of this.game.players.values()) {
             for (const ally of this.game.players.values()) {
@@ -149,17 +220,17 @@ export class Vote {
             this.game.worldMap.ReplaceRunedBricksWithLava();
         }
 
-        MultiboardSetItemValueBJ(
-            this.game.scoreBoard.board,
-            2, 3,
-            `${I2S(R2I(this.difficulty))}% (${Util.ColourString(settings.DIFFICULTY_COLOURS[diffIndex],
-                settings.DIFFICULTY_STRINGS[diffIndex])})`,
-        );
+        MultiboardSetItemValueBJ(this.game.scoreBoard.board, 2, 3, `${I2S(R2I(this.difficulty))}% (${colouredDifficulty})`);
+    }
 
-        // The race panel can open as soon as voting is done; the panel itself never blocked it
+    private openRaceSelection(): void {
         for (const player of this.game.players.values()) {
             this.game.raceSelectPanel.open(player);
         }
+    }
+
+    private modeName(mode: number): string {
+        return Util.ColourString(settings.GAME_MODE_COLOURS[mode], settings.GAME_MODE_STRINGS[mode]);
     }
 
     private playerName(player: MapPlayer): string {
