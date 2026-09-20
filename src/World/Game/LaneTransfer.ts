@@ -62,6 +62,7 @@ class LaneFrame {
 interface CarriedTower {
     typeId: number;
     name: string;
+    value: number;
     fromX: number;
     fromY: number;
     x: number;
@@ -114,6 +115,7 @@ export class LaneTransfer {
             carried.push({
                 typeId: tower.unit.typeId,
                 name: tower.unit.name,
+                value: tower.GetSellValue(),
                 fromX: tower.unit.x,
                 fromY: tower.unit.y,
                 x: this.snap(position.x),
@@ -159,7 +161,7 @@ export class LaneTransfer {
         PanCameraToTimedForPlayer(player.handle, player.getCenterX(), player.getCenterY(), 0.00);
         SendMessage(`${player.getNameWithColour()} moved into the gray lane and is now the last defender`);
         if (rebuilt < carried.length) {
-            player.sendMessage(`${carried.length - rebuilt} of ${carried.length} towers could not be rebuilt, see -log`);
+            player.sendMessage(`${carried.length - rebuilt} of ${carried.length} towers had no room in the gray lane and were refunded`);
         }
         Log.Info(`${player.getPlayerName()} moved ${rebuilt}/${carried.length} towers from lane ${oldLane} to gray`);
     }
@@ -184,26 +186,49 @@ export class LaneTransfer {
         tower.unit.destroy();
     }
 
-    /** Returns whether the tower stands where it was meant to. */
+    /**
+     * Rebuilds a tower at its target cell, or refunds it when the cell is not buildable there.
+     * The lanes match in shape but not entirely in terrain (the last row of the gray lane,
+     * by the ship, is not buildable), and CreateUnit would silently shift a building whose
+     * footprint is not free - which could block or open the maze - so a tower that cannot
+     * stand exactly where it belongs is refunded in full instead.
+     */
     private rebuildTower(player: Defender, tower: CarriedTower, lane: number): boolean {
+        if (!this.isBuildable(tower.x, tower.y)) {
+            Log.Info(`${tower.name} (${DecodeFourCC(tower.typeId)}) ${tower.fromX},${tower.fromY} -> ${tower.x},${tower.y} not buildable, refunded`);
+            player.giveGold(tower.value);
+            return false;
+        }
         const unit = Unit.create(player, tower.typeId, tower.x, tower.y, 270.00);
-        Log.Info(`Rebuild ${tower.name} (${DecodeFourCC(tower.typeId)}) ${tower.fromX},${tower.fromY} -> ${tower.x},${tower.y}`
-            + (unit ? ` landed ${unit.x},${unit.y}` : ' failed: no unit'));
         if (!unit) {
-            Log.Error(`Could not rebuild ${tower.name} at ${tower.x}, ${tower.y}`);
+            Log.Error(`Could not rebuild ${tower.name} at ${tower.x}, ${tower.y}, refunded`);
+            player.giveGold(tower.value);
+            return false;
+        }
+        const x = this.snap(unit.x);
+        const y = this.snap(unit.y);
+        if (x !== tower.x || y !== tower.y) {
+            Log.Error(`${tower.name} was shifted from ${tower.x},${tower.y} to ${x},${y}, refunded`);
+            unit.destroy();
+            player.giveGold(tower.value);
             return false;
         }
         // Same as a finished construction: no rally point, then the tower logic is attached
         unit.removeAbility(FourCC('ARal'));
         this.game.worldMap.towerConstruction.SetupTower(unit, player);
-        // CreateUnit shifts a building whose footprint is not free; the maze must follow the
-        // unit, and a shifted tower is reported so the cause can be found
-        const x = this.snap(unit.x);
-        const y = this.snap(unit.y);
         this.game.worldMap.playerMazes[lane].setFootprint(x, y, Walkable.Blocked);
-        if (x !== tower.x || y !== tower.y) {
-            Log.Error(`${tower.name} was shifted from ${tower.x},${tower.y} to ${x},${y}`);
-            return false;
+        return true;
+    }
+
+    /** Whether all four cells of a tower footprint centred on (x, y) are buildable terrain. */
+    private isBuildable(x: number, y: number): boolean {
+        for (const dx of [-GRID / 2, GRID / 2]) {
+            for (const dy of [-GRID / 2, GRID / 2]) {
+                // The native answers whether the point is NOT pathable for the given type
+                if (IsTerrainPathable(x + dx, y + dy, PATHING_TYPE_BUILDABILITY)) {
+                    return false;
+                }
+            }
         }
         return true;
     }
