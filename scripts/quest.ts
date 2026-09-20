@@ -30,35 +30,31 @@ export class Quest {
     }
 }
 
-export function create_quest(title: string, icon: string, type: string, body: string[], number: number[], quest_list: Quest[]): void {
-    const s: string = '\\n';
-
-    let stype: number;
-    switch (type) {
-        case "bj_QUESTTYPE_REQ_DISCOVERED":
-            stype = 1;
-            break;
-        // ... Add other cases as needed
-        default: // "bj_QUESTTYPE_OPT_DISCOVERED" and any other unhandled types will default here
-            stype = 2;
-            break;
+export function create_quest(title: string, icon: string, type: string, body: string[], quest_list: Quest[]): void {
+    // blizzard.j: REQ_DISCOVERED 0, REQ_UNDISCOVERED 1, OPT_DISCOVERED 2, OPT_UNDISCOVERED 3.
+    // Undiscovered quests are hidden, so only the discovered types are used.
+    const stype: number = type === "bj_QUESTTYPE_REQ_DISCOVERED" ? 0 : 2;
+    while (body.length > 0 && body[body.length - 1].trim() === '') {
+        body.pop();
     }
-
-    if (s.concat(...body).length >= 1000) {
-        const [q_a, q_b] = split_quest(body);
-        number[0]++;
-        create_quest(title, icon, type, q_a, number, quest_list);
-        number[0]++;
-        create_quest(title, icon, type, q_b, number, quest_list);
-    } else {
-        if (number[0] !== 0) {
-            title = `${title} - ${number[0]}`;
-        }
-        quest_list.push(new Quest(title, icon, stype, s.concat(...body)));
-    }
+    // The game truncates quest text around 1000 characters, so a long entry becomes
+    // "title - 1", "title - 2", ... split at its "Updates:" headings where possible.
+    // Lines are joined with an escaped newline: the body lands inside a template literal in
+    // the generated source, where \n becomes a real line break in the game.
+    const parts: string[][] = split_to_fit(body);
+    parts.forEach((part, index) => {
+        const partTitle: string = parts.length > 1 ? `${title} - ${index + 1}` : title;
+        quest_list.push(new Quest(partTitle, icon, stype, part.join('\\n')));
+    });
 }
 
-
+function split_to_fit(body: string[]): string[][] {
+    if (body.join('\\n').length < 1000) {
+        return [body];
+    }
+    const [first, second] = split_quest(body);
+    return [...split_to_fit(first), ...split_to_fit(second)];
+}
 
 export function split_quest(quest_body: string[]): [string[], string[]] {
     const indices: number[] = quest_body.map((x, i) => x.includes('Updates') ? i : -1).filter(i => i !== -1);
@@ -115,7 +111,7 @@ export function get_all_quests(): void {
                 }
             }
         }
-        create_quest(title, icon, type, body, [0], quest_list);
+        create_quest(title, icon, type, body, quest_list);
     }
     const template: string[] = fs.readFileSync(path.join('templates', 'questsGEN.ts.template'), 'utf-8').split('\n');
 

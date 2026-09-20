@@ -24,6 +24,7 @@ import {HybridBuildPanel} from './Game/Ui/HybridBuild/HybridBuildPanel';
 import {PlayerSync} from './Game/PlayerSync';
 import {HostDetection} from './Game/HostDetection';
 import {LaneTransfer} from './Game/LaneTransfer';
+import {Quests} from '../Generated/questsGEN';
 import {RaceSelectPanel} from './Game/Ui/RaceSelect/RaceSelectPanel';
 import {WarcraftMaulSettings} from './WarcraftMaulSettings';
 import {IMapSettings} from './IMapSettings';
@@ -158,9 +159,11 @@ export class WarcraftMaul {
         // this.gameRoundHandler = new AbstractGameRound(this);
 
 
-        // for (const quest of Quests) {
-        //     CreateQuestBJ(quest.stype, quest.title, quest.body, quest.icon);
-        // }
+        // The F9 quest log: patch notes per version (Quests/*.md, generated into questsGEN)
+        // and the fixed help entries
+        for (const quest of Quests) {
+            CreateQuestBJ(quest.stype, quest.title, quest.body, quest.icon);
+        }
 
         SendMessage('Welcome to Warcraft Maul Reimagined');
         // SendMessage(`This is build: ${BUILD_NUMBER}, built ${BUILD_DATE}.`);
