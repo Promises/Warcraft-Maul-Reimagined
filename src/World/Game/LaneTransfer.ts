@@ -207,8 +207,8 @@ export class LaneTransfer {
 
         for (let lane = 0; lane < lanes; lane++) {
             let missing = 0;
+            // One cell per line: the log sink truncates long lines
             alongs.forEach((along, i) => {
-                const cells: string[] = [];
                 acrosses.forEach((across, j) => {
                     if (buildable[lane][i][j]) {
                         return;
@@ -216,13 +216,10 @@ export class LaneTransfer {
                     const buildableElsewhere = buildable.filter((other, otherLane) => otherLane !== lane && other[i][j]).length;
                     if (buildableElsewhere > (lanes - 1) / 2) {
                         const point = frames[lane].fromLocal(along, across);
-                        cells.push(`across ${across} (${snapToGrid(point.x)},${snapToGrid(point.y)})`);
+                        missing++;
+                        Log.Info(`Lane ${lane} ${Util.COLOUR_NAMES[lane]} along ${along} across ${across}: not buildable at ${snapToGrid(point.x)},${snapToGrid(point.y)}`);
                     }
                 });
-                if (cells.length > 0) {
-                    missing += cells.length;
-                    Log.Info(`Lane ${lane} ${Util.COLOUR_NAMES[lane]} along ${along}: not buildable at ${cells.join(', ')}`);
-                }
             });
             Log.Info(`Lane ${lane} ${Util.COLOUR_NAMES[lane]}: ${missing} cells not buildable that other lanes have`);
         }
