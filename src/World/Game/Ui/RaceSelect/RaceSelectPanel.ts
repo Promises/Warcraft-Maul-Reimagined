@@ -8,7 +8,8 @@ import {RaceListRow} from './RaceListRow';
 import {trackHover} from '../UiHover';
 
 // Three columns: [categories] [scrolling race list] [information]
-const PANEL_CENTER_X = 0.4;
+// Slightly right of centre so the left edge clears the vote panel (0.00-0.14) with a gap
+const PANEL_CENTER_X = 0.415;
 const PANEL_CENTER_Y = 0.34;
 const PANEL_HEIGHT = 0.30;
 const PADDING = 0.012;
