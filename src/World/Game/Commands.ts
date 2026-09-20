@@ -6,6 +6,7 @@ import {CheckPoint} from '../Entity/CheckPoint';
 import {AdvancedHoloMaze} from '../Holograms/AdvancedHoloMaze';
 import {SimpleHoloMaze} from '../Holograms/SimpleHoloMaze';
 import {CircleHoloMaze} from '../Holograms/CircleHoloMaze';
+import {AbstractHologramMaze} from '../Holograms/AbstractHologramMaze';
 import {Rectangle} from '../../JassOverrides/Rectangle';
 import {SpawnedCreeps} from '../Entity/SpawnedCreeps';
 import {TimedEvent} from '../../lib/WCEventQueue/TimedEvent';
@@ -307,6 +308,9 @@ export class Commands {
             case 'leave':
                 player.PlayerLeftTheGame();
                 break;
+            case 'fillmaze':
+                this.fillMaze(player, command[1] ?? '3', FourCC(command2[2] ?? 'hC66'));
+                break;
             case 'spawn':
                 const id: string = command2[1];
                 if (id.length === 4) {
@@ -316,7 +320,7 @@ export class Commands {
                 }
                 break;
             case 'tm':
-                player.sendMessage(Util.ArraysToString(this.game.worldMap.playerMazes[player.id].maze));
+                player.sendMessage(Util.ArraysToString(this.game.worldMap.playerMazes[player.lane].maze));
                 PreloadGenStart();
                 this.MazeToString(this.game.worldMap.playerMazes[player.id].maze);
 
@@ -336,6 +340,47 @@ export class Commands {
                 this.game.waveTimer = amount;
                 break;
         }
+    }
+
+    /** The sample maze 1/2/3 drawn in the player's lane, or undefined for any other choice. */
+    private holoMazeFor(player: Defender, choice: string): AbstractHologramMaze | undefined {
+        const firstCheckpoint: CheckPoint | undefined = this.game.worldMap.playerSpawns[player.lane].spawnOne?.next;
+        const secondCheckpoint: CheckPoint | undefined = firstCheckpoint?.next;
+        if (!firstCheckpoint || !secondCheckpoint) {
+            return undefined;
+        }
+        const imagePath: string = 'ReplaceableTextures\\Splats\\SuggestedPlacementSplat.blp';
+        const x1: number = GetRectCenterX(firstCheckpoint.rectangle);
+        const y1: number = GetRectCenterY(firstCheckpoint.rectangle);
+        const x2: number = GetRectCenterX(secondCheckpoint.rectangle);
+        const y2: number = GetRectCenterY(secondCheckpoint.rectangle);
+        switch (choice) {
+            case '1':
+                return new CircleHoloMaze(imagePath, x1, y1, x2, y2);
+            case '2':
+                return new SimpleHoloMaze(imagePath, x1, y1, x2, y2);
+            case '3':
+                return new AdvancedHoloMaze(imagePath, x1, y1, x2, y2);
+            default:
+                return undefined;
+        }
+    }
+
+    /** Debug: builds real towers on every point of a sample maze in the player's lane. */
+    private fillMaze(player: Defender, choice: string, typeId: number): void {
+        const maze = this.holoMazeFor(player, choice);
+        if (!maze) {
+            player.sendMessage('Usage: -fillmaze [1|2|3] [tower id], e.g. -fillmaze 3 hC66');
+            return;
+        }
+        let built: number = 0;
+        for (const point of maze.points) {
+            if (this.game.worldMap.towerConstruction.placeTower(player, typeId, point.x, point.y)) {
+                built++;
+            }
+        }
+        maze.Destroy();
+        player.sendMessage(`Built ${built} of ${maze.points.length} towers of maze ${choice}`);
     }
 
     private handleCommand(): void {
@@ -507,74 +552,21 @@ export class Commands {
                 player.sendMessage('Wrong Usage: -buildings <colour>');
             }
         } else if (command[0] === 'maze') {
-            let invalidMaze: boolean = false;
-            if (command.length === 2) {
-                const firstSpawn: CheckPoint | undefined = this.game.worldMap.playerSpawns[player.lane].spawnOne;
-                if (firstSpawn === undefined) {
-                    return;
-                }
-
-                const firstCheckpoint: CheckPoint | undefined = firstSpawn.next;
-                if (firstCheckpoint === undefined) {
-                    return;
-                }
-
-                const secondCheckpoint: CheckPoint | undefined = firstCheckpoint.next;
-                if (secondCheckpoint === undefined) {
-                    return;
-                }
-
-                let imagePath: string = '';
-                // if (GetTriggerPlayer() === GetLocalPlayer()) {
-                imagePath = 'ReplaceableTextures\\Splats\\SuggestedPlacementSplat.blp';
-                // }
-
-                switch (command[1]) {
-                    case 'none':
-                        player.setHoloMaze(undefined);
-                        break;
-                    case '1':
-                        player.setHoloMaze(
-                            new CircleHoloMaze(
-                                imagePath,
-                                GetRectCenterX(firstCheckpoint.rectangle),
-                                GetRectCenterY(firstCheckpoint.rectangle),
-                                GetRectCenterX(secondCheckpoint.rectangle),
-                                GetRectCenterY(secondCheckpoint.rectangle)));
-                        break;
-                    case '2':
-                        player.setHoloMaze(
-                            new SimpleHoloMaze(
-                                imagePath,
-                                GetRectCenterX(firstCheckpoint.rectangle),
-                                GetRectCenterY(firstCheckpoint.rectangle),
-                                GetRectCenterX(secondCheckpoint.rectangle),
-                                GetRectCenterY(secondCheckpoint.rectangle)));
-                        break;
-                    case '3':
-                        player.setHoloMaze(
-                            new AdvancedHoloMaze(
-                                imagePath,
-                                GetRectCenterX(firstCheckpoint.rectangle),
-                                GetRectCenterY(firstCheckpoint.rectangle),
-                                GetRectCenterX(secondCheckpoint.rectangle),
-                                GetRectCenterY(secondCheckpoint.rectangle)));
-                        break;
-                    default:
-                        invalidMaze = true;
-                        break;
-                }
+            const choice: string = command.length === 2 ? command[1] : '';
+            if (choice === 'none') {
+                player.setHoloMaze(undefined);
             } else {
-                invalidMaze = true;
-            }
-
-            if (invalidMaze === true) {
-                player.sendMessage(
-                    'Unknown maze selected, please try one of the mazes shown below\n' +
-                    '|cFFFFCC00-maze none|r: removes the current maze\n' +
-                    '|cFFFFCC00-maze 1|r: shows a very simple circled maze\n' +
-                    '|cFFFFCC00-maze 2|r: shows a basic maze\n' +
-                    '|cFFFFCC00-maze 3|r: shows a more advanced maze');
+                const maze = this.holoMazeFor(player, choice);
+                if (maze) {
+                    player.setHoloMaze(maze);
+                } else {
+                    player.sendMessage(
+                        'Unknown maze selected, please try one of the mazes shown below\n' +
+                        '|cFFFFCC00-maze none|r: removes the current maze\n' +
+                        '|cFFFFCC00-maze 1|r: shows a very simple circled maze\n' +
+                        '|cFFFFCC00-maze 2|r: shows a basic maze\n' +
+                        '|cFFFFCC00-maze 3|r: shows a more advanced maze');
+                }
             }
         }
         if (this.game.debugMode) {

@@ -8,6 +8,11 @@ import {Log} from '../../lib/Serilog/Serilog';
 
 const GRID = 64;
 
+/** Tower centres sit on grid corners; snapping removes float error from the frame maths. */
+function snapToGrid(value: number): number {
+    return Math.floor(value / GRID + 0.5) * GRID;
+}
+
 /**
  * A lane's coordinate frame: origin at its first checkpoint, `along` pointing at the second
  * checkpoint and `across` perpendicular to it. This is the frame the sample holomaze is drawn
@@ -118,8 +123,8 @@ export class LaneTransfer {
                 value: tower.GetSellValue(),
                 fromX: tower.unit.x,
                 fromY: tower.unit.y,
-                x: this.snap(position.x),
-                y: this.snap(position.y),
+                x: snapToGrid(position.x),
+                y: snapToGrid(position.y),
             });
         }
         // Every tower is removed before any is rebuilt, so a rebuilt one cannot land on a
@@ -187,48 +192,17 @@ export class LaneTransfer {
     }
 
     /**
-     * Rebuilds a tower at its target cell, or refunds it when the cell is not buildable there.
-     * The lanes match in shape but not entirely in terrain (the last row of the gray lane,
-     * by the ship, is not buildable), and CreateUnit would silently shift a building whose
-     * footprint is not free - which could block or open the maze - so a tower that cannot
-     * stand exactly where it belongs is refunded in full instead.
+     * Rebuilds a tower at its target cell, or refunds it in full when it cannot stand exactly
+     * there: the lanes match in shape but not entirely in terrain (the last row of the gray
+     * lane, by the ship, is not buildable).
      */
     private rebuildTower(player: Defender, tower: CarriedTower, lane: number): boolean {
-        if (!this.isBuildable(tower.x, tower.y)) {
-            Log.Info(`${tower.name} (${DecodeFourCC(tower.typeId)}) ${tower.fromX},${tower.fromY} -> ${tower.x},${tower.y} not buildable, refunded`);
-            player.giveGold(tower.value);
-            return false;
-        }
-        const unit = Unit.create(player, tower.typeId, tower.x, tower.y, 270.00);
+        const unit = this.game.worldMap.towerConstruction.placeTower(player, tower.typeId, tower.x, tower.y);
+        Log.Info(`Rebuild ${tower.name} (${DecodeFourCC(tower.typeId)}) ${tower.fromX},${tower.fromY} -> ${tower.x},${tower.y}`
+            + (unit ? '' : ' has no room, refunded'));
         if (!unit) {
-            Log.Error(`Could not rebuild ${tower.name} at ${tower.x}, ${tower.y}, refunded`);
             player.giveGold(tower.value);
             return false;
-        }
-        const x = this.snap(unit.x);
-        const y = this.snap(unit.y);
-        if (x !== tower.x || y !== tower.y) {
-            Log.Error(`${tower.name} was shifted from ${tower.x},${tower.y} to ${x},${y}, refunded`);
-            unit.destroy();
-            player.giveGold(tower.value);
-            return false;
-        }
-        // Same as a finished construction: no rally point, then the tower logic is attached
-        unit.removeAbility(FourCC('ARal'));
-        this.game.worldMap.towerConstruction.SetupTower(unit, player);
-        this.game.worldMap.playerMazes[lane].setFootprint(x, y, Walkable.Blocked);
-        return true;
-    }
-
-    /** Whether all four cells of a tower footprint centred on (x, y) are buildable terrain. */
-    private isBuildable(x: number, y: number): boolean {
-        for (const dx of [-GRID / 2, GRID / 2]) {
-            for (const dy of [-GRID / 2, GRID / 2]) {
-                // The native answers whether the point is NOT pathable for the given type
-                if (IsTerrainPathable(x + dx, y + dy, PATHING_TYPE_BUILDABILITY)) {
-                    return false;
-                }
-            }
         }
         return true;
     }
@@ -241,10 +215,5 @@ export class LaneTransfer {
             }
         }
         return builders;
-    }
-
-    /** Tower centres sit on grid corners; snapping removes float error from the frame maths. */
-    private snap(value: number): number {
-        return Math.floor(value / GRID + 0.5) * GRID;
     }
 }
