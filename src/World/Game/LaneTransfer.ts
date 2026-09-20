@@ -3,7 +3,8 @@ import {WarcraftMaul} from '../WarcraftMaul';
 import {Defender} from '../Entity/Players/Defender';
 import {Tower} from '../Entity/Tower/Specs/Tower';
 import {Walkable} from '../Antiblock/Maze';
-import {COLOUR, DecodeFourCC, SendMessage} from '../../lib/translators';
+import {COLOUR, DecodeFourCC, SendMessage, Util} from '../../lib/translators';
+import {COLOUR_CODES} from '../GlobalSettings';
 import {Log} from '../../lib/Serilog/Serilog';
 
 const GRID = 64;
@@ -75,11 +76,12 @@ interface CarriedTower {
 }
 
 /**
- * Lets a player take over the gray lane when nobody holds it: gray is the last stretch before
- * the ship, so an empty gray lane leaks every creep. The player keeps their colour; their
- * area, spawn and last-defender bonus follow `Defender.lane`. Their towers in their own lane
- * are rebuilt at the same place in the gray lane (through the lane frames above), their
- * builders walk over, and anything still standing in the gray lane is sold to its owner first.
+ * Lets a player take over a lane nobody holds. The case that matters in play is gray: it is
+ * the last stretch before the ship, so an empty gray lane leaks every creep. The player keeps
+ * their colour; their area, spawn and last-defender bonus follow `Defender.lane`. Their towers
+ * in their own lane are rebuilt at the same place in the new lane (through the lane frames
+ * above), their builders walk over, and anything still standing in the new lane is sold to
+ * its owner first.
  *
  * Runs from a chat command, which fires on every client, so everything here is synchronous
  * game state.
@@ -89,19 +91,23 @@ export class LaneTransfer {
     }
 
     public moveToGray(player: Defender): void {
-        const target = COLOUR.GRAY;
+        this.moveToLane(player, COLOUR.GRAY);
+    }
+
+    public moveToLane(player: Defender, target: number): void {
+        const laneName = Util.ColourString(COLOUR_CODES[target], Util.COLOUR_NAMES[target]);
         if (player.lane === target) {
-            player.sendMessage('You already hold the gray lane');
+            player.sendMessage(`You already hold the ${laneName} lane`);
             return;
         }
         for (const other of this.game.players.values()) {
             if (other.lane === target && other.slotState === PLAYER_SLOT_STATE_PLAYING) {
-                player.sendMessage(`${other.getNameWithColour()} holds the gray lane`);
+                player.sendMessage(`${other.getNameWithColour()} holds the ${laneName} lane`);
                 return;
             }
         }
         if (this.game.worldMap.gameRoundHandler?.isWaveInProgress) {
-            player.sendMessage('Wait until the wave is over before moving to the gray lane');
+            player.sendMessage(`Wait until the wave is over before moving to the ${laneName} lane`);
             return;
         }
 
@@ -164,11 +170,12 @@ export class LaneTransfer {
         }
 
         PanCameraToTimedForPlayer(player.handle, player.getCenterX(), player.getCenterY(), 0.00);
-        SendMessage(`${player.getNameWithColour()} moved into the gray lane and is now the last defender`);
+        SendMessage(`${player.getNameWithColour()} moved into the ${laneName} lane`
+            + (target === COLOUR.GRAY ? ' and is now the last defender' : ''));
         if (rebuilt < carried.length) {
-            player.sendMessage(`${carried.length - rebuilt} of ${carried.length} towers had no room in the gray lane and were refunded`);
+            player.sendMessage(`${carried.length - rebuilt} of ${carried.length} towers had no room in the ${laneName} lane and were refunded`);
         }
-        Log.Info(`${player.getPlayerName()} moved ${rebuilt}/${carried.length} towers from lane ${oldLane} to gray`);
+        Log.Info(`${player.getPlayerName()} moved ${rebuilt}/${carried.length} towers from lane ${oldLane} to ${target}`);
     }
 
     /** Sells every remaining tower in a lane to its owner, so the lane is clear to move into. */

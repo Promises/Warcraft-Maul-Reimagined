@@ -308,6 +308,17 @@ export class Commands {
             case 'leave':
                 player.PlayerLeftTheGame();
                 break;
+            case 'swap': {
+                // Colour name or index; getPlayerIdFromColourName is undefined for unknown names
+                const byName: number | undefined = this.getPlayerIdFromColourName(command[1] ?? '');
+                const lane: number = byName ?? Util.ParseInt(command[1] ?? '');
+                if (lane >= 0 && lane < this.game.mapSettings.PLAYER_AREAS.length && command[1] !== undefined) {
+                    this.game.laneTransfer.moveToLane(player, lane);
+                } else {
+                    player.sendMessage('Usage: -swap <colour|0-12>, e.g. -swap gray or -swap 8');
+                }
+                break;
+            }
             case 'fillmaze':
                 this.fillMaze(player, command[1] ?? '3', FourCC(command2[2] ?? 'hC66'));
                 break;
