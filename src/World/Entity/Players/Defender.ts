@@ -165,14 +165,17 @@ export class Defender extends AbstractPlayer {
         const cornerY = Math.min(...this.highlightedPoints.map(point => point.y));
         // Holding shift keeps build mode for the next tower, like the native build command
         const keepBuilding = BlzIsMetaKeyPressed(METAKEY_SHIFT) ? 1 : 0;
-        this.game.playerSync.send('build', `${this.currentHighlightedMaze}:${cornerX}:${cornerY}:${keepBuilding}`);
+        // Build mode is local, so buildTier only exists on this client; carry it in the message
+        this.game.playerSync.send('build',
+            `${this.currentHighlightedMaze}:${cornerX}:${cornerY}:${this.buildTier}:${keepBuilding}`);
     }
 
     /** Applies a placement sent by requestTowerPlacement; runs on every client. */
     public placeTower(data: string): void {
-        const [mazeIndex, cornerX, cornerY, keepBuilding] = data.split(':').map(value => Number(value));
+        const [mazeIndex, cornerX, cornerY, tier, keepBuilding] = data.split(':').map(value => Number(value));
         const maze = this.game.worldMap.playerMazes[mazeIndex];
-        if (!this._buildMode || this.buildTier === undefined || !this.hybridBuilder || !maze) {
+        // Build mode is local, so this runs on all clients from the tier in the message, not local state
+        if (!this.hybridBuilder || !maze || !this.hybridTowers[tier]) {
             return;
         }
         const points = [
@@ -189,13 +192,13 @@ export class Defender extends AbstractPlayer {
             this.sendMessage('You cannot build on a checkpoint');
             return;
         }
-        const tower = this.hybridTowers[this.buildTier];
+        const tower = this.hybridTowers[tier];
         if (this.getGold() < tower.goldCost) {
             this.sendMessage(`Not enough gold, ${tower.name} costs |cffffcc00${tower.goldCost}|r`);
             return;
         }
         const center = maze.getHighlightedPointsCenter(points)!;
-        const dummyId = DummyTowers[`${this.id + 1}`][`${this.buildTier + 1}`];
+        const dummyId = DummyTowers[`${this.id + 1}`][`${tier + 1}`];
         if (!this.hybridBuilder.issueBuildOrder(FourCC(dummyId), center.x, center.y)) {
             this.sendMessage('The builder could not start building there');
             return;

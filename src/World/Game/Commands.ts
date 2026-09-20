@@ -478,7 +478,7 @@ export class Commands {
                 this.game.diffVote.forceBlitz = true;
             }
         } else if (command[0] === 'build') {
-            this.game.hybridBuildPanel.toggle(player);
+            this.game.hybridBuildPanel.toggleLocal();
         } else if (command[0] === 'race') {
             this.game.raceSelectPanel.toggleLocal();
         } else if (command[0] === 'host') {

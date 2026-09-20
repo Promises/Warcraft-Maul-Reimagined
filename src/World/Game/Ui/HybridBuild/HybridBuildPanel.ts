@@ -16,17 +16,17 @@ const TIERS = 9;
 const CANCEL_SLOT = COLUMNS * ROWS - 1;
 
 /**
- * Tower picker for hybrid random players. Picking a tower enters build mode; placement
- * itself is handled by Defender. Button clicks are local frame events, so they only send
- * sync messages; open/close/pick run on every client through PlayerSync.
+ * Tower picker for hybrid random players. Opening the panel and entering build mode are pure
+ * local UI (frames, grid images and the ghost are per-client visuals), so they run instantly
+ * with no sync round-trip; only placing a tower is synced, by Defender.
  */
 export class HybridBuildPanel {
     private readonly panel: Frame;
     private readonly tierButtons: IconButton[] = [];
     private readonly cancelButton: IconButton;
-    private readonly openFor: Set<number> = new Set<number>();
+    private visibleLocally: boolean = false;
 
-    constructor(game: WarcraftMaul) {
+    constructor(private readonly game: WarcraftMaul) {
         const gameUi = Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0)!;
         const width = COLUMNS * BUTTON_SPACING + PANEL_PADDING;
         const height = ROWS * BUTTON_SPACING + PANEL_PADDING;
@@ -50,15 +50,11 @@ export class HybridBuildPanel {
             const slot = Math.floor(tier / (COLUMNS - 1)) * COLUMNS + tier % (COLUMNS - 1);
             const [x, y] = slotCenter(slot);
             this.tierButtons.push(new IconButton(game, `hybridBuildTier${tier}`, this.panel, x, y, BUTTON_SIZE,
-                () => game.playerSync.send('hybrid-pick', `${tier}`)));
+                () => this.pickTowerLocal(tier)));
         }
         const [cancelX, cancelY] = slotCenter(CANCEL_SLOT);
         this.cancelButton = new IconButton(game, 'hybridBuildCancel', this.panel, cancelX, cancelY, BUTTON_SIZE,
-            () => game.playerSync.send('hybrid-close'));
-
-        game.playerSync.on('hybrid-toggle', player => this.toggle(player));
-        game.playerSync.on('hybrid-close', player => this.close(player));
-        game.playerSync.on('hybrid-pick', (player, data) => this.pickTower(player, Number(data)));
+            () => this.closeLocal());
 
         this.panel.setVisible(false);
     }
@@ -78,9 +74,14 @@ export class HybridBuildPanel {
         });
     }
 
-    public toggle(player: Defender): void {
-        if (this.openFor.has(player.id)) {
-            this.close(player);
+    /** Local toggle for the action bar button / -build; each client owns its panel. */
+    public toggleLocal(): void {
+        const player = this.game.players.get(GetPlayerId(GetLocalPlayer()));
+        if (!player) {
+            return;
+        }
+        if (this.visibleLocally) {
+            this.closeLocal();
         } else {
             this.open(player);
         }
@@ -91,18 +92,25 @@ export class HybridBuildPanel {
             player.sendMessage('The build menu is only available after hybrid randoming');
             return;
         }
-        this.openFor.add(player.id);
         this.setVisible(player, true);
     }
 
+    /** Closes the panel and leaves build mode; used by the cancel button, escape and after a build. */
     public close(player: Defender): void {
-        this.openFor.delete(player.id);
         player.stopBuilding();
         this.setVisible(player, false);
     }
 
-    private pickTower(player: Defender, tier: number): void {
-        if (this.openFor.has(player.id) && player.hybridTowers[tier]) {
+    private closeLocal(): void {
+        const player = this.game.players.get(GetPlayerId(GetLocalPlayer()));
+        if (player) {
+            this.close(player);
+        }
+    }
+
+    private pickTowerLocal(tier: number): void {
+        const player = this.game.players.get(GetPlayerId(GetLocalPlayer()));
+        if (player && player.hybridTowers[tier]) {
             player.startBuilding(tier);
         }
     }
@@ -112,6 +120,7 @@ export class HybridBuildPanel {
         if (!player.isLocal()) {
             return;
         }
+        this.visibleLocally = visible;
         this.panel.setVisible(visible);
         if (!visible) {
             player.pointerOverUi = false;

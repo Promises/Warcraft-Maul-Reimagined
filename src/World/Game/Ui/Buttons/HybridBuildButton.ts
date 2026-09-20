@@ -16,9 +16,9 @@ export class HybridBuildButton extends AbstractActionButton {
     }
 
     public clickAction(): void {
-        // Local frame event: the toggle itself runs on every client via PlayerSync
+        // Opening the panel is local UI; only placing a tower is synced
         this.disable();
-        this.game.playerSync.send('hybrid-toggle');
+        this.game.hybridBuildPanel.toggleLocal();
         this.enable();
     }
 }
