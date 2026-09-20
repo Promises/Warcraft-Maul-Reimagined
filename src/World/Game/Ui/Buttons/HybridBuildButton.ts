@@ -16,9 +16,14 @@ export class HybridBuildButton extends AbstractActionButton {
     }
 
     public clickAction(): void {
-        // Opening the panel is local UI; only placing a tower is synced
+        // The click fires on every client with the clicking player; the panel toggles for
+        // that player everywhere so build-mode handles stay in step (visuals gated inside)
+        const player = this.game.players.get(GetPlayerId(GetTriggerPlayer()!));
+        if (!player) {
+            return;
+        }
         this.disable();
-        this.game.hybridBuildPanel.toggleLocal();
+        this.game.hybridBuildPanel.toggle(player);
         this.enable();
     }
 }

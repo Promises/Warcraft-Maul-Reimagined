@@ -33,8 +33,10 @@ const PANEL_WIDTH = PADDING + CATEGORY_WIDTH + PADDING + LIST_WIDTH + SCROLLBAR_
 /**
  * Race selection replacing the race shops: category tabs on the left, a scrolling list of the
  * races in that category (icon + name), and details of the highlighted one on the right, with a
- * Pick button. Category, scroll and highlight are local; picking sends a sync message so the
- * choice is applied on every client through RacePicking.
+ * Pick button. Frame click events fire on every client with the clicking player, so every
+ * handler here is gated to `GetTriggerPlayer() === GetLocalPlayer()`: category, scroll and
+ * highlight are the local player's view only. Picking sends a sync message (once, from the
+ * clicker's client) so the choice is applied on every client through RacePicking.
  */
 export class RaceSelectPanel {
     private readonly panel: Frame;
@@ -75,6 +77,9 @@ export class RaceSelectPanel {
             const trigger = Trigger.create();
             trigger.triggerRegisterFrameEvent(button, FRAMEEVENT_CONTROL_CLICK);
             trigger.addAction(() => {
+                if (GetTriggerPlayer() !== GetLocalPlayer()) {
+                    return;
+                }
                 button.setEnabled(false);
                 button.setEnabled(true);
                 this.showTier(tier);
@@ -104,8 +109,14 @@ export class RaceSelectPanel {
             this.scrollbar.setStepSize(1);
             const scrollTrigger = Trigger.create();
             scrollTrigger.triggerRegisterFrameEvent(this.scrollbar, FRAMEEVENT_SLIDER_VALUE_CHANGED);
-            // The scrollbar runs top=max, so the offset is the inverted value
-            scrollTrigger.addAction(() => this.scrollTo(this.maxScroll() - Math.floor(Frame.getEventValue() + 0.5)));
+            // The scrollbar runs top=max, so the offset is the inverted value. Only a drag by
+            // the local player scrolls this client's list; wheel and showTier scroll directly.
+            scrollTrigger.addAction(() => {
+                if (GetTriggerPlayer() !== GetLocalPlayer()) {
+                    return;
+                }
+                this.scrollTo(this.maxScroll() - Math.floor(Frame.getEventValue() + 0.5));
+            });
         }
 
         // Information
@@ -128,6 +139,10 @@ export class RaceSelectPanel {
         const pickTrigger = Trigger.create();
         pickTrigger.triggerRegisterFrameEvent(this.pickButton, FRAMEEVENT_CONTROL_CLICK);
         pickTrigger.addAction(() => {
+            // Only the clicker's client sends; the sync handler applies the pick everywhere
+            if (GetTriggerPlayer() !== GetLocalPlayer()) {
+                return;
+            }
             this.pickButton.setEnabled(false);
             this.pickButton.setEnabled(true);
             if (this.highlightedItem !== undefined) {
@@ -139,7 +154,7 @@ export class RaceSelectPanel {
         // Close: just outside the top-right corner so it never overlaps the race name
         const close = new IconButton(game, 'raceSelectClose', this.panel,
             left + PANEL_WIDTH - CLOSE_BUTTON / 2, top + PADDING + CLOSE_BUTTON / 2, CLOSE_BUTTON,
-            () => this.closeLocal(), false);
+            player => this.close(player), false);
         for (const player of game.players.values()) {
             close.setContent(player, {
                 icon: 'ReplaceableTextures\\CommandButtons\\BTNCancel.blp',
@@ -155,23 +170,18 @@ export class RaceSelectPanel {
         this.panel.setVisible(false);
     }
 
-    /** Local toggle for the button; each client controls its own panel visibility. */
-    public toggleLocal(): void {
-        const player = this.game.players.get(GetPlayerId(GetLocalPlayer()));
-        if (!player) {
+    /**
+     * Toggles the panel for the acting player. Runs on every client (button and -race fire
+     * everywhere), but the panel is pure view, so only that player's own client does anything.
+     */
+    public toggle(player: Defender): void {
+        if (!player.isLocal()) {
             return;
         }
         if (this.visibleLocally) {
-            this.closeLocal();
+            this.close(player);
         } else {
             this.open(player);
-        }
-    }
-
-    public closeLocal(): void {
-        const player = this.game.players.get(GetPlayerId(GetLocalPlayer()));
-        if (player) {
-            this.close(player);
         }
     }
 
@@ -235,7 +245,7 @@ export class RaceSelectPanel {
         if (this.scrollbar) {
             this.scrollbar.setMinMaxValue(0, this.maxScroll());
             this.scrollbar.setVisible(this.maxScroll() > 0);
-            // Slider at max = top of the list; fires value-changed -> scrollTo(0)
+            // Slider at max = top of the list; the direct scrollTo(0) below does the scroll
             this.scrollbar.setValue(this.maxScroll());
         }
         this.scrollTo(0);
@@ -246,15 +256,16 @@ export class RaceSelectPanel {
         return Math.max(0, this.currentItems.length - VISIBLE_ROWS);
     }
 
-    /** Local: shows the window of items starting at offset. */
-    /** Moves the slider by one step; the slider's value-changed event does the actual scroll. */
+    /**
+     * Local: scrolls one step and moves the slider to match. The scroll happens directly
+     * rather than through the slider's value-changed event: that event arrives a frame later
+     * without a reliable trigger player, so the gated handler may drop it. scrollTo is
+     * idempotent and never writes the slider, so the late event is harmless either way.
+     */
     private wheelScroll(up: boolean): void {
         const target = Math.max(0, Math.min(this.scrollOffset + (up ? -1 : 1), this.maxScroll()));
-        if (this.scrollbar) {
-            this.scrollbar.setValue(this.maxScroll() - target);
-        } else {
-            this.scrollTo(target);
-        }
+        this.scrollTo(target);
+        this.scrollbar?.setValue(this.maxScroll() - target);
     }
 
     private scrollTo(offset: number): void {

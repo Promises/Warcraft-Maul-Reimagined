@@ -478,9 +478,10 @@ export class Commands {
                 this.game.diffVote.forceBlitz = true;
             }
         } else if (command[0] === 'build') {
-            this.game.hybridBuildPanel.toggleLocal();
+            // Chat events fire on every client with the speaker; toggle handles per player
+            this.game.hybridBuildPanel.toggle(player);
         } else if (command[0] === 'race') {
-            this.game.raceSelectPanel.toggleLocal();
+            this.game.raceSelectPanel.toggle(player);
         } else if (command[0] === 'host') {
             this.game.hostDetection.report(player);
         } else if (command[0] === 'log') {

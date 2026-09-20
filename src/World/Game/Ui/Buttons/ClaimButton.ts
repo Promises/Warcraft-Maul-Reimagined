@@ -25,7 +25,11 @@ export class ClaimButton extends AbstractActionButton {
     }
 
     public clickAction(): void {
-        // Local frame event: claiming changes unit ownership, so it runs on every client via PlayerSync
+        // The click fires on every client; only the clicker's client sends, and the sync
+        // handler claims the towers for that player everywhere
+        if (GetTriggerPlayer() !== GetLocalPlayer()) {
+            return;
+        }
         this.disable();
         this.game.playerSync.send('claim');
         this.enable();

@@ -38,9 +38,14 @@ export class RaceListRow {
         this.label.setAbsPoint(FRAMEPOINT_LEFT, x + height, y - height / 2);
         BlzFrameSetTextAlignment(this.label.handle, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
 
+        // Frame events fire on every client with the acting player; the row only ever shows
+        // and changes the local player's view, so other clients ignore the event entirely
         const trigger = Trigger.create();
         trigger.triggerRegisterFrameEvent(this.button, FRAMEEVENT_CONTROL_CLICK);
         trigger.addAction(() => {
+            if (GetTriggerPlayer() !== GetLocalPlayer()) {
+                return;
+            }
             this.button.setEnabled(false);
             this.button.setEnabled(true);
             if (this.itemId !== undefined) {
@@ -49,7 +54,12 @@ export class RaceListRow {
         });
         const wheel = Trigger.create();
         wheel.triggerRegisterFrameEvent(this.button, FRAMEEVENT_MOUSE_WHEEL);
-        wheel.addAction(() => onWheel(Frame.getEventValue() > 0));
+        wheel.addAction(() => {
+            if (GetTriggerPlayer() !== GetLocalPlayer()) {
+                return;
+            }
+            onWheel(Frame.getEventValue() > 0);
+        });
 
         trackHover(game, this.button);
     }

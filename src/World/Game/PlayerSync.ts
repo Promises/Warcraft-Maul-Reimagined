@@ -8,13 +8,15 @@ export type SyncHandler = (player: Defender, data: string) => void;
 /**
  * Runs player actions on every client.
  *
- * UI frame events only fire on the client that clicked, so anything they change in the game
- * (units, gold, handles) would happen on one machine and desync the game. A frame handler
- * instead sends a short message with BlzSendSyncData; the sync event delivers it to all
- * clients in the same order, and the handler registered for the command applies it there.
+ * Used for actions whose input is local knowledge (the highlighted grid cells, the item
+ * highlighted in a panel): the acting player's client sends a short message with
+ * BlzSendSyncData; the sync event delivers it to all clients in the same order, and the
+ * handler registered for the command applies it there.
  *
- * Commands are "name" or "name:data". send() transmits as the local player, so it must only
- * be called from code that runs for the acting player's own client.
+ * Commands are "name" or "name:data". send() transmits as the local player. UI frame events
+ * fire on EVERY client with GetTriggerPlayer() as the clicker, so a frame handler must gate
+ * its send with `GetTriggerPlayer() === GetLocalPlayer()` — otherwise every client sends and
+ * the action is applied once per player.
  *
  * The sender's player id is encoded into the payload rather than read from GetTriggerPlayer():
  * inside a sync event that native is unreliable across Reforged patches (it can return the

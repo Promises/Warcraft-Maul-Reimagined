@@ -17,7 +17,9 @@ export interface IconButtonContent {
 /**
  * A square icon button with a BoxedText tooltip (title, description, gold cost).
  * Frames are shared by all clients, so content is only ever set for the local player.
- * Clicks are local frame events: onClick must not touch game state, only send sync messages.
+ * A click event fires on every client with the clicking player, so onClick runs everywhere
+ * and gets that player: per-player game logic may run directly (it stays in step), but
+ * anything visual must be gated to `player.isLocal()`.
  */
 export class IconButton {
     private readonly button: Frame;
@@ -28,7 +30,7 @@ export class IconButton {
     private readonly goldCost: Frame | undefined;
 
     constructor(game: WarcraftMaul, name: string, parent: Frame, x: number, y: number, size: number,
-                onClick: () => void, showTooltip: boolean = true) {
+                onClick: (this: void, player: Defender) => void, showTooltip: boolean = true) {
         this.button = Frame.createType(name, parent, 0, 'BUTTON', 'StandardButtonTemplate')!;
         this.button.setSize(size, size);
         this.button.setAbsPoint(FRAMEPOINT_CENTER, x, y);
@@ -53,7 +55,10 @@ export class IconButton {
             // Drop keyboard focus so the button does not swallow hotkeys afterwards
             this.button.setEnabled(false);
             this.button.setEnabled(true);
-            onClick();
+            const player = game.players.get(GetPlayerId(GetTriggerPlayer()!));
+            if (player) {
+                onClick(player);
+            }
         });
         trackHover(game, this.button);
     }

@@ -16,8 +16,9 @@ const MAX_OPTIONS = 6;
 /**
  * Left-side voting panel that replaces the native mode/difficulty vote dialogs. Native dialogs
  * are modal and cover the race panel; this is an ordinary frame panel, so all three coexist.
- * A button click is a local frame event, so it only calls onVote; the caller sends a sync
- * message so the tally is applied on every client.
+ * A button click fires on every client with the clicking player, so the handler is gated to
+ * the clicker's own client: it hides that client's panel and calls onVote once, and the
+ * caller's sync message applies the tally on every client.
  */
 export class VotePanel {
     private readonly panel: Frame;
@@ -49,6 +50,9 @@ export class VotePanel {
             const trigger = Trigger.create();
             trigger.triggerRegisterFrameEvent(button, FRAMEEVENT_CONTROL_CLICK);
             trigger.addAction(() => {
+                if (GetTriggerPlayer() !== GetLocalPlayer()) {
+                    return;
+                }
                 button.setEnabled(false);
                 button.setEnabled(true);
                 if (index < this.optionCount) {

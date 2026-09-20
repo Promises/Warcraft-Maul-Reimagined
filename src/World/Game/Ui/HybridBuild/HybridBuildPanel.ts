@@ -16,15 +16,18 @@ const TIERS = 9;
 const CANCEL_SLOT = COLUMNS * ROWS - 1;
 
 /**
- * Tower picker for hybrid random players. Opening the panel and entering build mode are pure
- * local UI (frames, grid images and the ghost are per-client visuals), so they run instantly
- * with no sync round-trip; only placing a tower is synced, by Defender.
+ * Tower picker for hybrid random players. Its click, chat and key events all fire on every
+ * client with the acting player, so open/close/pick run everywhere for that player: build
+ * mode creates handles (mouse triggers, the ghost effect) that must stay in step across
+ * clients. Only the panel frame's visibility is per client, gated to the local player.
+ * Placing a tower stays synced by Defender.
  */
 export class HybridBuildPanel {
     private readonly panel: Frame;
     private readonly tierButtons: IconButton[] = [];
     private readonly cancelButton: IconButton;
-    private visibleLocally: boolean = false;
+    // Per player, updated on every client so toggle decisions agree everywhere
+    private readonly openFor: boolean[] = [];
 
     constructor(private readonly game: WarcraftMaul) {
         const gameUi = Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0)!;
@@ -50,11 +53,11 @@ export class HybridBuildPanel {
             const slot = Math.floor(tier / (COLUMNS - 1)) * COLUMNS + tier % (COLUMNS - 1);
             const [x, y] = slotCenter(slot);
             this.tierButtons.push(new IconButton(game, `hybridBuildTier${tier}`, this.panel, x, y, BUTTON_SIZE,
-                () => this.pickTowerLocal(tier)));
+                player => this.pickTower(player, tier)));
         }
         const [cancelX, cancelY] = slotCenter(CANCEL_SLOT);
         this.cancelButton = new IconButton(game, 'hybridBuildCancel', this.panel, cancelX, cancelY, BUTTON_SIZE,
-            () => this.closeLocal());
+            player => this.close(player));
 
         this.panel.setVisible(false);
     }
@@ -74,14 +77,10 @@ export class HybridBuildPanel {
         });
     }
 
-    /** Local toggle for the action bar button / -build; each client owns its panel. */
-    public toggleLocal(): void {
-        const player = this.game.players.get(GetPlayerId(GetLocalPlayer()));
-        if (!player) {
-            return;
-        }
-        if (this.visibleLocally) {
-            this.closeLocal();
+    /** Toggles the panel for the acting player; runs on every client (button and -build). */
+    public toggle(player: Defender): void {
+        if (this.openFor[player.id]) {
+            this.close(player);
         } else {
             this.open(player);
         }
@@ -92,25 +91,19 @@ export class HybridBuildPanel {
             player.sendMessage('The build menu is only available after hybrid randoming');
             return;
         }
+        this.openFor[player.id] = true;
         this.setVisible(player, true);
     }
 
     /** Closes the panel and leaves build mode; used by the cancel button, escape and after a build. */
     public close(player: Defender): void {
+        this.openFor[player.id] = false;
         player.stopBuilding();
         this.setVisible(player, false);
     }
 
-    private closeLocal(): void {
-        const player = this.game.players.get(GetPlayerId(GetLocalPlayer()));
-        if (player) {
-            this.close(player);
-        }
-    }
-
-    private pickTowerLocal(tier: number): void {
-        const player = this.game.players.get(GetPlayerId(GetLocalPlayer()));
-        if (player && player.hybridTowers[tier]) {
+    private pickTower(player: Defender, tier: number): void {
+        if (this.openFor[player.id] && player.hybridTowers[tier]) {
             player.startBuilding(tier);
         }
     }
@@ -120,7 +113,6 @@ export class HybridBuildPanel {
         if (!player.isLocal()) {
             return;
         }
-        this.visibleLocally = visible;
         this.panel.setVisible(visible);
         if (!visible) {
             player.pointerOverUi = false;
