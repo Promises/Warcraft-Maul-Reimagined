@@ -99,14 +99,7 @@ export class AntiBlock {
         }
 
         const maze: Maze = this._worldMap.playerMazes[playerSpawnId];
-        const leftSide: number = ((x - 64) - maze.minX) / 64;
-        const rightSide: number = (x - maze.minX) / 64;
-        const topSide: number = (y - maze.minY) / 64;
-        const bottomSide: number = ((y - 64) - maze.minY) / 64;
-        maze.setWalkable(leftSide, bottomSide, Walkable.Blocked);
-        maze.setWalkable(rightSide, bottomSide, Walkable.Blocked);
-        maze.setWalkable(leftSide, topSide, Walkable.Blocked);
-        maze.setWalkable(rightSide, topSide, Walkable.Blocked);
+        maze.setFootprint(x, y, Walkable.Blocked);
 
         const playerSpawn: PlayerSpawns = this._worldMap.playerSpawns[playerSpawnId];
         const spawnOne: CheckPoint = <CheckPoint>playerSpawn.spawnOne;

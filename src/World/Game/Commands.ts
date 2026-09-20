@@ -471,6 +471,8 @@ export class Commands {
             player.sendMessage('ALL players are now |cFFFF0000denied|r access to your spawn!');
         } else if (command[0] === 'claim') {
             player.ClaimTowers();
+        } else if (command[0] === 'gray' || command[0] === 'grey') {
+            this.game.laneTransfer.moveToGray(player);
         } else if (command[0] === 'forceblitz') {
             if (player.isDeveloper) {
                 this.game.diffVote.forceBlitz = true;
@@ -507,8 +509,7 @@ export class Commands {
         } else if (command[0] === 'maze') {
             let invalidMaze: boolean = false;
             if (command.length === 2) {
-                const playerId = MapPlayer.fromEvent()?.id!;
-                const firstSpawn: CheckPoint | undefined = this.game.worldMap.playerSpawns[playerId].spawnOne;
+                const firstSpawn: CheckPoint | undefined = this.game.worldMap.playerSpawns[player.lane].spawnOne;
                 if (firstSpawn === undefined) {
                     return;
                 }
@@ -587,7 +588,7 @@ export class Commands {
 
     public RepickActions(player: Defender): void {
         const grp: group = GetUnitsInRectAll(GetPlayableMapRect()!)!;
-        const maxGold: number = player.id === COLOUR.GRAY ? 150 : 100;
+        const maxGold: number = player.lane === COLOUR.GRAY ? 150 : 100;
         if (player.getGold() > maxGold) {
             player.setGold(maxGold);
         }
@@ -720,7 +721,7 @@ export class Commands {
 
         if (currentVotes >= neededVotes) {
             if (this.voteAgainstPlayer) {
-                this.game.worldMap.playerSpawns[this.voteAgainstPlayer.id].isOpen = false;
+                this.game.worldMap.playerSpawns[this.voteAgainstPlayer.lane].isOpen = false;
 
                 this.RemoveAllKickedPlayerTowers();
                 if (this.game.scoreBoard) {

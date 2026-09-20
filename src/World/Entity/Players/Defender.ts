@@ -257,6 +257,9 @@ export class Defender extends AbstractPlayer {
     private _builders: Unit[] = [];
 
     private _towerForces: Map<number, number> = new Map<number, number>();
+    // The lane (area, spawn, last-defender bonus) this player defends: their colour's lane
+    // unless they took over the gray lane, see LaneTransfer
+    private _lane: number;
 
     private protectedTowers: number[] = [ // towers that cant be disabled
         FourCC('n01D'), // [High Elven Farm] - High Elven Farm
@@ -271,6 +274,7 @@ export class Defender extends AbstractPlayer {
     constructor(id: number, game: WarcraftMaul) {
         super(id);
         this.game = game;
+        this._lane = id;
         this.setUpPlayerVariables();
         this.leaveTrigger = Trigger.create();
         TriggerRegisterPlayerEventLeave
@@ -385,8 +389,23 @@ export class Defender extends AbstractPlayer {
     }
 
 
+    get lane(): number {
+        return this._lane;
+    }
+
+    /** Takes over another lane; the towers and builders are carried over by LaneTransfer. */
+    public moveToLane(lane: number): void {
+        this._lane = lane;
+        this.setHoloMaze(undefined);
+        const location: Point = this.game.mapSettings.ALLOW_PLAYER_TOWER_LOCATIONS[lane];
+        if (this.allowPlayerTower) {
+            this.allowPlayerTower.x = location.x;
+            this.allowPlayerTower.y = location.y;
+        }
+    }
+
     public getArea(): Rectangle {
-        return this.game.mapSettings.PLAYER_AREAS[this.id];
+        return this.game.mapSettings.PLAYER_AREAS[this.lane];
     }
 
     public getCenterX(): number {
@@ -429,7 +448,7 @@ export class Defender extends AbstractPlayer {
         SendMessage(`${this.getNameWithColour()} has left the game!`);
 
         // TriggerSleepAction(2.00);
-        this.game.worldMap.playerSpawns[this.id].isOpen = false;
+        this.game.worldMap.playerSpawns[this.lane].isOpen = false;
         if (this.game.scoreBoard && this._scoreSlot > -1) {
 
             MultiboardSetItemValueBJ(

@@ -23,6 +23,7 @@ import {ActionBar} from './Game/Ui/ActionBar';
 import {HybridBuildPanel} from './Game/Ui/HybridBuild/HybridBuildPanel';
 import {PlayerSync} from './Game/PlayerSync';
 import {HostDetection} from './Game/HostDetection';
+import {LaneTransfer} from './Game/LaneTransfer';
 import {RaceSelectPanel} from './Game/Ui/RaceSelect/RaceSelectPanel';
 import {WarcraftMaulSettings} from './WarcraftMaulSettings';
 import {IMapSettings} from './IMapSettings';
@@ -63,6 +64,7 @@ export class WarcraftMaul {
     public hybridBuildPanel: HybridBuildPanel;
     public playerSync: PlayerSync;
     public hostDetection: HostDetection;
+    public laneTransfer: LaneTransfer;
     public raceSelectPanel: RaceSelectPanel;
 
     public enemies: Attacker[] = [];
@@ -162,6 +164,7 @@ export class WarcraftMaul {
         // SendMessage(`This is build: ${BUILD_NUMBER}, built ${BUILD_DATE}.`);
         this.playerSync = new PlayerSync(this);
         this.hostDetection = new HostDetection(this);
+        this.laneTransfer = new LaneTransfer(this);
         this.playerSync.on('build', (player, data) => player.placeTower(data));
         this.hybridBuildPanel = new HybridBuildPanel(this);
         this.raceSelectPanel = new RaceSelectPanel(this);

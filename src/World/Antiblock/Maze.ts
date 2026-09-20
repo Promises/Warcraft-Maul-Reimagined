@@ -104,6 +104,18 @@ export class Maze {
         return this.maze[x][y];
     }
 
+    /** Marks the 2x2 footprint of a tower centred on the grid corner (x, y). */
+    public setFootprint(x: number, y: number, walkable: Walkable): void {
+        const left: number = ((x - 64) - this.minX) / 64;
+        const right: number = (x - this.minX) / 64;
+        const top: number = (y - this.minY) / 64;
+        const bottom: number = ((y - 64) - this.minY) / 64;
+        this.setWalkable(left, bottom, walkable);
+        this.setWalkable(right, bottom, walkable);
+        this.setWalkable(left, top, walkable);
+        this.setWalkable(right, top, walkable);
+    }
+
     public breathFirstSearch(sourceX: number, sourceY: number, destinationX: number, destinationY: number): number {
         if (this.maze[sourceX][sourceY] !== Walkable.Walkable || this.maze[destinationX][destinationY] !== Walkable.Walkable) {
             return -1;

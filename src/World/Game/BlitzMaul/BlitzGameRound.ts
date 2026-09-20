@@ -266,7 +266,7 @@ export class BlitzGameRound extends AbstractGameRound {
             if (this.currentWave === 15) {
                 player.giveLumber(1);
             }
-            if (player.id === COLOUR.GRAY) {
+            if (player.lane === COLOUR.GRAY) {
                 player.giveGold(2 * this.roundOverGoldReward);
                 player.sendMessage(
                     `|c0000cdf9You received|r ${2 * this.roundOverGoldReward} |c0000cdf9` +

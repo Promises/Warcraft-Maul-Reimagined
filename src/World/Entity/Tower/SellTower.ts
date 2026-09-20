@@ -93,14 +93,7 @@ export class SellTower {
 
 
                 const maze: Maze = this._game.worldMap.playerMazes[<number>playerSpawnId];
-                const leftSide: number = ((x - 64) - maze.minX) / 64;
-                const rightSide: number = (x - maze.minX) / 64;
-                const topSide: number = (y - maze.minY) / 64;
-                const bottomSide: number = ((y - 64) - maze.minY) / 64;
-                maze.setWalkable(leftSide, bottomSide, Walkable.Walkable);
-                maze.setWalkable(rightSide, bottomSide, Walkable.Walkable);
-                maze.setWalkable(leftSide, topSide, Walkable.Walkable);
-                maze.setWalkable(rightSide, topSide, Walkable.Walkable);
+                maze.setFootprint(x, y, Walkable.Walkable);
                 unit.destroy();
             }
         }

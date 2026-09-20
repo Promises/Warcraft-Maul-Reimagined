@@ -45,7 +45,7 @@ export class ExampleMaze extends AbstractActionButton {
         this.backdropHandle.setAlpha(255);
         this.backdropHandle.setSize(this.defaultSize, this.defaultSize)
         this.buttonHandle.setSize(this.defaultSize, this.defaultSize)
-        const firstSpawn: CheckPoint | undefined = this.game.worldMap.playerSpawns[player.id].spawnOne;
+        const firstSpawn: CheckPoint | undefined = this.game.worldMap.playerSpawns[player.lane].spawnOne;
         if (firstSpawn === undefined) {
             this.enable();
 

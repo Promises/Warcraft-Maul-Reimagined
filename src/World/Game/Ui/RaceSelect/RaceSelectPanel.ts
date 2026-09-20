@@ -212,7 +212,7 @@ export class RaceSelectPanel {
         }
         player.giveLumber(-item.lumberCost);
         player.giveGold(-item.goldCost);
-        this.game.worldMap.playerSpawns[player.id].isOpen = true;
+        this.game.worldMap.playerSpawns[player.lane].isOpen = true;
         this.game.racePicking.PickRaceForPlayerByItem(player, FourCC(itemId));
         if (player.races.length > 0 || player.hasHybridRandomed) {
             this.close(player);
