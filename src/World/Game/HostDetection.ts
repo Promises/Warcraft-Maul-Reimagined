@@ -5,23 +5,31 @@ import {Log} from '../../lib/Serilog/Serilog';
 const ANNOUNCE_DELAY = 0.5;
 const FALLBACK_DELAY = 6.0;
 
+type HostSource = 'disk' | 'race' | 'fallback';
+const SOURCE_RANK: { [source in HostSource]: number } = {disk: 3, race: 2, fallback: 1};
+
 /**
- * Finds the game host. There is no native for it, but ReloadGameCachesFromDisk() returns true
- * only on the host's machine (other clients skip the disk read and return false), so the client
- * that gets true announces itself over PlayerSync and every client records the same host.
+ * Finds the game host; there is no native for it. Three sources, best one wins:
  *
- * If that produces nothing (it does not work on every platform), a fallback kicks in: the
- * lowest-slot player in the game, which is identical on every client, so host-only logic still
- * has a consistent owner even when the disk trick fails.
+ * - disk: ReloadGameCachesFromDisk() returns true only on the host's machine, so that client
+ *   announces itself. Does not work on every platform (dead on macOS).
+ * - race: every client sends a sync message at the same game time. The host's own message
+ *   enters the shared stream without a network hop while everyone else's has to reach the
+ *   host first, so the first message to arrive is the host's - and the arrival order is the
+ *   same on every client, so they all agree. This is the wait-time asymmetry between the
+ *   host and the joiners, measured from game start, the only clock the sandbox has.
+ * - fallback: the lowest-slot player, identical everywhere, so host-only logic always has
+ *   a consistent owner.
  */
 export class HostDetection {
     private _host: MapPlayer | undefined;
-    private detectedFromDisk: boolean = false;
+    private source: HostSource | undefined;
 
     constructor(private readonly game: WarcraftMaul) {
-        game.playerSync.on('host', player => this.setHost(player, true));
+        game.playerSync.on('host', player => this.setHost(player, 'disk'));
+        game.playerSync.on('host-race', player => this.setHost(player, 'race'));
 
-        Timer.create().start(ANNOUNCE_DELAY, false, () => this.announceIfHost());
+        Timer.create().start(ANNOUNCE_DELAY, false, () => this.announce());
         Timer.create().start(FALLBACK_DELAY, false, () => {
             if (!this._host) {
                 this.applyFallback();
@@ -29,8 +37,12 @@ export class HostDetection {
         });
     }
 
-    /** Runs the disk check locally and announces if this client is the host. */
-    public announceIfHost(): void {
+    /**
+     * Runs on every client: each sends its race entry as itself, and the one whose disk
+     * check passes announces that too.
+     */
+    public announce(): void {
+        this.game.playerSync.send('host-race');
         if (ReloadGameCachesFromDisk()) {
             this.game.playerSync.send('host');
         }
@@ -50,18 +62,18 @@ export class HostDetection {
     private applyFallback(): void {
         const fallback = this.lowestSlotPlayer();
         if (fallback) {
-            this.setHost(fallback, false);
+            this.setHost(fallback, 'fallback');
         }
     }
 
-    private setHost(player: MapPlayer, fromDisk: boolean): void {
-        // A real disk-detected host always wins over the fallback
-        if (this._host && (this.detectedFromDisk || !fromDisk)) {
+    /** A better source replaces a worse one; within a source the first answer stands. */
+    private setHost(player: MapPlayer, source: HostSource): void {
+        if (this.source && SOURCE_RANK[this.source] >= SOURCE_RANK[source]) {
             return;
         }
         this._host = player;
-        this.detectedFromDisk = fromDisk;
-        Log.Debug(`Host ${fromDisk ? 'detected' : 'fallback'}: player ${player.id}`);
+        this.source = source;
+        Log.Debug(`Host (${source}): player ${player.id}`);
     }
 
     public get host(): MapPlayer | undefined {
@@ -72,14 +84,12 @@ export class HostDetection {
         return this._host !== undefined && this._host.id === player.id;
     }
 
-    /** For the -host command: report the current host and re-run the disk announce. */
+    /** For the -host command: report the current host and its source. */
     public report(to: MapPlayer): void {
-        const source = this.detectedFromDisk ? 'disk' : 'fallback';
         const message = this._host !== undefined
-            ? `Host: player ${this._host.id} (${source})`
+            ? `Host: player ${this._host.id} (${this.source})`
             : 'Host: not detected yet';
         DisplayTimedTextToPlayer(to.handle, 0, 0, 10, message);
         Log.Debug(message);
-        this.announceIfHost();
     }
 }
