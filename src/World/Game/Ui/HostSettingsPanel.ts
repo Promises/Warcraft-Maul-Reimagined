@@ -16,41 +16,29 @@ const ROW_HEIGHT = 0.028;
 const ROW_SPACING = 0.032;
 const BUTTON_WIDTH = 0.13;
 const BUTTON_HEIGHT = 0.03;
+const SELECTED_MARKER = '|cffffcc00>>|r';
 
 /**
- * A column of mutually exclusive options: one highlighted row is the selection. Rows are
- * plain buttons with a highlight backdrop (the same look as the race list) rather than the
- * game's checkbox templates, which are not all loaded outside their own dialogs.
+ * A column of mutually exclusive options. Rows are CustomTextButtons (the vote panel's
+ * buttons, with a hit area that matches what is drawn); the selected row carries a marker
+ * in its text, which reads on any background and needs no tinted frames.
  */
 class OptionColumn {
-    private readonly highlights: Frame[] = [];
+    private readonly rows: Frame[] = [];
     private selected: number = 0;
 
     constructor(game: WarcraftMaul, name: string, parent: Frame, left: number, top: number,
-                header: string, labels: string[]) {
+                header: string, private readonly labels: string[]) {
         const title = Frame.createType(`${name}Header`, parent, 0, 'TEXT', '')!;
         title.setSize(COLUMN_WIDTH, HEADER_HEIGHT);
         title.setAbsPoint(FRAMEPOINT_TOPLEFT, left, top);
         title.setText(header);
         BlzFrameSetTextAlignment(title.handle, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
 
-        labels.forEach((label, index) => {
-            const rowTop = top - HEADER_HEIGHT - index * ROW_SPACING;
-            const button = Frame.createType(`${name}Row${index}`, parent, 0, 'GLUEBUTTON', 'ScriptDialogButton')!;
+        labels.forEach((_, index) => {
+            const button = Frame.create('CustomTextButton', parent, 0, 0)!;
             button.setSize(COLUMN_WIDTH, ROW_HEIGHT);
-            button.setAbsPoint(FRAMEPOINT_TOPLEFT, left, rowTop);
-
-            const highlight = Frame.createType(`${name}Row${index}Highlight`, button, 0, 'BACKDROP', '')!;
-            highlight.setAllPoints(button);
-            highlight.setTexture('Textures\\White.blp', 0, true);
-            highlight.setVertexColor(BlzConvertColor(150, 80, 120, 190));
-
-            const text = Frame.createType(`${name}Row${index}Label`, button, 0, 'TEXT', '')!;
-            text.setSize(COLUMN_WIDTH - 0.01, ROW_HEIGHT);
-            text.setAbsPoint(FRAMEPOINT_LEFT, left + 0.008, rowTop - ROW_HEIGHT / 2);
-            text.setText(label);
-            BlzFrameSetTextAlignment(text.handle, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
-
+            button.setAbsPoint(FRAMEPOINT_TOPLEFT, left, top - HEADER_HEIGHT - index * ROW_SPACING);
             // The click fires on every client; the selection is the local player's view
             const trigger = Trigger.create();
             trigger.triggerRegisterFrameEvent(button, FRAMEEVENT_CONTROL_CLICK);
@@ -63,14 +51,14 @@ class OptionColumn {
                 this.select(index);
             });
             trackHover(game, button);
-            this.highlights.push(highlight);
+            this.rows.push(button);
         });
         this.select(0);
     }
 
     public select(index: number): void {
         this.selected = index;
-        this.highlights.forEach((highlight, i) => highlight.setVisible(i === index));
+        this.rows.forEach((row, i) => row.setText(i === index ? `${SELECTED_MARKER} ${this.labels[i]}` : this.labels[i]));
     }
 
     public get selection(): number {

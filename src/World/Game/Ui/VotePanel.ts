@@ -3,8 +3,8 @@ import {WarcraftMaul} from '../../WarcraftMaul';
 import {Defender} from '../../Entity/Players/Defender';
 import {trackHover} from './UiHover';
 
-// Left side of the screen, clear of the centred race panel, so votes never cover it
-const PANEL_LEFT = 0.06;
+// Flush with the left screen edge: the centred race panel starts at x 0.142, and the two are shown together
+const PANEL_LEFT = 0.00;
 const PANEL_CENTER_Y = 0.40;
 const PANEL_WIDTH = 0.14;
 const PADDING = 0.01;

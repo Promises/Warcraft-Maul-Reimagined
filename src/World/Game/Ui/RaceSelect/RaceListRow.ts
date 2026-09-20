@@ -24,9 +24,9 @@ export class RaceListRow {
 
         this.highlight = Frame.createType(`${name}Highlight`, this.button, 0, 'BACKDROP', '')!;
         this.highlight.setAllPoints(this.button);
-        // A solid white texture (loads reliably) tinted to a faint blue as the selection bar
-        this.highlight.setTexture('Textures\\White.blp', 0, true);
-        this.highlight.setVertexColor(BlzConvertColor(150, 80, 120, 190));
+        // A dark translucent bar: frame alpha applies reliably where a vertex-colour tint does not
+        this.highlight.setTexture('Textures\\Black32.blp', 0, true);
+        this.highlight.setAlpha(150);
         this.highlight.setVisible(false);
 
         this.icon = Frame.createType(`${name}Icon`, this.button, 0, 'BACKDROP', '')!;
@@ -77,7 +77,7 @@ export class RaceListRow {
     public setSelected(selected: boolean): void {
         const on = selected && this.itemId !== undefined;
         this.highlight.setVisible(on);
-        this.label.setTextColor(on ? BlzConvertColor(255, 255, 255, 190) : BlzConvertColor(255, 255, 255, 255));
+        this.label.setTextColor(on ? BlzConvertColor(255, 255, 204, 0) : BlzConvertColor(255, 255, 255, 255));
     }
 
     public get item(): string | undefined {
