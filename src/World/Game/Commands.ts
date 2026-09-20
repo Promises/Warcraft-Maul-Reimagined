@@ -6,6 +6,7 @@ import {CheckPoint} from '../Entity/CheckPoint';
 import {AdvancedHoloMaze} from '../Holograms/AdvancedHoloMaze';
 import {SimpleHoloMaze} from '../Holograms/SimpleHoloMaze';
 import {CircleHoloMaze} from '../Holograms/CircleHoloMaze';
+import {AbstractHologramMaze} from '../Holograms/AbstractHologramMaze';
 import {Rectangle} from '../../JassOverrides/Rectangle';
 import {SpawnedCreeps} from '../Entity/SpawnedCreeps';
 import {TimedEvent} from '../../lib/WCEventQueue/TimedEvent';
@@ -14,7 +15,6 @@ import {Maze, Walkable} from '../Antiblock/Maze';
 import {COLOUR, DecodeFourCC, SendMessage, Util} from "../../lib/translators";
 import {Effect, Frame, MapPlayer, Timer, Trigger, Unit} from "w3ts";
 import {Image} from "../../JassOverrides/Image";
-import {HybridRandomCommandButton} from "./Ui/HybridRandomCommandButton";
 
 /**
  * Gets a random number between a range.
@@ -203,10 +203,8 @@ export class Commands {
 
                 }
                 player.sendMessage(`Difficulty was set to ${amount}%`);
+                // Applies to creeps spawned from now on; Creep scales each unit itself
                 this.game.diffVote.difficulty = amount;
-                for (const enemy of this.game.enemies) {
-                    enemy.handicap = amount;
-                }
                 break;
             case 'wave':
                 amount = Util.ParsePositiveInt(command[1]);
@@ -310,6 +308,24 @@ export class Commands {
             case 'leave':
                 player.PlayerLeftTheGame();
                 break;
+            case 'swap': {
+                // Colour name or index; getPlayerIdFromColourName is undefined for unknown names
+                const byName: number | undefined = this.getPlayerIdFromColourName(command[1] ?? '');
+                const lane: number = byName ?? Util.ParseInt(command[1] ?? '');
+                if (lane >= 0 && lane < this.game.mapSettings.PLAYER_AREAS.length && command[1] !== undefined) {
+                    this.game.laneTransfer.moveToLane(player, lane);
+                } else {
+                    player.sendMessage('Usage: -swap <colour|0-12>, e.g. -swap gray or -swap 8');
+                }
+                break;
+            }
+            case 'lanecheck':
+                this.game.laneTransfer.reportLaneDifferences();
+                player.sendMessage('Lane differences written to the log');
+                break;
+            case 'fillmaze':
+                this.fillMaze(player, command[1] ?? '3', FourCC(command2[2] ?? 'hC66'));
+                break;
             case 'spawn':
                 const id: string = command2[1];
                 if (id.length === 4) {
@@ -319,7 +335,7 @@ export class Commands {
                 }
                 break;
             case 'tm':
-                player.sendMessage(Util.ArraysToString(this.game.worldMap.playerMazes[player.id].maze));
+                player.sendMessage(Util.ArraysToString(this.game.worldMap.playerMazes[player.lane].maze));
                 PreloadGenStart();
                 this.MazeToString(this.game.worldMap.playerMazes[player.id].maze);
 
@@ -339,6 +355,47 @@ export class Commands {
                 this.game.waveTimer = amount;
                 break;
         }
+    }
+
+    /** The sample maze 1/2/3 drawn in the player's lane, or undefined for any other choice. */
+    private holoMazeFor(player: Defender, choice: string): AbstractHologramMaze | undefined {
+        const firstCheckpoint: CheckPoint | undefined = this.game.worldMap.playerSpawns[player.lane].spawnOne?.next;
+        const secondCheckpoint: CheckPoint | undefined = firstCheckpoint?.next;
+        if (!firstCheckpoint || !secondCheckpoint) {
+            return undefined;
+        }
+        const imagePath: string = 'ReplaceableTextures\\Splats\\SuggestedPlacementSplat.blp';
+        const x1: number = GetRectCenterX(firstCheckpoint.rectangle);
+        const y1: number = GetRectCenterY(firstCheckpoint.rectangle);
+        const x2: number = GetRectCenterX(secondCheckpoint.rectangle);
+        const y2: number = GetRectCenterY(secondCheckpoint.rectangle);
+        switch (choice) {
+            case '1':
+                return new CircleHoloMaze(imagePath, x1, y1, x2, y2);
+            case '2':
+                return new SimpleHoloMaze(imagePath, x1, y1, x2, y2);
+            case '3':
+                return new AdvancedHoloMaze(imagePath, x1, y1, x2, y2);
+            default:
+                return undefined;
+        }
+    }
+
+    /** Debug: builds real towers on every point of a sample maze in the player's lane. */
+    private fillMaze(player: Defender, choice: string, typeId: number): void {
+        const maze = this.holoMazeFor(player, choice);
+        if (!maze) {
+            player.sendMessage('Usage: -fillmaze [1|2|3] [tower id], e.g. -fillmaze 3 hC66');
+            return;
+        }
+        let built: number = 0;
+        for (const point of maze.points) {
+            if (this.game.worldMap.towerConstruction.placeTower(player, typeId, point.x, point.y)) {
+                built++;
+            }
+        }
+        maze.Destroy();
+        player.sendMessage(`Built ${built} of ${maze.points.length} towers of maze ${choice}`);
     }
 
     private handleCommand(): void {
@@ -474,25 +531,22 @@ export class Commands {
             player.sendMessage('ALL players are now |cFFFF0000denied|r access to your spawn!');
         } else if (command[0] === 'claim') {
             player.ClaimTowers();
+        } else if (command[0] === 'gray' || command[0] === 'grey') {
+            this.game.laneTransfer.moveToGray(player);
         } else if (command[0] === 'forceblitz') {
             if (player.isDeveloper) {
                 this.game.diffVote.forceBlitz = true;
             }
         } else if (command[0] === 'build') {
-            player.setBuildMode(!player.buildMode);
-        } else if (command[0] === 'zoom' || command[0] === 'cam') {
-            if (GetLocalPlayer() === player.handle) {
-                const amount: number = Util.ParsePositiveInt(command[1]);
-                if (!amount) {
-                    player.sendMessage(Util.ColourString(COLOUR_CODES[COLOUR.RED], 'Invalid Amount'));
-                    return;
-
-                }
-                SetCameraField(CAMERA_FIELD_TARGET_DISTANCE, amount, 1);
-            }
-        } else if (command[0] === 'dt' || command[0] === 'disabletowers') {
-            // player.DisableTowers();
-            player.sendMessage('This command has been removed.');
+            // Chat events fire on every client with the speaker; toggle handles per player
+            this.game.hybridBuildPanel.toggle(player);
+        } else if (command[0] === 'race') {
+            this.game.raceSelectPanel.toggle(player);
+        } else if (command[0] === 'host') {
+            this.game.hostDetection.report(player);
+        } else if (command[0] === 'log') {
+            Log.flush();
+            player.sendMessage('Log flushed');
         } else if (command[0] === 'buildings' || command[0] === 'towers') {
             if (command[1]) {
                 const receiver: number = this.getPlayerIdFromColourName(command[1]);
@@ -513,75 +567,21 @@ export class Commands {
                 player.sendMessage('Wrong Usage: -buildings <colour>');
             }
         } else if (command[0] === 'maze') {
-            let invalidMaze: boolean = false;
-            if (command.length === 2) {
-                const playerId = MapPlayer.fromEvent()?.id!;
-                const firstSpawn: CheckPoint | undefined = this.game.worldMap.playerSpawns[playerId].spawnOne;
-                if (firstSpawn === undefined) {
-                    return;
-                }
-
-                const firstCheckpoint: CheckPoint | undefined = firstSpawn.next;
-                if (firstCheckpoint === undefined) {
-                    return;
-                }
-
-                const secondCheckpoint: CheckPoint | undefined = firstCheckpoint.next;
-                if (secondCheckpoint === undefined) {
-                    return;
-                }
-
-                let imagePath: string = '';
-                // if (GetTriggerPlayer() === GetLocalPlayer()) {
-                imagePath = 'ReplaceableTextures\\Splats\\SuggestedPlacementSplat.blp';
-                // }
-
-                switch (command[1]) {
-                    case 'none':
-                        player.setHoloMaze(undefined);
-                        break;
-                    case '1':
-                        player.setHoloMaze(
-                            new CircleHoloMaze(
-                                imagePath,
-                                GetRectCenterX(firstCheckpoint.rectangle),
-                                GetRectCenterY(firstCheckpoint.rectangle),
-                                GetRectCenterX(secondCheckpoint.rectangle),
-                                GetRectCenterY(secondCheckpoint.rectangle)));
-                        break;
-                    case '2':
-                        player.setHoloMaze(
-                            new SimpleHoloMaze(
-                                imagePath,
-                                GetRectCenterX(firstCheckpoint.rectangle),
-                                GetRectCenterY(firstCheckpoint.rectangle),
-                                GetRectCenterX(secondCheckpoint.rectangle),
-                                GetRectCenterY(secondCheckpoint.rectangle)));
-                        break;
-                    case '3':
-                        player.setHoloMaze(
-                            new AdvancedHoloMaze(
-                                imagePath,
-                                GetRectCenterX(firstCheckpoint.rectangle),
-                                GetRectCenterY(firstCheckpoint.rectangle),
-                                GetRectCenterX(secondCheckpoint.rectangle),
-                                GetRectCenterY(secondCheckpoint.rectangle)));
-                        break;
-                    default:
-                        invalidMaze = true;
-                        break;
-                }
+            const choice: string = command.length === 2 ? command[1] : '';
+            if (choice === 'none') {
+                player.setHoloMaze(undefined);
             } else {
-                invalidMaze = true;
-            }
-
-            if (invalidMaze === true) {
-                player.sendMessage(
-                    'Unknown maze selected, please try one of the mazes shown below\n' +
-                    '|cFFFFCC00-maze none|r: removes the current maze\n' +
-                    '|cFFFFCC00-maze 1|r: shows a very simple circled maze\n' +
-                    '|cFFFFCC00-maze 2|r: shows a basic maze\n' +
-                    '|cFFFFCC00-maze 3|r: shows a more advanced maze');
+                const maze = this.holoMazeFor(player, choice);
+                if (maze) {
+                    player.setHoloMaze(maze);
+                } else {
+                    player.sendMessage(
+                        'Unknown maze selected, please try one of the mazes shown below\n' +
+                        '|cFFFFCC00-maze none|r: removes the current maze\n' +
+                        '|cFFFFCC00-maze 1|r: shows a very simple circled maze\n' +
+                        '|cFFFFCC00-maze 2|r: shows a basic maze\n' +
+                        '|cFFFFCC00-maze 3|r: shows a more advanced maze');
+                }
             }
         }
         if (this.game.debugMode) {
@@ -595,13 +595,14 @@ export class Commands {
 
     public RepickActions(player: Defender): void {
         const grp: group = GetUnitsInRectAll(GetPlayableMapRect()!)!;
-        const maxGold: number = player.id === COLOUR.GRAY ? 150 : 100;
+        const maxGold: number = player.lane === COLOUR.GRAY ? 150 : 100;
         if (player.getGold() > maxGold) {
             player.setGold(maxGold);
         }
         player.setLumber(1);
         ForGroupBJ(grp, () => this.RemovePlayerUnits(player));
         DestroyGroup(grp);
+        this.game.raceSelectPanel.open(player);
     }
 
     public RepickConditions(player: Defender): boolean {
@@ -727,7 +728,7 @@ export class Commands {
 
         if (currentVotes >= neededVotes) {
             if (this.voteAgainstPlayer) {
-                this.game.worldMap.playerSpawns[this.voteAgainstPlayer.id].isOpen = false;
+                this.game.worldMap.playerSpawns[this.voteAgainstPlayer.lane].isOpen = false;
 
                 this.RemoveAllKickedPlayerTowers();
                 if (this.game.scoreBoard) {

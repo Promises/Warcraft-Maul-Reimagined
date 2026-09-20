@@ -48,6 +48,12 @@ export interface ColourToIndex {
 
 export class Util {
 
+    /** Display names of the player lanes, indexed by player id (the reverse of COLOUR_IDS). */
+    public static COLOUR_NAMES: string[] = [
+        'Red', 'Blue', 'Teal', 'Purple', 'Yellow', 'Orange', 'Green', 'Pink', 'Gray',
+        'Light blue', 'Dark green', 'Brown', 'Maroon',
+    ];
+
     public static COLOUR_IDS: ColourToIndex = {
         RED: 0,
         BLUE: 1,

@@ -22,8 +22,17 @@ export class Log {
     public static addSink(sink: ILogSink): void {
         this.sinks.push(sink);
     }
+    /** Replaces sinks of the same type as the given one (e.g. the chat sink), keeping the others. */
     public static replaceSinks(sink: ILogSink): void {
-        this.sinks = [sink];
+        this.sinks = this.sinks.filter(existing => existing.constructor !== sink.constructor);
+        this.sinks.push(sink);
+    }
+
+    /** Flushes sinks that buffer (the file sink). */
+    public static flush(): void {
+        for (const sink of this.sinks) {
+            sink.flush?.();
+        }
     }
 
     public static write(level: LogLevel, message: string): void {
@@ -65,4 +74,6 @@ export interface ILogSink {
     isEnabled(level: LogLevel): boolean;
 
     emit(event: LogEvent): void;
+
+    flush?(): void;
 }

@@ -1,6 +1,7 @@
 import {Log} from '../../../../lib/Serilog/Serilog';
 import {WarcraftMaul} from '../../../WarcraftMaul';
 import {Frame, Trigger} from "w3ts";
+import {trackHover} from '../UiHover';
 
 export abstract class AbstractActionButton {
 
@@ -49,6 +50,7 @@ export abstract class AbstractActionButton {
         this.trig = Trigger.create();
         this.trig.addAction(() => this.clickAction());
         this.trig.triggerRegisterFrameEvent(this._buttonHandle, FRAMEEVENT_CONTROL_CLICK);
+        trackHover(game, this._buttonHandle);
     }
 
     public disable(): void {

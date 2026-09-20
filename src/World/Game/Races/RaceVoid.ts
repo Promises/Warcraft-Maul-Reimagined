@@ -7,11 +7,12 @@ export class RaceVoid extends Race {
         player.voidBuilder = Unit.create(player, FourCC(this.id), player.getCenterX(), player.getCenterY(), bj_UNIT_FACING);
         const voidBuilder: Unit | undefined = player.getVoidBuilder();
         if (voidBuilder !== undefined) {
-            voidBuilder.addAbility(FourCC('I01Y'));
-            voidBuilder.addAbility(FourCC('I01Z'));
-            voidBuilder.addAbility(FourCC('I020'));
-            voidBuilder.addAbility(FourCC('I01X'));
-            voidBuilder.addAbility(FourCC('I02E'));
+            // These are the Void purchase items, not abilities
+            voidBuilder.addItemById(FourCC('I01Y'));
+            voidBuilder.addItemById(FourCC('I01Z'));
+            voidBuilder.addItemById(FourCC('I020'));
+            voidBuilder.addItemById(FourCC('I01X'));
+            voidBuilder.addItemById(FourCC('I02E'));
             player.builders.push(voidBuilder);
         }
     }

@@ -12,6 +12,7 @@ import {InitialiseAllRaceTowers} from './Races/RaceInitialiser';
 import {Trigger, Unit} from "w3ts";
 import {COLOUR, DecodeFourCC, ReplaceUnit} from "../../../lib/translators";
 import {DummyTowersMap} from "../../Game/Races/HybridRandom";
+import {Walkable} from "../../Antiblock/Maze";
 
 export class TowerConstruction {
     private races: RaceTowers[] = [];
@@ -171,6 +172,53 @@ export class TowerConstruction {
         }
 
         this.SetupTower(tower, owner);
+    }
+
+    /**
+     * Creates a finished tower directly, as if a builder had just completed it: the tower
+     * logic is attached and its cells are blocked in the lane's maze. Returns undefined -
+     * creating nothing - when the footprint is not buildable terrain or the game would shift
+     * the building off (x, y): a silently shifted tower could block or open the maze, and
+     * the anti-block check only runs for real construction.
+     */
+    public placeTower(owner: Defender, typeId: number, x: number, y: number): Unit | undefined {
+        if (!this.isBuildable(x, y)) {
+            return undefined;
+        }
+        const unit = Unit.create(owner, typeId, x, y, 270.00);
+        if (!unit) {
+            return undefined;
+        }
+        if (this.snap(unit.x) !== x || this.snap(unit.y) !== y) {
+            unit.destroy();
+            return undefined;
+        }
+        // Same as a finished construction: no rally point
+        unit.removeAbility(FourCC('ARal'));
+        this.SetupTower(unit, owner);
+        const lane = this.game.mapSettings.PLAYER_AREAS.findIndex(area => area.ContainsUnit(unit));
+        if (lane !== -1) {
+            this.game.worldMap.playerMazes[lane].setFootprint(x, y, Walkable.Blocked);
+        }
+        return unit;
+    }
+
+    /** Whether all four cells of a 2x2 footprint centred on the grid corner (x, y) are buildable. */
+    public isBuildable(x: number, y: number): boolean {
+        for (const dx of [-32, 32]) {
+            for (const dy of [-32, 32]) {
+                // The native answers whether the point is NOT pathable for the given type
+                if (IsTerrainPathable(x + dx, y + dy, PATHING_TYPE_BUILDABILITY)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /** Tower centres sit on grid corners. */
+    private snap(value: number): number {
+        return Math.floor(value / 64 + 0.5) * 64;
     }
 
     public SetupTower(tower: Unit, owner: Defender): Tower {

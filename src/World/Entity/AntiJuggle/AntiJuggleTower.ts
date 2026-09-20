@@ -5,6 +5,21 @@ import { WarcraftMaul } from '../../WarcraftMaul';
 import { Tower } from '../Tower/Specs/Tower';
 import {Destructable} from "w3ts";
 
+/** Pathing blocker used for anti-juggle; a stock invisible blocker unless given a model. */
+const ANTI_JUGGLE_BLOCKER = 'YTpc';
+
+// The blocker is shown as a circle of power on a red 2x2 pathing footprint. This lived in the
+// map's object data before and was lost on a World Editor save, so it is applied at build time.
+compiletime(({objectData}) => {
+    // Evaluated in isolation at build time: module constants are not in scope here
+    const blocker = objectData.destructables.get('YTpc');
+    if (!blocker) {
+        throw new Error('Anti-juggle blocker YTpc not found in object data');
+    }
+    blocker.modelFile = 'buildings\\other\\CircleOfPower\\CircleOfPower.mdl';
+    blocker.pathingTexture = 'PathTextures\\4x4red.tga';
+});
+
 export class AntiJuggleTower {
 
     private readonly x: number;
@@ -21,7 +36,7 @@ export class AntiJuggleTower {
         // super(tower, owner, game);
         this.x = tower.unit.x;
         this.y = tower.unit.y;
-        this.destructable = Destructable.create(FourCC('YTpc'), this.x, this.y, bj_UNIT_FACING, 1, 1)!;
+        this.destructable = Destructable.create(FourCC(ANTI_JUGGLE_BLOCKER), this.x, this.y, bj_UNIT_FACING, 1, 1)!;
 
         let playerSpawnId: undefined | number;
         for (let i: number = 0; i < this.game.mapSettings.PLAYER_AREAS.length; i++) {

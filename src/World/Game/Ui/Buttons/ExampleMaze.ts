@@ -7,8 +7,8 @@ import {AbstractPlayer} from '../../../Entity/Players/AbstractPlayer';
 import {MapPlayer,Frame} from "w3ts";
 
 export class ExampleMaze extends AbstractActionButton {
-    private static enabledIcon: string = 'uiImport/CommandButtonsDisabled/DISBTNMAZEAlpha.dds';
-    private static disabledIcon: string = 'uiImport/CommandButtons/BTNMAZEAlpha.dds';
+    private static enabledIcon: string = 'uiImport\\CommandButtonsDisabled\\DISBTNMAZEAlpha.dds';
+    private static disabledIcon: string = 'uiImport\\CommandButtons\\BTNMAZEAlpha.dds';
     private readonly toolTip: Frame;
     private currentFade: number = 255;
     private defaultSize: number;
@@ -45,7 +45,7 @@ export class ExampleMaze extends AbstractActionButton {
         this.backdropHandle.setAlpha(255);
         this.backdropHandle.setSize(this.defaultSize, this.defaultSize)
         this.buttonHandle.setSize(this.defaultSize, this.defaultSize)
-        const firstSpawn: CheckPoint | undefined = this.game.worldMap.playerSpawns[player.id].spawnOne;
+        const firstSpawn: CheckPoint | undefined = this.game.worldMap.playerSpawns[player.lane].spawnOne;
         if (firstSpawn === undefined) {
             this.enable();
 

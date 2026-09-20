@@ -1,0 +1,103 @@
+diff --git a/node_modules/mdx-m3-viewer-th/dist/cjs/common/binarystream.js b/node_modules/mdx-m3-viewer-th/dist/cjs/common/binarystream.js
+index 9447f2d..2d76979 100644
+--- a/node_modules/mdx-m3-viewer-th/dist/cjs/common/binarystream.js
++++ b/node_modules/mdx-m3-viewer-th/dist/cjs/common/binarystream.js
+@@ -100,13 +100,14 @@ class BinaryStream {
+         }
+         const uint8array = this.uint8array;
+         const index = this.index;
+-        let data = '';
++        let chars = '';
+         for (let i = 0; i < bytes; i++) {
+-            data += String.fromCharCode(uint8array[index + i]);
++            const byte = uint8array[index + i];
++            chars += (byte === 0x0 ? '0' : String.fromCharCode(byte))
+         }
+         this.index += bytes;
+         this.remaining -= bytes;
+-        return data;
++        return chars;
+     }
+     /**
+      * Read a 8 bit signed integer.
+@@ -621,4 +622,4 @@ class BinaryStream {
+     }
+ }
+ exports.default = BinaryStream;
+-//# sourceMappingURL=binarystream.js.map
+\ No newline at end of file
++//# sourceMappingURL=binarystream.js.map
+diff --git a/node_modules/mdx-m3-viewer-th/dist/cjs/parsers/ini/file.js b/node_modules/mdx-m3-viewer-th/dist/cjs/parsers/ini/file.js
+index c962c8a..476bec1 100644
+--- a/node_modules/mdx-m3-viewer-th/dist/cjs/parsers/ini/file.js
++++ b/node_modules/mdx-m3-viewer-th/dist/cjs/parsers/ini/file.js
+@@ -8,13 +8,15 @@ class IniFile {
+     constructor() {
+         this.properties = new Map();
+         this.sections = new Map();
++        this.lineEnding = '\r\n';
+     }
+     load(buffer) {
++        this.lineEnding = buffer.includes('\r\n') ? '\r\n' : (buffer.includes('\n') ? '\n' : '\r');
+         // All properties added until a section is reached are added to the properties map.
+         // Once a section is reached, any further properties will be added to it until matching another section, etc.
+         let section = this.properties;
+         const sections = this.sections;
+-        for (const line of buffer.split('\r\n')) {
++        for (const line of buffer.split(/\r\n|\r|\n/)) {
+             // INI defines comments as starting with a semicolon ';'.
+             // However, Warcraft 3 INI files use normal C comments '//'.
+             // In addition, Warcraft 3 files have empty lines.
+@@ -53,11 +55,11 @@ class IniFile {
+                 lines.push(`${key}=${value}`);
+             }
+         }
+-        return lines.join('\r\n');
++        return lines.join(this.lineEnding);
+     }
+     getSection(name) {
+         return this.sections.get(name);
+     }
+ }
+ exports.IniFile = IniFile;
+-//# sourceMappingURL=file.js.map
+\ No newline at end of file
++//# sourceMappingURL=file.js.map
+diff --git a/node_modules/mdx-m3-viewer-th/dist/cjs/parsers/mpq/archive.js b/node_modules/mdx-m3-viewer-th/dist/cjs/parsers/mpq/archive.js
+index 5a47a6b..dbe5281 100644
+--- a/node_modules/mdx-m3-viewer-th/dist/cjs/parsers/mpq/archive.js
++++ b/node_modules/mdx-m3-viewer-th/dist/cjs/parsers/mpq/archive.js
+@@ -21,6 +21,7 @@ class MpqArchive {
+         this.hashTable = new hashtable_1.default(this.c);
+         this.blockTable = new blocktable_1.default(this.c);
+         this.files = [];
++        this.lineEnding = '\r\n'; // Default line ending
+     }
+     /**
+      * Load an existing archive.
+@@ -77,7 +78,8 @@ class MpqArchive {
+         if (listfile) {
+             const list = listfile.text();
+             if (list) {
+-                for (const name of list.split('\r\n')) {
++                this.lineEnding = list.includes('\r\n') ? '\r\n' : (list.includes('\n') ? '\n' : '\r');
++                for (const name of list.split(/\r\n|\r|\n/)) {
+                     // get() internally also sets the file's name to the given one.
+                     this.get(name);
+                 }
+@@ -112,7 +114,7 @@ class MpqArchive {
+         // This removes such blocks of memory from the archive.
+         this.saveMemory();
+         // Set the listfile.
+-        this.set('(listfile)', this.getFileNames().join('\r\n'));
++        this.set('(listfile)', this.getFileNames().join(this.lineEnding));
+         // Reset the file offsets.
+         let offset = headerSize;
+         for (const file of this.files) {
+@@ -394,4 +396,4 @@ class MpqArchive {
+     }
+ }
+ exports.default = MpqArchive;
+-//# sourceMappingURL=archive.js.map
+\ No newline at end of file
++//# sourceMappingURL=archive.js.map

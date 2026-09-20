@@ -23,7 +23,8 @@ export const {
     HybridTierEight,
     HybridTierNine,
     DummyTowers,
-    DummyTowersMap
+    DummyTowersMap,
+    HybridButtonPositions,
     // HybridSpells
 } = compiletime(({objectData, constants}) => {
     const PLAYER_COUNT = 13;
@@ -314,10 +315,12 @@ export const {
         'a', 's', 'd',
         'z', 'x', 'c',
     ]
-    const buttonPositions = [
-        [-1,-1], [1,-1], [2,-1],
-        [-1,1], [1,1], [2,1],
-        [-1,2], [1,2], [2,2],
+    // Slot on the native Build submenu for each tier (column 3 stays free for Cancel).
+    // The submenu is never shown; these only tell the picker UI which command button to click.
+    const buttonPositions: [number, number][] = [
+        [0, 0], [1, 0], [2, 0],
+        [0, 1], [1, 1], [2, 1],
+        [0, 2], [1, 2], [2, 2],
     ]
     // const towers = objectData.units.map
     // const towersToDel = Object.values(towers).filter(a => a.name.startsWith('Player '))
@@ -346,6 +349,10 @@ export const {
             building.scalingValueundefined = 0.75
             building.lumberCostundefined = 0;
             building.goldCostundefined = 0;
+            // nntg is a Naga water building: its 'upar' (Placement Requires) is "unwalkable", which
+            // makes the engine refuse any ground placement. war3-objectdata exposes 'upar' as
+            // placementPreventedBy and 'upap' as placementRequires (the names are swapped).
+            building.placementPreventedBy = '';
 
             building.hotkey = hotKeys[tier];
             [building.buttonPositionX, building.buttonPositionY] = buttonPositions[tier]
@@ -366,10 +373,38 @@ export const {
     }
 
     hybridBuilder.structuresBuilt = Object.keys(hybridBuildingsMap).join(',');
-    objectData.save();
+    // The build UI replaces the old 'Build' spellbook (A0FK) test. The undead build ability
+    // is listed explicitly: it is what makes build orders for the dummies valid.
+    const abilities = String(hybridBuilder.normal ?? '').split(',').filter(id => id !== 'A0FK' && id !== 'AUbu');
+    // No spread here: compiletime code is evaluated as an ES5 expression and cannot carry TS helpers
+    hybridBuilder.normal = abilities.concat('AUbu').join(',');
+
+    // war3-objectdata only writes a field when it differs from the library's base data.
+    // nntg's base button position is (0,0), so x = 0 is never written, and the game then
+    // puts an unset button in column 3. Force the position onto the skin table when the
+    // transformer saves.
+    const save = objectData.save.bind(objectData);
+    objectData.save = () => {
+        const files = save();
+        const {tsToWar3} = require('war3-objectdata-th/dist/cjs/utils');
+        for (const object of files.w3uSkin?.customTable.objects ?? []) {
+            const dummy = hybridBuildingsMap[object.newId];
+            if (!dummy) {
+                continue;
+            }
+            const [x, y] = buttonPositions[dummy.tier];
+            for (const [id, value] of [['ubpx', x], ['ubpy', y]] as const) {
+                if (!object.modifications.some((m: {id: string}) => m.id === id)) {
+                    object.modifications.push(tsToWar3(id, 'int', value));
+                }
+            }
+        }
+        return files;
+    };
     return {
         DummyTowers: hybridBuilding,
         DummyTowersMap: hybridBuildingsMap,
+        HybridButtonPositions: buttonPositions,
         // HybridSpells: abilitites,
         HybridTierOne: returnTiers.HybridTierOne,
         HybridTierTwo: returnTiers.HybridTierTwo,
@@ -383,7 +418,8 @@ export const {
     };
 }) as {
     DummyTowers: Record<string, Record<string, string>>;
-    DummyTowersMap: Record<string, DummyTowersEntry>
+    DummyTowersMap: Record<string, DummyTowersEntry>;
+    HybridButtonPositions: [number, number][];
     // HybridSpells: Record<string, AbilityTypes.BuildTinyScoutTower<any>>,
     HybridTierOne: GameTowerDef[],
     HybridTierTwo: GameTowerDef[],

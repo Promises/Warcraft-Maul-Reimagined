@@ -11,7 +11,7 @@ export class AncientProtector extends Tower implements GenericAutoAttackTower {
             if (!(this.unit.mana >= 30)) {
                 return;
             }
-            if (!(this.unit.inventorySize <= 1)) {
+            if (!(UnitInventoryCount(this.unit.handle) <= 1)) {
                 return;
             }
 

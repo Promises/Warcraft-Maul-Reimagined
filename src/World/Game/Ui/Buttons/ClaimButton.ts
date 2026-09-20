@@ -2,10 +2,10 @@ import { AbstractActionButton } from './AbstractActionButton';
 import { WarcraftMaul } from '../../../WarcraftMaul';
 import { Defender } from '../../../Entity/Players/Defender';
 import { AbstractPlayer } from '../../../Entity/Players/AbstractPlayer';
-import {MapPlayer, Frame} from "w3ts";
+import {Frame} from "w3ts";
 
 export class ClaimButton extends AbstractActionButton {
-    private static Icon: string = 'uiImport/CommandButtons/BTNClaim.dds';
+    private static Icon: string = 'uiImport\\CommandButtons\\BTNClaim.dds';
     private readonly toolTip: Frame;
     private players: Map<number, AbstractPlayer> = new Map<number, AbstractPlayer>();
 
@@ -21,16 +21,17 @@ export class ClaimButton extends AbstractActionButton {
             this.players.set(player.id, player);
         }
 
+        game.playerSync.on('claim', player => player.ClaimTowers());
     }
 
     public clickAction(): void {
-        const nativePlayer = MapPlayer.fromEvent()!;
-        const player: Defender | undefined = this.game.players.get(nativePlayer.id);
-        if (!player) {
+        // The click fires on every client; only the clicker's client sends, and the sync
+        // handler claims the towers for that player everywhere
+        if (GetTriggerPlayer() !== GetLocalPlayer()) {
             return;
         }
         this.disable();
-        player.ClaimTowers();
+        this.game.playerSync.send('claim');
         this.enable();
     }
 

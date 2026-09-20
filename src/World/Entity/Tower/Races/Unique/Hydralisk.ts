@@ -15,7 +15,7 @@ export class Hydralisk extends Tower implements KillingActionTower {
                 this.unit.incAbilityLevel(FourCC('A0EH'));
             }
 
-            if (this.unit.getAbilityLevel(FourCC('A0EH')) <= 50) {
+            if (this.unit.getAbilityLevel(FourCC('A0EI')) <= 50) {
                 this.unit.incAbilityLevel(FourCC('A0EI'));
             }
 

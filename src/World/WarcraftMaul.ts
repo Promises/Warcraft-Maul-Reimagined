@@ -20,16 +20,22 @@ import {GenericAbilityHandler} from './Entity/GenericAbilities/GenericAbilityHan
 import {CreepAbilityHandler} from './Entity/CreepAbilities/CreepAbilityHandler';
 import {VoidTicker} from './Game/VoidTicker';
 import {ActionBar} from './Game/Ui/ActionBar';
+import {HybridBuildPanel} from './Game/Ui/HybridBuild/HybridBuildPanel';
+import {PlayerSync} from './Game/PlayerSync';
+import {HostDetection} from './Game/HostDetection';
+import {LaneTransfer} from './Game/LaneTransfer';
+import {RaceSelectPanel} from './Game/Ui/RaceSelect/RaceSelectPanel';
 import {WarcraftMaulSettings} from './WarcraftMaulSettings';
 import {IMapSettings} from './IMapSettings';
 import {EventQueue} from "../lib/WCEventQueue/EventQueue";
 import {SafeEventQueue} from "../lib/WCEventQueue/SafeEventQueue";
 import {TimedEventQueue} from "../lib/WCEventQueue/TimedEventQueue";
-import {MapPlayer,Effect} from "w3ts";
+import {Effect, MapPlayer, Timer} from "w3ts";
 import {COLOUR, DecodeFourCC, SendMessage, SendMessageUnlogged, Util} from "../lib/translators";
 import {StringSink} from "../lib/Serilog/Sinks/StringSink";
-import {HybridRandomUI} from "./Game/Ui/HybridRandomUI";
-import {BuildTowerSpell} from "./Entity/Tower/BuildTowerSpell";
+
+/** True when built with WCM_DEV=1 (npm run build:dev); enables debug mode regardless of player names. */
+const DEV_BUILD = compiletime(() => process.env.WCM_DEV === '1') as boolean;
 
 export class WarcraftMaul {
 
@@ -51,11 +57,15 @@ export class WarcraftMaul {
     public scoreBoard: MultiBoard | undefined;
     private itemHandler: ItemHandler;
     public sellTower: SellTower;
-    public buildTower: BuildTowerSpell;
     public abilityHandler: GenericAbilityHandler;
 
 
     public players: Map<number, Defender> = new Map<number, Defender>();
+    public hybridBuildPanel: HybridBuildPanel;
+    public playerSync: PlayerSync;
+    public hostDetection: HostDetection;
+    public laneTransfer: LaneTransfer;
+    public raceSelectPanel: RaceSelectPanel;
 
     public enemies: Attacker[] = [];
     private readonly _creepAbilityHandler: CreepAbilityHandler;
@@ -63,7 +73,6 @@ export class WarcraftMaul {
     public eventQueue: EventQueue;
     public safeEventQueue: SafeEventQueue;
     public timedEventQueue: TimedEventQueue;
-    // public hybridUI: HybridRandomUI;
     public racePicking: RacePicking;
     private TeleportMovement: boolean = false;
     public readonly mapSettings: IMapSettings;
@@ -85,8 +94,9 @@ export class WarcraftMaul {
         this.eventQueue = new EventQueue();
         this.safeEventQueue = new SafeEventQueue(this);
         this.timedEventQueue = new TimedEventQueue(this);
-        // Should we enable debug mode?
-        if (FourCC(MapPlayer.fromIndex(COLOUR.RED)!.name) === 1466921580 || FourCC(MapPlayer.fromIndex(COLOUR.RED)!.name) === 1282368353) {
+        // Debug mode: dev builds (npm run build:dev), or player red is the World Editor / offline test player
+        const redName = FourCC(MapPlayer.fromIndex(COLOUR.RED)!.name);
+        if (DEV_BUILD || redName === FourCC('Worl') || redName === FourCC('Loca')) {
             this.debugMode = true;
             Log.replaceSinks((new StringSink(LogLevel.Debug)));
             Log.Debug("DEBUG MODE ENABLED")
@@ -140,11 +150,8 @@ export class WarcraftMaul {
         creepAbilityHandler.SetupGame(this);
 
 
-        this.diffVote = new Vote(this);
-        // this.hybridUI = new HybridRandomUI(this);
         this.racePicking = new RacePicking(this);
         this.sellTower = new SellTower(this);
-        this.buildTower = new BuildTowerSpell(this);
 
         // this.gameRoundHandler = new AbstractGameRound(this);
 
@@ -155,6 +162,13 @@ export class WarcraftMaul {
 
         SendMessage('Welcome to Warcraft Maul Reimagined');
         // SendMessage(`This is build: ${BUILD_NUMBER}, built ${BUILD_DATE}.`);
+        this.playerSync = new PlayerSync(this);
+        this.hostDetection = new HostDetection(this);
+        this.laneTransfer = new LaneTransfer(this);
+        this.playerSync.on('build', (player, data) => player.placeTower(data));
+        this.hybridBuildPanel = new HybridBuildPanel(this);
+        this.raceSelectPanel = new RaceSelectPanel(this);
+        this.diffVote = new Vote(this);
         new ActionBar(this);
     }
 
