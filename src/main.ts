@@ -6,6 +6,7 @@ import {StringSink} from "./lib/Serilog/Sinks/StringSink";
 import {FileSink} from './lib/Serilog/Sinks/FileSink';
 import {CreepAbilityHandler} from "./World/Entity/CreepAbilities/CreepAbilityHandler";
 import {WarcraftMaul} from "./World/WarcraftMaul";
+import {writeLobbyStamp} from "./World/Game/LobbyStamp";
 import {AbilityTypes} from "war3-objectdata-th";
 import BuildTinyScoutTower = AbilityTypes.BuildTinyScoutTower;
 
@@ -101,5 +102,8 @@ export class InitGame {
         return creepAbilityHandler;
     }
 }
+
+// Root of the chunk: the lobby executes it too, which is when the stamp must be written
+writeLobbyStamp();
 
 addScriptHook(W3TS_HOOK.MAIN_AFTER, tsMain);

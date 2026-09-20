@@ -6,6 +6,7 @@
 #
 #   npm run play            stage, launch, click through to the game
 #   npm run play -- -m      stage and launch only, click the menus yourself
+#   npm run play -- -l      stop in the lobby (after Create) instead of starting the game
 set -euo pipefail
 
 GAME="/Applications/Warcraft III/_retail_/x86_64/Warcraft III.app/Contents/MacOS/Warcraft III"
@@ -31,10 +32,12 @@ MENU_CLICKS=(
 )
 
 manual=false
+stop_at=""
 map=""
 for arg in "$@"; do
   case "$arg" in
     -m|--manual) manual=true ;;
+    -l|--lobby) stop_at="Create" ;;
     *) map="$arg" ;;
   esac
 done
@@ -95,6 +98,7 @@ else
         "Create") sleep 4 ;;
         *) sleep 2.5 ;;
       esac
+      [[ "$label" == "$stop_at" ]] && { echo "  stopped in the lobby"; break; }
     done
   fi
 fi
