@@ -1,4 +1,4 @@
-import {MapPlayer, Trigger} from 'w3ts';
+import {Trigger} from 'w3ts';
 import {WarcraftMaul} from '../WarcraftMaul';
 import {Defender} from '../Entity/Players/Defender';
 import {Log} from '../../lib/Serilog/Serilog';
@@ -15,6 +15,11 @@ export type SyncHandler = (player: Defender, data: string) => void;
  *
  * Commands are "name" or "name:data". send() transmits as the local player, so it must only
  * be called from code that runs for the acting player's own client.
+ *
+ * The sender's player id is encoded into the payload rather than read from GetTriggerPlayer():
+ * inside a sync event that native is unreliable across Reforged patches (it can return the
+ * local player on each client), which made an action apply to every player instead of the one
+ * who sent it.
  */
 export class PlayerSync {
     private static readonly PREFIX = 'wm';
@@ -26,11 +31,15 @@ export class PlayerSync {
             trigger.registerPlayerSyncEvent(player, PlayerSync.PREFIX, false);
         }
         trigger.addAction(() => {
-            const player = game.players.get(MapPlayer.fromEvent()!.id);
+            // Payload is "<senderId> <command>:<data>"
             const message = BlzGetTriggerSyncData() ?? '';
-            const separator = message.indexOf(':');
-            const command = separator === -1 ? message : message.substring(0, separator);
-            const data = separator === -1 ? '' : message.substring(separator + 1);
+            const space = message.indexOf(' ');
+            const senderId = space === -1 ? -1 : Number(message.substring(0, space));
+            const rest = space === -1 ? '' : message.substring(space + 1);
+            const separator = rest.indexOf(':');
+            const command = separator === -1 ? rest : rest.substring(0, separator);
+            const data = separator === -1 ? '' : rest.substring(separator + 1);
+            const player = game.players.get(senderId);
             const handler = this.handlers.get(command);
             if (!player || !handler) {
                 Log.Warning(`Unhandled sync message '${message}'`);
@@ -50,6 +59,9 @@ export class PlayerSync {
     }
 
     public send(command: string, data: string = ''): void {
-        BlzSendSyncData(PlayerSync.PREFIX, data === '' ? command : `${command}:${data}`);
+        // Encode the sender so the handler applies the action to the right player
+        const senderId = GetPlayerId(GetLocalPlayer());
+        const body = data === '' ? command : `${command}:${data}`;
+        BlzSendSyncData(PlayerSync.PREFIX, `${senderId} ${body}`);
     }
 }
