@@ -14,6 +14,7 @@ import {GameTowerDef} from "../../Game/Races/HybridRandom.types";
 import {Maze, Walkable} from "../../Antiblock/Maze";
 import {DummyTowers} from "../../Game/Races/HybridRandom";
 import {VOID_FRAGMENT_CAP} from "../Tower/Races/Void/VoidFragmentCosts";
+import {RangeIndicator} from "./RangeIndicator";
 
 export class Defender extends AbstractPlayer {
 
@@ -250,6 +251,11 @@ export class Defender extends AbstractPlayer {
     private _hybridTowers: GameTowerDef[] = [];
     private leaveTrigger: Trigger;
     private selectUnitTrigger: Trigger;
+    private deselectUnitTrigger: Trigger;
+    // Range check mode: selecting a tower draws its attack range. Per player, toggled on
+    // every client (chat and button events are synced) so the ring's handle stays in step.
+    private _rangeCheck: boolean = false;
+    private readonly rangeIndicator: RangeIndicator = new RangeIndicator(this);
     private deniedPlayers: Map<number, boolean> = new Map<number, boolean>();
     private _towers: Map<number, Tower> = new Map<number, Tower>();
     private _towersArray: Tower[] = [];
@@ -287,6 +293,9 @@ export class Defender extends AbstractPlayer {
         this.selectUnitTrigger = Trigger.create();
         this.selectUnitTrigger.registerPlayerUnitEvent(this, EVENT_PLAYER_UNIT_SELECTED, undefined);
         this.selectUnitTrigger.addAction(() => this.SelectUnit());
+        this.deselectUnitTrigger = Trigger.create();
+        this.deselectUnitTrigger.registerPlayerUnitEvent(this, EVENT_PLAYER_UNIT_DESELECTED, undefined);
+        this.deselectUnitTrigger.addAction(() => this.rangeIndicator.hide());
 
         const t = new Timer().start(0.1, false, () => {
             t.destroy();
@@ -796,6 +805,23 @@ export class Defender extends AbstractPlayer {
         if (unit?.owner.id === this.id) {
             unit.paused = false;
         }
+        if (unit && this._rangeCheck && unit.isUnitType(UNIT_TYPE_STRUCTURE)) {
+            this.rangeIndicator.show(unit);
+        }
+    }
+
+    get rangeCheck(): boolean {
+        return this._rangeCheck;
+    }
+
+    /** Flips range check mode and returns the new state. */
+    public toggleRangeCheck(): boolean {
+        this._rangeCheck = !this._rangeCheck;
+        if (!this._rangeCheck) {
+            this.rangeIndicator.hide();
+        }
+        this.sendMessage(`Range check ${this._rangeCheck ? '|cff00ff00on|r: select a tower to see its range' : '|cffff0000off|r'}`);
+        return this._rangeCheck;
     }
 
     updateBuildEffect() {

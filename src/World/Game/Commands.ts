@@ -531,6 +531,8 @@ export class Commands {
             player.sendMessage('ALL players are now |cFFFF0000denied|r access to your spawn!');
         } else if (command[0] === 'claim') {
             player.ClaimTowers();
+        } else if (command[0] === 'range') {
+            player.toggleRangeCheck();
         } else if (command[0] === 'gray' || command[0] === 'grey') {
             this.game.laneTransfer.moveToGray(player);
         } else if (command[0] === 'forceblitz') {
