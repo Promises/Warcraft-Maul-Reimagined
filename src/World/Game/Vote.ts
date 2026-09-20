@@ -129,8 +129,7 @@ export class Vote {
 
         const diffIndex: number = R2I((this.difficulty - 100.00) / 100.00 + ModuloReal((this.difficulty - 100.00) / 100.00, 1.00));
         this.difficulty = Math.floor(this.difficulty);
-        // Percentage: the BJ divides by 100, the raw handicap setter would not
-        SetPlayerHandicapBJ(Player(PLAYER_NEUTRAL_PASSIVE)!, this.difficulty);
+        // No player handicap: creeps are scaled per unit in Creep (HP, armor, abilities)
         SendMessage(`Difficulty was set to ${this.difficulty}% (${Util.ColourString(settings.DIFFICULTY_COLOURS[diffIndex],
             settings.DIFFICULTY_STRINGS[diffIndex])})`);
 

@@ -202,10 +202,8 @@ export class Commands {
 
                 }
                 player.sendMessage(`Difficulty was set to ${amount}%`);
+                // Applies to creeps spawned from now on; Creep scales each unit itself
                 this.game.diffVote.difficulty = amount;
-                for (const enemy of this.game.enemies) {
-                    enemy.setHandicap(amount);
-                }
                 break;
             case 'wave':
                 amount = Util.ParsePositiveInt(command[1]);
