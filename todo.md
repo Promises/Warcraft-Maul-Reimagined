@@ -7,7 +7,7 @@
 - [x] Range check mode (`-range` / action bar button, untested in-game): a toggle (action bar button and/or chat command, per player, local) that draws the attack range around the currently selected tower while enabled. Selection events already exist per player (`Defender.SelectUnit`); range from `BlzGetUnitWeaponRealField(ATTACK_RANGE)`; render as a local-only image/effect ring like the maze grid.
 
 ## Backlog
-- [ ] Audit follow-ups from the Buildtools comparison: Wyvern radius 128 vs 500 (TODOs in code), Iron Golem spike angles, `-killall` uses RemoveUnit instead of KillUnit.
-- [ ] `war3map.imp` regeneration defect in the build (imports listed twice / stale entries).
+- [x] Audit follow-ups from the Buildtools comparison: Wyvern radius 128 vs 500 (TODOs in code), Iron Golem spike angles, `-killall` uses RemoveUnit instead of KillUnit.
+- [x] `war3map.imp` regeneration defect in the build (imports listed twice / stale entries). The build now generates it from the archive contents.
 - [ ] Lobby stamp carrier: the lobby timestamp rides in the `ANcl` (Channel) tooltip on the local client; harmless today, pick a dedicated dummy ability if Channel ever gets shown.
 - [ ] Two clients on one user account share `CustomMapData/wm-lobby.txt`, so the lobby host source ties on a single machine (race and disk still work). Only matters for local testing.

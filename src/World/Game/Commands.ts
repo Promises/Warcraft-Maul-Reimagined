@@ -262,7 +262,8 @@ export class Commands {
             case 'killall':
                 const spawnedCreeps: SpawnedCreeps | undefined = this.game.worldMap.spawnedCreeps;
                 if (spawnedCreeps !== undefined) {
-                    spawnedCreeps.unitMap.forEach(u => u.unit.destroy());
+                    // Kill, not remove: death events (kill gold, wave end) must run as in a real wave
+                    spawnedCreeps.unitMap.forEach(u => u.unit.kill());
                 }
                 break;
             case 'events':

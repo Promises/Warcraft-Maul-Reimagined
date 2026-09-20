@@ -11,14 +11,12 @@ export class Wyvern extends Tower implements AttackActionTower {
                 return;
             }
         }
-        // TODO:
         const sourceUnit = Unit.fromHandle(this.game.gameDamageEngineGlobals.udg_DamageEventSource);
         if (sourceUnit === this.unit) {
-            // TODO: Validate
+            // Lightning arcs to creeps right next to the tower (the original 128, not the wider
+            // radius the port briefly used)
             const grp = Group.create();
-            grp?.enumUnitsInRange(this.unit.x, this.unit.y, 500.00, () => true)
-
-            // unitsInRange.enumUnitsInRange(loc, 128, null);
+            grp?.enumUnitsInRange(this.unit.x, this.unit.y, 128.00, () => true)
 
             grp?.for(() => {
                 const u = Unit.fromEnum();

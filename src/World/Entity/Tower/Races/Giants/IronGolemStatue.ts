@@ -11,7 +11,11 @@ export class IronGolemStatue extends Tower implements TickingTower {
             const y: number = this.unit.y;
             const impalers: Unit[] = [];
 
+            // Each impaler spawns at one angle and drives its spikes toward another: the four
+            // diagonal ones a quarter turn on (135 -> 45, 225 -> 135, ...), so the spikes cross
+            // the tower's surroundings instead of just pointing outward; the axis ones straight.
             const angles = [135, 225, 315, 45, 0, 90, 180, 270];
+            const targetAngles = [45, 135, 225, 315, 0, 90, 180, 270];
 
             angles.forEach((angle) => {
                 const impaler = Unit.create(this.owner, FourCC('u008'), x + 100 * Math.cos(angle * Math.PI / 180), y + 100 * Math.sin(angle * Math.PI / 180), 0);
@@ -23,8 +27,8 @@ export class IronGolemStatue extends Tower implements TickingTower {
             });
 
             impalers.forEach((impaler, index) => {
-                const angle = angles[index];
-                impaler?.issueOrderAt('impale', x + 150 * Math.cos(angle * Math.PI / 180), y + 150 * Math.sin(angle * Math.PI / 180));
+                const angle = targetAngles[index];
+                impaler.issueOrderAt('impale', x + 150 * Math.cos(angle * Math.PI / 180), y + 150 * Math.sin(angle * Math.PI / 180));
             });
         }
     }

@@ -46,6 +46,29 @@ function main() {
   // }
 }
 
+/** The editor's own map files; everything else in the folder is an import. */
+function isMapDataFile(archivePath: string): boolean {
+  const name = archivePath.toLowerCase();
+  return name.startsWith('war3map') || name === 'conversation.json';
+}
+
+/**
+ * The import manager listing (war3map.imp) for the editor. The game reads imports straight
+ * from the archive, but the editor only shows and keeps files that are listed here, so the
+ * list is generated from the archive contents instead of being maintained by hand (it had
+ * drifted: files missing, files long deleted).
+ * Format: version 1, count, then per file a flag byte and a zero-terminated path; flag 29
+ * is what the editor writes for imports kept at their full custom path.
+ */
+function buildImportList(imports: string[]): ArrayBuffer {
+  const CUSTOM_PATH = 29;
+  const entries = imports.map(name => Buffer.concat([Buffer.from([CUSTOM_PATH]), Buffer.from(name, 'latin1'), Buffer.from([0])]));
+  const header = Buffer.alloc(8);
+  header.writeUInt32LE(1, 0);
+  header.writeUInt32LE(imports.length, 4);
+  return toArrayBuffer(Buffer.concat([header, ...entries]));
+}
+
 /**
  * Creates a w3x archive from a directory
  * @param output The output filename
@@ -55,13 +78,21 @@ export function createMapFromDir(output: string, dir: string) {
   const map = new War3Map();
   const files = getFilesInDirectory(dir);
 
-  map.archive.resizeHashtable(files.length);
+  map.archive.resizeHashtable(files.length + 1);
 
+  const imports: string[] = [];
   for (const fileName of files) {
     const contents = toArrayBuffer(fs.readFileSync(fileName));
     // The game looks map files up by the exact path string (no separator normalisation), so
     // the archive, TOC entries and every path in code use backslashes like Blizzard's tools.
     const archivePath = path.relative(dir, fileName).split(path.sep).join('\\');
+    if (archivePath.toLowerCase() === 'war3map.imp') {
+      // Regenerated below from what is actually in the archive
+      continue;
+    }
+    if (!isMapDataFile(archivePath)) {
+      imports.push(archivePath);
+    }
     const imported = map.import(archivePath, contents);
 
     if (!imported) {
@@ -69,6 +100,7 @@ export function createMapFromDir(output: string, dir: string) {
       continue;
     }
   }
+  map.import('war3map.imp', buildImportList(imports));
 
   const result = map.save();
 
