@@ -7,7 +7,7 @@ import { Maze, Walkable } from './Maze';
 import { PlayerSpawns } from '../Entity/PlayerSpawns';
 import { CheckPoint } from '../Entity/CheckPoint';
 import { AbstractGameRound } from '../Game/BaseMaul/AbstractGameRound';
-import {Group, Trigger, Unit} from "w3ts";
+import {Group, Timer, Trigger, Unit} from "w3ts";
 import {COLOUR} from "../../lib/translators";
 
 export class AntiBlock {
@@ -47,12 +47,9 @@ export class AntiBlock {
         const antiJuggleCreeps: Creep[] = [];
         if (isWaveInProgress && antiJuggleEnabled) {
             let isJuggling: boolean = false;
-            const grp = Group.create();
-            grp?.enumUnitsInRange(consUnit.x, consUnit.y, 128.00, () => true)
-
-            // unitsInRange.enumUnitsInRange(loc, 128, null);
-
-            grp?.for(() =>{
+            const grp = Group.create()!;
+            grp.enumUnitsInRange(consUnit.x, consUnit.y, 128.00, () => true);
+            grp.for(() => {
                 const enumUnit = Unit.fromEnum();
                 const ownerID: COLOUR | undefined = enumUnit?.getOwner()?.id;
                 switch (ownerID) {
@@ -75,6 +72,8 @@ export class AntiBlock {
                 }
             });
 
+
+            grp.destroy();
 
             if (isJuggling) {
                 return this.juggling(consUnit, player, antiJuggleCreeps);
@@ -162,9 +161,14 @@ export class AntiBlock {
     }
 
     private cancelBuilding(consUnit: Unit): void {
-        TriggerSleepAction(0.01);
-        consUnit.issueImmediateOrder(settings.UNIT_ORDER_CANCEL_UPGRADE);
-        consUnit.destroy();
+        // Cancel on a 0-delay timer instead of TriggerSleepAction: it runs after the
+        // construct-start event settles without pausing this (often concurrent) handler thread.
+        const timer = Timer.create();
+        timer.start(0, false, () => {
+            consUnit.issueImmediateOrder(settings.UNIT_ORDER_CANCEL_UPGRADE);
+            consUnit.destroy();
+            timer.destroy();
+        });
     }
 
     private CanceledBuilding(): void {

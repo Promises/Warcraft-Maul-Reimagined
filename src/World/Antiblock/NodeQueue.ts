@@ -1,5 +1,6 @@
 import { Node } from './Node';
 
+/** FIFO queue for the maze BFS. Index-based so pop is O(1); shifting made the BFS O(n^2). */
 export class NodeQueue {
     private _nodes: Node[] = [];
     private _i: number = 0;
@@ -17,6 +18,6 @@ export class NodeQueue {
     }
 
     public pop(): void {
-        this._nodes.shift();
+        this._i++;
     }
 }
