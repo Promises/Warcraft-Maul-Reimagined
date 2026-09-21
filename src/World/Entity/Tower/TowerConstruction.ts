@@ -31,6 +31,7 @@ export class TowerConstruction {
     private killingActionsTrigger: Trigger;
     private readonly game: WarcraftMaul;
     private lootBoxerHander: LootBoxerHandler;
+    private readonly upgradingFrom: Map<number, number> = new Map<number, number>();
     public lootBoxerTowers: number[] = [
         FourCC('u044'), // Tier 1
         FourCC('u045'), // Tier 2
@@ -58,14 +59,24 @@ export class TowerConstruction {
 
         this.towerUpgradeTrigger = Trigger.create();
         this.towerUpgradeTrigger.registerAnyUnitEvent(EVENT_PLAYER_UNIT_UPGRADE_FINISH);
-        // Logs the gold before an upgrade, to measure what the engine charges or refunds
+        // The type a unit had before an upgrade, by unit id: at UPGRADE_FINISH the unit is
+        // already the new type, and the price correction below needs the old one
         const upgradeStart = Trigger.create();
         upgradeStart.registerAnyUnitEvent(EVENT_PLAYER_UNIT_UPGRADE_START);
         upgradeStart.addAction(() => {
             const unit = Unit.fromEvent();
             const owner = unit ? this.game.players.get(unit.owner.id) : undefined;
             if (unit && owner) {
+                this.upgradingFrom.set(unit.id, unit.typeId);
                 Log.Info(`Upgrade started: ${unit.name} (${DecodeFourCC(unit.typeId)}, cost ${GetUnitGoldCost(unit.typeId)}) for ${owner.getPlayerName()}, gold ${owner.getGold()}`);
+            }
+        });
+        const upgradeCancel = Trigger.create();
+        upgradeCancel.registerAnyUnitEvent(EVENT_PLAYER_UNIT_UPGRADE_CANCEL);
+        upgradeCancel.addAction(() => {
+            const unit = Unit.fromEvent();
+            if (unit) {
+                this.upgradingFrom.delete(unit.id);
             }
         });
         this.towerUpgradeTrigger.addAction(() => this.UpgradeTower());
@@ -100,6 +111,7 @@ export class TowerConstruction {
         }
         const instance: Tower | undefined = owner.GetTower(tower.id);
         Log.Info(`Upgrade finished: ${tower.name} (${DecodeFourCC(tower.typeId)}, cost ${GetUnitGoldCost(tower.typeId)}) for ${owner.getPlayerName()}, gold ${owner.getGold()}, previous value ${instance?.towerValue ?? 'none'}`);
+        this.correctUpgradePrice(tower, owner);
         if (instance) {
             instance.Sell();
             const newTower: Tower = this.game.worldMap.towerConstruction.SetupTower(tower, owner);
@@ -183,6 +195,25 @@ export class TowerConstruction {
         }
 
         this.SetupTower(tower, owner);
+    }
+
+    /**
+     * Reforged refunds the price difference when a unit upgrades into a cheaper one (the
+     * Galaxy Druid, 100 gold, turning into the free Bear or Crow handed 100 gold back). The
+     * map prices an upgrade as the new unit's cost on top of what was paid, so the refund
+     * is taken back.
+     */
+    private correctUpgradePrice(tower: Unit, owner: Defender): void {
+        const previousType = this.upgradingFrom.get(tower.id);
+        this.upgradingFrom.delete(tower.id);
+        if (previousType === undefined) {
+            return;
+        }
+        const refunded = GetUnitGoldCost(previousType) - GetUnitGoldCost(tower.typeId);
+        if (refunded > 0) {
+            owner.giveGold(-refunded);
+            Log.Info(`Upgrade refund of ${refunded} gold taken back from ${owner.getPlayerName()}`);
+        }
     }
 
     /**
