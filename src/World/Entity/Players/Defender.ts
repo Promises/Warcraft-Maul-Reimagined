@@ -15,6 +15,7 @@ import {Maze, Walkable} from "../../Antiblock/Maze";
 import {DummyTowers} from "../../Game/Races/HybridRandom";
 import {VOID_FRAGMENT_CAP} from "../Tower/Races/Void/VoidFragmentCosts";
 import {RangeIndicator} from "./RangeIndicator";
+import {HYBRID_BUILD_HOTKEYS} from "../../Game/Ui/HybridBuild/HybridBuildPanel";
 
 export class Defender extends AbstractPlayer {
 
@@ -302,12 +303,34 @@ export class Defender extends AbstractPlayer {
             this.escapeTrigger = Trigger.create();
             this.escapeTrigger.registerPlayerKeyEvent(this, OSKEY_ESCAPE, 0, true);
             this.escapeTrigger.addAction(() => this.game.hybridBuildPanel.close(this));
+            this.registerBuildHotkeys();
         });
 
 
         this.game.gameCommandHandler.commandTrigger.registerPlayerChatEvent(this, '', false);
     }
 
+
+    /**
+     * Hybrid build menu hotkeys: B opens and closes it, the command card keys pick a tower
+     * while it is open. Key events are synced player events, so the handlers run on every
+     * client for this player. A player who has not hybrid randomed is left alone: B is the
+     * game's own build hotkey for everyone else.
+     */
+    private registerBuildHotkeys(): void {
+        const openKey = Trigger.create();
+        openKey.registerPlayerKeyEvent(this, OSKEY_B, 0, true);
+        openKey.addAction(() => {
+            if (this.hasHybridRandomed) {
+                this.game.hybridBuildPanel.toggle(this);
+            }
+        });
+        HYBRID_BUILD_HOTKEYS.forEach((key, slot) => {
+            const trigger = Trigger.create();
+            trigger.registerPlayerKeyEvent(this, key, 0, true);
+            trigger.addAction(() => this.game.hybridBuildPanel.hotkey(this, slot));
+        });
+    }
 
     private mouseMoved() {
         this.mouseX = BlzGetTriggerPlayerMouseX();

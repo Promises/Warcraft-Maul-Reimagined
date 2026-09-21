@@ -167,6 +167,11 @@ export class RacePicking {
 
         if (!player.hasHybridRandomed) {
             player.hybridBuilder = Unit.create(player, FourCC('e00I'), player.getCenterX(), player.getCenterY(), 0);
+            // The native build menu would show the placeholder towers; building goes through
+            // the panel instead. The ability stays for the build orders the panel issues.
+            if (player.hybridBuilder) {
+                BlzUnitHideAbility(player.hybridBuilder.handle, FourCC('AUbu'), true);
+            }
             // player.races.push(player.hybridBuilder);
 
         }

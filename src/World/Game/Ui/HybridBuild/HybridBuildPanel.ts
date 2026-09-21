@@ -14,6 +14,18 @@ const PANEL_CENTER_X = 0.4;
 const PANEL_BOTTOM_Y = 0.165;
 const TIERS = 9;
 const CANCEL_SLOT = COLUMNS * ROWS - 1;
+// One hotkey per grid slot, the command card's layout: QWER / ASDF / ZXCV
+export const HYBRID_BUILD_HOTKEYS: oskeytype[] = [
+    OSKEY_Q, OSKEY_W, OSKEY_E, OSKEY_R,
+    OSKEY_A, OSKEY_S, OSKEY_D, OSKEY_F,
+    OSKEY_Z, OSKEY_X, OSKEY_C, OSKEY_V,
+];
+const HOTKEY_LABELS = ['Q', 'W', 'E', 'R', 'A', 'S', 'D', 'F', 'Z', 'X', 'C', 'V'];
+
+/** The grid slot of a tier: three towers per row, the right column is kept for cancel. */
+function slotOfTier(tier: number): number {
+    return Math.floor(tier / (COLUMNS - 1)) * COLUMNS + tier % (COLUMNS - 1);
+}
 
 /**
  * Tower picker for hybrid random players. Its click, chat and key events all fire on every
@@ -49,11 +61,9 @@ export class HybridBuildPanel {
 
         // A closure per tier: a classic for loop would share one loop variable in the generated Lua
         for (const tier of Array.from({length: TIERS}, (_, index) => index)) {
-            // Three towers per row; the right column is kept for cancel
-            const slot = Math.floor(tier / (COLUMNS - 1)) * COLUMNS + tier % (COLUMNS - 1);
-            const [x, y] = slotCenter(slot);
+            const [x, y] = slotCenter(slotOfTier(tier));
             this.tierButtons.push(new IconButton(game, `hybridBuildTier${tier}`, this.panel, x, y, BUTTON_SIZE,
-                player => this.pickTower(player, tier)));
+                player => this.pick(player, tier)));
         }
         const [cancelX, cancelY] = slotCenter(CANCEL_SLOT);
         this.cancelButton = new IconButton(game, 'hybridBuildCancel', this.panel, cancelX, cancelY, BUTTON_SIZE,
@@ -66,15 +76,34 @@ export class HybridBuildPanel {
     public refresh(player: Defender): void {
         player.hybridTowers.forEach((tower, tier) => this.tierButtons[tier].setContent(player, {
             icon: tower.icon ?? '',
-            title: tower.name,
+            title: `|cffffcc00${HOTKEY_LABELS[slotOfTier(tier)]}|r  ${tower.name}`,
             description: tower.toolTipExtended,
             goldCost: tower.goldCost,
         }));
         this.cancelButton.setContent(player, {
             icon: 'ReplaceableTextures\\CommandButtons\\BTNCancel.blp',
-            title: 'Close',
-            description: 'Close the build menu and stop building',
+            title: `|cffffcc00${HOTKEY_LABELS[CANCEL_SLOT]}|r  Close`,
+            description: 'Close the build menu and stop building (Escape)',
         });
+    }
+
+    /**
+     * A hotkey press while the panel is open: the slot's tower enters build mode, V closes.
+     * Key events are synced player events, so this runs on every client like a click.
+     */
+    public hotkey(player: Defender, slot: number): void {
+        if (!this.openFor[player.id]) {
+            return;
+        }
+        if (slot === CANCEL_SLOT) {
+            this.close(player);
+            return;
+        }
+        const row = Math.floor(slot / COLUMNS);
+        const column = slot % COLUMNS;
+        if (column < COLUMNS - 1) {
+            this.pick(player, row * (COLUMNS - 1) + column);
+        }
     }
 
     /** Toggles the panel for the acting player; runs on every client (button and -build). */
@@ -92,6 +121,7 @@ export class HybridBuildPanel {
             return;
         }
         this.openFor[player.id] = true;
+        this.showTiers(player, undefined);
         this.setVisible(player, true);
     }
 
@@ -102,10 +132,20 @@ export class HybridBuildPanel {
         this.setVisible(player, false);
     }
 
-    private pickTower(player: Defender, tier: number): void {
+    /** Enters build mode for a tier; the panel then shows only that tower (and Close). */
+    private pick(player: Defender, tier: number): void {
         if (this.openFor[player.id] && player.hybridTowers[tier]) {
             player.startBuilding(tier);
+            this.showTiers(player, tier);
         }
+    }
+
+    /** Local view: all tiers, or a single one while it is being placed. */
+    private showTiers(player: Defender, only: number | undefined): void {
+        if (!player.isLocal()) {
+            return;
+        }
+        this.tierButtons.forEach((button, tier) => button.setVisible(only === undefined || tier === only));
     }
 
     private setVisible(player: Defender, visible: boolean): void {
