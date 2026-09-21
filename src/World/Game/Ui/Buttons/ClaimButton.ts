@@ -6,16 +6,11 @@ import {Frame} from "w3ts";
 
 export class ClaimButton extends AbstractActionButton {
     private static Icon: string = 'uiImport\\CommandButtons\\BTNClaim.dds';
-    private readonly toolTip: Frame;
     private players: Map<number, AbstractPlayer> = new Map<number, AbstractPlayer>();
 
-    constructor(game: WarcraftMaul, x: number, y: number, size: number, idx: number = 0) {
-        super(game, `claimButton${idx}`, ClaimButton.Icon, x, y, size);
-
-        this.toolTip = Frame.createType('FaceFrameTooltip', this.backdropHandle, 0, 'TEXT', '')!;
-        this.buttonHandle.setTooltip(this.toolTip);
-        this.toolTip.setAbsPoint(FRAMEPOINT_CENTER, x, y + 0.025);
-        this.toolTip.setText('Claim all towers in your region');
+    constructor(game: WarcraftMaul, rail: Frame, offsetX: number, size: number, idx: number = 0) {
+        super(game, `claimButton${idx}`, ClaimButton.Icon, rail, offsetX, size);
+        this.setTooltip('Claim', 'Claims every tower built in your region. |cffffcc00-claim|r');
 
         for (const player of this.game.players.values()) {
             this.players.set(player.id, player);

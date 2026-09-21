@@ -4,15 +4,9 @@ import {Frame} from 'w3ts';
 
 export class HybridBuildButton extends AbstractActionButton {
     private static Icon: string = 'ReplaceableTextures\\CommandButtons\\BTNBasicStruct.blp';
-    private readonly toolTip: Frame;
-
-    constructor(game: WarcraftMaul, x: number, y: number, size: number, idx: number = 0) {
-        super(game, `hybridBuildButton${idx}`, HybridBuildButton.Icon, x, y, size);
-
-        this.toolTip = Frame.createType('FaceFrameTooltip', this.backdropHandle, 0, 'TEXT', '')!;
-        this.buttonHandle.setTooltip(this.toolTip);
-        this.toolTip.setAbsPoint(FRAMEPOINT_CENTER, x, y + 0.025);
-        this.toolTip.setText('Open the hybrid build menu');
+    constructor(game: WarcraftMaul, rail: Frame, offsetX: number, size: number, idx: number = 0) {
+        super(game, `hybridBuildButton${idx}`, HybridBuildButton.Icon, rail, offsetX, size);
+        this.setTooltip('Hybrid build |cffffcc00(B)|r', 'The nine-tower build menu. Available after hybrid randoming. |cffffcc00-build|r');
     }
 
     public clickAction(): void {

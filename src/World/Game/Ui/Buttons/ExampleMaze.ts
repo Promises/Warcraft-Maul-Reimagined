@@ -9,23 +9,17 @@ import {MapPlayer,Frame} from "w3ts";
 export class ExampleMaze extends AbstractActionButton {
     private static enabledIcon: string = 'uiImport\\CommandButtonsDisabled\\DISBTNMAZEAlpha.dds';
     private static disabledIcon: string = 'uiImport\\CommandButtons\\BTNMAZEAlpha.dds';
-    private readonly toolTip: Frame;
     private currentFade: number = 255;
     private defaultSize: number;
     private currentSize: number;
     private increaseFade: boolean = false;
     private players: Map<number, AbstractPlayer> = new Map<number, AbstractPlayer>();
 
-    constructor(game: WarcraftMaul, x: number, y: number, size: number, idx: number = 0) {
-        super(game, `mazeButton${idx}`, ExampleMaze.disabledIcon, x, y, size);
-        this.toolTip = Frame.createType('FaceFrameTooltip', this.backdropHandle, 0, 'TEXT', '')!;
+    constructor(game: WarcraftMaul, rail: Frame, offsetX: number, size: number, idx: number = 0) {
+        super(game, `mazeButton${idx}`, ExampleMaze.disabledIcon, rail, offsetX, size);
         this.defaultSize = size;
         this.currentSize = (size * 2);
-        this.buttonHandle
-        this.buttonHandle.setTooltip(this.toolTip)
-
-        this.toolTip.setAbsPoint(FRAMEPOINT_CENTER, x, y + 0.025);
-        this.toolTip.setText('Show/Hide Sample Maze')
+        this.setTooltip('Sample maze', 'Shows or hides the advanced sample maze in your lane.');
 
         for (const player of this.game.players.values()) {
             this.players.set(player.id, player);
@@ -43,8 +37,6 @@ export class ExampleMaze extends AbstractActionButton {
         this.disable();
         this.players.delete(player.id);
         this.backdropHandle.setAlpha(255);
-        this.backdropHandle.setSize(this.defaultSize, this.defaultSize)
-        this.buttonHandle.setSize(this.defaultSize, this.defaultSize)
         const firstSpawn: CheckPoint | undefined = this.game.worldMap.playerSpawns[player.lane].spawnOne;
         if (firstSpawn === undefined) {
             this.enable();
@@ -83,16 +75,11 @@ export class ExampleMaze extends AbstractActionButton {
     }
 
     public setIcon(enabled: boolean): void {
-        if (enabled) {
-            if (GetTriggerPlayer() === GetLocalPlayer()) {
-                this.backdropHandle.setTexture(ExampleMaze.enabledIcon, 0, true)
-            }
-        } else {
-            if (GetTriggerPlayer() === GetLocalPlayer()) {
-                this.backdropHandle.setTexture(ExampleMaze.disabledIcon, 0, true)
-            }
+        const local = GetTriggerPlayer() === GetLocalPlayer();
+        if (local) {
+            this.backdropHandle.setTexture(enabled ? ExampleMaze.enabledIcon : ExampleMaze.disabledIcon, 0, true);
         }
-
+        this.setOn(enabled, local);
     }
 
     public fadeInAndOut(): boolean {
