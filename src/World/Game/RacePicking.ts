@@ -1,5 +1,5 @@
 import {WarcraftMaul} from '../WarcraftMaul';
-import {Defender} from '../Entity/Players/Defender';
+import {Defender, HYBRID_BUILD_ABILITY} from '../Entity/Players/Defender';
 import {Race} from './Races/Race';
 import {
     DummyTowers,
@@ -170,7 +170,7 @@ export class RacePicking {
             // The native build menu would show the placeholder towers; building goes through
             // the panel instead. The ability stays for the build orders the panel issues.
             if (player.hybridBuilder) {
-                BlzUnitHideAbility(player.hybridBuilder.handle, FourCC('AUbu'), true);
+                BlzUnitHideAbility(player.hybridBuilder.handle, HYBRID_BUILD_ABILITY, true);
             }
             // player.races.push(player.hybridBuilder);
 

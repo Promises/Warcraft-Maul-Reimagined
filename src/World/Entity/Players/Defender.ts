@@ -17,6 +17,9 @@ import {VOID_FRAGMENT_CAP} from "../Tower/Races/Void/VoidFragmentCosts";
 import {RangeIndicator} from "./RangeIndicator";
 import {HYBRID_BUILD_HOTKEYS} from "../../Game/Ui/HybridBuild/HybridBuildPanel";
 
+// The hybrid builder's build ability (AUbu); its command card button is hidden
+export const HYBRID_BUILD_ABILITY: number = FourCC('AUbu');
+
 export class Defender extends AbstractPlayer {
 
     public metadata: Record<string, any> = {};
@@ -203,7 +206,12 @@ export class Defender extends AbstractPlayer {
         }
         const center = maze.getHighlightedPointsCenter(points)!;
         const dummyId = DummyTowers[`${this.id + 1}`][`${tier + 1}`];
-        if (!this.hybridBuilder.issueBuildOrder(FourCC(dummyId), center.x, center.y)) {
+        // The build ability is hidden from the command card (the placeholders must not show)
+        // and a hidden ability refuses orders, so it is shown for the order and hidden again
+        BlzUnitHideAbility(this.hybridBuilder.handle, HYBRID_BUILD_ABILITY, false);
+        const ordered = this.hybridBuilder.issueBuildOrder(FourCC(dummyId), center.x, center.y);
+        BlzUnitHideAbility(this.hybridBuilder.handle, HYBRID_BUILD_ABILITY, true);
+        if (!ordered) {
             this.sendMessage('The builder could not start building there');
             return;
         }
