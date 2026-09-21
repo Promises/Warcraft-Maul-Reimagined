@@ -19,20 +19,20 @@ const BUTTON_HEIGHT = 0.03;
 const RADIO_SIZE = 0.016;
 const RADIO_INSET = 0.006;
 const LABEL_GAP = 0.006;
+// The ESC menu's radio art (see war3skins.txt EscMenuRadioButton*)
+const RADIO_RING = 'UI\\Widgets\\EscMenu\\Human\\radiobutton-background.blp';
+const RADIO_DOT = 'UI\\Widgets\\EscMenu\\Human\\radiobutton-button.blp';
 
 /**
- * A column of mutually exclusive options with the game's own radio buttons
- * (EscMenuRadioButtonTemplate, a GLUECHECKBOX with the round ESC-menu art; the template is
- * loaded because our TOC includes EscMenuTemplates.fdf). A checkbox toggles itself on click,
- * so the column keeps exactly one checked: checking one unchecks the rest, and unchecking the
- * selected one is undone. The label next to each radio is an invisible button, so clicking
- * the text selects too.
+ * A column of mutually exclusive options drawn as radio buttons. The game's GLUECHECKBOX
+ * toggles itself and its checked state cannot be set reliably from script, so each option is
+ * a plain button carrying the ESC-menu radio art (war3skins: radiobutton-background, and
+ * radiobutton-button as the dot) and the column shows the dot on exactly one of them. An
+ * invisible button over each label makes the text clickable too.
  */
 class OptionColumn {
-    private readonly radios: Frame[] = [];
+    private readonly dots: Frame[] = [];
     private selected: number = 0;
-    // Set while the column changes states itself, so the resulting events are ignored
-    private updating: boolean = false;
 
     constructor(game: WarcraftMaul, name: string, parent: Frame, left: number, top: number,
                 header: string, labels: string[]) {
@@ -44,67 +44,48 @@ class OptionColumn {
 
         labels.forEach((label, index) => {
             const rowTop = top - HEADER_HEIGHT - index * ROW_SPACING;
-            const radio = Frame.create('EscMenuRadioButtonTemplate', parent, 0, 0)!;
+            const rowCenterY = rowTop - ROW_HEIGHT / 2;
+
+            const radio = Frame.createType(`${name}Row${index}Radio`, parent, 0, 'BUTTON', '')!;
             radio.setSize(RADIO_SIZE, RADIO_SIZE);
-            radio.setAbsPoint(FRAMEPOINT_LEFT, left + RADIO_INSET, rowTop - ROW_HEIGHT / 2);
+            radio.setAbsPoint(FRAMEPOINT_LEFT, left + RADIO_INSET, rowCenterY);
+            const ring = Frame.createType(`${name}Row${index}Ring`, radio, 0, 'BACKDROP', '')!;
+            ring.setAllPoints(radio);
+            ring.setTexture(RADIO_RING, 0, true);
+            const dot = Frame.createType(`${name}Row${index}Dot`, radio, 0, 'BACKDROP', '')!;
+            dot.setAllPoints(radio);
+            dot.setTexture(RADIO_DOT, 0, true);
 
             const text = Frame.createType(`${name}Row${index}Label`, parent, 0, 'TEXT', '')!;
             text.setSize(COLUMN_WIDTH - RADIO_INSET - RADIO_SIZE - LABEL_GAP, ROW_HEIGHT);
-            text.setAbsPoint(FRAMEPOINT_LEFT, left + RADIO_INSET + RADIO_SIZE + LABEL_GAP, rowTop - ROW_HEIGHT / 2);
+            text.setAbsPoint(FRAMEPOINT_LEFT, left + RADIO_INSET + RADIO_SIZE + LABEL_GAP, rowCenterY);
             text.setText(label);
             BlzFrameSetTextAlignment(text.handle, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
-
-            // Invisible click target over the label
             const labelButton = Frame.createType(`${name}Row${index}Hit`, parent, 0, 'BUTTON', '')!;
             labelButton.setAllPoints(text);
 
-            // Events fire on every client with the acting player; the selection is the local view
-            const clicks = Trigger.create();
-            clicks.triggerRegisterFrameEvent(radio, FRAMEEVENT_CHECKBOX_CHECKED);
-            clicks.triggerRegisterFrameEvent(radio, FRAMEEVENT_CHECKBOX_UNCHECKED);
-            clicks.addAction(() => {
-                if (this.updating || GetTriggerPlayer() !== GetLocalPlayer()) {
-                    return;
-                }
-                if (Frame.getEventHandle() === FRAMEEVENT_CHECKBOX_CHECKED) {
+            // Clicks fire on every client with the acting player; the selection is the local view
+            for (const button of [radio, labelButton]) {
+                const trigger = Trigger.create();
+                trigger.triggerRegisterFrameEvent(button, FRAMEEVENT_CONTROL_CLICK);
+                trigger.addAction(() => {
+                    if (GetTriggerPlayer() !== GetLocalPlayer()) {
+                        return;
+                    }
+                    button.setEnabled(false);
+                    button.setEnabled(true);
                     this.select(index);
-                } else if (index === this.selected) {
-                    // The selected radio cannot be unchecked, only replaced
-                    this.setChecked(radio, true);
-                }
-            });
-            const labelClick = Trigger.create();
-            labelClick.triggerRegisterFrameEvent(labelButton, FRAMEEVENT_CONTROL_CLICK);
-            labelClick.addAction(() => {
-                if (GetTriggerPlayer() !== GetLocalPlayer()) {
-                    return;
-                }
-                labelButton.setEnabled(false);
-                labelButton.setEnabled(true);
-                this.select(index);
-            });
-            trackHover(game, radio);
-            trackHover(game, labelButton);
-            this.radios.push(radio);
+                });
+                trackHover(game, button);
+            }
+            this.dots.push(dot);
         });
         this.select(0);
     }
 
     public select(index: number): void {
         this.selected = index;
-        this.radios.forEach((radio, i) => this.setChecked(radio, i === index));
-    }
-
-    private setChecked(radio: Frame, checked: boolean): void {
-        this.updating = true;
-        if ((radio.value > 0) !== checked) {
-            radio.setValue(checked ? 1 : 0);
-            if ((radio.value > 0) !== checked) {
-                // Some builds only flip a checkbox through a click
-                radio.click();
-            }
-        }
-        this.updating = false;
+        this.dots.forEach((dot, i) => dot.setVisible(i === index));
     }
 
     public get selection(): number {
