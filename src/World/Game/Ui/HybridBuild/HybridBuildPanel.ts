@@ -12,7 +12,8 @@ const BUTTON_SIZE = 0.032;
 const BUTTON_SPACING = 0.036;
 const PANEL_PADDING = 0.008;
 const PANEL_CENTER_X = 0.4;
-const PANEL_BOTTOM_Y = 0.165;
+// Above the action bar rail (its top is at 0.181)
+const PANEL_BOTTOM_Y = 0.19;
 const TIERS = 9;
 const CANCEL_SLOT = COLUMNS * ROWS - 1;
 // One hotkey per grid slot, the command card's layout: QWER / ASDF / ZXCV
@@ -63,12 +64,15 @@ export class HybridBuildPanel {
         // A closure per tier: a classic for loop would share one loop variable in the generated Lua
         for (const tier of Array.from({length: TIERS}, (_, index) => index)) {
             const [x, y] = slotCenter(slotOfTier(tier));
-            this.tierButtons.push(new IconButton(game, `hybridBuildTier${tier}`, this.panel, x, y, BUTTON_SIZE,
-                player => this.pick(player, tier)));
+            const button = new IconButton(game, `hybridBuildTier${tier}`, this.panel, x, y, BUTTON_SIZE,
+                player => this.pick(player, tier));
+            button.setHotkey(HOTKEY_LABELS[slotOfTier(tier)]);
+            this.tierButtons.push(button);
         }
         const [cancelX, cancelY] = slotCenter(CANCEL_SLOT);
         this.cancelButton = new IconButton(game, 'hybridBuildCancel', this.panel, cancelX, cancelY, BUTTON_SIZE,
             player => this.close(player));
+        this.cancelButton.setHotkey(HOTKEY_LABELS[CANCEL_SLOT]);
 
         this.panel.setVisible(false);
 

@@ -28,6 +28,7 @@ export class IconButton {
     private readonly title: Frame | undefined;
     private readonly description: Frame | undefined;
     private readonly goldCost: Frame | undefined;
+    private readonly hotkeyLabel: Frame;
 
     constructor(game: WarcraftMaul, name: string, parent: Frame, x: number, y: number, size: number,
                 onClick: (this: void, player: Defender) => void, showTooltip: boolean = true) {
@@ -48,6 +49,13 @@ export class IconButton {
             this.description = this.tooltip.getChild(1);
             this.goldCost = this.tooltip.getChild(3);
         }
+
+        // Hotkey letter in the corner, like the command card's; empty until setHotkey
+        this.hotkeyLabel = Frame.createType(`${name}Hotkey`, this.button, 0, 'TEXT', '')!;
+        this.hotkeyLabel.setSize(size, size * 0.4);
+        this.hotkeyLabel.setPoint(FRAMEPOINT_BOTTOMRIGHT, this.button, FRAMEPOINT_BOTTOMRIGHT, -0.002, 0.001);
+        BlzFrameSetTextAlignment(this.hotkeyLabel.handle, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_RIGHT);
+        this.hotkeyLabel.setText('');
 
         const trigger = Trigger.create();
         trigger.triggerRegisterFrameEvent(this.button, FRAMEEVENT_CONTROL_CLICK);
@@ -77,6 +85,11 @@ export class IconButton {
 
     public setVisible(visible: boolean): void {
         this.button.setVisible(visible);
+    }
+
+    /** The key label shown in the corner; the same on every client. */
+    public setHotkey(label: string): void {
+        this.hotkeyLabel.setText(`|cffffcc00${label}|r`);
     }
 
     /** Dim the icon, e.g. for an unavailable choice; local UI only. */
