@@ -31,10 +31,12 @@ export class RaceListRow {
         // A dark translucent bar: frame alpha applies reliably where a vertex-colour tint does not
         this.highlight.setTexture('Textures\\Black32.blp', 0, true);
         this.highlight.setAlpha(150);
+        this.highlight.setLevel(1);
         this.highlight.setVisible(false);
 
         this.icon = Frame.createType(`${name}Icon`, this.button, 0, 'BACKDROP', '')!;
         this.icon.setSize(height - 2 * ICON_INSET, height - 2 * ICON_INSET);
+        this.icon.setLevel(2);
         this.icon.setAbsPoint(FRAMEPOINT_TOPLEFT, x + ICON_INSET, y - ICON_INSET);
 
         // Frame events fire on every client with the acting player; the row only ever shows

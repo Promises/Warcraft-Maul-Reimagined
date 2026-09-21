@@ -52,9 +52,11 @@ class OptionColumn {
             const ring = Frame.createType(`${name}Row${index}Ring`, radio, 0, 'BACKDROP', '')!;
             ring.setAllPoints(radio);
             ring.setTexture(RADIO_RING, 0, true);
+            ring.setLevel(1);
             const dot = Frame.createType(`${name}Row${index}Dot`, radio, 0, 'BACKDROP', '')!;
             dot.setAllPoints(radio);
             dot.setTexture(RADIO_DOT, 0, true);
+            dot.setLevel(2);
 
             const text = Frame.createType(`${name}Row${index}Label`, parent, 0, 'TEXT', '')!;
             text.setSize(COLUMN_WIDTH - RADIO_INSET - RADIO_SIZE - LABEL_GAP, ROW_HEIGHT);

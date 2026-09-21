@@ -38,6 +38,8 @@ export class IconButton {
 
         this.icon = Frame.createType(`${name}Icon`, this.button, 0, 'BACKDROP', 'ButtonBackdropTemplate')!;
         this.icon.setAllPoints(this.button);
+        // Overlapping siblings at one level flicker on hover; layers get their own level
+        this.icon.setLevel(1);
 
         // BoxedText comes from war3mapImported\ui\CustomTextButton.fdf: title, description, gold icon, gold value.
         // A panel with its own details pane passes showTooltip=false to avoid a hover box over it.
@@ -55,6 +57,7 @@ export class IconButton {
         this.hotkeyLabel.setSize(size, size * 0.4);
         this.hotkeyLabel.setPoint(FRAMEPOINT_BOTTOMRIGHT, this.button, FRAMEPOINT_BOTTOMRIGHT, -0.002, 0.001);
         BlzFrameSetTextAlignment(this.hotkeyLabel.handle, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_RIGHT);
+        this.hotkeyLabel.setLevel(2);
         this.hotkeyLabel.setText('');
 
         const trigger = Trigger.create();

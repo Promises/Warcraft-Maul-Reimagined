@@ -36,23 +36,29 @@ export abstract class AbstractActionButton {
         this.well = Frame.createType(`${name}Well`, this._buttonHandle, 0, 'BACKDROP', '')!;
         this.well.setAllPoints(this._buttonHandle);
         this.well.setTexture(WELL_TEXTURE, 0, true);
+        // Overlapping sibling frames at one level have no stable draw order and flicker on
+        // hover, so each layer gets its own level
+        this.well.setLevel(1);
 
         const inset = size * WELL_BORDER;
         this._backdropHandle = Frame.createType(`${name}BackDrop`, this._buttonHandle, 0, 'BACKDROP', 'ButtonBackdropTemplate')!;
         this._backdropHandle.setPoint(FRAMEPOINT_TOPLEFT, this._buttonHandle, FRAMEPOINT_TOPLEFT, inset, -inset);
         this._backdropHandle.setPoint(FRAMEPOINT_BOTTOMRIGHT, this._buttonHandle, FRAMEPOINT_BOTTOMRIGHT, -inset, inset);
         this._backdropHandle.setTexture(icon, 0, true);
+        this._backdropHandle.setLevel(2);
 
         // Drawn over the well while a toggle is on; created last so it renders on top
         this.onRim = Frame.createType(`${name}On`, this._buttonHandle, 0, 'BACKDROP', '')!;
         this.onRim.setAllPoints(this._buttonHandle);
         this.onRim.setTexture(WELL_ON_TEXTURE, 0, true);
+        this.onRim.setLevel(3);
         this.onRim.setVisible(false);
 
         this.hotkeyLabel = Frame.createType(`${name}Hotkey`, this._buttonHandle, 0, 'TEXT', '')!;
         this.hotkeyLabel.setSize(size, size * 0.4);
         this.hotkeyLabel.setPoint(FRAMEPOINT_BOTTOMRIGHT, this._buttonHandle, FRAMEPOINT_BOTTOMRIGHT, -0.002, 0.001);
         BlzFrameSetTextAlignment(this.hotkeyLabel.handle, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_RIGHT);
+        this.hotkeyLabel.setLevel(4);
         this.hotkeyLabel.setText('');
 
         // BoxedText from war3mapImported\ui\CustomTextButton.fdf: title, description
