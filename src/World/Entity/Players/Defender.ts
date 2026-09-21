@@ -78,8 +78,9 @@ export class Defender extends AbstractPlayer {
         this.stopBuilding();
         this._buildMode = true;
         this.buildTier = tier;
-        for (const maze of this.game.worldMap.playerMazes) {
-            maze.setBuildmode(this, true);
+        // Only the maze under the pointer shows its grid; mouseMoved switches it
+        if (this.currentHighlightedMaze !== -1) {
+            this.game.worldMap.playerMazes[this.currentHighlightedMaze].setBuildmode(this, true);
         }
         this.registerMouseTriggers();
 
@@ -344,10 +345,16 @@ export class Defender extends AbstractPlayer {
             const maze = playerMazes[i];
             if (maze.isPointInMaze(this.mouseX, this.mouseY)) {
                 foundMaze = true;
-                // If we were in a different maze before, clear those highlights
-                if (this.currentHighlightedMaze !== i && this.currentHighlightedMaze !== -1) {
-                    const oldMaze = playerMazes[this.currentHighlightedMaze];
-                    this.clearHighlightedPoints(oldMaze);
+                // Entering another maze: its grid replaces the previous one's
+                if (this.currentHighlightedMaze !== i) {
+                    if (this.currentHighlightedMaze !== -1) {
+                        const oldMaze = playerMazes[this.currentHighlightedMaze];
+                        this.clearHighlightedPoints(oldMaze);
+                        oldMaze.setBuildmode(this, false);
+                    }
+                    if (this._buildMode) {
+                        maze.setBuildmode(this, true);
+                    }
                 }
                 // Update current maze and highlight new points
                 this.currentHighlightedMaze = i;

@@ -2,6 +2,7 @@ import {Frame} from 'w3ts';
 import {WarcraftMaul} from '../../../WarcraftMaul';
 import {Defender} from '../../../Entity/Players/Defender';
 import {IconButton} from '../IconButton';
+import {Timer} from 'w3ts';
 
 // Layout: a 4x3 grid like the command card, sitting above the action bar. The console
 // area itself never passes mouse input to custom frames, so the panel cannot overlay it.
@@ -70,6 +71,25 @@ export class HybridBuildPanel {
             player => this.close(player));
 
         this.panel.setVisible(false);
+
+        // Gold changes all the time (kills, wave rewards); keep the dimming current while open.
+        // Runs on every client and only touches the local player's view.
+        Timer.create().start(0.5, true, () => {
+            for (const player of game.players.values()) {
+                if (this.openFor[player.id]) {
+                    this.refreshAffordable(player);
+                }
+            }
+        });
+    }
+
+    /** Local view: towers the player cannot pay for right now are dimmed. */
+    private refreshAffordable(player: Defender): void {
+        if (!player.isLocal()) {
+            return;
+        }
+        const gold = player.getGold();
+        player.hybridTowers.forEach((tower, tier) => this.tierButtons[tier].setDimmed(player, tower.goldCost > gold));
     }
 
     /** Refreshes the local player's buttons after their towers were rolled. */
@@ -121,7 +141,7 @@ export class HybridBuildPanel {
             return;
         }
         this.openFor[player.id] = true;
-        this.showTiers(player, undefined);
+        this.refreshAffordable(player);
         this.setVisible(player, true);
     }
 
@@ -132,20 +152,11 @@ export class HybridBuildPanel {
         this.setVisible(player, false);
     }
 
-    /** Enters build mode for a tier; the panel then shows only that tower (and Close). */
+    /** Enters build mode for a tier. */
     private pick(player: Defender, tier: number): void {
         if (this.openFor[player.id] && player.hybridTowers[tier]) {
             player.startBuilding(tier);
-            this.showTiers(player, tier);
         }
-    }
-
-    /** Local view: all tiers, or a single one while it is being placed. */
-    private showTiers(player: Defender, only: number | undefined): void {
-        if (!player.isLocal()) {
-            return;
-        }
-        this.tierButtons.forEach((button, tier) => button.setVisible(only === undefined || tier === only));
     }
 
     private setVisible(player: Defender, visible: boolean): void {
