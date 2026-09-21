@@ -232,7 +232,7 @@ export class Defender extends AbstractPlayer {
         // Reset previously highlighted points to their original colours
         for (const point of this._highlightedPoints) {
             if (this.isLocal()) {
-                maze.gridPoints[point.x][point.y].colour = maze.gridColour(point.x, point.y);
+                maze.unhighlight(point.x, point.y);
             }
         }
         this._highlightedPoints = [];

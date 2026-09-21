@@ -268,6 +268,7 @@ export class RacePicking {
         //     }
         // }
         this.game.hybridBuildPanel.refresh(player);
+        this.game.actionBar.showHybridBuild(player);
         SendMessage(player.getNameWithColour() + ' has |cFFB0F442hy|r|cFF8CF442b|r|cFF42F4C5r|r|cFF42F4F1id|r randomed!');
 
 

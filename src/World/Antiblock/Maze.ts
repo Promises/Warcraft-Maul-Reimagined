@@ -90,9 +90,19 @@ export class Maze {
     }
 
 
+    // Whether the local player is placing towers in this maze: only the cells that cannot be
+    // built on are drawn then (the free ones would tile the whole lane), plus the footprint
+    // under the pointer
+    private localBuildMode: boolean = false;
+
+    private cellVisible(x: number, y: number): boolean {
+        return this.localBuildMode && this.maze[x][y] !== Walkable.Walkable;
+    }
+
     public setWalkable(x: number, y: number, isWalkable: Walkable): void {
         this.maze[x][y] = isWalkable;
         const point = this.gridPoints[x][y];
+        point.visible = this.cellVisible(x, y);
         if (isWalkable === Walkable.Walkable) {
             point.colour = {red: 0, green: 0, blue: 255, alpha: 153}; // Blue
         } else {
@@ -250,10 +260,11 @@ export class Maze {
         const cellX = Math.floor(relativeX / 64);
         const cellY = Math.floor(relativeY / 64) - 1;  // Subtract 1 to shift up one cell
 
-        // Reset previously highlighted points to their original colours
+        // Reset previously highlighted points to their original colours and visibility
         for (const point of defender.highlightedPoints) {
             if (defender.isLocal()) {
                 this.gridPoints[point.x][point.y].colour = this.gridColour(point.x, point.y);
+                this.gridPoints[point.x][point.y].visible = this.cellVisible(point.x, point.y);
             }
         }
 
@@ -272,6 +283,7 @@ export class Maze {
         for (const point of newPoints) {
             if (defender.isLocal()) {
                 this.gridPoints[point.x][point.y].colour = this.gridColour(point.x, point.y, true);
+                this.gridPoints[point.x][point.y].visible = true;
             }
         }
 
@@ -284,15 +296,22 @@ export class Maze {
         return x >= this.minX && x <= this.maxX && y >= this.minY && y <= this.maxY;
     }
 
+    /** Local view: the blocked cells of this maze while the player is placing towers. */
     setBuildmode(player: Defender, buildMode: boolean) {
+        if (!player.isLocal()) {
+            return;
+        }
+        this.localBuildMode = buildMode;
         for (let x: number = 0; x < this.width; x++) {
             for (let y: number = 0; y < this.height; y++) {
-                let showImg = this.gridPoints[x][y].visible;
-                if (player.isLocal()) {
-                    showImg = buildMode;
-                }
-                this.gridPoints[x][y].visible = showImg;
+                this.gridPoints[x][y].visible = this.cellVisible(x, y);
             }
         }
+    }
+
+    /** Restores a highlighted cell's colour and visibility. */
+    public unhighlight(x: number, y: number): void {
+        this.gridPoints[x][y].colour = this.gridColour(x, y);
+        this.gridPoints[x][y].visible = this.cellVisible(x, y);
     }
 }

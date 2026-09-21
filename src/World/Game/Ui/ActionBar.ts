@@ -10,6 +10,7 @@ import { HybridBuildButton } from './Buttons/HybridBuildButton';
 import { RaceSelectButton } from './Buttons/RaceSelectButton';
 import { RangeCheckButton } from './Buttons/RangeCheckButton';
 import {Frame} from "w3ts";
+import {Defender} from '../../Entity/Players/Defender';
 
 // Design handoff "Action bar, full rail": a rail on the console ledge, 0.042 tall, holding
 // the buttons at 0.026 on a 0.032 pitch as one cluster: the five buttons, a divider, and
@@ -32,6 +33,7 @@ export class ActionBar {
     private readonly game: WarcraftMaul;
     private readonly rail: Frame;
     private readonly buttons: AbstractActionButton[] = [];
+    private readonly hybridBuild: HybridBuildButton;
 
     constructor(game: WarcraftMaul) {
         this.game = game;
@@ -42,7 +44,16 @@ export class ActionBar {
         this.rail.setSize(ActionBar.clusterSpan() + 2 * RAIL_PADDING, RAIL_HEIGHT);
         this.rail.setAbsPoint(FRAMEPOINT_CENTER, RAIL_CENTER_X, RAIL_CENTER_Y);
 
-        this.initializeButtons();
+        this.hybridBuild = this.initializeButtons();
+        // Only a hybrid random player has a build menu; the button appears when they random
+        this.hybridBuild.setVisible(false);
+    }
+
+    /** Shows the hybrid build button on that player's client. */
+    public showHybridBuild(player: Defender): void {
+        if (player.isLocal()) {
+            this.hybridBuild.setVisible(true);
+        }
     }
 
     /** Width of the button cluster: the buttons, the divider's room, the reserved wells. */
@@ -50,7 +61,7 @@ export class ActionBar {
         return (BUTTON_COUNT + RESERVED_WELLS) * BUTTON_PITCH + 2 * DIVIDER_GAP;
     }
 
-    private initializeButtons(): void {
+    private initializeButtons(): HybridBuildButton {
         // Cluster layout in pitches, centred: buttons 0..4, divider, two wells
         const span = ActionBar.clusterSpan();
         const first = -span / 2 + BUTTON_PITCH / 2;
@@ -58,7 +69,8 @@ export class ActionBar {
 
         this.buttons.push(new ExampleMaze(this.game, this.rail, offset(0), BUTTON_SIZE, 0));
         this.buttons.push(new ClaimButton(this.game, this.rail, offset(1), BUTTON_SIZE, 1));
-        this.buttons.push(new HybridBuildButton(this.game, this.rail, offset(2), BUTTON_SIZE, 2));
+        const hybridBuild = new HybridBuildButton(this.game, this.rail, offset(2), BUTTON_SIZE, 2);
+        this.buttons.push(hybridBuild);
         this.buttons.push(new RaceSelectButton(this.game, this.rail, offset(3), BUTTON_SIZE, 3));
         this.buttons.push(new RangeCheckButton(this.game, this.rail, offset(4), BUTTON_SIZE, 4));
 
@@ -77,5 +89,6 @@ export class ActionBar {
             well.setTexture(WELL_TEXTURE, 0, true);
             well.setAlpha(107);
         }
+        return hybridBuild;
     }
 }

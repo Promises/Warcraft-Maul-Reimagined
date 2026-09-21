@@ -98,6 +98,11 @@ export abstract class AbstractActionButton {
         }
     }
 
+    /** Local view: the button and everything on it. */
+    public setVisible(visible: boolean): void {
+        this._buttonHandle.setVisible(visible);
+    }
+
     public disable(): void {
         this._buttonHandle.setEnabled(false);
     }

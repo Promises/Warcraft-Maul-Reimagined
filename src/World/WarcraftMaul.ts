@@ -69,6 +69,7 @@ export class WarcraftMaul {
     public hostDetection: HostDetection;
     public laneTransfer: LaneTransfer;
     public raceSelectPanel: RaceSelectPanel;
+    public actionBar: ActionBar;
 
     public enemies: Attacker[] = [];
     private readonly _creepAbilityHandler: CreepAbilityHandler;
@@ -174,7 +175,7 @@ export class WarcraftMaul {
         this.hybridBuildPanel = new HybridBuildPanel(this);
         this.raceSelectPanel = new RaceSelectPanel(this);
         this.diffVote = new Vote(this);
-        new ActionBar(this);
+        this.actionBar = new ActionBar(this);
     }
 
     public DefeatAllPlayers(): void {
