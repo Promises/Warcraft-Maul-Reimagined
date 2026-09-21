@@ -1,6 +1,7 @@
 import {WarcraftMaul} from '../../../WarcraftMaul';
 import {Frame, Trigger} from "w3ts";
 import {trackHover} from '../UiHover';
+import {RAIL_CENTER_X, RAIL_CENTER_Y} from '../ActionBarLayout';
 
 // The icon frame art (design handoff, imported as uiImport\CommandButtons\frame-icon*.dds):
 // a bevelled well the icon sits in, a gold version for a toggle that is on
@@ -46,9 +47,11 @@ export abstract class AbstractActionButton {
         // highlight and tooltip flicker). The button itself is the inset icon, exactly the
         // structure of the build panel's tiles.
         const variant = ACTION_BUTTON_VARIANT;
+        const x = RAIL_CENTER_X + offsetX;
+        const y = RAIL_CENTER_Y;
         this.well = Frame.createType(`${name}Well`, rail, 0, 'BACKDROP', '')!;
         this.well.setSize(size, size);
-        this.well.setPoint(FRAMEPOINT_CENTER, rail, FRAMEPOINT_CENTER, offsetX, 0);
+        this.well.setAbsPoint(FRAMEPOINT_CENTER, x, y);
         this.well.setTexture(WELL_TEXTURE, 0, true);
         if (variant === 1) {
             this.well.setVisible(false);
@@ -57,7 +60,7 @@ export abstract class AbstractActionButton {
         const iconSize = size * (1 - 2 * WELL_BORDER);
         this._buttonHandle = Frame.createType(name, rail, 0, 'BUTTON', variant === 3 ? '' : 'StandardButtonTemplate')!;
         this._buttonHandle.setSize(iconSize, iconSize);
-        this._buttonHandle.setPoint(FRAMEPOINT_CENTER, rail, FRAMEPOINT_CENTER, offsetX, 0);
+        this._buttonHandle.setAbsPoint(FRAMEPOINT_CENTER, x, y);
         this._buttonHandle.setLevel(1);
 
         this._backdropHandle = Frame.createType(`${name}BackDrop`, this._buttonHandle, 0, 'BACKDROP', 'ButtonBackdropTemplate')!;
@@ -74,7 +77,7 @@ export abstract class AbstractActionButton {
         // Shown over the well while a toggle is on; a backdrop takes no mouse input
         this.onRim = Frame.createType(`${name}On`, rail, 0, 'BACKDROP', '')!;
         this.onRim.setSize(size, size);
-        this.onRim.setPoint(FRAMEPOINT_CENTER, rail, FRAMEPOINT_CENTER, offsetX, 0);
+        this.onRim.setAbsPoint(FRAMEPOINT_CENTER, x, y);
         this.onRim.setTexture(WELL_ON_TEXTURE, 0, true);
         this.onRim.setLevel(3);
         this.onRim.setVisible(false);
@@ -84,7 +87,7 @@ export abstract class AbstractActionButton {
             ? Frame.createType(`${name}Tip`, this._buttonHandle, 0, 'TEXT', '')
             : Frame.create('BoxedText', this._buttonHandle, 0, 0);
         if (this.tooltip) {
-            this.tooltip.setPoint(FRAMEPOINT_BOTTOM, this.well, FRAMEPOINT_TOP, 0, 0.010);
+            this.tooltip.setAbsPoint(FRAMEPOINT_BOTTOM, x, y + size / 2 + 0.010);
             this.tooltip.setLevel(TOOLTIP_LEVEL);
             this._buttonHandle.setTooltip(this.tooltip);
         }

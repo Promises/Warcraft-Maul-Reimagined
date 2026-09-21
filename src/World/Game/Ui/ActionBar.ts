@@ -11,17 +11,12 @@ import { RaceSelectButton } from './Buttons/RaceSelectButton';
 import { RangeCheckButton } from './Buttons/RangeCheckButton';
 import {Frame} from "w3ts";
 import {Defender} from '../../Entity/Players/Defender';
+import {BUTTON_PITCH, BUTTON_SIZE, RAIL_CENTER_X, RAIL_CENTER_Y, RAIL_HEIGHT, RAIL_PADDING} from './ActionBarLayout';
 
 // Design handoff "Action bar, full rail": a rail on the console ledge, 0.042 tall, holding
 // the buttons at 0.026 on a 0.032 pitch as one cluster: the five buttons, a divider, and
 // two reserved wells. The rail is sized to the cluster plus padding and centred above the
 // console (anchoring it to the minimap and inventory frames collapsed it to a line).
-const RAIL_CENTER_X = 0.4;
-const RAIL_CENTER_Y = 0.16;
-const RAIL_HEIGHT = 0.042;
-const RAIL_PADDING = 0.012;
-const BUTTON_SIZE = 0.026;
-const BUTTON_PITCH = 0.032;
 const BUTTON_COUNT = 5;
 const RESERVED_WELLS = 2;
 // Extra room either side of the divider
@@ -88,8 +83,8 @@ export class ActionBar {
 
         const divider = Frame.createType('actionbarDivider', this.rail, 0, 'BACKDROP', '')!;
         divider.setSize(0.001, BUTTON_SIZE);
-        divider.setPoint(FRAMEPOINT_CENTER, this.rail, FRAMEPOINT_CENTER,
-            first + BUTTON_COUNT * BUTTON_PITCH - BUTTON_PITCH / 2 + DIVIDER_GAP, 0);
+        divider.setAbsPoint(FRAMEPOINT_CENTER,
+            RAIL_CENTER_X + first + BUTTON_COUNT * BUTTON_PITCH - BUTTON_PITCH / 2 + DIVIDER_GAP, RAIL_CENTER_Y);
         divider.setTexture(DIVIDER_TEXTURE, 0, true);
         divider.setAlpha(110);
         this.decorations.push(divider);
@@ -98,7 +93,7 @@ export class ActionBar {
         for (let i = 0; i < RESERVED_WELLS; i++) {
             const well = Frame.createType(`actionbarReserved${i}`, this.rail, 0, 'BACKDROP', '')!;
             well.setSize(BUTTON_SIZE, BUTTON_SIZE);
-            well.setPoint(FRAMEPOINT_CENTER, this.rail, FRAMEPOINT_CENTER, offset(BUTTON_COUNT + i), 0);
+            well.setAbsPoint(FRAMEPOINT_CENTER, RAIL_CENTER_X + offset(BUTTON_COUNT + i), RAIL_CENTER_Y);
             well.setTexture(WELL_TEXTURE, 0, true);
             well.setAlpha(107);
             this.decorations.push(well);
