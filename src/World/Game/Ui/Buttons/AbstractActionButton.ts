@@ -17,6 +17,17 @@ const TOOLTIP_LEVEL = 20;
  * well, and a boxed tooltip. Subclasses implement clickAction(); the click event fires on
  * every client with the clicking player (see the README in "Wc3 buttons/action-bar").
  */
+/**
+ * Debug isolation of the hover flicker (-flick <n> rebuilds the bar):
+ * 0 normal; 1 no well/rim frames; 2 tooltip as a plain TEXT like the old bar;
+ * 3 plain BUTTON base (no StandardButtonTemplate); 4 no tooltip at all; 5 no hover tracking
+ */
+export let ACTION_BUTTON_VARIANT = 0;
+
+export function setActionButtonVariant(variant: number): void {
+    ACTION_BUTTON_VARIANT = variant;
+}
+
 export abstract class AbstractActionButton {
     private readonly _buttonHandle: Frame;
     private readonly _backdropHandle: Frame;
@@ -34,13 +45,17 @@ export abstract class AbstractActionButton {
         // it: extra frames stacked inside a button make its hover hit-test flap (cursor,
         // highlight and tooltip flicker). The button itself is the inset icon, exactly the
         // structure of the build panel's tiles.
+        const variant = ACTION_BUTTON_VARIANT;
         this.well = Frame.createType(`${name}Well`, rail, 0, 'BACKDROP', '')!;
         this.well.setSize(size, size);
         this.well.setPoint(FRAMEPOINT_CENTER, rail, FRAMEPOINT_CENTER, offsetX, 0);
         this.well.setTexture(WELL_TEXTURE, 0, true);
+        if (variant === 1) {
+            this.well.setVisible(false);
+        }
 
         const iconSize = size * (1 - 2 * WELL_BORDER);
-        this._buttonHandle = Frame.createType(name, rail, 0, 'BUTTON', 'StandardButtonTemplate')!;
+        this._buttonHandle = Frame.createType(name, rail, 0, 'BUTTON', variant === 3 ? '' : 'StandardButtonTemplate')!;
         this._buttonHandle.setSize(iconSize, iconSize);
         this._buttonHandle.setPoint(FRAMEPOINT_CENTER, rail, FRAMEPOINT_CENTER, offsetX, 0);
         this._buttonHandle.setLevel(1);
@@ -65,7 +80,9 @@ export abstract class AbstractActionButton {
         this.onRim.setVisible(false);
 
         // BoxedText from war3mapImported\ui\CustomTextButton.fdf: title, description
-        this.tooltip = Frame.create('BoxedText', this._buttonHandle, 0, 0);
+        this.tooltip = variant === 4 ? undefined : variant === 2
+            ? Frame.createType(`${name}Tip`, this._buttonHandle, 0, 'TEXT', '')
+            : Frame.create('BoxedText', this._buttonHandle, 0, 0);
         if (this.tooltip) {
             this.tooltip.setPoint(FRAMEPOINT_BOTTOM, this.well, FRAMEPOINT_TOP, 0, 0.010);
             this.tooltip.setLevel(TOOLTIP_LEVEL);
@@ -75,12 +92,18 @@ export abstract class AbstractActionButton {
         this.trig = Trigger.create();
         this.trig.addAction(() => this.clickAction());
         this.trig.triggerRegisterFrameEvent(this._buttonHandle, FRAMEEVENT_CONTROL_CLICK);
-        trackHover(game, this._buttonHandle);
+        if (variant !== 5) {
+            trackHover(game, this._buttonHandle);
+        }
     }
 
     /** Tooltip contents; the same on every client, so no gating needed. */
     protected setTooltip(title: string, description: string): void {
         if (!this.tooltip) {
+            return;
+        }
+        if (ACTION_BUTTON_VARIANT === 2) {
+            this.tooltip.setText(`${title}: ${description}`);
             return;
         }
         const titleFrame = this.tooltip.getChild(0);

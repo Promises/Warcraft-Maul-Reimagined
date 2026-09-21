@@ -15,6 +15,8 @@ import {Maze, Walkable} from '../Antiblock/Maze';
 import {COLOUR, DecodeFourCC, SendMessage, Util} from "../../lib/translators";
 import {Effect, Frame, MapPlayer, Timer, Trigger, Unit} from "w3ts";
 import {Image} from "../../JassOverrides/Image";
+import {ActionBar} from './Ui/ActionBar';
+import {setActionButtonVariant} from './Ui/Buttons/AbstractActionButton';
 
 /**
  * Gets a random number between a range.
@@ -327,6 +329,20 @@ export class Commands {
                 } else {
                     player.sendMessage('Usage: -swap <colour|0-12>, e.g. -swap gray or -swap 8');
                 }
+                break;
+            }
+            case 'flick': {
+                // Rebuild the action bar in a variant to isolate the hover flicker
+                const variant = Util.ParseInt(command[1] ?? '0');
+                setActionButtonVariant(isNaN(variant) ? 0 : variant);
+                this.game.actionBar.hide();
+                this.game.actionBar = new ActionBar(this.game);
+                for (const other of this.game.players.values()) {
+                    if (other.hasHybridRandomed) {
+                        this.game.actionBar.showHybridBuild(other);
+                    }
+                }
+                player.sendMessage(`Action bar variant ${variant}`);
                 break;
             }
             case 'lanecheck':

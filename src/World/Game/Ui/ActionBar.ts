@@ -49,6 +49,11 @@ export class ActionBar {
         this.hybridBuild.setVisible(false);
     }
 
+    /** Debug: hides this bar; -flick builds a new one in a variant. */
+    public hide(): void {
+        this.rail.setVisible(false);
+    }
+
     /** Shows the hybrid build button on that player's client. */
     public showHybridBuild(player: Defender): void {
         if (player.isLocal()) {
