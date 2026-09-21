@@ -30,43 +30,44 @@ export abstract class AbstractActionButton {
     constructor(game: WarcraftMaul, name: string, icon: string, rail: Frame, offsetX: number, size: number) {
         this._game = game;
 
-        this._buttonHandle = Frame.createType(name, rail, 0, 'BUTTON', 'StandardButtonTemplate')!;
-        this._buttonHandle.setSize(size, size);
-        this._buttonHandle.setPoint(FRAMEPOINT_CENTER, rail, FRAMEPOINT_CENTER, offsetX, 0);
-
-        this.well = Frame.createType(`${name}Well`, this._buttonHandle, 0, 'BACKDROP', '')!;
-        this.well.setAllPoints(this._buttonHandle);
+        // The well and the gold rim are siblings of the button on the rail, not layers inside
+        // it: extra frames stacked inside a button make its hover hit-test flap (cursor,
+        // highlight and tooltip flicker). The button itself is the inset icon, exactly the
+        // structure of the build panel's tiles.
+        this.well = Frame.createType(`${name}Well`, rail, 0, 'BACKDROP', '')!;
+        this.well.setSize(size, size);
+        this.well.setPoint(FRAMEPOINT_CENTER, rail, FRAMEPOINT_CENTER, offsetX, 0);
         this.well.setTexture(WELL_TEXTURE, 0, true);
-        // Overlapping sibling frames at one level have no stable draw order and flicker on
-        // hover, so each layer gets its own level
-        this.well.setLevel(1);
 
-        const inset = size * WELL_BORDER;
+        const iconSize = size * (1 - 2 * WELL_BORDER);
+        this._buttonHandle = Frame.createType(name, rail, 0, 'BUTTON', 'StandardButtonTemplate')!;
+        this._buttonHandle.setSize(iconSize, iconSize);
+        this._buttonHandle.setPoint(FRAMEPOINT_CENTER, rail, FRAMEPOINT_CENTER, offsetX, 0);
+        this._buttonHandle.setLevel(1);
+
         this._backdropHandle = Frame.createType(`${name}BackDrop`, this._buttonHandle, 0, 'BACKDROP', 'ButtonBackdropTemplate')!;
-        this._backdropHandle.setPoint(FRAMEPOINT_TOPLEFT, this._buttonHandle, FRAMEPOINT_TOPLEFT, inset, -inset);
-        this._backdropHandle.setPoint(FRAMEPOINT_BOTTOMRIGHT, this._buttonHandle, FRAMEPOINT_BOTTOMRIGHT, -inset, inset);
+        this._backdropHandle.setAllPoints(this._buttonHandle);
         this._backdropHandle.setTexture(icon, 0, true);
-        this._backdropHandle.setLevel(2);
 
-        // Drawn over the well while a toggle is on; created last so it renders on top
-        this.onRim = Frame.createType(`${name}On`, this._buttonHandle, 0, 'BACKDROP', '')!;
-        this.onRim.setAllPoints(this._buttonHandle);
+        this.hotkeyLabel = Frame.createType(`${name}Hotkey`, this._buttonHandle, 0, 'TEXT', '')!;
+        this.hotkeyLabel.setSize(iconSize, iconSize * 0.45);
+        this.hotkeyLabel.setPoint(FRAMEPOINT_BOTTOMRIGHT, this._buttonHandle, FRAMEPOINT_BOTTOMRIGHT, -0.001, 0.0005);
+        BlzFrameSetTextAlignment(this.hotkeyLabel.handle, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_RIGHT);
+        this.hotkeyLabel.setLevel(2);
+        this.hotkeyLabel.setText('');
+
+        // Shown over the well while a toggle is on; a backdrop takes no mouse input
+        this.onRim = Frame.createType(`${name}On`, rail, 0, 'BACKDROP', '')!;
+        this.onRim.setSize(size, size);
+        this.onRim.setPoint(FRAMEPOINT_CENTER, rail, FRAMEPOINT_CENTER, offsetX, 0);
         this.onRim.setTexture(WELL_ON_TEXTURE, 0, true);
         this.onRim.setLevel(3);
         this.onRim.setVisible(false);
 
-        this.hotkeyLabel = Frame.createType(`${name}Hotkey`, this._buttonHandle, 0, 'TEXT', '')!;
-        this.hotkeyLabel.setSize(size, size * 0.4);
-        this.hotkeyLabel.setPoint(FRAMEPOINT_BOTTOMRIGHT, this._buttonHandle, FRAMEPOINT_BOTTOMRIGHT, -0.002, 0.001);
-        BlzFrameSetTextAlignment(this.hotkeyLabel.handle, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_RIGHT);
-        this.hotkeyLabel.setLevel(4);
-        this.hotkeyLabel.setText('');
-
         // BoxedText from war3mapImported\ui\CustomTextButton.fdf: title, description
         this.tooltip = Frame.create('BoxedText', this._buttonHandle, 0, 0);
         if (this.tooltip) {
-            // Clear of the rail's top edge, and above every other frame so it never z-fights
-            this.tooltip.setPoint(FRAMEPOINT_BOTTOM, this._buttonHandle, FRAMEPOINT_TOP, 0, 0.014);
+            this.tooltip.setPoint(FRAMEPOINT_BOTTOM, this.well, FRAMEPOINT_TOP, 0, 0.010);
             this.tooltip.setLevel(TOOLTIP_LEVEL);
             this._buttonHandle.setTooltip(this.tooltip);
         }
@@ -107,9 +108,13 @@ export abstract class AbstractActionButton {
         }
     }
 
-    /** Local view: the button and everything on it. */
+    /** Local view: the button, its well and rim. */
     public setVisible(visible: boolean): void {
         this._buttonHandle.setVisible(visible);
+        this.well.setVisible(visible);
+        if (!visible) {
+            this.onRim.setVisible(false);
+        }
     }
 
     public disable(): void {
