@@ -108,7 +108,7 @@ export class HostSettingsPanel {
     constructor(game: WarcraftMaul,
                 onConfirm: (this: void, mode: number, difficulty: number) => void,
                 onVote: (this: void) => void) {
-        const gameUi = Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0)!;
+        const gameUi = Frame.fromOrigin(ORIGIN_FRAME_WORLD_FRAME, 0)!;
         const rows = Math.max(settings.GAME_MODE_STRINGS.length, settings.DIFFICULTIES.length);
         const width = PADDING + COLUMN_WIDTH + COLUMN_GAP + COLUMN_WIDTH + PADDING;
         const height = PADDING + TITLE_HEIGHT + PADDING + HEADER_HEIGHT + rows * ROW_SPACING + PADDING + BUTTON_HEIGHT + PADDING;

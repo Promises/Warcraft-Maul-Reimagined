@@ -12,8 +12,8 @@ const BUTTON_SIZE = 0.032;
 const BUTTON_SPACING = 0.036;
 const PANEL_PADDING = 0.008;
 const PANEL_CENTER_X = 0.4;
-// Above the action bar rail (its top is at 0.181)
-const PANEL_BOTTOM_Y = 0.19;
+// Above the action bar rail (its top is at 0.221)
+const PANEL_BOTTOM_Y = 0.23;
 const TIERS = 9;
 const CANCEL_SLOT = COLUMNS * ROWS - 1;
 // One hotkey per tower slot, the command card's layout: QWER / ASDF / ZXC; the last slot is
@@ -45,7 +45,7 @@ export class HybridBuildPanel {
     private readonly openFor: boolean[] = [];
 
     constructor(private readonly game: WarcraftMaul) {
-        const gameUi = Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0)!;
+        const gameUi = Frame.fromOrigin(ORIGIN_FRAME_WORLD_FRAME, 0)!;
         const width = COLUMNS * BUTTON_SPACING + PANEL_PADDING;
         const height = ROWS * BUTTON_SPACING + PANEL_PADDING;
 

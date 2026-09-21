@@ -28,7 +28,7 @@ export class VotePanel {
     private optionCount: number = 0;
 
     constructor(game: WarcraftMaul) {
-        const gameUi = Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0)!;
+        const gameUi = Frame.fromOrigin(ORIGIN_FRAME_WORLD_FRAME, 0)!;
         const height = PADDING + TITLE_HEIGHT + PADDING + MAX_OPTIONS * OPTION_SPACING + PADDING;
         const top = PANEL_CENTER_Y + height / 2;
 

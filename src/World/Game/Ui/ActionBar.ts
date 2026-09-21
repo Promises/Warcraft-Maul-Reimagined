@@ -33,7 +33,7 @@ export class ActionBar {
 
     constructor(game: WarcraftMaul) {
         this.game = game;
-        const gameUi = Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0)!;
+        const gameUi = Frame.fromOrigin(ORIGIN_FRAME_WORLD_FRAME, 0)!;
 
         // The game's recessed control backdrop (EscMenuTemplates, loaded through our TOC)
         this.rail = Frame.createType('actionbarRail', gameUi, 0, 'BACKDROP', 'EscMenuControlBackdropTemplate')!;

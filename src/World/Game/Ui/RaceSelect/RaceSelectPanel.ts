@@ -56,7 +56,7 @@ export class RaceSelectPanel {
     private visibleLocally: boolean = false;
 
     constructor(private readonly game: WarcraftMaul) {
-        const gameUi = Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0)!;
+        const gameUi = Frame.fromOrigin(ORIGIN_FRAME_WORLD_FRAME, 0)!;
         const left = PANEL_CENTER_X - PANEL_WIDTH / 2;
         const top = PANEL_CENTER_Y + PANEL_HEIGHT / 2;
         const bottom = PANEL_CENTER_Y - PANEL_HEIGHT / 2;
