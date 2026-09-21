@@ -58,6 +58,16 @@ export class TowerConstruction {
 
         this.towerUpgradeTrigger = Trigger.create();
         this.towerUpgradeTrigger.registerAnyUnitEvent(EVENT_PLAYER_UNIT_UPGRADE_FINISH);
+        // Logs the gold before an upgrade, to measure what the engine charges or refunds
+        const upgradeStart = Trigger.create();
+        upgradeStart.registerAnyUnitEvent(EVENT_PLAYER_UNIT_UPGRADE_START);
+        upgradeStart.addAction(() => {
+            const unit = Unit.fromEvent();
+            const owner = unit ? this.game.players.get(unit.owner.id) : undefined;
+            if (unit && owner) {
+                Log.Info(`Upgrade started: ${unit.name} (${DecodeFourCC(unit.typeId)}, cost ${GetUnitGoldCost(unit.typeId)}) for ${owner.getPlayerName()}, gold ${owner.getGold()}`);
+            }
+        });
         this.towerUpgradeTrigger.addAction(() => this.UpgradeTower());
 
 
@@ -89,7 +99,7 @@ export class TowerConstruction {
             return;
         }
         const instance: Tower | undefined = owner.GetTower(tower.id);
-        Log.Info(`Upgrade finished: ${tower.name} (${DecodeFourCC(tower.typeId)}) for ${owner.getPlayerName()}, gold ${owner.getGold()}, previous value ${instance?.towerValue ?? 'none'}`);
+        Log.Info(`Upgrade finished: ${tower.name} (${DecodeFourCC(tower.typeId)}, cost ${GetUnitGoldCost(tower.typeId)}) for ${owner.getPlayerName()}, gold ${owner.getGold()}, previous value ${instance?.towerValue ?? 'none'}`);
         if (instance) {
             instance.Sell();
             const newTower: Tower = this.game.worldMap.towerConstruction.SetupTower(tower, owner);
