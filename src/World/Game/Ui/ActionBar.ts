@@ -11,14 +11,14 @@ import { RaceSelectButton } from './Buttons/RaceSelectButton';
 import { RangeCheckButton } from './Buttons/RangeCheckButton';
 import {Frame} from "w3ts";
 
-// Design handoff "Action bar, full rail": the bar is a rail on the console ledge, anchored
-// from the minimap's right edge to just past the inventory, so it follows the aspect ratio;
-// 0.042 tall at 16:9 (y 0.131-0.173). Buttons are 0.026 on a 0.032 pitch, centred on the
-// rail as one cluster: the five buttons, a divider, and two reserved wells.
-const RAIL_LEFT_GAP = 0.006;
-const RAIL_BOTTOM_OFFSET = -0.008;
-const RAIL_RIGHT_GAP = 0.006;
-const RAIL_TOP_OFFSET = 0.034;
+// Design handoff "Action bar, full rail": a rail on the console ledge, 0.042 tall, holding
+// the buttons at 0.026 on a 0.032 pitch as one cluster: the five buttons, a divider, and
+// two reserved wells. The rail is sized to the cluster plus padding and centred above the
+// console (anchoring it to the minimap and inventory frames collapsed it to a line).
+const RAIL_CENTER_X = 0.4;
+const RAIL_CENTER_Y = 0.16;
+const RAIL_HEIGHT = 0.042;
+const RAIL_PADDING = 0.012;
 const BUTTON_SIZE = 0.026;
 const BUTTON_PITCH = 0.032;
 const BUTTON_COUNT = 5;
@@ -36,21 +36,23 @@ export class ActionBar {
     constructor(game: WarcraftMaul) {
         this.game = game;
         const gameUi = Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0)!;
-        const minimap = Frame.fromOrigin(ORIGIN_FRAME_MINIMAP, 0)!;
-        // Item slot 1 is the top-right inventory slot
-        const inventory = Frame.fromOrigin(ORIGIN_FRAME_ITEM_BUTTON, 1)!;
 
         // The game's recessed control backdrop (EscMenuTemplates, loaded through our TOC)
         this.rail = Frame.createType('actionbarRail', gameUi, 0, 'BACKDROP', 'EscMenuControlBackdropTemplate')!;
-        this.rail.setPoint(FRAMEPOINT_BOTTOMLEFT, minimap, FRAMEPOINT_TOPRIGHT, RAIL_LEFT_GAP, RAIL_BOTTOM_OFFSET);
-        this.rail.setPoint(FRAMEPOINT_TOPRIGHT, inventory, FRAMEPOINT_TOPRIGHT, RAIL_RIGHT_GAP, RAIL_TOP_OFFSET);
+        this.rail.setSize(ActionBar.clusterSpan() + 2 * RAIL_PADDING, RAIL_HEIGHT);
+        this.rail.setAbsPoint(FRAMEPOINT_CENTER, RAIL_CENTER_X, RAIL_CENTER_Y);
 
         this.initializeButtons();
     }
 
+    /** Width of the button cluster: the buttons, the divider's room, the reserved wells. */
+    private static clusterSpan(): number {
+        return (BUTTON_COUNT + RESERVED_WELLS) * BUTTON_PITCH + 2 * DIVIDER_GAP;
+    }
+
     private initializeButtons(): void {
         // Cluster layout in pitches, centred: buttons 0..4, divider, two wells
-        const span = (BUTTON_COUNT + RESERVED_WELLS) * BUTTON_PITCH + 2 * DIVIDER_GAP;
+        const span = ActionBar.clusterSpan();
         const first = -span / 2 + BUTTON_PITCH / 2;
         const offset = (index: number): number => first + index * BUTTON_PITCH + (index >= BUTTON_COUNT ? 2 * DIVIDER_GAP : 0);
 
