@@ -709,7 +709,12 @@ export class Defender extends AbstractPlayer {
 
     /** Gives fragments back (a cancelled purchase), capped, and keeps the builder's mana in step. */
     public refundVoidFragments(amount: number): void {
-        this.SetVoidFragments(Math.min(this.GetVoidFragments() + amount, VOID_FRAGMENT_CAP));
+        this.setVoidFragments(this.GetVoidFragments() + amount);
+    }
+
+    /** Sets the fragment count, capped, and keeps the void builder's mana (its display) in step. */
+    public setVoidFragments(value: number): void {
+        this.SetVoidFragments(Math.max(0, Math.min(value, VOID_FRAGMENT_CAP)));
         if (this._voidBuilder) {
             this._voidBuilder.mana = this.GetVoidFragments();
         }

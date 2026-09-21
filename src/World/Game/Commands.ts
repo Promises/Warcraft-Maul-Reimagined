@@ -79,6 +79,15 @@ export class Commands {
                 player.sendMessage(`Gold was set to |cFFFFCC00${amount}|r`);
                 player.setGold(amount);
                 break;
+            case 'fragments':
+                amount = Util.ParsePositiveInt(command[1]);
+                if (!command[1] || isNaN(amount)) {
+                    player.sendMessage(Util.ColourString(COLOUR_CODES[COLOUR.RED], 'Invalid Amount'));
+                    return;
+                }
+                player.setVoidFragments(amount);
+                player.sendMessage(`Void fragments were set to |cFFAA66FF${player.GetVoidFragments()}|r`);
+                break;
             case 'lumber':
                 amount = Util.ParsePositiveInt(command[1]);
                 if (!amount) {
