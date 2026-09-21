@@ -325,7 +325,7 @@ export class Defender extends AbstractPlayer {
 
     /**
      * Hybrid build menu hotkeys: B opens and closes it, the command card keys pick a tower
-     * while it is open. Key events are synced player events, so the handlers run on every
+     * while it is open, Escape closes (the escape trigger above). Key events are synced player events, so the handlers run on every
      * client for this player. A player who has not hybrid randomed is left alone: B is the
      * game's own build hotkey for everyone else.
      */

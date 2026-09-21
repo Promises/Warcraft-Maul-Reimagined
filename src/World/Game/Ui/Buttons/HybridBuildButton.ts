@@ -7,6 +7,7 @@ export class HybridBuildButton extends AbstractActionButton {
     constructor(game: WarcraftMaul, rail: Frame, offsetX: number, size: number, idx: number = 0) {
         super(game, `hybridBuildButton${idx}`, HybridBuildButton.Icon, rail, offsetX, size);
         this.setTooltip('Hybrid build |cffffcc00(B)|r', 'The nine-tower build menu. Available after hybrid randoming. |cffffcc00-build|r');
+        this.setHotkey('B');
     }
 
     public clickAction(): void {

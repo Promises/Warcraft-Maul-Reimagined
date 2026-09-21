@@ -16,13 +16,14 @@ const PANEL_CENTER_X = 0.4;
 const PANEL_BOTTOM_Y = 0.19;
 const TIERS = 9;
 const CANCEL_SLOT = COLUMNS * ROWS - 1;
-// One hotkey per grid slot, the command card's layout: QWER / ASDF / ZXCV
+// One hotkey per tower slot, the command card's layout: QWER / ASDF / ZXC; the last slot is
+// Close, which is Escape rather than V
 export const HYBRID_BUILD_HOTKEYS: oskeytype[] = [
     OSKEY_Q, OSKEY_W, OSKEY_E, OSKEY_R,
     OSKEY_A, OSKEY_S, OSKEY_D, OSKEY_F,
-    OSKEY_Z, OSKEY_X, OSKEY_C, OSKEY_V,
+    OSKEY_Z, OSKEY_X, OSKEY_C,
 ];
-const HOTKEY_LABELS = ['Q', 'W', 'E', 'R', 'A', 'S', 'D', 'F', 'Z', 'X', 'C', 'V'];
+const HOTKEY_LABELS = ['Q', 'W', 'E', 'R', 'A', 'S', 'D', 'F', 'Z', 'X', 'C', 'Esc'];
 
 /** The grid slot of a tier: three towers per row, the right column is kept for cancel. */
 function slotOfTier(tier: number): number {
@@ -107,20 +108,17 @@ export class HybridBuildPanel {
         this.cancelButton.setContent(player, {
             icon: 'ReplaceableTextures\\CommandButtons\\BTNCancel.blp',
             title: `|cffffcc00${HOTKEY_LABELS[CANCEL_SLOT]}|r  Close`,
-            description: 'Close the build menu and stop building (Escape)',
+            description: 'Close the build menu and stop building',
         });
     }
 
     /**
-     * A hotkey press while the panel is open: the slot's tower enters build mode, V closes.
-     * Key events are synced player events, so this runs on every client like a click.
+     * A hotkey press while the panel is open: the slot's tower enters build mode (Escape
+     * closes, registered by Defender). Key events are synced player events, so this runs on
+     * every client like a click.
      */
     public hotkey(player: Defender, slot: number): void {
         if (!this.openFor[player.id]) {
-            return;
-        }
-        if (slot === CANCEL_SLOT) {
-            this.close(player);
             return;
         }
         const row = Math.floor(slot / COLUMNS);
