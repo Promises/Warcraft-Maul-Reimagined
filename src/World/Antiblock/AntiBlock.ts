@@ -215,6 +215,8 @@ export class AntiBlock {
         maze.GetAntiJugglers().forEach((antiJuggleTower) => {
             const antiJuggleX: number = antiJuggleTower.GetX();
             const antiJuggleY: number = antiJuggleTower.GetY();
+            // A blocker lifted for a build that was then cancelled comes back
+            antiJuggleTower.restore();
             const antiJuggleLeftSide: number = ((antiJuggleX - 64) - maze.minX) / 64;
             const antiJuggleRightSide: number = (antiJuggleX - maze.minX) / 64;
             const antiJuggleTopSide: number = (antiJuggleY - maze.minY) / 64;

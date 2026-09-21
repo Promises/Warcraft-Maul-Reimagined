@@ -229,6 +229,11 @@ export class Maze {
         return this.antiJugglers;
     }
 
+    /** The anti-juggle blocker whose footprint is exactly the tower footprint centred on (x, y). */
+    public antiJugglerAt(x: number, y: number): AntiJuggleTower | undefined {
+        return this.antiJugglers.find(juggler => juggler.isAt(x, y));
+    }
+
     public getHighlightedPointsCenter(points: { x: number, y: number }[]): { x: number, y: number } | undefined {
         if (points.length === 0) {
             return undefined;

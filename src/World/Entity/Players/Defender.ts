@@ -15,6 +15,7 @@ import {Maze, Walkable} from "../../Antiblock/Maze";
 import {DummyTowers} from "../../Game/Races/HybridRandom";
 import {VOID_FRAGMENT_CAP} from "../Tower/Races/Void/VoidFragmentCosts";
 import {RangeIndicator} from "./RangeIndicator";
+import {AntiJuggleTower} from "../AntiJuggle/AntiJuggleTower";
 import {HYBRID_BUILD_HOTKEYS} from "../../Game/Ui/HybridBuild/HybridBuildPanel";
 
 // The hybrid builder's build ability (AUbu); its command card button is hidden
@@ -208,12 +209,25 @@ export class Defender extends AbstractPlayer {
         }
         const center = maze.getHighlightedPointsCenter(points)!;
         const dummyId = DummyTowers[`${this.id + 1}`][`${tier + 1}`];
+        // Building on an anti-juggle spot: the blocker's pathing refuses the order, so it is
+        // lifted for exactly its own footprint (half over it is not allowed) and put back if
+        // the order fails
+        let liftedBlocker: AntiJuggleTower | undefined;
+        if (points.some(point => maze.getWalkable(point.x, point.y) === Walkable.Protected)) {
+            liftedBlocker = maze.antiJugglerAt(center.x, center.y);
+            if (!liftedBlocker) {
+                this.sendMessage('A tower on a blocked spot must cover it exactly');
+                return;
+            }
+            liftedBlocker.release();
+        }
         // The build ability is hidden from the command card (the placeholders must not show)
         // and a hidden ability refuses orders, so it is shown for the order and hidden again
         BlzUnitHideAbility(this.hybridBuilder.handle, HYBRID_BUILD_ABILITY, false);
         const ordered = this.hybridBuilder.issueBuildOrder(FourCC(dummyId), center.x, center.y);
         BlzUnitHideAbility(this.hybridBuilder.handle, HYBRID_BUILD_ABILITY, true);
         if (!ordered) {
+            liftedBlocker?.restore();
             this.sendMessage('The builder could not start building there');
             return;
         }

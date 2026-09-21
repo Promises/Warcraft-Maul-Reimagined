@@ -29,7 +29,7 @@ export class AntiJuggleTower {
     private readonly topSide: number = 0;
     private readonly bottomSide: number = 0;
     private readonly game: WarcraftMaul;
-    private readonly destructable: Destructable;
+    private destructable: Destructable | undefined;
 
     constructor(game: WarcraftMaul, tower: Tower) {
         this.game = game;
@@ -67,7 +67,29 @@ export class AntiJuggleTower {
     }
 
     public EndOfRoundAction(): void {
-        this.destructable.destroy();
+        this.destructable?.destroy();
+        this.destructable = undefined;
+    }
+
+    /**
+     * Lifts the blocker so a tower can be built on exactly its footprint: the blocker's
+     * pathing refuses build orders. The cells stay Protected until the construction marks
+     * them Blocked; restore() puts the blocker back if the build never happens.
+     */
+    public release(): void {
+        this.destructable?.destroy();
+        this.destructable = undefined;
+    }
+
+    public restore(): void {
+        if (!this.destructable) {
+            this.destructable = Destructable.create(FourCC(ANTI_JUGGLE_BLOCKER), this.x, this.y, bj_UNIT_FACING, 1, 1);
+        }
+    }
+
+    /** Whether this blocker sits exactly on a tower footprint centred on (x, y). */
+    public isAt(x: number, y: number): boolean {
+        return this.x === x && this.y === y;
     }
 
     public GetX(): number {
