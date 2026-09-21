@@ -164,7 +164,9 @@ export class Defender extends AbstractPlayer {
             return;
         }
         const maze = this.game.worldMap.playerMazes[this.currentHighlightedMaze];
-        if (this.highlightedPoints.some(point => maze.getWalkable(point.x, point.y) !== Walkable.Walkable)) {
+        // Protected cells (an anti-juggle blocker where a tower was sold mid-wave) can be built
+        // on: the blocker only stops walking, and a tower there restores what the creeps saw
+        if (this.highlightedPoints.some(point => maze.getWalkable(point.x, point.y) === Walkable.Blocked)) {
             this.sendMessage('You cannot build there');
             return;
         }
@@ -190,7 +192,7 @@ export class Defender extends AbstractPlayer {
             {x: cornerX, y: cornerY + 1}, {x: cornerX + 1, y: cornerY + 1},
         ];
         if (points.some(point => point.x < 0 || point.x >= maze.width || point.y < 0 || point.y >= maze.height
-            || maze.getWalkable(point.x, point.y) !== Walkable.Walkable)) {
+            || maze.getWalkable(point.x, point.y) === Walkable.Blocked)) {
             return;
         }
         const footprint = maze.getHighlightedPointsCenter(points)!;
