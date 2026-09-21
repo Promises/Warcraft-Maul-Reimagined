@@ -6,7 +6,7 @@ import {Maze, Walkable} from '../../Antiblock/Maze';
 import {Tower} from './Specs/Tower';
 import {AntiJuggleTower} from '../AntiJuggle/AntiJuggleTower';
 import {Effect, Trigger, Unit} from "w3ts";
-import {Util} from "../../../lib/translators";
+import {DecodeFourCC, Util} from "../../../lib/translators";
 
 export class SellTower {
     private _sellTrigger: Trigger;
@@ -63,6 +63,7 @@ export class SellTower {
             if (!(unit.getAbilityLevel(FourCC('A02D')) > 0)) {
                 value = 0;
             }
+            Log.Info(`Sell ${unit.name} (${DecodeFourCC(unit.typeId)}) by ${player.getPlayerName()}: ${value} gold, spell ${DecodeFourCC(GetSpellAbilityId())}`);
             (<Defender>player).giveGold(value);
 
 

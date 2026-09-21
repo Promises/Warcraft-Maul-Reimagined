@@ -89,6 +89,7 @@ export class TowerConstruction {
             return;
         }
         const instance: Tower | undefined = owner.GetTower(tower.id);
+        Log.Info(`Upgrade finished: ${tower.name} (${DecodeFourCC(tower.typeId)}) for ${owner.getPlayerName()}, gold ${owner.getGold()}, previous value ${instance?.towerValue ?? 'none'}`);
         if (instance) {
             instance.Sell();
             const newTower: Tower = this.game.worldMap.towerConstruction.SetupTower(tower, owner);
