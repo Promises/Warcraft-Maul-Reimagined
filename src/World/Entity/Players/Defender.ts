@@ -113,7 +113,6 @@ export class Defender extends AbstractPlayer {
         }
         this.destroyMouseTriggers();
         this.discardGhost();
-        this.game.hybridBuildPanel.buildingStopped(this);
     }
 
     /**

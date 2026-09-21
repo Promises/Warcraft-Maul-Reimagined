@@ -154,18 +154,15 @@ export class HybridBuildPanel {
         this.setVisible(player, false);
     }
 
-    /** Enters build mode for a tier; the panel gets out of the way while the tower is placed. */
+    /**
+     * Enters build mode for a tier and closes the menu; build mode carries on until the tower
+     * is placed (shift keeps placing) or Escape ends it. B reopens the menu to switch tower.
+     */
     private pick(player: Defender, tier: number): void {
         if (this.openFor[player.id] && player.hybridTowers[tier]) {
             player.startBuilding(tier);
+            this.openFor[player.id] = false;
             this.setVisible(player, false);
-        }
-    }
-
-    /** Build mode ended without the menu being closed (Defender.stopBuilding): show it again. */
-    public buildingStopped(player: Defender): void {
-        if (this.openFor[player.id]) {
-            this.setVisible(player, true);
         }
     }
 
