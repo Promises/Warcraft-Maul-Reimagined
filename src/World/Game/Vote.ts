@@ -54,8 +54,10 @@ export class Vote {
     }
 
     private begin(): void {
+        // Each player starts looking at their own lane (the race shops the camera used to show
+        // are gone; races are picked on the panel)
         for (const player of this.game.players.values()) {
-            PanCameraToTimedForPlayer(player.handle, -1900.00, 2100.00, 0.00);
+            PanCameraToTimedForPlayer(player.handle, player.getCenterX(), player.getCenterY(), 0.00);
         }
         const host = this.game.hostDetection.detected ? this.game.hostDetection.host : undefined;
         const hostDefender = host ? this.game.players.get(host.id) : undefined;
