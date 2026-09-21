@@ -10,6 +10,7 @@ const WELL_ON_TEXTURE = 'uiImport\\CommandButtons\\frame-icon-on.dds';
 const WELL_BORDER = 11 / 96;
 const TOOLTIP_WIDTH = 0.20;
 const TOOLTIP_PADDING = 0.0315;
+const TOOLTIP_LEVEL = 20;
 
 /**
  * One button on the action bar: a BUTTON hanging off the rail, its icon inset in a bevelled
@@ -64,7 +65,9 @@ export abstract class AbstractActionButton {
         // BoxedText from war3mapImported\ui\CustomTextButton.fdf: title, description
         this.tooltip = Frame.create('BoxedText', this._buttonHandle, 0, 0);
         if (this.tooltip) {
-            this.tooltip.setPoint(FRAMEPOINT_BOTTOM, this._buttonHandle, FRAMEPOINT_TOP, 0, 0.008);
+            // Clear of the rail's top edge, and above every other frame so it never z-fights
+            this.tooltip.setPoint(FRAMEPOINT_BOTTOM, this._buttonHandle, FRAMEPOINT_TOP, 0, 0.014);
+            this.tooltip.setLevel(TOOLTIP_LEVEL);
             this._buttonHandle.setTooltip(this.tooltip);
         }
 

@@ -5,6 +5,7 @@ import {trackHover} from './UiHover';
 
 const TOOLTIP_WIDTH = 0.29;
 const TOOLTIP_PADDING = 0.0315;
+const TOOLTIP_LEVEL = 20;
 
 export interface IconButtonContent {
     icon: string;
@@ -46,6 +47,8 @@ export class IconButton {
         this.tooltip = showTooltip ? Frame.create('BoxedText', this.button, 0, 0) : undefined;
         if (this.tooltip) {
             this.tooltip.setPoint(FRAMEPOINT_BOTTOM, this.button, FRAMEPOINT_TOP, 0, 0.006);
+            // A tooltip covers the tiles above its button; its own high level keeps the draw order stable
+            this.tooltip.setLevel(TOOLTIP_LEVEL);
             this.button.setTooltip(this.tooltip);
             this.title = this.tooltip.getChild(0);
             this.description = this.tooltip.getChild(1);
