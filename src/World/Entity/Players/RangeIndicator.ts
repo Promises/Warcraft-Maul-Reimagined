@@ -1,18 +1,29 @@
-import {Unit} from 'w3ts';
-import {Image} from '../../../JassOverrides/Image';
+import {Effect, MapPlayer, Unit} from 'w3ts';
 import {Defender} from './Defender';
 
-const RING_TEXTURE = 'ReplaceableTextures\\Selection\\SelectionCircleLarge.blp';
 // Range is measured from the building's edge; a 2x2 tower's half width
 const TOWER_HALF_WIDTH = 64;
+// The ring models are 100 units in radius and get scaled to the range. Each is a strip whose
+// band width scales with it, so a thinner variant takes over as the scale grows and the line
+// stays 6 to 12 units wide (scripts/range-ring-models.py builds them).
+const MODEL_RADIUS = 100;
+const RING_MODELS: {model: string, maxScale: number}[] = [
+    {model: 'war3mapImported\\RangeRingWide.mdx', maxScale: 3},
+    {model: 'war3mapImported\\RangeRingMid.mdx', maxScale: 8},
+    {model: 'war3mapImported\\RangeRingFine.mdx', maxScale: Infinity},
+];
+// The ring's layers are team-colour textures, so its colour is a player colour: green
+const RING_COLOUR_PLAYER = 6;
+// The model's edge reads a touch outside where towers actually reach
+const RADIUS_TRIM = 0.985;
 
 /**
  * Draws a ring showing a tower's attack range for one player while their range check mode
- * is on. The image is created on every client (handles must stay in step) and shown on the
- * owner's client only. An image cannot be resized, so each tower gets a fresh one.
+ * is on. The effect is created on every client (handles must stay in step) with the model
+ * only on the owner's client, so only they see it.
  */
 export class RangeIndicator {
-    private ring: Image | undefined;
+    private ring: Effect | undefined;
 
     constructor(private readonly player: Defender) {
     }
@@ -24,16 +35,18 @@ export class RangeIndicator {
             return;
         }
         const radius = range + TOWER_HALF_WIDTH;
-        this.ring = new Image(RING_TEXTURE, radius * 2, tower.x, tower.y, 0);
-        this.ring.colour = {red: 80, green: 255, blue: 120, alpha: 200};
-        this.ring.SetImageRenderAlways(true);
-        this.ring.visible = this.player.isLocal();
+        const scale = radius * RADIUS_TRIM / MODEL_RADIUS;
+        const variant = RING_MODELS.find(candidate => scale <= candidate.maxScale) ?? RING_MODELS[RING_MODELS.length - 1];
+        this.ring = Effect.create(this.player.isLocal() ? variant.model : '', tower.x, tower.y);
+        if (!this.ring) {
+            return;
+        }
+        this.ring.scale = scale;
+        this.ring.setColorByPlayer(MapPlayer.fromIndex(RING_COLOUR_PLAYER)!);
     }
 
     public hide(): void {
-        if (this.ring) {
-            this.ring.Destroy();
-            this.ring = undefined;
-        }
+        this.ring?.destroy();
+        this.ring = undefined;
     }
 }
