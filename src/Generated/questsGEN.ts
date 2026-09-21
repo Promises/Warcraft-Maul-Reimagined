@@ -11,16 +11,22 @@ interface Quest {
 
 export const Quests: Quest[] = [
     {
+        title: `5.0.0 - 3`,
+        icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
+        stype: 0,
+        body: `Updates:\n- Fixed: void fragments are refunded when a bought building is cancelled\n- Fixed: the last row of the Blue, Gray, Brown and Maroon lanes can be built on\n- Fixed: abilities broken in the rewrite (Void items, base damage of several towers, Draenei Seer, Ancient Protector, Hydralisk, Adventurer, Cavern Hermit, Pay the Toll)\n- Fixed: hybrid towers could be built on checkpoints\n- Fixed: Wyvern lightning range, Iron Golem spike directions\n- Fixed: Wild Shape handed 100 gold back\n- Fixed: the custom UI flickered under the mouse\n- Anti-block and anti-juggle are faster and cancel instantly\n- Host detection works on every platform, so host-only settings are reliable`,
+    },
+    {
         title: `5.0.0 - 2`,
         icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
         stype: 0,
-        body: `Updates:\n- Fixed: void fragments are refunded when a bought building is cancelled\n- Fixed: the last row of the Blue, Gray, Brown and Maroon lanes can be built on\n- Fixed: abilities broken in the rewrite (Void items, base damage of several towers, Draenei Seer, Ancient Protector, Hydralisk, Adventurer, Cavern Hermit, Pay the Toll)\n- Fixed: hybrid towers could be built on checkpoints\n- Fixed: Wyvern lightning range, Iron Golem spike directions\n- Anti-block and anti-juggle are faster and cancel instantly\n- Host detection works on every platform, so host-only settings are reliable`,
+        body: `Updates:\n- -gray: when the gray lane is empty, take it over. Your towers, builders and units move with you and you become the last defender\n- When the gray player leaves, everyone is offered the lane. The first to take it moves there at once, or as soon as gray is clear of creeps\n- Range check: -range or the action bar button draws the attack range of any tower you select as a sharp ring at any size\n- Difficulty scales creep health and armor only (a hidden second multiplier is gone)\n- New loading screen`,
     },
     {
         title: `5.0.0 - 1`,
         icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
         stype: 0,
-        body: `Updates:\n- The map has been rebuilt from the ground up for Warcraft III 2.0 (new script engine)\n- Race selection is a panel: browse races by tier, read what each one does, then pick. The race shops are gone\n- Hybrid random gets a build menu with your nine rolled towers: click one, then click the grid to build (shift to keep building)\n- The host picks game mode and difficulty, or hands it to a vote. Votes no longer block the screen; the difficulty vote runs while races are picked\n- -gray: when the gray lane is empty, take it over. Your towers, builders and units move with you and you become the last defender\n- Range check: -range or the action bar button shows the attack range of any tower you select\n- New action bar: sample maze, claim towers, build menu, race selection, range check\n- Difficulty scales creep health and armor only (a hidden second multiplier is gone)`,
+        body: `Updates:\n- The map has been rebuilt from the ground up for Warcraft III 2.0 (new script engine)\n- Race selection is a panel: browse races by tier, read what each one does, then pick. The race shops are gone\n- Hybrid random gets a build menu with your nine rolled towers: B opens it, Q W E R A S D F Z X C pick a tower, Escape closes. Click the grid to build; hold shift to keep building and to queue towers behind the builder, shown as ghosts\n- The host picks game mode and difficulty, or hands it to a vote. Votes no longer block the screen; the difficulty vote runs while races are picked\n- New action bar: sample maze, claim towers, build menu, race selection, range check`,
     },
     {
         title: `4.4.2`,
