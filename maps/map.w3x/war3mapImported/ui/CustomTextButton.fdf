@@ -85,3 +85,13 @@ Frame "BACKDROP" "BoxedText" INHERITS "BoxedTextBackgroundTemplate" {
            FontShadowOffset 0.001 -0.001,
        }
 }
+
+// An icon button: a plain BUTTON with the standard mouse-over glow; the script adds the icon
+// as a child backdrop. Hover feedback (glow, tooltip) is left to the engine: registering
+// mouse enter/leave events on a frame makes the engine reset its hover every tick.
+Frame "BUTTON" "CustomIconButton" {
+    ControlStyle "AUTOTRACK|HIGHLIGHTONMOUSEOVER",
+    ControlMouseOverHighlight "CustomIconButtonHighlight",
+    Frame "HIGHLIGHT" "CustomIconButtonHighlight" INHERITS "StandardButtonMouseOverHighlightTemplate" {
+    }
+}

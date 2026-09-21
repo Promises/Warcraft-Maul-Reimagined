@@ -1,11 +1,11 @@
 import {Frame, Trigger} from 'w3ts';
 import {WarcraftMaul} from '../../../WarcraftMaul';
+import {trackUiPress} from '../UiPress';
 import {Defender} from '../../../Entity/Players/Defender';
 import {Race} from '../../Races/Race';
 import {RACE_TIERS, RaceItemDef, RaceItems, RaceTier, RANDOM_PICK_ITEMS} from '../../Races/RaceItems';
 import {IconButton} from '../IconButton';
 import {RaceListRow} from './RaceListRow';
-import {trackHover} from '../UiHover';
 
 // Three columns: [categories] [scrolling race list] [information]
 // Slightly right of centre so the left edge clears the vote panel (0.00-0.14) with a gap
@@ -64,7 +64,6 @@ export class RaceSelectPanel {
         this.panel = Frame.createType('raceSelectPanel', gameUi, 0, 'BACKDROP', 'BoxedTextBackgroundTemplate')!;
         this.panel.setSize(PANEL_WIDTH, PANEL_HEIGHT);
         this.panel.setAbsPoint(FRAMEPOINT_CENTER, PANEL_CENTER_X, PANEL_CENTER_Y);
-        trackHover(game, this.panel);
 
         // Categories: the normal tiers, plus a Dev tab in debug builds for the races you cannot
         // normally select (disabled races and the random-only Loot Boxer)
@@ -85,7 +84,7 @@ export class RaceSelectPanel {
                 button.setEnabled(true);
                 this.showTier(tier);
             });
-            trackHover(game, button);
+            trackUiPress(game, button);
             this.categoryButtons.set(tier, button);
         });
 
@@ -150,7 +149,7 @@ export class RaceSelectPanel {
                 game.playerSync.send('race-pick', this.highlightedItem);
             }
         });
-        trackHover(game, this.pickButton);
+        trackUiPress(game, this.pickButton);
 
         // Close: just outside the top-right corner so it never overlaps the race name
         const close = new IconButton(game, 'raceSelectClose', this.panel,
@@ -295,8 +294,5 @@ export class RaceSelectPanel {
         }
         this.visibleLocally = visible;
         this.panel.setVisible(visible);
-        if (!visible) {
-            player.pointerOverUi = false;
-        }
     }
 }

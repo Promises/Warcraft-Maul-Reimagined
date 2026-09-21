@@ -1,6 +1,6 @@
 import {WarcraftMaul} from '../../../WarcraftMaul';
 import {Frame, Trigger} from "w3ts";
-import {trackHover} from '../UiHover';
+import {trackUiPress} from '../UiPress';
 import {RAIL_CENTER_X, RAIL_CENTER_Y} from '../ActionBarLayout';
 
 // The icon frame art (design handoff, imported as uiImport\CommandButtons\frame-icon*.dds):
@@ -14,56 +14,41 @@ const TOOLTIP_PADDING = 0.0315;
 const TOOLTIP_LEVEL = 20;
 
 /**
- * One button on the action bar: a BUTTON hanging off the rail, its icon inset in a bevelled
- * well, and a boxed tooltip. Subclasses implement clickAction(); the click event fires on
- * every client with the clicking player (see the README in "Wc3 buttons/action-bar").
+ * One button on the action bar: a CustomIconButton (our FDF: a BUTTON with the standard
+ * mouse-over glow) hanging off the rail, its icon inset in a bevelled well, and a boxed
+ * tooltip the engine shows. No mouse enter/leave events are registered on it, see UiPress.
+ * Subclasses implement clickAction(); the click event fires on every client with the
+ * clicking player (see the README in "Wc3 buttons/action-bar").
  */
-/**
- * Debug isolation of the hover flicker (-flick <n> rebuilds the bar):
- * 0 normal; 1 no well/rim frames; 2 tooltip as a plain TEXT like the old bar;
- * 3 plain BUTTON base (no StandardButtonTemplate); 4 no tooltip at all; 5 no hover tracking
- */
-export let ACTION_BUTTON_VARIANT = 0;
-
-export function setActionButtonVariant(variant: number): void {
-    ACTION_BUTTON_VARIANT = variant;
-}
-
 export abstract class AbstractActionButton {
     private readonly _buttonHandle: Frame;
     private readonly _backdropHandle: Frame;
     private readonly well: Frame;
     private readonly onRim: Frame;
     private readonly hotkeyLabel: Frame;
-    private readonly tooltip: Frame | undefined;
+    private readonly tooltip: Frame;
     private readonly trig: Trigger;
     private readonly _game: WarcraftMaul;
 
     constructor(game: WarcraftMaul, name: string, icon: string, rail: Frame, offsetX: number, size: number) {
         this._game = game;
 
-        // The well and the gold rim are siblings of the button on the rail, not layers inside
-        // it: extra frames stacked inside a button make its hover hit-test flap (cursor,
-        // highlight and tooltip flicker). The button itself is the inset icon, exactly the
-        // structure of the build panel's tiles.
-        const variant = ACTION_BUTTON_VARIANT;
+        // The well and the gold rim are siblings of the button on the rail; a backdrop takes
+        // no mouse input, so the button alone decides the hit area
         const x = RAIL_CENTER_X + offsetX;
         const y = RAIL_CENTER_Y;
         this.well = Frame.createType(`${name}Well`, rail, 0, 'BACKDROP', '')!;
         this.well.setSize(size, size);
         this.well.setAbsPoint(FRAMEPOINT_CENTER, x, y);
         this.well.setTexture(WELL_TEXTURE, 0, true);
-        if (variant === 1) {
-            this.well.setVisible(false);
-        }
 
         const iconSize = size * (1 - 2 * WELL_BORDER);
-        this._buttonHandle = Frame.createType(name, rail, 0, 'BUTTON', variant === 3 ? '' : 'StandardButtonTemplate')!;
+        this._buttonHandle = Frame.createType(name, rail, 0, 'BUTTON', 'CustomIconButton')!;
         this._buttonHandle.setSize(iconSize, iconSize);
         this._buttonHandle.setAbsPoint(FRAMEPOINT_CENTER, x, y);
         this._buttonHandle.setLevel(1);
 
-        this._backdropHandle = Frame.createType(`${name}BackDrop`, this._buttonHandle, 0, 'BACKDROP', 'ButtonBackdropTemplate')!;
+        this._backdropHandle = Frame.createType(`${name}BackDrop`, this._buttonHandle, 0, 'BACKDROP', '')!;
         this._backdropHandle.setAllPoints(this._buttonHandle);
         this._backdropHandle.setTexture(icon, 0, true);
 
@@ -74,7 +59,7 @@ export abstract class AbstractActionButton {
         this.hotkeyLabel.setLevel(2);
         this.hotkeyLabel.setText('');
 
-        // Shown over the well while a toggle is on; a backdrop takes no mouse input
+        // Shown over the well while a toggle is on
         this.onRim = Frame.createType(`${name}On`, rail, 0, 'BACKDROP', '')!;
         this.onRim.setSize(size, size);
         this.onRim.setAbsPoint(FRAMEPOINT_CENTER, x, y);
@@ -83,32 +68,19 @@ export abstract class AbstractActionButton {
         this.onRim.setVisible(false);
 
         // BoxedText from war3mapImported\ui\CustomTextButton.fdf: title, description
-        this.tooltip = variant === 4 ? undefined : variant === 2
-            ? Frame.createType(`${name}Tip`, this._buttonHandle, 0, 'TEXT', '')
-            : Frame.create('BoxedText', this._buttonHandle, 0, 0);
-        if (this.tooltip) {
-            this.tooltip.setAbsPoint(FRAMEPOINT_BOTTOM, x, y + size / 2 + 0.010);
-            this.tooltip.setLevel(TOOLTIP_LEVEL);
-            this._buttonHandle.setTooltip(this.tooltip);
-        }
+        this.tooltip = Frame.create('BoxedText', this._buttonHandle, 0, 0)!;
+        this.tooltip.setAbsPoint(FRAMEPOINT_BOTTOM, x, y + size / 2 + 0.010);
+        this.tooltip.setLevel(TOOLTIP_LEVEL);
+        this._buttonHandle.setTooltip(this.tooltip);
 
         this.trig = Trigger.create();
         this.trig.addAction(() => this.clickAction());
         this.trig.triggerRegisterFrameEvent(this._buttonHandle, FRAMEEVENT_CONTROL_CLICK);
-        if (variant !== 5) {
-            trackHover(game, this._buttonHandle);
-        }
+        trackUiPress(game, this._buttonHandle);
     }
 
     /** Tooltip contents; the same on every client, so no gating needed. */
     protected setTooltip(title: string, description: string): void {
-        if (!this.tooltip) {
-            return;
-        }
-        if (ACTION_BUTTON_VARIANT === 2) {
-            this.tooltip.setText(`${title}: ${description}`);
-            return;
-        }
         const titleFrame = this.tooltip.getChild(0);
         const descriptionFrame = this.tooltip.getChild(1);
         titleFrame?.setText(title);
@@ -132,17 +104,6 @@ export abstract class AbstractActionButton {
         if (local) {
             this.onRim.setVisible(on);
         }
-    }
-
-    /** Removes every frame of the button (debug rebuilds). */
-    public destroy(): void {
-        this.tooltip?.destroy();
-        this.hotkeyLabel.destroy();
-        this._backdropHandle.destroy();
-        this.onRim.destroy();
-        this.well.destroy();
-        this._buttonHandle.destroy();
-        this.trig.destroy();
     }
 
     /** Local view: the button, its well and rim. */

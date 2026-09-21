@@ -38,7 +38,10 @@ export class Defender extends AbstractPlayer {
     private mousePressTrigger: Trigger | undefined;
     private escapeTrigger: Trigger | undefined;
     /** Set from frame hover events so clicks on our UI are not treated as map clicks (local only) */
-    public pointerOverUi: boolean = false;
+    // Real-time clock of the last mouse press on a custom control (UiPress.trackUiPress);
+    // local knowledge, only read on this player's own client
+    private uiPressedAt: number = -1;
+    private placementTimer: Timer | undefined;
     mouseX: number = 0;
     mouseY: number = 0;
     private _highlightedPoints: { x: number, y: number }[] = [];
@@ -142,13 +145,16 @@ export class Defender extends AbstractPlayer {
         this.mousePressTrigger = Trigger.create();
         this.mousePressTrigger.registerPlayerMouseEvent(this, bj_MOUSEEVENTTYPE_DOWN);
         this.mousePressTrigger.addAction(() => this.mousePressed());
+        this.placementTimer = Timer.create();
     }
 
     private destroyMouseTriggers(): void {
         this.mouseMoveTrigger?.destroy();
         this.mousePressTrigger?.destroy();
+        this.placementTimer?.destroy();
         this.mouseMoveTrigger = undefined;
         this.mousePressTrigger = undefined;
+        this.placementTimer = undefined;
     }
 
     /**
@@ -157,7 +163,7 @@ export class Defender extends AbstractPlayer {
      * sync message and placeTower runs everywhere with the same input.
      */
     private requestTowerPlacement(): void {
-        if (!this.isLocal() || this.pointerOverUi || this.buildTier === undefined) {
+        if (!this.isLocal() || this.pressedUi() || this.buildTier === undefined) {
             return;
         }
         if (this.currentHighlightedMaze === -1 || this.highlightedPoints.length !== 4) {
@@ -405,8 +411,22 @@ export class Defender extends AbstractPlayer {
         if (button === MOUSE_BUTTON_TYPE_RIGHT) {
             this.stopBuilding();
         } else if (button === MOUSE_BUTTON_TYPE_LEFT) {
-            this.requestTowerPlacement();
+            // A press on a custom control fires its own frame event alongside this one, in no
+            // fixed order; deciding a moment later sees both
+            this.placementTimer?.start(0.01, false, () => this.requestTowerPlacement());
         }
+    }
+
+    /** Called from a custom control's mouse-down event, for the pressing player. */
+    public noteUiPress(): void {
+        if (this.isLocal()) {
+            this.uiPressedAt = os.clock();
+        }
+    }
+
+    /** Whether the click being handled landed on a custom control (local knowledge). */
+    private pressedUi(): boolean {
+        return this.uiPressedAt >= 0 && os.clock() - this.uiPressedAt < 0.2;
     }
 
     public setHoloMaze(holoMaze: AbstractHologramMaze | undefined): void {

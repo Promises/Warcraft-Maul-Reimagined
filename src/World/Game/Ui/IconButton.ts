@@ -1,7 +1,7 @@
 import {Frame, Trigger} from 'w3ts';
 import {WarcraftMaul} from '../../WarcraftMaul';
 import {Defender} from '../../Entity/Players/Defender';
-import {trackHover} from './UiHover';
+import {trackUiPress} from './UiPress';
 
 const TOOLTIP_WIDTH = 0.29;
 const TOOLTIP_PADDING = 0.0315;
@@ -16,7 +16,9 @@ export interface IconButtonContent {
 }
 
 /**
- * A square icon button with a BoxedText tooltip (title, description, gold cost).
+ * A square icon button (CustomIconButton from our FDF: a BUTTON with the standard mouse-over
+ * glow) with a BoxedText tooltip (title, description, gold cost) the engine shows. No mouse
+ * enter/leave events are registered on it, see UiPress.
  * Frames are shared by all clients, so content is only ever set for the local player.
  * A click event fires on every client with the clicking player, so onClick runs everywhere
  * and gets that player: per-player game logic may run directly (it stays in step), but
@@ -33,14 +35,12 @@ export class IconButton {
 
     constructor(game: WarcraftMaul, name: string, parent: Frame, x: number, y: number, size: number,
                 onClick: (this: void, player: Defender) => void, showTooltip: boolean = true) {
-        this.button = Frame.createType(name, parent, 0, 'BUTTON', 'StandardButtonTemplate')!;
+        this.button = Frame.createType(name, parent, 0, 'BUTTON', 'CustomIconButton')!;
         this.button.setSize(size, size);
         this.button.setAbsPoint(FRAMEPOINT_CENTER, x, y);
 
-        this.icon = Frame.createType(`${name}Icon`, this.button, 0, 'BACKDROP', 'ButtonBackdropTemplate')!;
+        this.icon = Frame.createType(`${name}Icon`, this.button, 0, 'BACKDROP', '')!;
         this.icon.setAllPoints(this.button);
-        // Overlapping siblings at one level flicker on hover; layers get their own level
-        this.icon.setLevel(1);
 
         // BoxedText comes from war3mapImported\ui\CustomTextButton.fdf: title, description, gold icon, gold value.
         // A panel with its own details pane passes showTooltip=false to avoid a hover box over it.
@@ -74,7 +74,7 @@ export class IconButton {
                 onClick(player);
             }
         });
-        trackHover(game, this.button);
+        trackUiPress(game, this.button);
     }
 
     /** Local UI only: call for every player, it applies to the local one. */

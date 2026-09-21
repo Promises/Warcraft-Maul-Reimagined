@@ -2,7 +2,6 @@ import {Frame, Trigger} from 'w3ts';
 import * as settings from '../../GlobalSettings';
 import {WarcraftMaul} from '../../WarcraftMaul';
 import {Defender} from '../../Entity/Players/Defender';
-import {trackHover} from './UiHover';
 import {Util} from '../../../lib/translators';
 
 const PANEL_CENTER_X = 0.4;
@@ -78,7 +77,6 @@ class OptionColumn {
                     button.setEnabled(true);
                     this.select(index);
                 });
-                trackHover(game, button);
             }
             this.dots.push(dot);
         });
@@ -119,7 +117,6 @@ export class HostSettingsPanel {
         this.panel = Frame.createType('hostSettingsPanel', gameUi, 0, 'BACKDROP', 'BoxedTextBackgroundTemplate')!;
         this.panel.setSize(width, height);
         this.panel.setAbsPoint(FRAMEPOINT_CENTER, PANEL_CENTER_X, PANEL_CENTER_Y);
-        trackHover(game, this.panel);
 
         const title = Frame.createType('hostSettingsTitle', this.panel, 0, 'TEXT', '')!;
         title.setSize(width - 2 * PADDING, TITLE_HEIGHT);
@@ -160,7 +157,6 @@ export class HostSettingsPanel {
             button.setEnabled(true);
             action();
         });
-        trackHover(game, button);
     }
 
     /** Local UI: the panel appears on the given player's client only. */

@@ -68,7 +68,6 @@ export class TowerConstruction {
             const owner = unit ? this.game.players.get(unit.owner.id) : undefined;
             if (unit && owner) {
                 this.upgradingFrom.set(unit.id, unit.typeId);
-                Log.Info(`Upgrade started: ${unit.name} (${DecodeFourCC(unit.typeId)}, cost ${GetUnitGoldCost(unit.typeId)}) for ${owner.getPlayerName()}, gold ${owner.getGold()}`);
             }
         });
         const upgradeCancel = Trigger.create();
@@ -110,7 +109,6 @@ export class TowerConstruction {
             return;
         }
         const instance: Tower | undefined = owner.GetTower(tower.id);
-        Log.Info(`Upgrade finished: ${tower.name} (${DecodeFourCC(tower.typeId)}, cost ${GetUnitGoldCost(tower.typeId)}) for ${owner.getPlayerName()}, gold ${owner.getGold()}, previous value ${instance?.towerValue ?? 'none'}`);
         this.correctUpgradePrice(tower, owner);
         if (instance) {
             instance.Sell();

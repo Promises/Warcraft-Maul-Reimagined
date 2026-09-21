@@ -1,7 +1,6 @@
 import {Frame, Trigger} from 'w3ts';
 import {WarcraftMaul} from '../../WarcraftMaul';
 import {Defender} from '../../Entity/Players/Defender';
-import {trackHover} from './UiHover';
 
 // Flush with the left screen edge: the centred race panel starts at x 0.142, and the two are shown together
 const PANEL_LEFT = 0.00;
@@ -35,7 +34,6 @@ export class VotePanel {
         this.panel = Frame.createType('votePanel', gameUi, 0, 'BACKDROP', 'BoxedTextBackgroundTemplate')!;
         this.panel.setSize(PANEL_WIDTH, height);
         this.panel.setAbsPoint(FRAMEPOINT_TOPLEFT, PANEL_LEFT, top);
-        trackHover(game, this.panel);
 
         this.title = Frame.createType('votePanelTitle', this.panel, 0, 'TEXT', '')!;
         this.title.setSize(PANEL_WIDTH - 2 * PADDING, TITLE_HEIGHT);
@@ -61,7 +59,6 @@ export class VotePanel {
                     this.onVote(index);
                 }
             });
-            trackHover(game, button);
             this.options.push(button);
         }
 

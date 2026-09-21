@@ -13,7 +13,7 @@ const BUTTON_SPACING = 0.036;
 const PANEL_PADDING = 0.008;
 const PANEL_CENTER_X = 0.4;
 // Above the action bar rail (its top is at 0.221)
-const PANEL_BOTTOM_Y = 0.23;
+const PANEL_BOTTOM_Y = 0.19;
 const TIERS = 9;
 const CANCEL_SLOT = COLUMNS * ROWS - 1;
 // One hotkey per tower slot, the command card's layout: QWER / ASDF / ZXC; the last slot is
@@ -172,8 +172,5 @@ export class HybridBuildPanel {
             return;
         }
         this.panel.setVisible(visible);
-        if (!visible) {
-            player.pointerOverUi = false;
-        }
     }
 }

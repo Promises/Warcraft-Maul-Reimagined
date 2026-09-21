@@ -28,12 +28,13 @@ export class ActionBar {
     private readonly game: WarcraftMaul;
     private readonly rail: Frame;
     private readonly buttons: AbstractActionButton[] = [];
-    private readonly decorations: Frame[] = [];
     private readonly hybridBuild: HybridBuildButton;
 
     constructor(game: WarcraftMaul) {
         this.game = game;
-        const gameUi = Frame.fromOrigin(ORIGIN_FRAME_WORLD_FRAME, 0)!;
+        // On the game UI, not the world frame: the world frame is hidden by the console art
+        // below y 0.176, and the rail sits on the console ledge
+        const gameUi = Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0)!;
 
         // The game's recessed control backdrop (EscMenuTemplates, loaded through our TOC)
         this.rail = Frame.createType('actionbarRail', gameUi, 0, 'BACKDROP', 'EscMenuControlBackdropTemplate')!;
@@ -43,17 +44,6 @@ export class ActionBar {
         this.hybridBuild = this.initializeButtons();
         // Only a hybrid random player has a build menu; the button appears when they random
         this.hybridBuild.setVisible(false);
-    }
-
-    /** Debug: removes every frame of this bar; -flick builds a new one in a variant. */
-    public destroy(): void {
-        for (const button of this.buttons) {
-            button.destroy();
-        }
-        for (const frame of this.decorations) {
-            frame.destroy();
-        }
-        this.rail.destroy();
     }
 
     /** Shows the hybrid build button on that player's client. */
@@ -87,7 +77,6 @@ export class ActionBar {
             RAIL_CENTER_X + first + BUTTON_COUNT * BUTTON_PITCH - BUTTON_PITCH / 2 + DIVIDER_GAP, RAIL_CENTER_Y);
         divider.setTexture(DIVIDER_TEXTURE, 0, true);
         divider.setAlpha(110);
-        this.decorations.push(divider);
 
         // Reserved wells: empty frames, dimmed, where the next buttons go
         for (let i = 0; i < RESERVED_WELLS; i++) {
@@ -96,7 +85,6 @@ export class ActionBar {
             well.setAbsPoint(FRAMEPOINT_CENTER, RAIL_CENTER_X + offset(BUTTON_COUNT + i), RAIL_CENTER_Y);
             well.setTexture(WELL_TEXTURE, 0, true);
             well.setAlpha(107);
-            this.decorations.push(well);
         }
         return hybridBuild;
     }
