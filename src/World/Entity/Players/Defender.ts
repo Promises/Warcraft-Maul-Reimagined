@@ -311,7 +311,10 @@ export class Defender extends AbstractPlayer {
             t.destroy();
             this.escapeTrigger = Trigger.create();
             this.escapeTrigger.registerPlayerKeyEvent(this, OSKEY_ESCAPE, 0, true);
-            this.escapeTrigger.addAction(() => this.game.hybridBuildPanel.close(this));
+            this.escapeTrigger.addAction(() => {
+                this.game.hybridBuildPanel.close(this);
+                this.game.raceSelectPanel.close(this);
+            });
             this.registerBuildHotkeys();
         });
 

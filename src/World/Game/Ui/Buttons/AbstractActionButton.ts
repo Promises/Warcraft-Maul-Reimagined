@@ -21,6 +21,7 @@ export abstract class AbstractActionButton {
     private readonly _backdropHandle: Frame;
     private readonly well: Frame;
     private readonly onRim: Frame;
+    private readonly hotkeyLabel: Frame;
     private readonly tooltip: Frame | undefined;
     private readonly trig: Trigger;
     private readonly _game: WarcraftMaul;
@@ -47,6 +48,12 @@ export abstract class AbstractActionButton {
         this.onRim.setAllPoints(this._buttonHandle);
         this.onRim.setTexture(WELL_ON_TEXTURE, 0, true);
         this.onRim.setVisible(false);
+
+        this.hotkeyLabel = Frame.createType(`${name}Hotkey`, this._buttonHandle, 0, 'TEXT', '')!;
+        this.hotkeyLabel.setSize(size, size * 0.4);
+        this.hotkeyLabel.setPoint(FRAMEPOINT_BOTTOMRIGHT, this._buttonHandle, FRAMEPOINT_BOTTOMRIGHT, -0.002, 0.001);
+        BlzFrameSetTextAlignment(this.hotkeyLabel.handle, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_RIGHT);
+        this.hotkeyLabel.setText('');
 
         // BoxedText from war3mapImported\ui\CustomTextButton.fdf: title, description
         this.tooltip = Frame.create('BoxedText', this._buttonHandle, 0, 0);
@@ -77,6 +84,11 @@ export abstract class AbstractActionButton {
         this.tooltip.getChild(3)?.setText('');
         const height = (titleFrame?.height ?? 0) + (descriptionFrame?.height ?? 0);
         this.tooltip.setSize(TOOLTIP_WIDTH, height + TOOLTIP_PADDING);
+    }
+
+    /** The key label in the corner; the same on every client. */
+    protected setHotkey(label: string): void {
+        this.hotkeyLabel.setText(`|cffffcc00${label}|r`);
     }
 
     /** Gold rim while a toggle is on. View only: call for the acting player, it applies locally. */
