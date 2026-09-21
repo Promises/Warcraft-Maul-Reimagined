@@ -10,9 +10,6 @@ import {writeLobbyStamp} from "./World/Game/LobbyStamp";
 import {AbilityTypes} from "war3-objectdata-th";
 import BuildTinyScoutTower = AbilityTypes.BuildTinyScoutTower;
 
-const BUILD_DATE = compiletime(() => new Date().toUTCString());
-const TS_VERSION = compiletime(() => require("typescript").version);
-const TSTL_VERSION = compiletime(() => require("typescript-to-lua").version);
 
 
 // Replace ground texture of undead acolite
@@ -45,10 +42,6 @@ function tsMain() {
     Log.addSink((new StringSink(LogLevel.Error)));
     Log.addSink(new FileSink('warcraft-maul.txt'));
     try {
-        // print(`Build: ${BUILD_DATE}`);
-        // print(`Typescript: v${TS_VERSION}`);
-        // print(`Transpiler: v${TSTL_VERSION}`);
-        // print(" ");
         // print("Welcome to TypeScript! TEST2");
         //
         // const unit = new Unit(Players[0], FourCC('hC07'), 0, 0, 270);

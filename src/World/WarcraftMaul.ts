@@ -8,7 +8,6 @@ import {Vote} from './Game/Vote';
 import {RacePicking} from './Game/RacePicking';
 import {MultiBoard} from './Game/MultiBoard';
 // import {Quests} from '../Generated/questsGEN';
-// import { BUILD_DATE, BUILD_NUMBER } from '../Generated/Version';
 import {Log, LogLevel} from '../lib/Serilog/Serilog';
 import {SellTower} from './Entity/Tower/SellTower';
 import {DamageEngine} from './Game/DamageEngine';
@@ -24,6 +23,7 @@ import {HybridBuildPanel} from './Game/Ui/HybridBuild/HybridBuildPanel';
 import {PlayerSync} from './Game/PlayerSync';
 import {HostDetection} from './Game/HostDetection';
 import {LaneTransfer} from './Game/LaneTransfer';
+import {GrayVacancy} from './Game/GrayVacancy';
 import {Quests} from '../Generated/questsGEN';
 import {RaceSelectPanel} from './Game/Ui/RaceSelect/RaceSelectPanel';
 import {WarcraftMaulSettings} from './WarcraftMaulSettings';
@@ -37,6 +37,39 @@ import {StringSink} from "../lib/Serilog/Sinks/StringSink";
 
 /** True when built with WCM_DEV=1 (npm run build:dev); enables debug mode regardless of player names. */
 const DEV_BUILD = compiletime(() => process.env.WCM_DEV === '1') as boolean;
+/**
+ * Build stamp shown at game start, so a report can be matched to a build: the version
+ * (the newest patch notes file in Quests/), the commit (a + when the tree had uncommitted
+ * changes) and the build time. Computed when the map is built, not when it runs.
+ */
+const BUILD_STAMP = compiletime(() => {
+    var fs = require('fs');
+    var path = require('path');
+    var execSync = require('child_process').execSync;
+    var root = (process as any).cwd() as string;
+    var notes = fs.readdirSync(path.join(root, 'Quests'))
+        .filter(function (name: string) { return /^\d+\.\d+\.\d+\.md$/.test(name); })
+        .map(function (name: string) { return name.replace(/\.md$/, ''); })
+        .sort(function (a: string, b: string) {
+            var pa = a.split('.').map(Number), pb = b.split('.').map(Number);
+            return (pa[0] - pb[0]) || (pa[1] - pb[1]) || (pa[2] - pb[2]);
+        });
+    var version = notes.length > 0 ? notes[notes.length - 1] : '?';
+    var commit = 'unknown';
+    try {
+        commit = execSync('git rev-parse --short HEAD', {cwd: root, stdio: ['ignore', 'pipe', 'ignore']}).toString().trim();
+        if (execSync('git status --porcelain', {cwd: root, stdio: ['ignore', 'pipe', 'ignore']}).toString().trim() !== '') {
+            commit += '+';
+        }
+    } catch (error) {
+        // Not a git checkout: the version and time still identify the build
+    }
+    var now = new Date();
+    var pad = function (n: number) { return (n < 10 ? '0' : '') + n; };
+    var built = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate())
+        + ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes());
+    return 'v' + version + ' (' + commit + ') built ' + built;
+}) as string;
 
 export class WarcraftMaul {
 
@@ -70,6 +103,7 @@ export class WarcraftMaul {
     public laneTransfer: LaneTransfer;
     public raceSelectPanel: RaceSelectPanel;
     public actionBar: ActionBar;
+    public grayVacancy: GrayVacancy;
 
     public enemies: Attacker[] = [];
     private readonly _creepAbilityHandler: CreepAbilityHandler;
@@ -167,10 +201,11 @@ export class WarcraftMaul {
         }
 
         SendMessage('Welcome to Warcraft Maul Reimagined');
-        // SendMessage(`This is build: ${BUILD_NUMBER}, built ${BUILD_DATE}.`);
+        SendMessage(`|cff999999Build ${BUILD_STAMP}${DEV_BUILD ? ', dev' : ''}|r`);
         this.playerSync = new PlayerSync(this);
         this.hostDetection = new HostDetection(this);
         this.laneTransfer = new LaneTransfer(this);
+        this.grayVacancy = new GrayVacancy(this);
         this.playerSync.on('build', (player, data) => player.placeTower(data));
         this.hybridBuildPanel = new HybridBuildPanel(this);
         this.raceSelectPanel = new RaceSelectPanel(this);

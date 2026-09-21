@@ -40,6 +40,8 @@ export class ActionBar {
         this.rail = Frame.createType('actionbarRail', gameUi, 0, 'BACKDROP', 'EscMenuControlBackdropTemplate')!;
         this.rail.setSize(ActionBar.clusterSpan() + 2 * RAIL_PADDING, RAIL_HEIGHT);
         this.rail.setAbsPoint(FRAMEPOINT_CENTER, RAIL_CENTER_X, RAIL_CENTER_Y);
+        // Below the game's dialogs (Message Log, ESC menu), which sit at level 0 on the game UI
+        this.rail.setLevel(-1);
 
         this.hybridBuild = this.initializeButtons();
         // Only a hybrid random player has a build menu; the button appears when they random

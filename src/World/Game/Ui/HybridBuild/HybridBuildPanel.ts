@@ -101,7 +101,8 @@ export class HybridBuildPanel {
     public refresh(player: Defender): void {
         player.hybridTowers.forEach((tower, tier) => this.tierButtons[tier].setContent(player, {
             icon: tower.icon ?? '',
-            title: `|cffffcc00${HOTKEY_LABELS[slotOfTier(tier)]}|r  ${tower.name}`,
+            // The name is a string-table key; resolved here, since the hotkey prefix would stop the button doing it
+            title: `|cffffcc00${HOTKEY_LABELS[slotOfTier(tier)]}|r  ${GetLocalizedString(tower.name) ?? tower.name}`,
             description: tower.toolTipExtended,
             goldCost: tower.goldCost,
         }));

@@ -5,9 +5,9 @@ import {WarcraftMaul} from '../../WarcraftMaul';
 import {AbstractHologramMaze} from '../../Holograms/AbstractHologramMaze';
 import {Tower} from '../Tower/Specs/Tower';
 import {CitadelOfNaxxramas} from '../Tower/Races/Naxxramas/CitadelOfNaxxramas';
-import {Effect, Timer, Trigger, Unit} from "w3ts";
+import {Effect, Timer, Trigger, Unit, Image} from "w3ts";
 import {Rectangle} from "../../../JassOverrides/Rectangle";
-import {COLOUR, DecodeFourCC, SendMessage, Util} from "../../../lib/translators";
+import {COLOUR, DecodeFourCC, SendMessage, Util, createImage} from "../../../lib/translators";
 import {Log} from "../../../lib/Serilog/Serilog";
 import {TimedEvent} from "../../../lib/WCEventQueue/TimedEvent";
 import {GameTowerDef} from "../../Game/Races/HybridRandom.types";
@@ -20,6 +20,9 @@ import {HYBRID_BUILD_HOTKEYS} from "../../Game/Ui/HybridBuild/HybridBuildPanel";
 
 // The hybrid builder's build ability (AUbu); its command card button is hidden
 export const HYBRID_BUILD_ABILITY: number = FourCC('AUbu');
+// The sample maze's tile, at the size it uses for one 2x2 tower spot
+const QUEUED_TILE_TEXTURE = 'ReplaceableTextures\\Splats\\SuggestedPlacementSplat.blp';
+const QUEUED_TILE_SIZE = 192;
 
 export class Defender extends AbstractPlayer {
 
@@ -42,6 +45,13 @@ export class Defender extends AbstractPlayer {
     // local knowledge, only read on this player's own client
     private uiPressedAt: number = -1;
     private placementTimer: Timer | undefined;
+    // Shift-placed towers waiting for the builder, issued in order as it goes idle. The game's
+    // own order queue does not survive the placeholder being swapped for the tower, so the
+    // map keeps its own, drawn as ghosts like the native queue and cleared by any other order
+    // given to the builder, as the native one is.
+    private readonly pendingBuilds: {data: string, ghost: Effect | undefined, tile: Image}[] = [];
+    private readonly buildQueueTimer: Timer = Timer.create();
+    private issuingBuild: boolean = false;
     mouseX: number = 0;
     mouseY: number = 0;
     private _highlightedPoints: { x: number, y: number }[] = [];
@@ -93,14 +103,7 @@ export class Defender extends AbstractPlayer {
 
         // The ghost is a local visual; other clients get an empty model at the same handle
         const center = this.highlightedCenter();
-        this.buildEffect = Effect.create(this.isLocal() ? tower.model : '', center?.x ?? 0, center?.y ?? 0);
-        if (this.buildEffect) {
-            this.buildEffect.scale = tower.modelScale;
-            this.buildEffect.setColor(128, 128, 128);
-            this.buildEffect.setAlpha(153);
-            this.buildEffect.setYaw(Deg2Rad(270));
-            this.buildEffect.setTimeScale(0.01);
-        }
+        this.buildEffect = this.createGhost(tower, center?.x ?? 0, center?.y ?? 0);
     }
 
     public stopBuilding(): void {
@@ -179,7 +182,8 @@ export class Defender extends AbstractPlayer {
         }
         const cornerX = Math.min(...this.highlightedPoints.map(point => point.x));
         const cornerY = Math.min(...this.highlightedPoints.map(point => point.y));
-        // Holding shift keeps build mode for the next tower, like the native build command
+        // Holding shift queues the tower behind the builder's current work and keeps build
+        // mode for the next one, like the native build command
         const keepBuilding = BlzIsMetaKeyPressed(METAKEY_SHIFT) ? 1 : 0;
         // Build mode is local, so buildTier only exists on this client; carry it in the message
         this.game.playerSync.send('build',
@@ -210,10 +214,24 @@ export class Defender extends AbstractPlayer {
         }
         const tower = this.hybridTowers[tier];
         if (this.getGold() < tower.goldCost) {
-            this.sendMessage(`Not enough gold, ${tower.name} costs |cffffcc00${tower.goldCost}|r`);
+            this.sendMessage(`Not enough gold, ${GetLocalizedString(tower.name) ?? tower.name} costs |cffffcc00${tower.goldCost}|r`);
             return;
         }
         const center = maze.getHighlightedPointsCenter(points)!;
+        // A shift placement behind a busy builder waits its turn, shown as a ghost; a plain
+        // placement replaces the builder's work and drops what was waiting, like a native order
+        if (keepBuilding === 1 && GetUnitCurrentOrder(this.hybridBuilder.handle) !== 0) {
+            this.pendingBuilds.push({
+                data,
+                ghost: this.createGhost(tower, center.x, center.y),
+                tile: this.createQueuedTile(center.x, center.y),
+            });
+            this.buildQueueTimer.start(0.1, true, () => this.issuePendingBuild());
+            return;
+        }
+        if (keepBuilding !== 1) {
+            this.clearPendingBuilds();
+        }
         const dummyId = DummyTowers[`${this.id + 1}`][`${tier + 1}`];
         // Building on an anti-juggle spot: the blocker's pathing refuses the order, so it is
         // lifted for exactly its own footprint (half over it is not allowed) and put back if
@@ -230,7 +248,9 @@ export class Defender extends AbstractPlayer {
         // The build ability is hidden from the command card (the placeholders must not show)
         // and a hidden ability refuses orders, so it is shown for the order and hidden again
         BlzUnitHideAbility(this.hybridBuilder.handle, HYBRID_BUILD_ABILITY, false);
+        this.issuingBuild = true;
         const ordered = this.hybridBuilder.issueBuildOrder(FourCC(dummyId), center.x, center.y);
+        this.issuingBuild = false;
         BlzUnitHideAbility(this.hybridBuilder.handle, HYBRID_BUILD_ABILITY, true);
         if (!ordered) {
             liftedBlocker?.restore();
@@ -241,6 +261,54 @@ export class Defender extends AbstractPlayer {
         if (keepBuilding !== 1) {
             this.game.hybridBuildPanel.close(this);
         }
+    }
+
+    /** Issues the next waiting tower once the builder is idle; the placement is re-checked then. */
+    private issuePendingBuild(): void {
+        if (!this.hybridBuilder || this.pendingBuilds.length === 0) {
+            this.clearPendingBuilds();
+            return;
+        }
+        if (GetUnitCurrentOrder(this.hybridBuilder.handle) === 0) {
+            const next = this.pendingBuilds.shift()!;
+            next.ghost?.destroy();
+            next.tile.destroy();
+            this.placeTower(next.data);
+        }
+    }
+
+    private clearPendingBuilds(): void {
+        for (const pending of this.pendingBuilds) {
+            pending.ghost?.destroy();
+            pending.tile.destroy();
+        }
+        this.pendingBuilds.length = 0;
+        this.buildQueueTimer.pause();
+    }
+
+    /**
+     * The floor tile under a queued ghost: the sample maze's placement splat in a warmer tint.
+     * Created on every client (a handle), shown on this player's only.
+     */
+    private createQueuedTile(x: number, y: number): Image {
+        const tile = createImage(QUEUED_TILE_TEXTURE, QUEUED_TILE_SIZE, x, y, 0);
+        tile.setRender(true);
+        tile.setColor(255, 220, 140, 200);
+        tile.show(this.isLocal());
+        return tile;
+    }
+
+    /** A dimmed still model of the tower; a local visual, other clients get an empty model. */
+    private createGhost(tower: GameTowerDef, x: number, y: number): Effect | undefined {
+        const ghost = Effect.create(this.isLocal() ? tower.model : '', x, y);
+        if (ghost) {
+            ghost.scale = tower.modelScale;
+            ghost.setColor(128, 128, 128);
+            ghost.setAlpha(153);
+            ghost.setYaw(Deg2Rad(270));
+            ghost.setTimeScale(0.01);
+        }
+        return ghost;
     }
 
     private highlightedCenter(): { x: number, y: number } | undefined {
@@ -328,6 +396,16 @@ export class Defender extends AbstractPlayer {
         this.deselectUnitTrigger = Trigger.create();
         this.deselectUnitTrigger.registerPlayerUnitEvent(this, EVENT_PLAYER_UNIT_DESELECTED, undefined);
         this.deselectUnitTrigger.addAction(() => this.rangeIndicator.hide());
+        // Any order the hybrid builder gets that is not a placement from here drops the queue
+        const builderOrder = Trigger.create();
+        builderOrder.registerPlayerUnitEvent(this, EVENT_PLAYER_UNIT_ISSUED_ORDER, undefined);
+        builderOrder.registerPlayerUnitEvent(this, EVENT_PLAYER_UNIT_ISSUED_POINT_ORDER, undefined);
+        builderOrder.registerPlayerUnitEvent(this, EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER, undefined);
+        builderOrder.addAction(() => {
+            if (!this.issuingBuild && this.hybridBuilder && Unit.fromEvent() === this.hybridBuilder) {
+                this.clearPendingBuilds();
+            }
+        });
 
         const t = new Timer().start(0.1, false, () => {
             t.destroy();
@@ -486,6 +564,9 @@ export class Defender extends AbstractPlayer {
         this.game.laneHolders.delete(this._lane);
         this._lane = lane;
         this.game.laneHolders.set(lane, this);
+        if (lane === COLOUR.GRAY) {
+            this.game.grayVacancy.close();
+        }
         this.setHoloMaze(undefined);
         const location: Point = this.game.mapSettings.ALLOW_PLAYER_TOWER_LOCATIONS[lane];
         if (this.allowPlayerTower) {
@@ -540,6 +621,7 @@ export class Defender extends AbstractPlayer {
         // TriggerSleepAction(2.00);
         this.game.worldMap.playerSpawns[this.lane].isOpen = false;
         this.game.laneHolders.delete(this.lane);
+        this.game.grayVacancy.laneVacated(this.lane, this);
         if (this.game.scoreBoard && this._scoreSlot > -1) {
 
             MultiboardSetItemValueBJ(
@@ -552,6 +634,7 @@ export class Defender extends AbstractPlayer {
         }
 
         this.stopBuilding();
+        this.clearPendingBuilds();
         if (this.hybridBuilder) {
             this.hybridBuilder.destroy();
         }

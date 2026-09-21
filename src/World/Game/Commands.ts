@@ -329,6 +329,11 @@ export class Commands {
                 }
                 break;
             }
+            case 'vacategray':
+                // Simulates gray leaving: frees the lane and offers it around
+                this.game.laneHolders.delete(COLOUR.GRAY);
+                this.game.grayVacancy.laneVacated(COLOUR.GRAY, undefined);
+                break;
             case 'lanecheck':
                 this.game.laneTransfer.reportLaneDifferences();
                 player.sendMessage('Lane differences written to the log');
@@ -749,6 +754,7 @@ export class Commands {
                 }
                 this.game.players.delete(this.voteAgainstPlayer.id);
                 this.game.laneHolders.delete(this.voteAgainstPlayer.lane);
+                this.game.grayVacancy.laneVacated(this.voteAgainstPlayer.lane, this.voteAgainstPlayer);
 
                 SendMessage(`Votekick for ${this.voteAgainstPlayer.getNameWithColour()} has succeeded!`);
                 CustomDefeatBJ(this.voteAgainstPlayer.handle, 'Kicked!');

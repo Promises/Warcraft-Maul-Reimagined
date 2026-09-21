@@ -98,7 +98,22 @@ export class LaneTransfer {
         this.moveToLane(player, COLOUR.GRAY);
     }
 
-    public moveToLane(player: Defender, target: number): void {
+    /** Whether any spawned creep is inside a lane's area. */
+    public laneHasCreeps(lane: number): boolean {
+        const area = this.game.mapSettings.PLAYER_AREAS[lane];
+        for (const creep of this.game.worldMap.spawnedCreeps.unitMap.values()) {
+            if (area.ContainsCreep(creep)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Moves during a wave are refused, since towers leave creeps behind; `whenLaneClear`
+     * allows one as long as the target lane has no creeps (taking over an open gray lane).
+     */
+    public moveToLane(player: Defender, target: number, whenLaneClear: boolean = false): void {
         const laneName = Util.ColourString(COLOUR_CODES[target], Util.COLOUR_NAMES[target]);
         if (player.lane === target) {
             player.sendMessage(`You already hold the ${laneName} lane`);
@@ -109,7 +124,7 @@ export class LaneTransfer {
             player.sendMessage(`${holder.getNameWithColour()} holds the ${laneName} lane`);
             return;
         }
-        if (this.game.worldMap.gameRoundHandler?.isWaveInProgress) {
+        if (this.game.worldMap.gameRoundHandler?.isWaveInProgress && (!whenLaneClear || this.laneHasCreeps(target))) {
             player.sendMessage(`Wait until the wave is over before moving to the ${laneName} lane`);
             return;
         }
