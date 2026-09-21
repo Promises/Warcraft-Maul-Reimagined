@@ -335,7 +335,7 @@ export class Commands {
                 // Rebuild the action bar in a variant to isolate the hover flicker
                 const variant = Util.ParseInt(command[1] ?? '0');
                 setActionButtonVariant(isNaN(variant) ? 0 : variant);
-                this.game.actionBar.hide();
+                this.game.actionBar.destroy();
                 this.game.actionBar = new ActionBar(this.game);
                 for (const other of this.game.players.values()) {
                     if (other.hasHybridRandomed) {

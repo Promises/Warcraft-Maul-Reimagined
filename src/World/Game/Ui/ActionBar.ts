@@ -33,6 +33,7 @@ export class ActionBar {
     private readonly game: WarcraftMaul;
     private readonly rail: Frame;
     private readonly buttons: AbstractActionButton[] = [];
+    private readonly decorations: Frame[] = [];
     private readonly hybridBuild: HybridBuildButton;
 
     constructor(game: WarcraftMaul) {
@@ -49,9 +50,15 @@ export class ActionBar {
         this.hybridBuild.setVisible(false);
     }
 
-    /** Debug: hides this bar; -flick builds a new one in a variant. */
-    public hide(): void {
-        this.rail.setVisible(false);
+    /** Debug: removes every frame of this bar; -flick builds a new one in a variant. */
+    public destroy(): void {
+        for (const button of this.buttons) {
+            button.destroy();
+        }
+        for (const frame of this.decorations) {
+            frame.destroy();
+        }
+        this.rail.destroy();
     }
 
     /** Shows the hybrid build button on that player's client. */
@@ -85,6 +92,7 @@ export class ActionBar {
             first + BUTTON_COUNT * BUTTON_PITCH - BUTTON_PITCH / 2 + DIVIDER_GAP, 0);
         divider.setTexture(DIVIDER_TEXTURE, 0, true);
         divider.setAlpha(110);
+        this.decorations.push(divider);
 
         // Reserved wells: empty frames, dimmed, where the next buttons go
         for (let i = 0; i < RESERVED_WELLS; i++) {
@@ -93,6 +101,7 @@ export class ActionBar {
             well.setPoint(FRAMEPOINT_CENTER, this.rail, FRAMEPOINT_CENTER, offset(BUTTON_COUNT + i), 0);
             well.setTexture(WELL_TEXTURE, 0, true);
             well.setAlpha(107);
+            this.decorations.push(well);
         }
         return hybridBuild;
     }

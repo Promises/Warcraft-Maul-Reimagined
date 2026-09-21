@@ -131,6 +131,17 @@ export abstract class AbstractActionButton {
         }
     }
 
+    /** Removes every frame of the button (debug rebuilds). */
+    public destroy(): void {
+        this.tooltip?.destroy();
+        this.hotkeyLabel.destroy();
+        this._backdropHandle.destroy();
+        this.onRim.destroy();
+        this.well.destroy();
+        this._buttonHandle.destroy();
+        this.trig.destroy();
+    }
+
     /** Local view: the button, its well and rim. */
     public setVisible(visible: boolean): void {
         this._buttonHandle.setVisible(visible);
