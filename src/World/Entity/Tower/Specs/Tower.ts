@@ -16,7 +16,10 @@ import { SellActionTower } from './SellActionTower';
 import { TickingTower } from './TickingTower';
 import { AntiJuggleTower } from '../../AntiJuggle/AntiJuggleTower';
 import {Unit} from "w3ts";
-import {ReplaceUnit} from "../../../../lib/translators";
+import {ReplaceUnit, Util} from "../../../../lib/translators";
+
+// A tower paid for while a wave was running is never fully refundable
+const PAID_DURING_WAVE: number = -1;
 
 export class Tower {
 
@@ -26,6 +29,10 @@ export class Tower {
     private readonly _owner: Defender;
     private readonly _game: WarcraftMaul;
     private _towerValue: number;
+    // What this tower cost in one build phase, and which phase that was: sold in the same phase
+    // that gold comes back in full, later only at settings.SELL_REFUND_RATE
+    private _fullRefundValue: number;
+    private _fullRefundPhase: number;
     private _leaverOwned: boolean = false;
     private targetTick: number | undefined;
 
@@ -35,6 +42,8 @@ export class Tower {
         this._UniqueID = tower.id;
         this._owner = owner;
         this._towerValue = GetUnitGoldCost(this.GetTypeID());
+        this._fullRefundValue = this._towerValue;
+        this._fullRefundPhase = game.worldMap.gameRoundHandler?.isWaveInProgress ? PAID_DURING_WAVE : game.buildPhase;
         owner.AddTower(this);
     }
 
@@ -89,6 +98,7 @@ export class Tower {
         const u = ReplaceUnit(this.unit, newTypeId)!;
         const newTower: Tower = this.game.worldMap.towerConstruction.SetupTower(u, this.owner);
         newTower._towerValue += this._towerValue;
+        newTower._fullRefundValue += this.refundableValue;
         return newTower;
     }
 
@@ -230,11 +240,32 @@ export class Tower {
         this.Sell();
         const newTower: Tower = this.game.worldMap.towerConstruction.SetupTower(this.unit, newOwner);
         newTower._towerValue = this._towerValue;
+        newTower._fullRefundValue = this._fullRefundValue;
+        newTower._fullRefundPhase = this._fullRefundPhase;
         return newTower;
     }
 
     public GetSellValue(): number {
         return this.towerValue;
+    }
+
+    /** Gold spent on this tower in the build phase that is still running; 0 once a wave has started. */
+    public get refundableValue(): number {
+        return this._fullRefundPhase === this._game.buildPhase ? this._fullRefundValue : 0;
+    }
+
+    /** Carries still-refundable gold onto this tower: an upgrade keeps what its predecessor cost. */
+    public AddRefundableValue(value: number): void {
+        this._fullRefundValue += value;
+    }
+
+    /**
+     * Gold for selling this tower: what it cost in the build phase still running comes back in
+     * full, so towers can be rearranged freely between waves; the rest at the sell rate.
+     */
+    public GetSellRefund(): number {
+        const full: number = this.refundableValue;
+        return Util.Round(full + (this._towerValue - full) * settings.SELL_REFUND_RATE);
     }
 
     public Remove(): void {

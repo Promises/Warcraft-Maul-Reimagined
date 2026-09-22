@@ -104,6 +104,11 @@ export class WarcraftMaul {
     public raceSelectPanel: RaceSelectPanel;
     public actionBar: ActionBar;
     public grayVacancy: GrayVacancy;
+    /**
+     * Counts build phases: it goes up when a wave starts, so a tower can tell whether the gold
+     * it cost was spent in the build phase that is still running (Tower.GetSellRefund).
+     */
+    public buildPhase: number = 0;
 
     public enemies: Attacker[] = [];
     private readonly _creepAbilityHandler: CreepAbilityHandler;

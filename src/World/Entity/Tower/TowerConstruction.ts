@@ -93,6 +93,7 @@ export class TowerConstruction {
             instance.Sell();
             const newTower: Tower = this.game.worldMap.towerConstruction.SetupTower(tower, owner);
             newTower.towerValue += instance.towerValue;
+            newTower.AddRefundableValue(instance.refundableValue);
         }
     }
 

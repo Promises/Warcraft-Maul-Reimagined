@@ -20,7 +20,7 @@ export const Quests: Quest[] = [
         title: `5.0.0 - 2`,
         icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
         stype: 0,
-        body: `Updates:\n- -gray: when the gray lane is empty, take it over. Your towers, builders and units move with you and you become the last defender\n- When the gray player leaves, everyone is offered the lane. The first to take it moves there at once, or as soon as gray is clear of creeps\n- Range check: -range or the action bar button draws the attack range of any tower you select as a sharp ring at any size\n- Difficulty scales creep health and armor only (a hidden second multiplier is gone)\n- New loading screen`,
+        body: `Updates:\n- -gray: when the gray lane is empty, take it over. Your towers, builders and units move with you and you become the last defender\n- When the gray player leaves, everyone is offered the lane. The first to take it moves there at once, or as soon as gray is clear of creeps\n- Range check: -range or the action bar button draws the attack range of any tower you select as a sharp ring at any size\n- Towers you build between waves sell for their full price until the next wave starts; once a wave is running, selling refunds 75% as before\n- Difficulty scales creep health and armor only (a hidden second multiplier is gone)\n- New loading screen`,
     },
     {
         title: `5.0.0 - 1`,

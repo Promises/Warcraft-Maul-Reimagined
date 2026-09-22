@@ -6,7 +6,11 @@ import {Maze, Walkable} from '../../Antiblock/Maze';
 import {Tower} from './Specs/Tower';
 import {AntiJuggleTower} from '../AntiJuggle/AntiJuggleTower';
 import {Effect, Trigger, Unit} from "w3ts";
-import {DecodeFourCC, Util} from "../../../lib/translators";
+import {DecodeFourCC} from "../../../lib/translators";
+
+// Towers whose own tooltip promises the full price back at any time
+const FULL_REFUND_TOWERS: number[] = [FourCC('n01Y'), FourCC('n00M'), FourCC('e00L')];
+const SELL_ABILITY: number = FourCC('A02D');
 
 export class SellTower {
     private _sellTrigger: Trigger;
@@ -18,10 +22,16 @@ export class SellTower {
         TriggerRegisterAnyUnitEventBJ(this._sellTrigger.handle, EVENT_PLAYER_UNIT_SPELL_EFFECT);
         this._sellTrigger.addCondition(() => this.AreWeSellingTheTower());
         this._sellTrigger.addAction(() => this.FindAndSellTower());
+        // The ability's own tooltip only knows the plain rate; the build phase rule is set here
+        // so it lives next to the gold it describes (object data is edited in the World Editor)
+        BlzSetAbilityExtendedTooltip(SELL_ABILITY,
+                                     `Sells the tower for ${Math.floor(settings.SELL_REFUND_RATE * 100)}% of its worth.`
+                                     + '|n|nGold spent since the last wave ended comes back in full,'
+                                     + ' until the next wave starts.', 0);
     }
 
     private AreWeSellingTheTower(): boolean {
-        return GetSpellAbilityId() === FourCC('A02D');
+        return GetSpellAbilityId() === SELL_ABILITY;
     }
 
 
@@ -50,17 +60,14 @@ export class SellTower {
             const tower: Tower | undefined = player.GetTower(unit.id);
             if (tower) {
 
-                value = Math.floor((<Tower>tower).GetSellValue());
-
-                if (tower.GetTypeID() !== FourCC('n01Y') &&
-                    tower.GetTypeID() !== FourCC('n00M') &&
-                    tower.GetTypeID() !== FourCC('e00L')) {
-                    value = Util.Round(value * 0.75);
-                }
+                // A few towers advertise a full refund whenever they are sold
+                value = FULL_REFUND_TOWERS.indexOf(tower.GetTypeID()) >= 0
+                    ? Math.floor(tower.GetSellValue())
+                    : tower.GetSellRefund();
 
                 tower.Sell();
             }
-            if (!(unit.getAbilityLevel(FourCC('A02D')) > 0)) {
+            if (!(unit.getAbilityLevel(SELL_ABILITY) > 0)) {
                 value = 0;
             }
             Log.Info(`Sell ${unit.name} (${DecodeFourCC(unit.typeId)}) by ${player.getPlayerName()}: ${value} gold, spell ${DecodeFourCC(GetSpellAbilityId())}`);

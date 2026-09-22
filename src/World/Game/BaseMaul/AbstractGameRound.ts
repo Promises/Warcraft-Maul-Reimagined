@@ -39,6 +39,10 @@ export abstract class AbstractGameRound {
     }
 
     set isWaveInProgress(value: boolean) {
+        // A wave starting ends the build phase: towers paid for in it stop selling for full price
+        if (value && !this._isWaveInProgress) {
+            this.game.buildPhase++;
+        }
         this._isWaveInProgress = value;
     }
 

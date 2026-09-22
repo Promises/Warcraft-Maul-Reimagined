@@ -12,6 +12,9 @@ export interface Point {
 // GAME SETTINGS:
 // export const INITIAL_LIVES: number = 20;
 
+/** Selling gives this much of a tower's worth back, except for gold spent in the build phase still running. */
+export const SELL_REFUND_RATE: number = 0.75;
+
 // @ts-ignore
 
 export enum GAME_MODES {
