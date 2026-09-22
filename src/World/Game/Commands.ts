@@ -23,6 +23,19 @@ function RandomChoice<T>(a: Array<T>): T {
     return a[Math.floor(Math.random() * a.length)];
 }
 
+// A lane's two waypoints are each marked by one tile of Cityscape white marble on the lane's
+// Icecrown rough dirt; terrain tiles are 128 wide with their centres on the half grid
+const WAYPOINT_TILE: number = FourCC('Ywmb');
+const LANE_GROUND_TILE: number = FourCC('Idtr');
+const TILE_SIZE: number = 128;
+// The checkpoints inside a player's build area, before the lane leaves it
+const WAYPOINTS_IN_AREA: number = 2;
+
+/** The centre of the terrain tile a point falls in. */
+function snapToTile(value: number): number {
+    return Math.floor(value / TILE_SIZE) * TILE_SIZE + TILE_SIZE / 2;
+}
+
 export class Commands {
 
     public commandTrigger: Trigger;
@@ -32,6 +45,10 @@ export class Commands {
     private hasVotedToKick: boolean[] = [];
     private voteKickTimer: timer = CreateTimer();
     private drawings: Image[][] = [];
+    // Debug: waypoint marker tiles painted by -wptest, so they can be put back
+    private waypointTestTiles: {x: number, y: number}[] = [];
+    // Debug: the real marker tiles -hidewp painted over, so they can be put back
+    private hiddenWaypointTiles: {x: number, y: number}[] = [];
     private points: Image[] = [];
 
 
@@ -334,6 +351,17 @@ export class Commands {
                 this.game.laneHolders.delete(COLOUR.GRAY);
                 this.game.grayVacancy.laneVacated(COLOUR.GRAY, undefined);
                 break;
+            case 'wptest': {
+                // Paints the waypoint marker tile at random spots in the red lane, to judge how a
+                // randomised waypoint would look on the ground; -wptest 0 puts the dirt back
+                const count: number = Util.ParseInt(command[1] ?? '5');
+                this.paintWaypointTest(isNaN(count) ? 5 : count, player);
+                break;
+            }
+            case 'hidewp':
+                // Hides the red lane's two real waypoint markers, and puts them back
+                this.toggleWaypointMarkers(player);
+                break;
             case 'lanecheck':
                 this.game.laneTransfer.reportLaneDifferences();
                 player.sendMessage('Lane differences written to the log');
@@ -604,6 +632,68 @@ export class Commands {
         if (this.game.debugMode) {
             this.handleDebugCommand(player, command, command2);
         }
+    }
+
+    /**
+     * Debug: every lane's two waypoints are marked by a single tile of white marble in the
+     * terrain. This paints that tile at random tile centres in the red lane and restores the
+     * ones painted before, so randomised waypoints can be looked at before any checkpoint
+     * really moves. Terrain is game state and a chat command runs on every client, so all
+     * clients paint the same tiles.
+     */
+    private paintWaypointTest(count: number, player: Defender): void {
+        for (const tile of this.waypointTestTiles) {
+            SetTerrainType(tile.x, tile.y, LANE_GROUND_TILE, -1, 1, 0);
+        }
+        this.waypointTestTiles = [];
+        const area: Rectangle = this.game.mapSettings.PLAYER_AREAS[COLOUR.RED];
+        for (let i: number = 0; i < count; i++) {
+            const x: number = snapToTile(GetRandomReal(area.minX + TILE_SIZE, area.maxX - TILE_SIZE));
+            const y: number = snapToTile(GetRandomReal(area.minY + TILE_SIZE, area.maxY - TILE_SIZE));
+            SetTerrainType(x, y, WAYPOINT_TILE, -1, 1, 0);
+            Log.Info(`Waypoint test tile at ${x}, ${y}, terrain there is now ${DecodeFourCC(GetTerrainType(x, y))}`);
+            this.waypointTestTiles.push({x, y});
+        }
+        PanCameraToTimedForPlayer(player.handle, (area.minX + area.maxX) / 2, (area.minY + area.maxY) / 2, 0);
+        player.sendMessage(count > 0
+            ? `Painted ${count} waypoint tiles in the red lane; |cffffcc00-wptest 0|r puts the ground back`
+            : 'Waypoint test tiles removed');
+    }
+
+    /**
+     * Debug: paints over the white marble tiles that mark the red lane's two waypoints, and
+     * puts them back when run again, so a rolled marker can be judged without the real ones
+     * beside it. A marker sits on the tile a checkpoint's centre is a corner of, so the tiles
+     * around each checkpoint are searched for one rather than assuming which it is.
+     */
+    private toggleWaypointMarkers(player: Defender): void {
+        if (this.hiddenWaypointTiles.length > 0) {
+            for (const tile of this.hiddenWaypointTiles) {
+                SetTerrainType(tile.x, tile.y, WAYPOINT_TILE, -1, 1, 0);
+            }
+            this.hiddenWaypointTiles = [];
+            player.sendMessage('The red lane\'s waypoint markers are back');
+            return;
+        }
+        const offsets: number[] = [-TILE_SIZE, 0, TILE_SIZE];
+        let checkpoint: CheckPoint | undefined = this.game.worldMap.playerSpawns[COLOUR.RED].spawnOne?.next;
+        for (let waypoint: number = 0; waypoint < WAYPOINTS_IN_AREA && checkpoint; waypoint++) {
+            const centreX: number = GetRectCenterX(checkpoint.rectangle);
+            const centreY: number = GetRectCenterY(checkpoint.rectangle);
+            for (const dx of offsets) {
+                for (const dy of offsets) {
+                    const x: number = snapToTile(centreX + dx);
+                    const y: number = snapToTile(centreY + dy);
+                    if (GetTerrainType(x, y) === WAYPOINT_TILE) {
+                        SetTerrainType(x, y, LANE_GROUND_TILE, -1, 1, 0);
+                        this.hiddenWaypointTiles.push({x, y});
+                    }
+                }
+            }
+            checkpoint = checkpoint.next;
+        }
+        player.sendMessage(`Hid ${this.hiddenWaypointTiles.length} waypoint marker tiles in the red lane;`
+            + ' |cffffcc00-hidewp|r again puts them back');
     }
 
     public getPlayerIdFromColourName(color: string): number {

@@ -162,7 +162,9 @@ export class Util {
     }
 
     public static ParseInt(str: string): number {
-        return +str;
+        // The unary plus is dropped in the generated Lua, which handed callers the string back
+        // and made every comparison against it a runtime error
+        return Number(str);
     }
 
     public static ParsePositiveInt(str: string): number {
