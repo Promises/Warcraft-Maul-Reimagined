@@ -11,6 +11,7 @@ FoodCeiling=300
 FrostAttackSpeedDecrease=0.0
 FrostMoveSpeedDecrease=0.25
 MinUnitSpeed=125.0
+RelativeUpgradeCost=1
 TradingIncLarge=100
 TradingIncSmall=25
 UpgradeRefundRate=1.0
