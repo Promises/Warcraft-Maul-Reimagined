@@ -75,7 +75,7 @@ export function get_all_quests(): void {
     const quest_list: Quest[] = [];
     const files: string[] = fs.readdirSync('Quests').filter(file => file.includes('.md')).sort();
     for (const f of files) {
-        const lines: string[] = fs.readFileSync(path.join('Quests', f), 'utf-8').split('\n');
+        const lines: string[] = fs.readFileSync(path.join('Quests', f), 'utf-8').split(/\r?\n/);
         const header: string[] = [];
         const body: string[] = [];
         let title: string = "";
@@ -113,7 +113,7 @@ export function get_all_quests(): void {
         }
         create_quest(title, icon, type, body, quest_list);
     }
-    const template: string[] = fs.readFileSync(path.join('templates', 'questsGEN.ts.template'), 'utf-8').split('\n');
+    const template: string[] = fs.readFileSync(path.join('templates', 'questsGEN.ts.template'), 'utf-8').split(/\r?\n/);
 
     const stripped_list: string[] = template.map(line => line.trim());
     const pivot: number = stripped_list.indexOf("{{GENERATE}}");
