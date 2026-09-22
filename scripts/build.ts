@@ -46,6 +46,24 @@ function main() {
   // }
 }
 
+/** The map name a dev build (WCM_DEV=1) carries, so a dev map is never taken for a release. */
+const DEV_MAP_NAME = 'Warcraft Maul: DEV build';
+const RELEASE_MAP_NAME = /^Warcraft Maul: Reimagined v[\d.]+$/m;
+
+/** The string table with the map name swapped for the dev one; other files unchanged. */
+function devNamed(archivePath: string, contents: Buffer): Buffer {
+  if (process.env.WCM_DEV !== '1' || archivePath.toLowerCase() !== 'war3map.wts') {
+    return contents;
+  }
+  const text = contents.toString('latin1');
+  if (!RELEASE_MAP_NAME.test(text)) {
+    logger.warn('Dev build: the map name was not found in war3map.wts, leaving it as is');
+    return contents;
+  }
+  logger.info(`Dev build: map named "${DEV_MAP_NAME}"`);
+  return Buffer.from(text.replace(RELEASE_MAP_NAME, DEV_MAP_NAME), 'latin1');
+}
+
 /** The editor's own map files; everything else in the folder is an import. */
 function isMapDataFile(archivePath: string): boolean {
   const name = archivePath.toLowerCase();
@@ -82,10 +100,10 @@ export function createMapFromDir(output: string, dir: string) {
 
   const imports: string[] = [];
   for (const fileName of files) {
-    const contents = toArrayBuffer(fs.readFileSync(fileName));
     // The game looks map files up by the exact path string (no separator normalisation), so
     // the archive, TOC entries and every path in code use backslashes like Blizzard's tools.
     const archivePath = path.relative(dir, fileName).split(path.sep).join('\\');
+    const contents = toArrayBuffer(devNamed(archivePath, fs.readFileSync(fileName)));
     if (archivePath.toLowerCase() === 'war3map.imp') {
       // Regenerated below from what is actually in the archive
       continue;
