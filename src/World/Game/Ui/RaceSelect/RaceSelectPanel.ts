@@ -217,6 +217,11 @@ export class RaceSelectPanel {
         if (!item || (!isRandomPick && !race?.enabled && !this.game.debugMode)) {
             return;
         }
+        // A race is picked once; only the random picks can repeat
+        if (race && !isRandomPick && player.hasRace(race)) {
+            player.sendMessage(`You already have ${GetLocalizedString(item.name) ?? item.name}`);
+            return;
+        }
         // The shops charged for the item before the pick rules ran, and those rules refund
         // lumber on an invalid pick, so the same cost is charged here.
         if (player.getLumber() < item.lumberCost || player.getGold() < item.goldCost) {
@@ -236,7 +241,16 @@ export class RaceSelectPanel {
     private settlePick(): void {
         this.pickInFlight = false;
         this.pickSettle.pause();
-        this.pickButton.setEnabled(true);
+        this.refreshPickButton();
+    }
+
+    /** Local: Pick is available unless a pick is in flight or the local player already has the race. */
+    private refreshPickButton(): void {
+        const localPlayer = this.game.players.get(GetPlayerId(GetLocalPlayer()));
+        const race = this.game.worldMap.races.find(candidate => candidate.itemid === this.highlightedItem);
+        const owned = race !== undefined && localPlayer !== undefined && localPlayer.hasRace(race);
+        this.pickButton.setEnabled(!this.pickInFlight && !owned);
+        this.pickButton.setText(owned ? 'Picked' : 'Pick');
     }
 
     /** Local: fills the list with the races of a tier. */
@@ -305,6 +319,7 @@ export class RaceSelectPanel {
         this.infoName.setText(item ? (GetLocalizedString(item.name) ?? item.name) : '');
         this.infoText.setText(item ? (GetLocalizedString(item.description) ?? item.description) : '');
         this.rows.forEach(row => row.setSelected(row.item === itemId));
+        this.refreshPickButton();
     }
 
     private setVisible(player: Defender, visible: boolean): void {
