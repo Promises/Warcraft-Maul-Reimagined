@@ -18,7 +18,7 @@
     "build:dev": "WCM_DEV=1 npm run build"
   },
   "dependencies": {
-    "w3ts": "^3.0.2"
+    "w3ts": "3.0.2"
   },
   "devDependencies": {
     "@types/fs-extra": "8.1.1",
@@ -28,7 +28,7 @@
     "fs-extra": "8.1.0",
     "lua-types": "^2.13.1",
     "luamin": "^1.0.4",
-    "mdx-m3-viewer-th": "^5.13.0",
+    "mdx-m3-viewer-th": "5.13.0",
     "npm-watch": "0.6.0",
     "patch-package": "^8.0.0",
     "ts-node": "8.10.2",
