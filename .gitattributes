@@ -8,3 +8,6 @@
 *.j text eol=crlf
 *.j linguist-language=TypeScript
 ./maps/* text eol=crlf
+
+# patch-package files must stay LF; a CRLF checkout on Windows makes the patches fail to apply
+*.patch text eol=lf
