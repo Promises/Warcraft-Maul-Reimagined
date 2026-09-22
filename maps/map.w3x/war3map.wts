@@ -663,7 +663,7 @@ A
 }
 
 STRING 111
-// Units: h01U ([Tavern] - Fire Lord), Hotkey (Hotkey)
+// Units: h01L ([Tavern] - Pandaren Brewmaster), Hotkey (Hotkey)
 {
 X
 }
@@ -921,7 +921,7 @@ X
 }
 
 STRING 154
-// Units: h023 ([Summons] - Dire Spirit Wolf), Hotkey (Hotkey)
+// Units: h02G ([Void Cult] - Void Worshipper), Hotkey (Hotkey)
 {
 Q
 }
@@ -975,7 +975,7 @@ Its so, so shiny; Restores 2 Mana.
 }
 
 STRING 163
-// Units: h02B ([Summons] - Treant), Hotkey (Hotkey)
+// Units: h01U ([Tavern] - Fire Lord), Hotkey (Hotkey)
 {
 Z
 }
@@ -993,37 +993,37 @@ C
 }
 
 STRING 166
-// Units: h03N ([Summons] - Angry Spirit Bear), Hotkey (Hotkey)
+// Units: h023 ([Summons] - Dire Spirit Wolf), Hotkey (Hotkey)
 {
 Z
 }
 
 STRING 167
-// Units: h042 ([Humans] - Arrow Tower), Hotkey (Hotkey)
+// Units: h024 ([Summons] - Great Spirit Wolf), Hotkey (Hotkey)
 {
 Z
 }
 
 STRING 168
-// Units: h045 ([Humans] - Venom Tower), Hotkey (Hotkey)
+// Units: h02B ([Summons] - Treant), Hotkey (Hotkey)
 {
 Z
 }
 
 STRING 169
-// Units: h047 ([Humans] - Fire Tower), Hotkey (Hotkey)
+// Units: h03N ([Summons] - Angry Spirit Bear), Hotkey (Hotkey)
 {
 Z
 }
 
 STRING 170
-// Units: h024 ([Summons] - Great Spirit Wolf), Hotkey (Hotkey)
+// Units: h02H ([Uniques] - Marine), Hotkey (Hotkey)
 {
 Q
 }
 
 STRING 171
-// Units: h02G ([Void Cult] - Void Worshipper), Hotkey (Hotkey)
+// Units: h03D ([Draenei] - Draenei Hut), Hotkey (Hotkey)
 {
 Q
 }
@@ -1035,13 +1035,13 @@ X
 }
 
 STRING 173
-// Units: h049 ([Human] - Darkness Tower), Hotkey (Hotkey)
+// Units: h042 ([Humans] - Arrow Tower), Hotkey (Hotkey)
 {
 Z
 }
 
 STRING 174
-// Units: h04L ([Cavernous Creatures] - Large Cavernous Growth), Hotkey (Hotkey)
+// Units: h045 ([Humans] - Venom Tower), Hotkey (Hotkey)
 {
 Z
 }
@@ -1071,7 +1071,7 @@ Fel Barrage
 }
 
 STRING 179
-// Units: h04S ([Cavernous Creatures] - Cavernous Growth), Hotkey (Hotkey)
+// Units: h047 ([Humans] - Fire Tower), Hotkey (Hotkey)
 {
 Z
 }
@@ -1156,49 +1156,49 @@ Grom Hellscream
 }
 
 STRING 188
-// Units: n002 (Dazzling), Hotkey (Hotkey)
+// Units: h049 ([Human] - Darkness Tower), Hotkey (Hotkey)
 {
 Z
 }
 
 STRING 189
-// Units: n00S ([Corrupt N.Elves] - Corrupted Warden), Hotkey (Hotkey)
+// Units: h04L ([Cavernous Creatures] - Large Cavernous Growth), Hotkey (Hotkey)
 {
 Z
 }
 
 STRING 190
-// Units: n01H ([High Elven Farm] - Upgraded Elven Farm), Hotkey (Hotkey)
+// Units: h04S ([Cavernous Creatures] - Cavernous Growth), Hotkey (Hotkey)
 {
 Z
 }
 
 STRING 191
-// Units: n01L ([High Elven Farm] - Albatross), Hotkey (Hotkey)
+// Units: n002 (Dazzling), Hotkey (Hotkey)
 {
 Z
 }
 
 STRING 192
-// Units: n01M ([High Elven Farm] - Well Fed Albatross), Hotkey (Hotkey)
+// Units: n00S ([Corrupt N.Elves] - Corrupted Warden), Hotkey (Hotkey)
 {
 Z
 }
 
 STRING 193
-// Units: n01N ([High Elven Farm] - Sheep), Hotkey (Hotkey)
+// Units: n01H ([High Elven Farm] - Upgraded Elven Farm), Hotkey (Hotkey)
 {
 Z
 }
 
 STRING 194
-// Units: n01O ([High Elven Farm] - Well Fed Sheep), Hotkey (Hotkey)
+// Units: n01L ([High Elven Farm] - Albatross), Hotkey (Hotkey)
 {
 Z
 }
 
 STRING 195
-// Units: n01P ([High Elven Farm] - Crab), Hotkey (Hotkey)
+// Units: n01M ([High Elven Farm] - Well Fed Albatross), Hotkey (Hotkey)
 {
 Z
 }
@@ -1222,19 +1222,19 @@ X
 }
 
 STRING 199
-// Units: n01Q ([High Elven Farm] - Well Fed Crab), Hotkey (Hotkey)
+// Units: n01N ([High Elven Farm] - Sheep), Hotkey (Hotkey)
 {
 Z
 }
 
 STRING 200
-// Units: n03K ([Forest Trolls] - Forest Troll Emperor), Hotkey (Hotkey)
+// Units: n01O ([High Elven Farm] - Well Fed Sheep), Hotkey (Hotkey)
 {
 Z
 }
 
 STRING 201
-// Units: n05D ([Caerbannog] - Shrubbery), Hotkey (Hotkey)
+// Units: n01P ([High Elven Farm] - Crab), Hotkey (Hotkey)
 {
 Z
 }
@@ -1360,19 +1360,19 @@ Inspiring Aura
 }
 
 STRING 222
-// Units: o000 ([Humans] - Juvenile Phoenix), Hotkey (Hotkey)
+// Units: n01Q ([High Elven Farm] - Well Fed Crab), Hotkey (Hotkey)
 {
 Z
 }
 
 STRING 223
-// Units: o00E ([Orc Stronghold] - Berserker), Hotkey (Hotkey)
+// Units: n03K ([Forest Trolls] - Forest Troll Emperor), Hotkey (Hotkey)
 {
 Z
 }
 
 STRING 224
-// Units: o00Y ([Giants] - Sea Giant), Hotkey (Hotkey)
+// Units: n05D ([Caerbannog] - Shrubbery), Hotkey (Hotkey)
 {
 Z
 }
@@ -1420,7 +1420,7 @@ An Oceanmaster is nearby
 }
 
 STRING 232
-// Units: oC68 ([Aviaries] - Chimera), Hotkey (Hotkey)
+// Units: n05Q ([Dwarven Mine] - Dwarf King (Statue)), Hotkey (Hotkey)
 {
 Z
 }
@@ -1696,7 +1696,7 @@ Increases damage by 1 for each Marine tower owned.
 }
 
 STRING 278
-// Items: I00X (Hybrid Random), Hotkey (Hotkey)
+// Units: oC7A ([Naxx] - Thane Korth'azz), Hotkey (Hotkey)
 {
 V
 }
@@ -2391,7 +2391,7 @@ Pay 50 gold to remove this unit.
 }
 
 STRING 391
-// Units: u02B (Death Rune [Level 3]), Hotkey (Hotkey)
+// Units: o000 ([Humans] - Juvenile Phoenix), Hotkey (Hotkey)
 {
 Z
 }
@@ -2478,7 +2478,7 @@ STRING 400
 }
 
 STRING 401
-// Units: u02D (Life Rune [Level 3]), Hotkey (Hotkey)
+// Units: o00E ([Orc Stronghold] - Berserker), Hotkey (Hotkey)
 {
 Z
 }
@@ -2505,7 +2505,7 @@ STRING 404
 }
 
 STRING 405
-// Units: h02H ([Uniques] - Marine), Hotkey (Hotkey)
+// Units: h03E ([Workers Union] - Orc Peon), Hotkey (Hotkey)
 {
 Q
 }
@@ -2637,7 +2637,7 @@ STRING 426
 }
 
 STRING 427
-// Units: u02F (Nature Rune [Level 3]), Hotkey (Hotkey)
+// Units: o00I ([Dragons] - Black Dragon Whelp), Hotkey (Hotkey)
 {
 Z
 }
@@ -2768,14 +2768,8 @@ STRING 448
 Construct Thaddius
 }
 
-STRING 449
-// Abilities: A0F5 (Construct Thaddius), Ubertip (Tooltip - Normal - Extended)
-{
-Combines Stalagg with Feugen to create Thaddius.
-}
-
 STRING 450
-// Units: u031 (Fire Rune [Level 3]), Hotkey (Hotkey)
+// Units: o00U ([Aviaries] - Phoenix), Hotkey (Hotkey)
 {
 Z
 }
@@ -5759,12 +5753,6 @@ STRING 946
 Build Pocket Factory
 }
 
-STRING 947
-// Units: h011 ([Goblins] - Pocket Factory), Ubertip (Tooltip - Extended)
-{
-This sweatshop factory is packed with wage-slave Goblins who continuously churn out Mecha-Goblins. Has no attack of its own, but spawns Mecha-Goblins to bash on enemies.|n|cffffcc00Attack:|r Normal|n|cffffcc00Cooldown:|r 0.4|n|cffffcc00Damage:|r 28-28 (Ground only)
-}
-
 STRING 948
 // Units: h012 ([Goblin] Mecha-Goblin), Name (Name)
 {
@@ -5868,25 +5856,25 @@ This creature may be chaotic, but his special ability can often come in handy wh
 }
 
 STRING 965
-// Units: h01E ([Gnolls] - Gnoll Warden), Name (Name)
+// Units: n02F ([Gnolls] - Gnoll Warden), Name (Name)
 {
 [Gnolls] - Gnoll Warden
 }
 
 STRING 966
-// Units: h01E ([Gnolls] - Gnoll Warden), Hotkey (Hotkey)
+// Units: h01E ([Tavern] - Gnoll Warden), Hotkey (Hotkey)
 {
 W
 }
 
 STRING 967
-// Units: h01E ([Gnolls] - Gnoll Warden), Tip (Tooltip - Basic)
+// Units: h01E ([Tavern] - Gnoll Warden), Tip (Tooltip - Basic)
 {
 Hire Gnoll Warden
 }
 
 STRING 968
-// Units: h01E ([Gnolls] - Gnoll Warden), Ubertip (Tooltip - Extended)
+// Units: h01E ([Tavern] - Gnoll Warden), Ubertip (Tooltip - Extended)
 {
 This Gnoll Warden was found passed out drunk in your tavern and he's only working for you so you won't report him for drinking on the job|n|n|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 1.00|n|cffffcc00Damage:|r 34 - 50|n|cffffcc00Range:|r 900|n|cffffcc00Ability:|r Splash; the area of effect is 125
 }
@@ -5982,7 +5970,7 @@ STRING 983
 }
 
 STRING 984
-// Units: h01L ([Tavern] - Pandaren Brewmaster), Hotkey (Hotkey)
+// Units: h02D ([Summons] - Avatar of Vengeance), Hotkey (Hotkey)
 {
 C
 }
@@ -6084,7 +6072,7 @@ STRING 1000
 }
 
 STRING 1001
-// Units: h01Z ([Summons] - Spirit Wolf), EditorSuffix (Name - Editor Suffix)
+// Units: h01C ([Tavern] - Centaur Outrunner), EditorSuffix (Name - Editor Suffix)
 {
 [T1]
 }
@@ -6114,7 +6102,7 @@ STRING 1005
 }
 
 STRING 1006
-// Units: h020 ([Summons] - Water Elemental), EditorSuffix (Name - Editor Suffix)
+// Units: h01E ([Tavern] - Gnoll Warden), EditorSuffix (Name - Editor Suffix)
 {
 [T2]
 }
@@ -6144,7 +6132,7 @@ STRING 1010
 }
 
 STRING 1011
-// Units: h021 ([Void Cult] - Void Monstrosity), EditorSuffix (Name - Editor Suffix)
+// Units: h01G ([Tavern] - Razormane), EditorSuffix (Name - Editor Suffix)
 {
 [T6]
 }
@@ -6168,7 +6156,7 @@ STRING 1014
 }
 
 STRING 1015
-// Units: h022 ([Summons] - Spirit Bear), EditorSuffix (Name - Editor Suffix)
+// Units: h01F ([Tavern] - Earth Pandaren), EditorSuffix (Name - Editor Suffix)
 {
 [T3]
 }
@@ -6288,7 +6276,7 @@ STRING 1034
 }
 
 STRING 1035
-// Units: h027 ([Summons] - Prawn), EditorSuffix (Name - Editor Suffix)
+// Units: h01I ([Tavern] - Fire Pandaren), EditorSuffix (Name - Editor Suffix)
 {
 [T6]
 }
@@ -6318,7 +6306,7 @@ STRING 1039
 }
 
 STRING 1040
-// Units: h028 ([Summons] - Skeletal Mage), EditorSuffix (Name - Editor Suffix)
+// Units: h01J ([Tavern] - Storm Pandaren), EditorSuffix (Name - Editor Suffix)
 {
 [T7]
 }
@@ -6348,7 +6336,7 @@ STRING 1044
 }
 
 STRING 1045
-// Units: h029 ([Summons] - Spirit Hawk), EditorSuffix (Name - Editor Suffix)
+// Units: h01U ([Tavern] - Fire Lord), EditorSuffix (Name - Editor Suffix)
 {
 [T8]
 }
@@ -6372,7 +6360,7 @@ STRING 1048
 }
 
 STRING 1049
-// Units: h02A ([Uniques] - Orc Firebat), EditorSuffix (Name - Editor Suffix)
+// Units: h022 ([Summons] - Spirit Bear), EditorSuffix (Name - Editor Suffix)
 {
 [T3]
 }
@@ -6396,7 +6384,7 @@ STRING 1052
 }
 
 STRING 1053
-// Units: h02B ([Summons] - Treant), EditorSuffix (Name - Editor Suffix)
+// Units: h01L ([Tavern] - Pandaren Brewmaster), EditorSuffix (Name - Editor Suffix)
 {
 [T9]
 }
@@ -6432,7 +6420,7 @@ STRING 1058
 }
 
 STRING 1059
-// Units: h02D ([Summons] - Avatar of Vengeance), Hotkey (Hotkey)
+// Units: h044 ([Humans] - Arcane Tower), Hotkey (Hotkey)
 {
 C
 }
@@ -6480,7 +6468,7 @@ STRING 1066
 }
 
 STRING 1067
-// Units: h02F ([Void Cult] - Void Priest), EditorSuffix (Name - Editor Suffix)
+// Units: h02A ([Uniques] - Orc Firebat), EditorSuffix (Name - Editor Suffix)
 {
 [T3]
 }
@@ -6504,7 +6492,7 @@ STRING 1070
 }
 
 STRING 1071
-// Units: h02G ([Void Cult] - Void Worshipper), EditorSuffix (Name - Editor Suffix)
+// Units: h01Z ([Summons] - Spirit Wolf), EditorSuffix (Name - Editor Suffix)
 {
 [T1]
 }
@@ -6528,7 +6516,7 @@ STRING 1074
 }
 
 STRING 1075
-// Units: h02H ([Uniques] - Marine), EditorSuffix (Name - Editor Suffix)
+// Units: h02G ([Void Cult] - Void Worshipper), EditorSuffix (Name - Editor Suffix)
 {
 [T1]
 }
@@ -6624,7 +6612,7 @@ STRING 1090
 }
 
 STRING 1091
-// Units: h02L ([Uniques] - Hydralisk), EditorSuffix (Name - Editor Suffix)
+// Units: h021 ([Void Cult] - Void Monstrosity), EditorSuffix (Name - Editor Suffix)
 {
 [T6]
 }
@@ -6654,7 +6642,7 @@ STRING 1095
 }
 
 STRING 1096
-// Units: h02Q ([Uniques] - Iron Arthas), EditorSuffix (Name - Editor Suffix)
+// Units: h028 ([Summons] - Skeletal Mage), EditorSuffix (Name - Editor Suffix)
 {
 [T7]
 }
@@ -6804,7 +6792,7 @@ STRING 1120
 }
 
 STRING 1121
-// Units: h03D ([Draenei] - Draenei Hut), EditorSuffix (Name - Editor Suffix)
+// Units: h02H ([Uniques] - Marine), EditorSuffix (Name - Editor Suffix)
 {
 [T1]
 }
@@ -6816,7 +6804,7 @@ STRING 1122
 }
 
 STRING 1123
-// Units: h03D ([Draenei] - Draenei Hut), Hotkey (Hotkey)
+// Units: h03J (Tinkers Crate), Hotkey (Hotkey)
 {
 Q
 }
@@ -6834,7 +6822,7 @@ STRING 1125
 }
 
 STRING 1126
-// Units: h03E ([Workers Union] - Orc Peon), EditorSuffix (Name - Editor Suffix)
+// Units: h03D ([Draenei] - Draenei Hut), EditorSuffix (Name - Editor Suffix)
 {
 [T1]
 }
@@ -6858,7 +6846,7 @@ STRING 1129
 }
 
 STRING 1130
-// Units: h03F ([Workers Union] - Human Peasant), EditorSuffix (Name - Editor Suffix)
+// Units: h02F ([Void Cult] - Void Priest), EditorSuffix (Name - Editor Suffix)
 {
 [T3]
 }
@@ -6948,7 +6936,7 @@ STRING 1144
 }
 
 STRING 1145
-// Units: h03I ([Workers Union] - Undead Acolyte), EditorSuffix (Name - Editor Suffix)
+// Units: h020 ([Summons] - Water Elemental), EditorSuffix (Name - Editor Suffix)
 {
 [T2]
 }
@@ -6960,7 +6948,7 @@ Tinkers Crate
 }
 
 STRING 1147
-// Units: h03E ([Workers Union] - Orc Peon), Hotkey (Hotkey)
+// Units: h03W ([Demon] - Felguard), Hotkey (Hotkey)
 {
 Q
 }
@@ -6978,7 +6966,7 @@ Basic observation tower. Has no attack, but can be upgraded into a Guard Tower, 
 }
 
 STRING 1150
-// Units: h03J (Tinkers Crate), EditorSuffix (Name - Editor Suffix)
+// Units: h03E ([Workers Union] - Orc Peon), EditorSuffix (Name - Editor Suffix)
 {
 [T1]
 }
@@ -7182,7 +7170,7 @@ You broke the barrel, that was a bad thing to do...|n|n|cffffcc00Attack:|r None|
 }
 
 STRING 1184
-// Units: h03T ([Arachnid] - Cracked Barrel), EditorSuffix (Name - Editor Suffix)
+// Units: h03J (Tinkers Crate), EditorSuffix (Name - Editor Suffix)
 {
 [T1]
 }
@@ -7212,7 +7200,7 @@ STRING 1188
 }
 
 STRING 1189
-// Units: h03U ([Demon] - Felhound), EditorSuffix (Name - Editor Suffix)
+// Units: h03I ([Workers Union] - Undead Acolyte), EditorSuffix (Name - Editor Suffix)
 {
 [T2]
 }
@@ -7254,7 +7242,7 @@ STRING 1195
 }
 
 STRING 1196
-// Units: h03J (Tinkers Crate), Hotkey (Hotkey)
+// Units: h04K ([Arachnid] - Basement Barrel), Hotkey (Hotkey)
 {
 Q
 }
@@ -7272,7 +7260,7 @@ STRING 1198
 }
 
 STRING 1199
-// Units: h03W ([Demon] - Felguard), EditorSuffix (Name - Editor Suffix)
+// Units: h03T ([Arachnid] - Cracked Barrel), EditorSuffix (Name - Editor Suffix)
 {
 [T1]
 }
@@ -7302,7 +7290,7 @@ STRING 1203
 }
 
 STRING 1204
-// Units: h03X ([Demon] - Succubus), EditorSuffix (Name - Editor Suffix)
+// Units: h03F ([Workers Union] - Human Peasant), EditorSuffix (Name - Editor Suffix)
 {
 [T3]
 }
@@ -7422,7 +7410,7 @@ STRING 1223
 }
 
 STRING 1224
-// Units: h041 ([Cavernous Creatures] - Cavern Frog), EditorSuffix (Name - Editor Suffix)
+// Units: h03X ([Demon] - Succubus), EditorSuffix (Name - Editor Suffix)
 {
 [T3]
 }
@@ -7470,7 +7458,7 @@ STRING 1231
 }
 
 STRING 1232
-// Units: h044 ([Humans] - Arcane Tower), Hotkey (Hotkey)
+// Units: n05E ([Caerbannog] - The Black Beast of Arrrghhh), Hotkey (Hotkey)
 {
 C
 }
@@ -7692,7 +7680,7 @@ STRING 1268
 }
 
 STRING 1269
-// Units: h04F ([Draenei] - Draenei Seer), EditorSuffix (Name - Editor Suffix)
+// Units: h041 ([Cavernous Creatures] - Cavern Frog), EditorSuffix (Name - Editor Suffix)
 {
 [T3]
 }
@@ -7752,7 +7740,7 @@ STRING 1278
 }
 
 STRING 1279
-// Units: h04H ([Draenei] - Salamander Hatchling), EditorSuffix (Name - Editor Suffix)
+// Units: h03U ([Demon] - Felhound), EditorSuffix (Name - Editor Suffix)
 {
 [T2]
 }
@@ -7782,7 +7770,7 @@ STRING 1283
 }
 
 STRING 1284
-// Units: h04I ([Draenei] - Salamander Lord), EditorSuffix (Name - Editor Suffix)
+// Units: h027 ([Summons] - Prawn), EditorSuffix (Name - Editor Suffix)
 {
 [T6]
 }
@@ -7806,7 +7794,7 @@ STRING 1287
 }
 
 STRING 1288
-// Units: h03W ([Demon] - Felguard), Hotkey (Hotkey)
+// Units: h04T ([Cavernous Creatures] - Cavern Mushroom), Hotkey (Hotkey)
 {
 Q
 }
@@ -7932,7 +7920,7 @@ STRING 1308
 }
 
 STRING 1309
-// Units: h04O ([Cavernous Creatures] - Cavern Revenant), EditorSuffix (Name - Editor Suffix)
+// Units: h02Q ([Uniques] - Iron Arthas), EditorSuffix (Name - Editor Suffix)
 {
 [T7]
 }
@@ -7962,7 +7950,7 @@ Basic observation tower. Has no attack, but can be upgraded into a Guard Tower, 
 }
 
 STRING 1314
-// Units: h04P ([Cavernous Creatures] - Cavern Hydra), EditorSuffix (Name - Editor Suffix)
+// Units: h02B ([Summons] - Treant), EditorSuffix (Name - Editor Suffix)
 {
 [T9]
 }
@@ -7992,7 +7980,7 @@ STRING 1318
 }
 
 STRING 1319
-// Units: h04Q ([Cavernous Creatures] - Cavern Druid), EditorSuffix (Name - Editor Suffix)
+// Units: h02L ([Uniques] - Hydralisk), EditorSuffix (Name - Editor Suffix)
 {
 [T6]
 }
@@ -8022,7 +8010,7 @@ STRING 1323
 }
 
 STRING 1324
-// Units: h04R ([Cavernous Creatures] - Small Cavernous Growth), EditorSuffix (Name - Editor Suffix)
+// Units: h04H ([Draenei] - Salamander Hatchling), EditorSuffix (Name - Editor Suffix)
 {
 [T2]
 }
@@ -8052,7 +8040,7 @@ STRING 1328
 }
 
 STRING 1329
-// Units: h04K ([Arachnid] - Basement Barrel), Hotkey (Hotkey)
+// Units: hC02 ([Orc Stronghold] - Grunt), Hotkey (Hotkey)
 {
 Q
 }
@@ -8070,7 +8058,7 @@ STRING 1331
 }
 
 STRING 1332
-// Units: h04T ([Cavernous Creatures] - Cavern Mushroom), EditorSuffix (Name - Editor Suffix)
+// Units: h03W ([Demon] - Felguard), EditorSuffix (Name - Editor Suffix)
 {
 [T1]
 }
@@ -8082,7 +8070,7 @@ STRING 1333
 }
 
 STRING 1334
-// Units: h04T ([Cavernous Creatures] - Cavern Mushroom), Hotkey (Hotkey)
+// Units: hC11 ([Aviaries] - Hippogryph), Hotkey (Hotkey)
 {
 Q
 }
@@ -8100,7 +8088,7 @@ STRING 1336
 }
 
 STRING 1337
-// Units: hC02 ([Orc Stronghold] - Grunt), EditorSuffix (Name - Editor Suffix)
+// Units: h04T ([Cavernous Creatures] - Cavern Mushroom), EditorSuffix (Name - Editor Suffix)
 {
 [T1]
 }
@@ -8190,7 +8178,7 @@ STRING 1351
 }
 
 STRING 1352
-// Units: hC02 ([Orc Stronghold] - Grunt), Hotkey (Hotkey)
+// Units: hC12 ([Void Cult] - Void Soldier), Hotkey (Hotkey)
 {
 Q
 }
@@ -8214,7 +8202,7 @@ STRING 1355
 }
 
 STRING 1356
-// Units: hC11 ([Aviaries] - Hippogryph), Hotkey (Hotkey)
+// Units: hC13 ([Void Cult] - Void Archer), Hotkey (Hotkey)
 {
 Q
 }
@@ -8232,7 +8220,7 @@ STRING 1358
 }
 
 STRING 1359
-// Units: hC12 ([Void Cult] - Void Soldier), EditorSuffix (Name - Editor Suffix)
+// Units: hC02 ([Orc Stronghold] - Grunt), EditorSuffix (Name - Editor Suffix)
 {
 [T1]
 }
@@ -8244,7 +8232,7 @@ STRING 1360
 }
 
 STRING 1361
-// Units: hC12 ([Void Cult] - Void Soldier), Hotkey (Hotkey)
+// Units: hC14 ([Void Cult] - Void Mage), Hotkey (Hotkey)
 {
 Q
 }
@@ -8262,7 +8250,7 @@ STRING 1363
 }
 
 STRING 1364
-// Units: hC13 ([Void Cult] - Void Archer), EditorSuffix (Name - Editor Suffix)
+// Units: hC12 ([Void Cult] - Void Soldier), EditorSuffix (Name - Editor Suffix)
 {
 [T1]
 }
@@ -8274,7 +8262,7 @@ STRING 1365
 }
 
 STRING 1366
-// Units: hC13 ([Void Cult] - Void Archer), Hotkey (Hotkey)
+// Units: hC21 ([Undead] - Ghast), Hotkey (Hotkey)
 {
 Q
 }
@@ -8292,7 +8280,7 @@ STRING 1368
 }
 
 STRING 1369
-// Units: hC14 ([Void Cult] - Void Mage), EditorSuffix (Name - Editor Suffix)
+// Units: hC13 ([Void Cult] - Void Archer), EditorSuffix (Name - Editor Suffix)
 {
 [T1]
 }
@@ -8334,7 +8322,7 @@ STRING 1375
 }
 
 STRING 1376
-// Units: hC14 ([Void Cult] - Void Mage), Hotkey (Hotkey)
+// Units: hC66 ([Humans] - Tower), Hotkey (Hotkey)
 {
 Q
 }
@@ -8520,7 +8508,7 @@ This Rock Giant is so old there's moss growing on him and is in dire need of an 
 }
 
 STRING 1407
-// Units: hC53 ([Giants] - Rock Giant), EditorSuffix (Name - Editor Suffix)
+// Units: h04F ([Draenei] - Draenei Seer), EditorSuffix (Name - Editor Suffix)
 {
 [T3]
 }
@@ -8532,7 +8520,7 @@ STRING 1408
 }
 
 STRING 1409
-// Items: I019 (Void Altar [Geno]), Hotkey (Hotkey)
+// Items: I00X (Hybrid Random), Hotkey (Hotkey)
 {
 V
 }
@@ -8562,7 +8550,7 @@ STRING 1413
 }
 
 STRING 1414
-// Units: hC21 ([Undead] - Ghast), Hotkey (Hotkey)
+// Units: n000 (Parasprite), Hotkey (Hotkey)
 {
 Q
 }
@@ -8664,7 +8652,7 @@ STRING 1430
 }
 
 STRING 1431
-// Units: hC80 ([Night Elves] - Huntress), EditorSuffix (Name - Editor Suffix)
+// Units: h04R ([Cavernous Creatures] - Small Cavernous Growth), EditorSuffix (Name - Editor Suffix)
 {
 [T2]
 }
@@ -8694,7 +8682,7 @@ STRING 1435
 }
 
 STRING 1436
-// Units: hC82 ([Night Elves] - Ancient Protector), EditorSuffix (Name - Editor Suffix)
+// Units: hC53 ([Giants] - Rock Giant), EditorSuffix (Name - Editor Suffix)
 {
 [T3]
 }
@@ -8808,7 +8796,7 @@ He used to be the weakest ogre in as a child, but that all changed when he found
 }
 
 STRING 1455
-// Units: hC97 ([Giants] - Ogre Magi), EditorSuffix (Name - Editor Suffix)
+// Units: h04I ([Draenei] - Salamander Lord), EditorSuffix (Name - Editor Suffix)
 {
 [T6]
 }
@@ -8820,7 +8808,7 @@ Parasprite
 }
 
 STRING 1457
-// Units: hC66 ([Humans] - Tower), Hotkey (Hotkey)
+// Units: n001 (Shadow), Hotkey (Hotkey)
 {
 Q
 }
@@ -8844,7 +8832,7 @@ Shadow
 }
 
 STRING 1461
-// Units: n000 (Parasprite), Hotkey (Hotkey)
+// Units: n005 (Iron Will), Hotkey (Hotkey)
 {
 Q
 }
@@ -8940,7 +8928,7 @@ Iron Will
 }
 
 STRING 1477
-// Units: n001 (Shadow), Hotkey (Hotkey)
+// Units: n00A (Uncharged Rune), Hotkey (Hotkey)
 {
 Q
 }
@@ -9060,7 +9048,7 @@ Uncharged Rune
 }
 
 STRING 1497
-// Units: n005 (Iron Will), Hotkey (Hotkey)
+// Units: n00F ([Ice Trolls] - Ice Troll), Hotkey (Hotkey)
 {
 Q
 }
@@ -9102,7 +9090,7 @@ STRING 1503
 }
 
 STRING 1504
-// Units: n00A (Uncharged Rune), Hotkey (Hotkey)
+// Units: n01D ([High Elven Farm] - High Elven Farm), Hotkey (Hotkey)
 {
 Q
 }
@@ -9144,7 +9132,7 @@ Hide yo wife, hide yo children, he's going berserk!|n|n|cffffcc00Attack:|r Pierc
 }
 
 STRING 1511
-// Units: u033 (Air Rune [Level 3]), Hotkey (Hotkey)
+// Units: o00Y ([Giants] - Sea Giant), Hotkey (Hotkey)
 {
 Z
 }
@@ -9168,7 +9156,7 @@ Ice Troll Trapper
 }
 
 STRING 1515
-// Units: u035 (Water Rune [Level 3]), Hotkey (Hotkey)
+// Units: o018 ([Dragons] - Black Drake), Hotkey (Hotkey)
 {
 Z
 }
@@ -9234,7 +9222,7 @@ STRING 1525
 }
 
 STRING 1526
-// Units: n00K ([Arachnid] - Nerubian Caretaker), EditorSuffix (Name - Editor Suffix)
+// Units: hC82 ([Night Elves] - Ancient Protector), EditorSuffix (Name - Editor Suffix)
 {
 [T3]
 }
@@ -9858,7 +9846,7 @@ STRING 1629
 }
 
 STRING 1630
-// Units: n00F ([Ice Trolls] - Ice Troll), Hotkey (Hotkey)
+// Units: n01R (Water Rune), Hotkey (Hotkey)
 {
 Q
 }
@@ -10230,7 +10218,7 @@ Water Rune
 }
 
 STRING 1692
-// Units: n01D ([High Elven Farm] - High Elven Farm), Hotkey (Hotkey)
+// Units: n01S (Fire Rune), Hotkey (Hotkey)
 {
 Q
 }
@@ -10272,7 +10260,7 @@ Fear Aura
 }
 
 STRING 1699
-// Units: n01R (Water Rune), Hotkey (Hotkey)
+// Units: n01Y ([Critters] - Mazing Tower), Hotkey (Hotkey)
 {
 Q
 }
@@ -10368,7 +10356,7 @@ Blood Aura
 }
 
 STRING 1715
-// Units: n01T ([Critters] - Stag), EditorSuffix (Name - Editor Suffix)
+// Units: hC80 ([Night Elves] - Huntress), EditorSuffix (Name - Editor Suffix)
 {
 [T2]
 }
@@ -10416,7 +10404,7 @@ STRING 1722
 }
 
 STRING 1723
-// Units: n01U ([Critters] - Frog), EditorSuffix (Name - Editor Suffix)
+// Units: n00K ([Arachnid] - Nerubian Caretaker), EditorSuffix (Name - Editor Suffix)
 {
 [T3]
 }
@@ -10542,7 +10530,7 @@ This unit is being effected by immolation.
 }
 
 STRING 1744
-// Units: n01X ([Critters] - Lizard), EditorSuffix (Name - Editor Suffix)
+// Units: h04Q ([Cavernous Creatures] - Cavern Druid), EditorSuffix (Name - Editor Suffix)
 {
 [T6]
 }
@@ -10560,7 +10548,7 @@ STRING 1746
 }
 
 STRING 1747
-// Units: n01S (Fire Rune), Hotkey (Hotkey)
+// Units: n022 (Nature Rune), Hotkey (Hotkey)
 {
 Q
 }
@@ -10578,7 +10566,7 @@ STRING 1749
 }
 
 STRING 1750
-// Units: n01Y ([Critters] - Mazing Tower), EditorSuffix (Name - Editor Suffix)
+// Units: hC14 ([Void Cult] - Void Mage), EditorSuffix (Name - Editor Suffix)
 {
 [T1]
 }
@@ -10650,7 +10638,7 @@ Blood Aura
 }
 
 STRING 1762
-// Units: n01Z ([Critters] - Pig), EditorSuffix (Name - Editor Suffix)
+// Units: hC34 ([Tavern] - Harpy Scout), EditorSuffix (Name - Editor Suffix)
 {
 [T5]
 }
@@ -10680,7 +10668,7 @@ STRING 1766
 }
 
 STRING 1767
-// Units: n020 ([Critters] - Snow Owl), EditorSuffix (Name - Editor Suffix)
+// Units: h04O ([Cavernous Creatures] - Cavern Revenant), EditorSuffix (Name - Editor Suffix)
 {
 [T7]
 }
@@ -10710,7 +10698,7 @@ STRING 1771
 }
 
 STRING 1772
-// Units: n021 ([Critters] - Black Sheep), EditorSuffix (Name - Editor Suffix)
+// Units: h029 ([Summons] - Spirit Hawk), EditorSuffix (Name - Editor Suffix)
 {
 [T8]
 }
@@ -10722,7 +10710,7 @@ Nature Rune
 }
 
 STRING 1774
-// Units: n01Y ([Critters] - Mazing Tower), Hotkey (Hotkey)
+// Units: n023 (Air Rune), Hotkey (Hotkey)
 {
 Q
 }
@@ -10746,7 +10734,7 @@ Air Rune
 }
 
 STRING 1778
-// Units: n022 (Nature Rune), Hotkey (Hotkey)
+// Units: n024 (Death Rune), Hotkey (Hotkey)
 {
 Q
 }
@@ -10770,7 +10758,7 @@ Death Rune
 }
 
 STRING 1782
-// Units: n023 (Air Rune), Hotkey (Hotkey)
+// Units: n029 ([Gnolls] - Gnoll), Hotkey (Hotkey)
 {
 Q
 }
@@ -10818,7 +10806,7 @@ STRING 1789
 }
 
 STRING 1790
-// Units: n024 (Death Rune), Hotkey (Hotkey)
+// Units: n02H ([Corrupt N.Elves] - Roots), Hotkey (Hotkey)
 {
 Q
 }
@@ -10955,12 +10943,6 @@ STRING 1812
 An assassin dedicated to killing the enemies one by one.|n|n|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.25|n|cffffcc00Damage:|r 2800 - 2800|n|cffffcc00Range:|r 400
 }
 
-STRING 1813
-// Units: n02F ([Gnolls] - Gnoll Warden), Name (Name)
-{
-[Gnolls] - Gnoll Warden
-}
-
 STRING 1814
 // Units: n02F ([Gnolls] - Gnoll Warden), Hotkey (Hotkey)
 {
@@ -11010,7 +10992,7 @@ STRING 1821
 }
 
 STRING 1822
-// Units: n029 ([Gnolls] - Gnoll), Hotkey (Hotkey)
+// Units: n02T ([Alliance of Blades] - Adventurer), Hotkey (Hotkey)
 {
 Q
 }
@@ -11076,7 +11058,7 @@ STRING 1832
 }
 
 STRING 1833
-// Units: n02H ([Corrupt N.Elves] - Roots), Hotkey (Hotkey)
+// Units: n03D ([Forest Trolls] - Forest Troll), Hotkey (Hotkey)
 {
 Q
 }
@@ -11220,7 +11202,7 @@ STRING 1856
 }
 
 STRING 1857
-// Units: n03B ([Cavernous Creatures] - Spirit Hydra), EditorSuffix (Name - Editor Suffix)
+// Units: n021 ([Critters] - Black Sheep), EditorSuffix (Name - Editor Suffix)
 {
 [T8]
 }
@@ -11262,7 +11244,7 @@ STRING 1863
 }
 
 STRING 1864
-// Units: n02T ([Alliance of Blades] - Adventurer), Hotkey (Hotkey)
+// Units: n055 ([Caerbannog] - French Soldier), Hotkey (Hotkey)
 {
 Q
 }
@@ -11550,7 +11532,7 @@ STRING 1911
 }
 
 STRING 1912
-// Units: n03D ([Forest Trolls] - Forest Troll), Hotkey (Hotkey)
+// Units: n05H ([Dwarves] - Undead Dwarf), Hotkey (Hotkey)
 {
 Q
 }
@@ -11790,7 +11772,7 @@ STRING 1951
 }
 
 STRING 1952
-// Units: n05E ([Caerbannog] - The Black Beast of Arrrghhh), Hotkey (Hotkey)
+// Units: o001 ([Giants] - Giant King), Hotkey (Hotkey)
 {
 C
 }
@@ -11838,7 +11820,7 @@ STRING 1959
 }
 
 STRING 1960
-// Units: n055 ([Caerbannog] - French Soldier), Hotkey (Hotkey)
+// Units: o003 ([Outland] - Chaos Grunt), Hotkey (Hotkey)
 {
 Q
 }
@@ -12096,7 +12078,7 @@ STRING 2002
 }
 
 STRING 2003
-// Units: n05Q ([Dwarven Mine] - Dwarf King (Statue)), Hotkey (Hotkey)
+// Units: o010 ([Dragons] - Red Drake), Hotkey (Hotkey)
 {
 X
 }
@@ -12504,7 +12486,7 @@ STRING 2070
 }
 
 STRING 2071
-// Units: o001 ([Giants] - Giant King), Hotkey (Hotkey)
+// Units: oC78 ([Naxx] - Sir Zeliek), Hotkey (Hotkey)
 {
 C
 }
@@ -12558,7 +12540,7 @@ Crippling Fear
 }
 
 STRING 2080
-// Units: n05H ([Dwarves] - Undead Dwarf), Hotkey (Hotkey)
+// Units: o009 ([High Elven] - Elven Swordsman), Hotkey (Hotkey)
 {
 Q
 }
@@ -12630,7 +12612,7 @@ STRING 2091
 }
 
 STRING 2092
-// Units: o006 ([Shrine of Buffs] - Chaos Kodo Beast), Hotkey (Hotkey)
+// Units: o00M ([Dragons] - Bronze Dragon Whelp), Hotkey (Hotkey)
 {
 S
 }
@@ -12639,12 +12621,6 @@ STRING 2093
 // Units: o006 ([Shrine of Buffs] - Chaos Kodo Beast), Tip (Tooltip - Basic)
 {
 Build Chaos Kodo Beast
-}
-
-STRING 2094
-// Units: o006 ([Shrine of Buffs] - Chaos Kodo Beast), Ubertip (Tooltip - Extended)
-{
-This unit has alot more damage as well as higher range than the Chaos Champion.  Its speed however is the same.  It increases nearby towers damage by 20%|n|n|cffffcc00Attack:|r Piercing|n|cffffcc00Cooldown:|r 0.90|n|cffffcc00Damage:|r 300 - 400|n|cffffcc00Range:|r 1000|n|cffffcc00Ability:|r Command Aura; friendly towers within range has their attack damage increased by 20%
 }
 
 STRING 2095
@@ -12690,7 +12666,7 @@ STRING 2101
 }
 
 STRING 2102
-// Units: o008 ([Shrine of Buffs] - Grom Hellscream), Hotkey (Hotkey)
+// Units: o015 ([Giants] - Giant Revenant), Hotkey (Hotkey)
 {
 X
 }
@@ -12701,12 +12677,6 @@ STRING 2103
 Build Grom Hellscream
 }
 
-STRING 2104
-// Units: o008 ([Shrine of Buffs] - Grom Hellscream), Ubertip (Tooltip - Extended)
-{
-This unit is the strongest chaos orc unit.  It has the best speed/damage/range as well as the fear aura which slows enemies by 35%|n|n|cffffcc00Attack:|r Piercing|n|cffffcc00Cooldown:|r 0.40|n|cffffcc00Damage:|r 462 - 1062|n|cffffcc00Range:|r 1000|n|cffffcc00Ability:|r Crippling Fear; slows enemy units within an area of 700 by 35%
-}
-
 STRING 2105
 // Units: o009 ([High Elven] - Elven Swordsman), Name (Name)
 {
@@ -12714,7 +12684,7 @@ STRING 2105
 }
 
 STRING 2106
-// Units: o003 ([Outland] - Chaos Grunt), Hotkey (Hotkey)
+// Units: o012 ([Shrine of Buffs] - Chaos Shrine), Hotkey (Hotkey)
 {
 Q
 }
@@ -12732,7 +12702,7 @@ STRING 2108
 }
 
 STRING 2109
-// Units: o009 ([High Elven] - Elven Swordsman), EditorSuffix (Name - Editor Suffix)
+// Units: n01Y ([Critters] - Mazing Tower), EditorSuffix (Name - Editor Suffix)
 {
 [T1]
 }
@@ -12744,7 +12714,7 @@ STRING 2110
 }
 
 STRING 2111
-// Units: o00A ([High Elven] - High Elf Archer), Hotkey (Hotkey)
+// Units: o006 ([Shrine of Buffs] - Chaos Kodo Beast), Hotkey (Hotkey)
 {
 W
 }
@@ -12762,7 +12732,7 @@ STRING 2113
 }
 
 STRING 2114
-// Units: o00A ([High Elven] - High Elf Archer), EditorSuffix (Name - Editor Suffix)
+// Units: n01T ([Critters] - Stag), EditorSuffix (Name - Editor Suffix)
 {
 [T2]
 }
@@ -12792,7 +12762,7 @@ STRING 2118
 }
 
 STRING 2119
-// Units: o00B ([High Elven] - Elven Sorceress), EditorSuffix (Name - Editor Suffix)
+// Units: n01U ([Critters] - Frog), EditorSuffix (Name - Editor Suffix)
 {
 [T3]
 }
@@ -12804,7 +12774,7 @@ STRING 2120
 }
 
 STRING 2121
-// Units: o00C ([High Elven] - High Elf Captain), Hotkey (Hotkey)
+// Units: o008 ([Shrine of Buffs] - Grom Hellscream), Hotkey (Hotkey)
 {
 R
 }
@@ -12852,7 +12822,7 @@ STRING 2128
 }
 
 STRING 2129
-// Units: o00D ([High Elven] - Sylvanus Windrunner), EditorSuffix (Name - Editor Suffix)
+// Units: n020 ([Critters] - Snow Owl), EditorSuffix (Name - Editor Suffix)
 {
 [T7]
 }
@@ -12882,7 +12852,7 @@ STRING 2133
 }
 
 STRING 2134
-// Units: o00F ([Dragons] - Red Dragon Whelp), Hotkey (Hotkey)
+// Units: o00A ([High Elven] - High Elf Archer), Hotkey (Hotkey)
 {
 W
 }
@@ -12891,12 +12861,6 @@ STRING 2135
 // Units: o00F ([Dragons] - Red Dragon Whelp), Tip (Tooltip - Basic)
 {
 Hatch Red Dragon Whelp
-}
-
-STRING 2136
-// Units: o00F ([Dragons] - Red Dragon Whelp), Ubertip (Tooltip - Extended)
-{
-Red Dragon Towers have relatively high damage, low splash at higher levels, normal damage, and support auras.|n|cffffcc00Attack:|r Normal|n|cffffcc00Cooldown:|r 0.50|n|cffffcc00Damage:|r 75-90|n|cffffcc00Range:|r 700|n|cffffcc00Ability:|r Inspiring Aura (5% DMG boost aura)
 }
 
 STRING 2137
@@ -12924,7 +12888,7 @@ A ghoulish collection of humanoid body parts stitched together into a single com
 }
 
 STRING 2141
-// Units: o00G ([Giants] - Flesh Golem), EditorSuffix (Name - Editor Suffix)
+// Units: n03B ([Cavernous Creatures] - Spirit Hydra), EditorSuffix (Name - Editor Suffix)
 {
 [T8]
 }
@@ -12948,7 +12912,7 @@ STRING 2144
 }
 
 STRING 2145
-// Units: o00I ([Dragons] - Black Dragon Whelp), Hotkey (Hotkey)
+// Units: o01M ([Goblins] - Sappers), Hotkey (Hotkey)
 {
 W
 }
@@ -12971,12 +12935,6 @@ STRING 2148
 Corruption
 }
 
-STRING 2149
-// Units: o00I ([Dragons] - Black Dragon Whelp), Ubertip (Tooltip - Extended)
-{
-Black Dragon Towers are the strongest line of Dragons. They have weak splash which gets stronger the more upgraded they are.|n|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.35|n|cffffcc00Damage:|r 100-100|n|cffffcc00Range:|r 700
-}
-
 STRING 2150
 // Units: o00J ([Dragons] - Blue Dragon Whelp), Name (Name)
 {
@@ -12984,7 +12942,7 @@ STRING 2150
 }
 
 STRING 2151
-// Units: o00J ([Dragons] - Blue Dragon Whelp), Hotkey (Hotkey)
+// Units: o013 ([Shrine of Buffs] - Chaos Pool), Hotkey (Hotkey)
 {
 E
 }
@@ -12993,12 +12951,6 @@ STRING 2152
 // Units: o00J ([Dragons] - Blue Dragon Whelp), Tip (Tooltip - Basic)
 {
 Hatch Blue Dragon Whelp
-}
-
-STRING 2153
-// Units: o00J ([Dragons] - Blue Dragon Whelp), Ubertip (Tooltip - Extended)
-{
-Blue Dragons Towers are relatively poor against ground units, but immensely powerful anti-air towers. They also can slow
 }
 
 STRING 2154
@@ -13026,7 +12978,7 @@ STRING 2157
 }
 
 STRING 2158
-// Units: o00L ([Demon] - Mannoroth), EditorSuffix (Name - Editor Suffix)
+// Units: o00D ([High Elven] - Sylvanus Windrunner), EditorSuffix (Name - Editor Suffix)
 {
 [T7]
 }
@@ -13050,7 +13002,7 @@ This unit is infected with Corruption, and will take damage over time.
 }
 
 STRING 2162
-// Units: o00M ([Dragons] - Bronze Dragon Whelp), Hotkey (Hotkey)
+// Units: o00C ([High Elven] - High Elf Captain), Hotkey (Hotkey)
 {
 R
 }
@@ -13061,12 +13013,6 @@ STRING 2163
 Hatch Bronze Dragon Whelp
 }
 
-STRING 2164
-// Units: o00M ([Dragons] - Bronze Dragon Whelp), Ubertip (Tooltip - Extended)
-{
-Bronze Dragon Towers have a fairly weak attack, but to compensate they have strong utility such as slows, stuns, and armor reduction.|n|cffffcc00Attack:|r Magic|n|cffffcc00Cooldown:|r 0.90|n|cffffcc00Damage:|r 60-80|n|cffffcc00Range:|r 650|n|cffffcc0Ability:|r Slow: Castable single target slow which reduces the targets movement speed by 35%.
-}
-
 STRING 2165
 // Units: o00N ([High Elven] - Kael), Name (Name)
 {
@@ -13074,7 +13020,7 @@ STRING 2165
 }
 
 STRING 2166
-// Units: o00N ([High Elven] - Kael), Hotkey (Hotkey)
+// Units: o00J ([Dragons] - Blue Dragon Whelp), Hotkey (Hotkey)
 {
 F
 }
@@ -13092,7 +13038,7 @@ STRING 2168
 }
 
 STRING 2169
-// Units: o00N ([High Elven] - Kael), EditorSuffix (Name - Editor Suffix)
+// Units: o00G ([Giants] - Flesh Golem), EditorSuffix (Name - Editor Suffix)
 {
 [T8]
 }
@@ -13146,7 +13092,7 @@ STRING 2177
 }
 
 STRING 2178
-// Units: o00P ([Orc Stronghold] - Rexxar), EditorSuffix (Name - Editor Suffix)
+// Units: hC97 ([Giants] - Ogre Magi), EditorSuffix (Name - Editor Suffix)
 {
 [T6]
 }
@@ -13176,7 +13122,7 @@ STRING 2182
 }
 
 STRING 2183
-// Units: o00Q ([High Elven] - Spellbreaker), EditorSuffix (Name - Editor Suffix)
+// Units: n01X ([Critters] - Lizard), EditorSuffix (Name - Editor Suffix)
 {
 [T6]
 }
@@ -13230,7 +13176,7 @@ STRING 2191
 }
 
 STRING 2192
-// Units: o00S ([Orc Stronghold] - Tauren Chieftain), EditorSuffix (Name - Editor Suffix)
+// Units: n01Z ([Critters] - Pig), EditorSuffix (Name - Editor Suffix)
 {
 [T5]
 }
@@ -13242,7 +13188,7 @@ STRING 2193
 }
 
 STRING 2194
-// Units: o00U ([Aviaries] - Phoenix), Hotkey (Hotkey)
+// Units: o01A ([Arachnid] - Parasitic Broodmother), Hotkey (Hotkey)
 {
 X
 }
@@ -13253,12 +13199,6 @@ STRING 2195
 Build Phoenix
 }
 
-STRING 2196
-// Units: o00U ([Aviaries] - Phoenix), Ubertip (Tooltip - Extended)
-{
-The best aerial unit. It combines the speed of the chimeara with splash. Though its damage is lower than the chimeara it makes up for it with its splash.|n|n|cffffcc00Attack:|r Normal|n|cffffcc00Cooldown:|r 0.00|n|cffffcc00Damage:|r 200 - 250|n|cffffcc00Range:|r 700|n|cffffcc00Ability:|r Splash; the area of effect is 100
-}
-
 STRING 2197
 // Units: o00V ([Outland] - Chaos Raider), Name (Name)
 {
@@ -13266,7 +13206,7 @@ STRING 2197
 }
 
 STRING 2198
-// Units: o00V ([Outland] - Chaos Raider), Hotkey (Hotkey)
+// Units: o01H ([Dragons] - Red Dragon), Hotkey (Hotkey)
 {
 X
 }
@@ -13308,7 +13248,7 @@ A giant dating way back to when the old gods used to roam this planet, he's almo
 }
 
 STRING 2205
-// Units: o00X ([Giants] - Ancient Golem), EditorSuffix (Name - Editor Suffix)
+// Units: o007 ([Outland] - Fel Champion), EditorSuffix (Name - Editor Suffix)
 {
 [T5]
 }
@@ -13332,7 +13272,7 @@ Sea Giants or Skrogs are very aggressive and territorial giants, you shouldn't g
 }
 
 STRING 2209
-// Units: o00Y ([Giants] - Sea Giant), EditorSuffix (Name - Editor Suffix)
+// Units: h04P ([Cavernous Creatures] - Cavern Hydra), EditorSuffix (Name - Editor Suffix)
 {
 [T9]
 }
@@ -13362,7 +13302,7 @@ STRING 2213
 }
 
 STRING 2214
-// Units: o00Z ([High Elven] - Ballista), EditorSuffix (Name - Editor Suffix)
+// Units: o00S ([Orc Stronghold] - Tauren Chieftain), EditorSuffix (Name - Editor Suffix)
 {
 [T5]
 }
@@ -13374,7 +13314,7 @@ STRING 2215
 }
 
 STRING 2216
-// Units: o009 ([High Elven] - Elven Swordsman), Hotkey (Hotkey)
+// Units: oC14 ([Giants] - Sasquatch), Hotkey (Hotkey)
 {
 Q
 }
@@ -13383,12 +13323,6 @@ STRING 2217
 // Units: o010 ([Dragons] - Red Drake), Tip (Tooltip - Basic)
 {
 Upgrade to Red Drake
-}
-
-STRING 2218
-// Units: o010 ([Dragons] - Red Drake), Ubertip (Tooltip - Extended)
-{
-The Red Drake gains weak splash, longer range, and a stronger support aura.|n|cffffcc00Attack:|r Normal|n|cffffcc00Cooldown:|r 0.50|n|cffffcc00Damage:|r 200-225|n|cffffcc00Range:|r 750|n|cffffcc00Ability:|r Inspiring Aura (10% DMG boost aura) Fierce Inspiration (5% Attack Speed)
 }
 
 STRING 2219
@@ -13428,7 +13362,7 @@ Corruption Bomb
 }
 
 STRING 2225
-// Units: o012 ([Shrine of Buffs] - Chaos Shrine), Hotkey (Hotkey)
+// Units: o017 ([Builder] - Draenei Laborer), Hotkey (Hotkey)
 {
 A
 }
@@ -13458,7 +13392,7 @@ STRING 2229
 }
 
 STRING 2230
-// Units: o013 ([Shrine of Buffs] - Chaos Pool), Hotkey (Hotkey)
+// Units: o00N ([High Elven] - Kael), Hotkey (Hotkey)
 {
 F
 }
@@ -13469,12 +13403,6 @@ STRING 2231
 Build Chaos Pool
 }
 
-STRING 2232
-// Units: o013 ([Shrine of Buffs] - Chaos Pool), Ubertip (Tooltip - Extended)
-{
-This is the best support tower on the map.  It increases the attack speed of friendly towers in a large area around it|n|n|cffffcc00Attack:|r None|n|cffffcc00Range:|r 1000|n|cffffcc00Ability:|r Blood Aura; friendly towers within range has their attack speed increased by 60%
-}
-
 STRING 2233
 // Units: o015 ([Giants] - Giant Revenant), Name (Name)
 {
@@ -13482,7 +13410,7 @@ STRING 2233
 }
 
 STRING 2234
-// Units: o015 ([Giants] - Giant Revenant), Hotkey (Hotkey)
+// Units: oC79 ([Naxx] - Lady Blaumeux), Hotkey (Hotkey)
 {
 X
 }
@@ -13505,26 +13433,14 @@ STRING 2237
 [T10]
 }
 
-STRING 2238
-// Units: o016 ([Outland] - Black Citadel WarMachine), Name (Name)
-{
-[Outland] - Black Citadel WarMachine
-}
-
 STRING 2239
-// Units: o016 ([Outland] - Black Citadel WarMachine), Hotkey (Hotkey)
+// Units: o016 ([Outland] - Black Citadel Warmachine), Hotkey (Hotkey)
 {
 S
 }
 
-STRING 2240
-// Units: o016 ([Outland] - Black Citadel WarMachine), Tip (Tooltip - Basic)
-{
-Build Black Citadel WarMachine
-}
-
 STRING 2241
-// Units: o016 ([Outland] - Black Citadel WarMachine), Ubertip (Tooltip - Extended)
+// Units: o016 ([Outland] - Black Citadel Warmachine), Ubertip (Tooltip - Extended)
 {
 The Black Citadel is lined with many of these contraptions which rain hot death on the unsuspecting.|n|n|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 2.50|n|cffffcc00Damage:|r 2000 - 2000 (Splash 225)|n|cffffcc00Range:|r 1000
 }
@@ -13536,7 +13452,7 @@ STRING 2242
 }
 
 STRING 2243
-// Units: o017 ([Builder] - Draenei Laborer), Hotkey (Hotkey)
+// Units: o01G ([Dragons] - Green Drake), Hotkey (Hotkey)
 {
 A
 }
@@ -13566,7 +13482,7 @@ STRING 2247
 }
 
 STRING 2248
-// Units: o010 ([Dragons] - Red Drake), Hotkey (Hotkey)
+// Units: oC76 ([Naxxramas] - Ghoul), Hotkey (Hotkey)
 {
 Q
 }
@@ -13587,12 +13503,6 @@ STRING 2251
 // Abilities: A013 (Corrupted Blades), Tip (Tooltip - Normal)
 {
 Corrupted Blades
-}
-
-STRING 2252
-// Units: o018 ([Dragons] - Black Drake), Ubertip (Tooltip - Extended)
-{
-The Black Drake greatly increases damage and splash. It has a minor range increase, and a slight attack speed decease.|n|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.30|n|cffffcc00Damage:|r 400-400|n|cffffcc00Range:|r 750
 }
 
 STRING 2253
@@ -13626,7 +13536,7 @@ STRING 2257
 }
 
 STRING 2258
-// Units: o019 ([Arachnid] - Acid Spitting Spider), EditorSuffix (Name - Editor Suffix)
+// Units: o004 ([Outland] - Nether Drake Hatchling), EditorSuffix (Name - Editor Suffix)
 {
 [T2]
 }
@@ -13638,7 +13548,7 @@ STRING 2259
 }
 
 STRING 2260
-// Units: o01A ([Arachnid] - Parasitic Broodmother), Hotkey (Hotkey)
+// Units: oC7K ([Naxxramas] - Kel'Thuzad), Hotkey (Hotkey)
 {
 X
 }
@@ -13656,7 +13566,7 @@ STRING 2262
 }
 
 STRING 2263
-// Units: o01A ([Arachnid] - Parasitic Broodmother), EditorSuffix (Name - Editor Suffix)
+// Units: o00P ([Orc Stronghold] - Rexxar), EditorSuffix (Name - Editor Suffix)
 {
 [T6]
 }
@@ -13722,7 +13632,7 @@ STRING 2273
 }
 
 STRING 2274
-// Units: o018 ([Dragons] - Black Drake), Hotkey (Hotkey)
+// Units: u00C ([Forsaken] - Tombstone), Hotkey (Hotkey)
 {
 Q
 }
@@ -13731,12 +13641,6 @@ STRING 2275
 // Units: o01D ([Dragons] - Blue Drake), Tip (Tooltip - Basic)
 {
 Upgrade to Blue Drake
-}
-
-STRING 2276
-// Units: o01D ([Dragons] - Blue Drake), Ubertip (Tooltip - Extended)
-{
-Blue Drakes are somewhat better against ground units than Whelps, but their air attack is a massive upgrade
 }
 
 STRING 2277
@@ -13752,7 +13656,7 @@ STRING 2278
 }
 
 STRING 2279
-// Units: o01D ([Dragons] - Blue Drake), Hotkey (Hotkey)
+// Units: u02A (Death Rune [Level 2]), Hotkey (Hotkey)
 {
 Q
 }
@@ -13763,12 +13667,6 @@ STRING 2280
 Upgrade to Bronze Drake
 }
 
-STRING 2281
-// Units: o01F ([Dragons] - Bronze Drake), Ubertip (Tooltip - Extended)
-{
-The Bronze Drake is a fair bit stronger with better range and attack speed. It also gains a stun.|n|cffffcc00Attack:|r Magic|n|cffffcc00Cooldown:|r 0.75|n|cffffcc00Damage:|r 160-180|n|cffffcc00Range:|r 750|n|cffffcc0Ability(1):|r Slow: Castable single target slow which reduces the targets movement speed by 35%.|n|cffffcc0Ability(2):|r Time-Lock: Each attack has a 15% chance to stun the target.
-}
-
 STRING 2282
 // Units: o01G ([Dragons] - Green Drake), Name (Name)
 {
@@ -13776,7 +13674,7 @@ STRING 2282
 }
 
 STRING 2283
-// Units: o01F ([Dragons] - Bronze Drake), Hotkey (Hotkey)
+// Units: u044 ([Loot Boxers] - Parent-Unfriendly Lootbox), Hotkey (Hotkey)
 {
 Q
 }
@@ -13800,7 +13698,7 @@ STRING 2286
 }
 
 STRING 2287
-// Units: o01G ([Dragons] - Green Drake), Hotkey (Hotkey)
+// Items: I002 (Undead Necropolis), Hotkey (Hotkey)
 {
 Q
 }
@@ -13811,12 +13709,6 @@ STRING 2288
 Upgrade to Red Dragon
 }
 
-STRING 2289
-// Units: o01H ([Dragons] - Red Dragon), Ubertip (Tooltip - Extended)
-{
-The Red Dragon has a better splash, longer range, and a stronger support aura.|n|cffffcc00Attack:|r Normal|n|cffffcc00Cooldown:|r 0.50|n|cffffcc00Damage:|r 375-400|n|cffffcc00Range:|r 825|n|cffffcc00Ability:|r Inspiring Aura (15% DMG boost aura) Fierce Inspiration (10% Attack Speed)
-}
-
 STRING 2290
 // Units: o01I ([Dragons] - Black Dragon), Name (Name)
 {
@@ -13824,7 +13716,7 @@ STRING 2290
 }
 
 STRING 2291
-// Units: o01H ([Dragons] - Red Dragon), Hotkey (Hotkey)
+// Items: I006 (Human Town Hall), Hotkey (Hotkey)
 {
 Q
 }
@@ -13835,12 +13727,6 @@ STRING 2292
 Upgrade to Black Dragon
 }
 
-STRING 2293
-// Units: o01I ([Dragons] - Black Dragon), Ubertip (Tooltip - Extended)
-{
-The Black Dragon has fantastic splash, damage, and a larger range and attack speed  than the Drake.|n|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.15|n|cffffcc00Damage:|r 1000-1000|n|cffffcc00Range:|r 850
-}
-
 STRING 2294
 // Units: o01J ([Dragons] - Blue Dragon), Name (Name)
 {
@@ -13848,7 +13734,7 @@ STRING 2294
 }
 
 STRING 2295
-// Units: o01I ([Dragons] - Black Dragon), Hotkey (Hotkey)
+// Items: I00P (Alliance of Blades), Hotkey (Hotkey)
 {
 Q
 }
@@ -13859,12 +13745,6 @@ STRING 2296
 Upgrade to Blue Dragon
 }
 
-STRING 2297
-// Units: o01J ([Dragons] - Blue Dragon), Ubertip (Tooltip - Extended)
-{
-Though the Black Dragon is a stronger anti air tower, the Blue Dragon is a much cheaper alternative, and continues to strengthen it's ground attack while employing explosive anti air power
-}
-
 STRING 2298
 // Units: o01K ([Dragons] - Bronze Dragon), Name (Name)
 {
@@ -13872,7 +13752,7 @@ STRING 2298
 }
 
 STRING 2299
-// Units: o01J ([Dragons] - Blue Dragon), Hotkey (Hotkey)
+// Items: I026 (Shrine of Buffs), Hotkey (Hotkey)
 {
 Q
 }
@@ -13883,12 +13763,6 @@ STRING 2300
 Upgrade to Bronze Dragon
 }
 
-STRING 2301
-// Units: o01K ([Dragons] - Bronze Dragon), Ubertip (Tooltip - Extended)
-{
-The Bronze Dragon is a solid single target tower. It now reduces the target's armor by 7 in addition to the effects inherited from the Drake.|n|cffffcc00Attack:|r Magic|n|cffffcc00Cooldown:|r 0.67|n|cffffcc00Damage:|r 321-321|n|cffffcc00Range:|r 750|n|cffffcc0Ability(1):|r Slow: Castable single target slow which reduces the targets movement speed by 35%.|n|cffffcc0Ability(2):|r Time-Lock: Each attack has a 15% chance to stun the target.n|cffffcc0Ability(3):|r The Dragon's attacks reduce the targets armor by 7 for 20 seconds.
-}
-
 STRING 2302
 // Units: o01L ([Dragons] - Green Dragon), Name (Name)
 {
@@ -13896,7 +13770,7 @@ STRING 2302
 }
 
 STRING 2303
-// Units: o01K ([Dragons] - Bronze Dragon), Hotkey (Hotkey)
+// Items: I02D (Loot Boxers [Geno]), Hotkey (Hotkey)
 {
 Q
 }
@@ -13920,7 +13794,7 @@ STRING 2306
 }
 
 STRING 2307
-// Units: o01M ([Goblins] - Sappers), Hotkey (Hotkey)
+// Units: oC18 ([Aviaries] - Gargoyle), Hotkey (Hotkey)
 {
 W
 }
@@ -13944,7 +13818,7 @@ STRING 2310
 }
 
 STRING 2311
-// Units: o01N ([Goblins] - Shredder), Hotkey (Hotkey)
+// Units: o00V ([Outland] - Chaos Raider), Hotkey (Hotkey)
 {
 R
 }
@@ -13955,12 +13829,6 @@ STRING 2312
 Build Shredder
 }
 
-STRING 2313
-// Units: o01N ([Goblins] - Shredder), Ubertip (Tooltip - Extended)
-{
-Equipped with a powerful war suit, this Goblin is ready to shred some faces!|n|cffffcc00Attack:|r Normal|n|cffffcc00Cooldown:|r 0.1|n|cffffcc00Damage:|r 500-500|n|cffffcc00Range:|r Melee (Splash 75 Air only)
-}
-
 STRING 2314
 // Units: o01O ([Goblins] - Alchemist), Name (Name)
 {
@@ -13968,7 +13836,7 @@ STRING 2314
 }
 
 STRING 2315
-// Units: o01O ([Goblins] - Alchemist), Hotkey (Hotkey)
+// Units: o01L ([Dragons] - Green Dragon), Hotkey (Hotkey)
 {
 A
 }
@@ -13977,12 +13845,6 @@ STRING 2316
 // Units: o01O ([Goblins] - Alchemist), Tip (Tooltip - Basic)
 {
 Build Alchemist
-}
-
-STRING 2317
-// Units: o01O ([Goblins] - Alchemist), Ubertip (Tooltip - Extended)
-{
-Riding atop his ogre slave, the clever Alchemist douses his enemies in corrosive and deadly concoctions.|n|cffffcc00Attack:|r Magic|n|cffffcc00Cooldown:|r 0.45|n|cffffcc00Damage:|r 450-475|n|cffffcc00Range:|r 730 (Splash, 150)|n|cffffcc00Ability:|r Acid Bomb: Splashes a group of enemies, dealing periodic damage and lowering armor.
 }
 
 STRING 2318
@@ -14001,12 +13863,6 @@ STRING 2320
 // Units: o01P ([Goblins] - Goblin Blademaster), Tip (Tooltip - Basic)
 {
 Build Goblin Blademaster
-}
-
-STRING 2321
-// Units: o01P ([Goblins] - Goblin Blademaster), Ubertip (Tooltip - Extended)
-{
-After a lengthy stay at the Orcish Stronghold, this goblin returned to his bretheren as a follower of the bushido.|n|cffffcc00Attack:|r Normal|n|cffffcc00Cooldown:|r 0.05|n|cffffcc00Damage:|r 1500-1700|n|cffffcc00Range:|r Melee|n|cffffcc00Ability:|r Has a 8% chance to spawn mirror images when attacking.
 }
 
 STRING 2322
@@ -14039,12 +13895,6 @@ STRING 2326
 Build Goblin Minelayer
 }
 
-STRING 2327
-// Units: o01R ([Goblins] - Goblin Minelayer), Ubertip (Tooltip - Extended)
-{
-Just in case you don't feel like there's enough explosions, the Goblin Minelayer has you covered.|n|cffffcc00Attack:|r Siege|n|cffffcc00Cooldown:|r 1.25|n|cffffcc00Damage:|r 20-20|n|cffffcc00Range:|r 1000|n|cffffcc00Ability:|r Mine Plant: When attacking with full mana, spawns a land mine at the feet of the attacked unit. The mine detonates after a few seconds, dealing 1500 damage to all units in an area.
-}
-
 STRING 2328
 // Units: o01S ([Goblins] - Tinker), Name (Name)
 {
@@ -14063,12 +13913,6 @@ STRING 2330
 Build Tinker
 }
 
-STRING 2331
-// Units: o01S ([Goblins] - Tinker), Ubertip (Tooltip - Extended)
-{
-Chief Executive Officer Tinker sports enough heavy fire power to crush any and all enemies.|n|cffffcc00Attack:|r Magic|n|cffffcc00Cooldown:|r 0.2|n|cffffcc00Damage:|r 1200-1200 (splash)|n|cffffcc00Range:|r 800|n|cffffcc00Ability:|r Has a 5% chance to fire a barrage of missiles when attacking.
-}
-
 STRING 2332
 // Units: oC14 ([Giants] - Sasquatch), Name (Name)
 {
@@ -14076,7 +13920,7 @@ STRING 2332
 }
 
 STRING 2333
-// Units: o01L ([Dragons] - Green Dragon), Hotkey (Hotkey)
+// Abilities: A03V (Assertiveness Training), Hotkey (Hotkey - Normal)
 {
 Q
 }
@@ -14094,7 +13938,7 @@ The infamous Sasquatch lives up in the mountains, but for the right coin he's wi
 }
 
 STRING 2336
-// Units: oC14 ([Giants] - Sasquatch), EditorSuffix (Name - Editor Suffix)
+// Units: o003 ([Outland] - Chaos Grunt), EditorSuffix (Name - Editor Suffix)
 {
 [T1]
 }
@@ -14106,7 +13950,7 @@ STRING 2337
 }
 
 STRING 2338
-// Units: oC18 ([Aviaries] - Gargoyle), Hotkey (Hotkey)
+// Units: oC19 ([Orc Stronghold] - Headhunter), Hotkey (Hotkey)
 {
 W
 }
@@ -14130,7 +13974,7 @@ STRING 2341
 }
 
 STRING 2342
-// Units: oC19 ([Orc Stronghold] - Headhunter), Hotkey (Hotkey)
+// Units: oC35 ([Giants] - Ogre Warrior), Hotkey (Hotkey)
 {
 W
 }
@@ -14148,7 +13992,7 @@ STRING 2344
 }
 
 STRING 2345
-// Units: oC19 ([Orc Stronghold] - Headhunter), EditorSuffix (Name - Editor Suffix)
+// Units: o00A ([High Elven] - High Elf Archer), EditorSuffix (Name - Editor Suffix)
 {
 [T2]
 }
@@ -14160,7 +14004,7 @@ STRING 2346
 }
 
 STRING 2347
-// Units: oC22 ([Builder] - Acolyte), Hotkey (Hotkey)
+// Units: o01O ([Goblins] - Alchemist), Hotkey (Hotkey)
 {
 A
 }
@@ -14172,7 +14016,7 @@ STRING 2348
 }
 
 STRING 2349
-// Units: oC26 ([Giants] - Iron Golem Statue), Hotkey (Hotkey)
+// Units: o01N ([Goblins] - Shredder), Hotkey (Hotkey)
 {
 R
 }
@@ -14190,7 +14034,7 @@ A statue dedicated to the giants, they keep it in the middle of town, to those g
 }
 
 STRING 2352
-// Units: oC26 ([Giants] - Iron Golem Statue), EditorSuffix (Name - Editor Suffix)
+// Units: o00V ([Outland] - Chaos Raider), EditorSuffix (Name - Editor Suffix)
 {
 [T4]
 }
@@ -14202,7 +14046,7 @@ Mutant
 }
 
 STRING 2354
-// Units: oC31 (Mutant), Hotkey (Hotkey)
+// Units: oC26 ([Giants] - Iron Golem Statue), Hotkey (Hotkey)
 {
 R
 }
@@ -14232,7 +14076,7 @@ STRING 2358
 }
 
 STRING 2359
-// Units: oC35 ([Giants] - Ogre Warrior), Hotkey (Hotkey)
+// Units: oC77 ([Naxxramas] - Horseman), Hotkey (Hotkey)
 {
 W
 }
@@ -14250,7 +14094,7 @@ The simple ogre doesn't know how to hit air units as they're too far up there, b
 }
 
 STRING 2362
-// Units: oC35 ([Giants] - Ogre Warrior), EditorSuffix (Name - Editor Suffix)
+// Units: o019 ([Arachnid] - Acid Spitting Spider), EditorSuffix (Name - Editor Suffix)
 {
 [T2]
 }
@@ -14334,7 +14178,7 @@ STRING 2375
 }
 
 STRING 2376
-// Units: oC58 ([Orc Stronghold] - Barrelmaster), EditorSuffix (Name - Editor Suffix)
+// Units: o005 ([Outland] - Chaos Warlock), EditorSuffix (Name - Editor Suffix)
 {
 [T3]
 }
@@ -14355,12 +14199,6 @@ STRING 2379
 // Units: oC60 ([Aviaries] - Wyvern), Tip (Tooltip - Basic)
 {
 Build Wyvern
-}
-
-STRING 2380
-// Units: oC60 ([Aviaries] - Wyvern), Ubertip (Tooltip - Extended)
-{
-A truly helpful Tower for any situation, the Wyvern does basically no base damage. It removes 15% of any non boss opponents current health. |n|n|cffffcc00Attack:|r Magic|n|cffffcc00Cooldown:|r 2.50|n|cffffcc00Damage:|r 1 - 1|n|cffffcc00Range:|r Melee|n|cffffcc00Ability:|r Splash; the area of effect is 128|n|cffffcc00Ability(2):|r Deadly Venom; enemies hit by this tower has their current health reduced by 15%
 }
 
 STRING 2381
@@ -14394,7 +14232,7 @@ STRING 2385
 }
 
 STRING 2386
-// Units: oC64 ([Orc Stronghold] - Tauren), Hotkey (Hotkey)
+// Units: oC31 (Mutant), Hotkey (Hotkey)
 {
 R
 }
@@ -14412,7 +14250,7 @@ STRING 2388
 }
 
 STRING 2389
-// Units: oC64 ([Orc Stronghold] - Tauren), EditorSuffix (Name - Editor Suffix)
+// Units: oC26 ([Giants] - Iron Golem Statue), EditorSuffix (Name - Editor Suffix)
 {
 [T4]
 }
@@ -14442,7 +14280,7 @@ STRING 2393
 }
 
 STRING 2394
-// Units: oC65 ([Orc Stronghold] - Warchief Thrall), EditorSuffix (Name - Editor Suffix)
+// Units: o00N ([High Elven] - Kael), EditorSuffix (Name - Editor Suffix)
 {
 [T8]
 }
@@ -14472,7 +14310,7 @@ Two isn't always better than one, these two heads constantly argue about who's t
 }
 
 STRING 2399
-// Units: oC67 ([Giants] - Ogre Lord), EditorSuffix (Name - Editor Suffix)
+// Units: o00L ([Demon] - Mannoroth), EditorSuffix (Name - Editor Suffix)
 {
 [T7]
 }
@@ -14532,7 +14370,7 @@ STRING 2408
 }
 
 STRING 2409
-// Units: oC73 ([Undead] - Obsidian Statue), Hotkey (Hotkey)
+// Units: oC64 ([Orc Stronghold] - Tauren), Hotkey (Hotkey)
 {
 R
 }
@@ -14556,7 +14394,7 @@ STRING 2412
 }
 
 STRING 2413
-// Units: oC74 ([Undead] - Dune Worm), Hotkey (Hotkey)
+// Units: oC68 ([Aviaries] - Chimera), Hotkey (Hotkey)
 {
 F
 }
@@ -14615,14 +14453,8 @@ STRING 2422
 Ghoul
 }
 
-STRING 2423
-// Units: oC76 ([Naxxramas] - Ghoul), Ubertip (Tooltip - Extended)
-{
-|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.25|n|cffffcc00Damage:|r 30 - 30|n|cffffcc00Range:|r 128|n
-}
-
 STRING 2424
-// Units: oC14 ([Giants] - Sasquatch), Hotkey (Hotkey)
+// Abilities: A078 (Dazzle), Hotkey (Hotkey - Normal)
 {
 Q
 }
@@ -14639,14 +14471,8 @@ STRING 2426
 Horseman
 }
 
-STRING 2427
-// Units: oC77 ([Naxxramas] - Horseman), Ubertip (Tooltip - Extended)
-{
-|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.05|n|cffffcc00Damage:|r 140 - 140|n|cffffcc00Range:|r 128|n|cffffcc00Ability:|r Can be upgraded to one of the four horsemen.|n
-}
-
 STRING 2428
-// Units: oC77 ([Naxxramas] - Horseman), Hotkey (Hotkey)
+// Units: u001 ([Outland] - Chaos Peon), Hotkey (Hotkey)
 {
 W
 }
@@ -14663,12 +14489,6 @@ STRING 2430
 Sir Zeliek
 }
 
-STRING 2431
-// Units: oC78 ([Naxx] - Sir Zeliek), Ubertip (Tooltip - Extended)
-{
-|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.05|n|cffffcc00Damage:|r 140 - 140|n|cffffcc00Range:|r 128|n
-}
-
 STRING 2432
 // Units: oC79 ([Naxx] - Lady Blaumeux), Name (Name)
 {
@@ -14679,12 +14499,6 @@ STRING 2433
 // Units: oC79 ([Naxx] - Lady Blaumeux), Tip (Tooltip - Basic)
 {
 Lady Blaumeux
-}
-
-STRING 2434
-// Units: oC79 ([Naxx] - Lady Blaumeux), Ubertip (Tooltip - Extended)
-{
-|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.05|n|cffffcc00Damage:|r 140 - 140|n|cffffcc00Range:|r 128|n
 }
 
 STRING 2435
@@ -14699,12 +14513,6 @@ STRING 2436
 Thane Korth'azz
 }
 
-STRING 2437
-// Units: oC7A ([Naxx] - Thane Korth'azz), Ubertip (Tooltip - Extended)
-{
-|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.05|n|cffffcc00Damage:|r 140 - 140|n|cffffcc00Range:|r 128|n
-}
-
 STRING 2438
 // Units: oC7B ([Naxx] - Alexandros Mograine), Name (Name)
 {
@@ -14715,12 +14523,6 @@ STRING 2439
 // Units: oC7B ([Naxx] - Alexandros Mograine), Tip (Tooltip - Basic)
 {
 Alexandros Mograine
-}
-
-STRING 2440
-// Units: oC7B ([Naxx] - Alexandros Mograine), Ubertip (Tooltip - Extended)
-{
-|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.05|n|cffffcc00Damage:|r 140 - 140|n|cffffcc00Range:|r 128|n
 }
 
 STRING 2441
@@ -14795,14 +14597,8 @@ STRING 2452
 Feugen
 }
 
-STRING 2453
-// Units: oC7D ([Naxxramas] - Feugen), Ubertip (Tooltip - Extended)
-{
-|cffffcc00Attack:|r Normal|n|cffffcc00Cooldown:|r 1.00|n|cffffcc00Damage:|r 650 - 700|n|cffffcc00Range:|r 128|n|cffffcc00Ability:|r Construct Thaddius; merges Feugen and Stalagg into one.|n
-}
-
 STRING 2454
-// Units: oC7D ([Naxxramas] - Feugen), Hotkey (Hotkey)
+// Units: oC73 ([Undead] - Obsidian Statue), Hotkey (Hotkey)
 {
 R
 }
@@ -14819,14 +14615,8 @@ STRING 2456
 Stalagg
 }
 
-STRING 2457
-// Units: oC7E ([Naxxramas] - Stalagg), Ubertip (Tooltip - Extended)
-{
-|cffffcc00Attack:|r Normal|n|cffffcc00Cooldown:|r 1.00|n|cffffcc00Damage:|r 650 - 700|n|cffffcc00Range:|r 128|n|cffffcc00Ability:|r Construct Thaddius; merges Feugen and Stalagg into one.|n
-}
-
 STRING 2458
-// Units: oC7E ([Naxxramas] - Stalagg), Hotkey (Hotkey)
+// Units: oC22 ([Builder] - Acolyte), Hotkey (Hotkey)
 {
 A
 }
@@ -14843,12 +14633,6 @@ STRING 2460
 Thaddius
 }
 
-STRING 2461
-// Units: oC7F ([Naxxramas] - Thaddius), Ubertip (Tooltip - Extended)
-{
-|cffffcc00Attack:|r Magic|n|cffffcc00Cooldown:|r 2.00|n|cffffcc00Damage:|r 1 - 1|n|cffffcc00Range:|r 700|n|cffffcc00Ability:|r Lightning Attack; attacks trigger a chain lightning dealing 1000 damage, bounces up to 10 times.|n
-}
-
 STRING 2462
 // Units: oC7G ([Naxxramas] - Maexxna), Name (Name)
 {
@@ -14859,12 +14643,6 @@ STRING 2463
 // Units: oC7G ([Naxxramas] - Maexxna), Tip (Tooltip - Basic)
 {
 Maexxna
-}
-
-STRING 2464
-// Units: oC7G ([Naxxramas] - Maexxna), Ubertip (Tooltip - Extended)
-{
-|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.20|n|cffffcc00Damage:|r 2 - 2|n|cffffcc00Range:|r 128|n|cffffcc00Ability:|r Splash; the area of effect is 100.|n|cffffcc00Ability (2):|r Poison Sting; inflicts enemies hit by Maexxnas attacks with a strong poison.|n
 }
 
 STRING 2465
@@ -14916,7 +14694,7 @@ STRING 2472
 }
 
 STRING 2473
-// Units: oC7I ([Naxxramas] - Grand Widdow Faerlina), Hotkey (Hotkey)
+// Units: oC74 ([Undead] - Dune Worm), Hotkey (Hotkey)
 {
 F
 }
@@ -14927,22 +14705,10 @@ STRING 2474
 [Naxxramas] - Sapphiron
 }
 
-STRING 2475
-// Units: oC7J ([Naxxramas] - Sapphiron), Hotkey (Hotkey)
-{
-Y
-}
-
 STRING 2476
 // Units: oC7J ([Naxxramas] - Sapphiron), Tip (Tooltip - Basic)
 {
 Sapphiron
-}
-
-STRING 2477
-// Units: oC7J ([Naxxramas] - Sapphiron), Ubertip (Tooltip - Extended)
-{
-|cffffcc00Attack:|r Magic|n|cffffcc00Cooldown:|r 1.00|n|cffffcc00Damage:|r 2000 - 2000|n|cffffcc00Range:|r 850|n|cffffcc00Ability:|r Splash; the area of effect is 400.|n|cffffcc00Ability(2):|r Creeping Frost; attacks drain energy from enemy foes to strengthen Sapphirons slow aura up to 35% slow. Resets on round end.|n
 }
 
 STRING 2478
@@ -14982,7 +14748,7 @@ STRING 2483
 }
 
 STRING 2484
-// Units: u001 ([Outland] - Chaos Peon), Hotkey (Hotkey)
+// Units: u002 ([Builder] - High Elf Worker), Hotkey (Hotkey)
 {
 W
 }
@@ -15006,7 +14772,7 @@ STRING 2487
 }
 
 STRING 2488
-// Units: u002 ([Builder] - High Elf Worker), Hotkey (Hotkey)
+// Units: u00D ([Forsaken] - Necromancer), Hotkey (Hotkey)
 {
 W
 }
@@ -15138,7 +14904,7 @@ STRING 2509
 }
 
 STRING 2510
-// Units: oC76 ([Naxxramas] - Ghoul), Hotkey (Hotkey)
+// Abilities: A07N ( Allow 01 - Red), Hotkey (Hotkey - Normal)
 {
 Q
 }
@@ -15162,7 +14928,7 @@ STRING 2513
 }
 
 STRING 2514
-// Units: u00D ([Forsaken] - Necromancer), Hotkey (Hotkey)
+// Units: u01B ([Builder] - Bringer of Buffs), Hotkey (Hotkey)
 {
 W
 }
@@ -15228,7 +14994,7 @@ STRING 2524
 }
 
 STRING 2525
-// Units: u00F ([Forsaken] - Gargoyle Spire), Hotkey (Hotkey)
+// Units: oC7D ([Naxxramas] - Feugen), Hotkey (Hotkey)
 {
 R
 }
@@ -15252,7 +15018,7 @@ STRING 2528
 }
 
 STRING 2529
-// Units: u010 ([Forsaken] - Banshee), Hotkey (Hotkey)
+// Units: oC7E ([Naxxramas] - Stalagg), Hotkey (Hotkey)
 {
 A
 }
@@ -15324,7 +15090,7 @@ STRING 2540
 }
 
 STRING 2541
-// Units: u013 ([Forsaken] - Sylvanas Windrunner), Hotkey (Hotkey)
+// Units: oC7I ([Naxxramas] - Grand Widdow Faerlina), Hotkey (Hotkey)
 {
 F
 }
@@ -15402,7 +15168,7 @@ STRING 2553
 }
 
 STRING 2554
-// Units: u01B ([Builder] - Bringer of Buffs), Hotkey (Hotkey)
+// Units: u03E ([Uniques] - Zergling Hive), Hotkey (Hotkey)
 {
 W
 }
@@ -15414,7 +15180,7 @@ STRING 2555
 }
 
 STRING 2556
-// Units: u01C ([Outland] - Magtheridon), Hotkey (Hotkey)
+// Units: u013 ([Forsaken] - Sylvanas Windrunner), Hotkey (Hotkey)
 {
 F
 }
@@ -15534,7 +15300,7 @@ Death Rune [Level 2]
 }
 
 STRING 2576
-// Units: u00C ([Forsaken] - Tombstone), Hotkey (Hotkey)
+// Abilities: A07P ( Deny 01 - Red), Hotkey (Hotkey - Normal)
 {
 Q
 }
@@ -15876,7 +15642,7 @@ STRING 2632
 }
 
 STRING 2633
-// Units: u03E ([Uniques] - Zergling Hive), Hotkey (Hotkey)
+// Units: u045 ([Loot Boxers] - Big Boy Box), Hotkey (Hotkey)
 {
 W
 }
@@ -15894,7 +15660,7 @@ STRING 2635
 }
 
 STRING 2636
-// Units: u03E ([Uniques] - Zergling Hive), EditorSuffix (Name - Editor Suffix)
+// Units: oC19 ([Orc Stronghold] - Headhunter), EditorSuffix (Name - Editor Suffix)
 {
 [T2]
 }
@@ -15906,7 +15672,7 @@ STRING 2637
 }
 
 STRING 2638
-// Units: u03F ([Uniques] - Sammy the Kobold Shoveler), Hotkey (Hotkey)
+// Units: u01C ([Outland] - Magtheridon), Hotkey (Hotkey)
 {
 F
 }
@@ -15924,7 +15690,7 @@ STRING 2640
 }
 
 STRING 2641
-// Units: u03F ([Uniques] - Sammy the Kobold Shoveler), EditorSuffix (Name - Editor Suffix)
+// Units: oC65 ([Orc Stronghold] - Warchief Thrall), EditorSuffix (Name - Editor Suffix)
 {
 [T8]
 }
@@ -15936,7 +15702,7 @@ STRING 2642
 }
 
 STRING 2643
-// Units: u040 ([Uniques] - The Darkness), EditorSuffix (Name - Editor Suffix)
+// Units: o00Y ([Giants] - Sea Giant), EditorSuffix (Name - Editor Suffix)
 {
 [T9]
 }
@@ -15990,7 +15756,7 @@ Creates a swarm of angry locusts that bite and tear at nearby enemy units. |CFF0
 }
 
 STRING 2652
-// Units: u043 ([Builder] - Little Timmy), Hotkey (Hotkey)
+// Units: u010 ([Forsaken] - Banshee), Hotkey (Hotkey)
 {
 A
 }
@@ -16008,7 +15774,7 @@ STRING 2654
 }
 
 STRING 2655
-// Units: u02A (Death Rune [Level 2]), Hotkey (Hotkey)
+// Abilities: A09Z ([Workers Union] Angry, Angry Workers), Hotkey (Hotkey - Normal)
 {
 Q
 }
@@ -16026,7 +15792,7 @@ STRING 2657
 }
 
 STRING 2658
-// Units: u044 ([Loot Boxers] - Parent-Unfriendly Lootbox), EditorSuffix (Name - Editor Suffix)
+// Units: o009 ([High Elven] - Elven Swordsman), EditorSuffix (Name - Editor Suffix)
 {
 [T1]
 }
@@ -16038,7 +15804,7 @@ STRING 2659
 }
 
 STRING 2660
-// Units: u045 ([Loot Boxers] - Big Boy Box), Hotkey (Hotkey)
+// Units: uC98 ([Builder] - Demon Worker), Hotkey (Hotkey)
 {
 W
 }
@@ -16056,7 +15822,7 @@ STRING 2662
 }
 
 STRING 2663
-// Units: u045 ([Loot Boxers] - Big Boy Box), EditorSuffix (Name - Editor Suffix)
+// Units: oC35 ([Giants] - Ogre Warrior), EditorSuffix (Name - Editor Suffix)
 {
 [T2]
 }
@@ -16068,7 +15834,7 @@ STRING 2664
 }
 
 STRING 2665
-// Units: u046 ([Loot Boxers] - "Canvas" Loot Bag), Hotkey (Hotkey)
+// Units: u00F ([Forsaken] - Gargoyle Spire), Hotkey (Hotkey)
 {
 R
 }
@@ -16086,7 +15852,7 @@ STRING 2667
 }
 
 STRING 2668
-// Units: u046 ([Loot Boxers] - "Canvas" Loot Bag), EditorSuffix (Name - Editor Suffix)
+// Units: oC64 ([Orc Stronghold] - Tauren), EditorSuffix (Name - Editor Suffix)
 {
 [T4]
 }
@@ -16122,7 +15888,7 @@ STRING 2673
 }
 
 STRING 2674
-// Units: u047 ([Loot Boxers] - Enigma Chest), EditorSuffix (Name - Editor Suffix)
+// Units: o00B ([High Elven] - Elven Sorceress), EditorSuffix (Name - Editor Suffix)
 {
 [T3]
 }
@@ -16134,7 +15900,7 @@ STRING 2675
 }
 
 STRING 2676
-// Units: u048 ([Loot Boxers] - Skinner Box), Hotkey (Hotkey)
+// Units: u043 ([Builder] - Little Timmy), Hotkey (Hotkey)
 {
 A
 }
@@ -16158,7 +15924,7 @@ Bombards an area with rockets, dealing 500 damage to nearby enemy land units and
 }
 
 STRING 2680
-// Units: u048 ([Loot Boxers] - Skinner Box), EditorSuffix (Name - Editor Suffix)
+// Units: o00X ([Giants] - Ancient Golem), EditorSuffix (Name - Editor Suffix)
 {
 [T5]
 }
@@ -16188,7 +15954,7 @@ STRING 2684
 }
 
 STRING 2685
-// Units: u049 ([Loot Boxers] - Augmented Box), EditorSuffix (Name - Editor Suffix)
+// Units: o00Q ([High Elven] - Spellbreaker), EditorSuffix (Name - Editor Suffix)
 {
 [T6]
 }
@@ -16218,7 +15984,7 @@ STRING 2689
 }
 
 STRING 2690
-// Units: u04A ([Loot Boxers] - Prime Loot Bundle), EditorSuffix (Name - Editor Suffix)
+// Units: o01B ([Outland] - Rend Blackhand), EditorSuffix (Name - Editor Suffix)
 {
 [T7]
 }
@@ -16230,7 +15996,7 @@ STRING 2691
 }
 
 STRING 2692
-// Units: u04B ([Loot Boxers] - Gold Elite Lootbox), Hotkey (Hotkey)
+// Units: u03F ([Uniques] - Sammy the Kobold Shoveler), Hotkey (Hotkey)
 {
 F
 }
@@ -16248,7 +16014,7 @@ STRING 2694
 }
 
 STRING 2695
-// Units: u04B ([Loot Boxers] - Gold Elite Lootbox), EditorSuffix (Name - Editor Suffix)
+// Units: u01C ([Outland] - Magtheridon), EditorSuffix (Name - Editor Suffix)
 {
 [T8]
 }
@@ -16272,7 +16038,7 @@ STRING 2698
 }
 
 STRING 2699
-// Units: u04C ([Loot Boxers] - Premium Deluxe Extravaganza Box), EditorSuffix (Name - Editor Suffix)
+// Units: u040 ([Uniques] - The Darkness), EditorSuffix (Name - Editor Suffix)
 {
 [T9]
 }
@@ -16344,7 +16110,7 @@ Walking Corpse
 }
 
 STRING 2711
-// Units: uC45 (Walking Corpse), Hotkey (Hotkey)
+// Units: u048 ([Loot Boxers] - Skinner Box), Hotkey (Hotkey)
 {
 A
 }
@@ -16380,7 +16146,7 @@ Wolf Bash
 }
 
 STRING 2717
-// Units: uC46 (Assassin), Hotkey (Hotkey)
+// Units: uC45 (Walking Corpse), Hotkey (Hotkey)
 {
 A
 }
@@ -16416,7 +16182,7 @@ Nether Dragon
 }
 
 STRING 2723
-// Units: uC71 (Nether Dragon), Hotkey (Hotkey)
+// Units: u04B ([Loot Boxers] - Gold Elite Lootbox), Hotkey (Hotkey)
 {
 F
 }
@@ -16518,7 +16284,7 @@ STRING 2739
 }
 
 STRING 2740
-// Units: uC98 ([Builder] - Demon Worker), Hotkey (Hotkey)
+// Items: I004 (High Elf Barracks [Geno]), Hotkey (Hotkey)
 {
 W
 }
@@ -16560,13 +16326,13 @@ Perplexed
 }
 
 STRING 2747
-// Units: u04E (Range Check), Hotkey (Hotkey)
+// Units: uC71 (Nether Dragon), Hotkey (Hotkey)
 {
 F
 }
 
 STRING 2748
-// Items: I000 (Caerbannog), Hotkey (Hotkey)
+// Units: u04E (Range Check), Hotkey (Hotkey)
 {
 F
 }
@@ -16578,13 +16344,13 @@ Caerbannog
 }
 
 STRING 2750
-// Items: I001 (Demon Portal [Geno]), Hotkey (Hotkey)
+// Units: u046 ([Loot Boxers] - "Canvas" Loot Bag), Hotkey (Hotkey)
 {
 R
 }
 
 STRING 2751
-// Units: u044 ([Loot Boxers] - Parent-Unfriendly Lootbox), Hotkey (Hotkey)
+// Abilities: A09Z ([Workers Union] Angry, Angry Workers), Unhotkey (Hotkey - Turn Off)
 {
 Q
 }
@@ -16608,13 +16374,13 @@ Aviaries
 }
 
 STRING 2755
-// Items: I004 (High Elf Barracks [Geno]), Hotkey (Hotkey)
+// Items: I00S (High Elves [DISABLED]), Hotkey (Hotkey)
 {
 W
 }
 
 STRING 2756
-// Items: I005 (Outland), Hotkey (Hotkey)
+// Units: uC46 (Assassin), Hotkey (Hotkey)
 {
 A
 }
@@ -16626,7 +16392,7 @@ Outland
 }
 
 STRING 2758
-// Items: I002 (Undead Necropolis), Hotkey (Hotkey)
+// Abilities: A0FL (Build Test Tower), Hotkey (Hotkey - Normal)
 {
 Q
 }
@@ -16638,19 +16404,19 @@ Human Town Hall
 }
 
 STRING 2760
-// Units: u039 (Purgatory - Level 2), Hotkey (Hotkey)
+// Units: o01D ([Dragons] - Blue Drake), Hotkey (Hotkey)
 {
 Z
 }
 
 STRING 2761
-// Units: u03A (Decay - Level 2), Hotkey (Hotkey)
+// Units: o01F ([Dragons] - Bronze Drake), Hotkey (Hotkey)
 {
 Z
 }
 
 STRING 2762
-// Items: I009 (Giants), Hotkey (Hotkey)
+// Items: I001 (Demon Portal [Geno]), Hotkey (Hotkey)
 {
 R
 }
@@ -16680,7 +16446,7 @@ S
 }
 
 STRING 2767
-// Items: I00E (Dragons), Hotkey (Hotkey)
+// Items: I000 (Caerbannog), Hotkey (Hotkey)
 {
 F
 }
@@ -16692,7 +16458,7 @@ Dragons
 }
 
 STRING 2769
-// Units: oC7K ([Naxxramas] - Kel'Thuzad), Hotkey (Hotkey)
+// Items: I00F (Night Elf Ancient [Geno]), Hotkey (Hotkey)
 {
 X
 }
@@ -16710,7 +16476,7 @@ This unit is caught in Decay; it will take damage over time.
 }
 
 STRING 2772
-// Items: I00H (Tavern), Hotkey (Hotkey)
+// Items: I005 (Outland), Hotkey (Hotkey)
 {
 A
 }
@@ -16722,7 +16488,7 @@ Tavern
 }
 
 STRING 2774
-// Units: u03B (Wildfire - Level 2), Hotkey (Hotkey)
+// Units: o01I ([Dragons] - Black Dragon), Hotkey (Hotkey)
 {
 Z
 }
@@ -16733,14 +16499,8 @@ STRING 2775
 Corrupted Night Elves
 }
 
-STRING 2776
-// Items: I006 (Human Town Hall), Hotkey (Hotkey)
-{
-Q
-}
-
 STRING 2777
-// Items: I00F (Night Elf Ancient [Geno]), Hotkey (Hotkey)
+// Items: I00J (Goblins), Hotkey (Hotkey)
 {
 X
 }
@@ -16764,13 +16524,13 @@ D
 }
 
 STRING 2781
-// Units: u03C (Wildfire - Level 3), Hotkey (Hotkey)
+// Units: o01J ([Dragons] - Blue Dragon), Hotkey (Hotkey)
 {
 Z
 }
 
 STRING 2782
-// Items: I00N (Angel's Gateway), Hotkey (Hotkey)
+// Items: I009 (Giants), Hotkey (Hotkey)
 {
 R
 }
@@ -16787,12 +16547,6 @@ STRING 2784
 Forest Troll Hut
 }
 
-STRING 2785
-// Items: I00P (Alliance of Blades), Hotkey (Hotkey)
-{
-Q
-}
-
 STRING 2786
 // Items: I00P (Alliance of Blades), Name (Name)
 {
@@ -16800,7 +16554,7 @@ Alliance of Blades
 }
 
 STRING 2787
-// Items: I00Q (Cavernous Creatures [Geno]), Hotkey (Hotkey)
+// Items: I00E (Dragons), Hotkey (Hotkey)
 {
 F
 }
@@ -16812,13 +16566,13 @@ C
 }
 
 STRING 2789
-// Items: I00S (High Elves [DISABLED]), Hotkey (Hotkey)
+// Items: I00T (The Forsaken), Hotkey (Hotkey)
 {
 W
 }
 
 STRING 2790
-// Items: I00T (The Forsaken), Hotkey (Hotkey)
+// Items: I00Z (Galaxy), Hotkey (Hotkey)
 {
 W
 }
@@ -16836,7 +16590,7 @@ Dwarven Mine
 }
 
 STRING 2793
-// Units: u03D (Sandstorm - Level 2), Hotkey (Hotkey)
+// Units: o01K ([Dragons] - Bronze Dragon), Hotkey (Hotkey)
 {
 Z
 }
@@ -16848,13 +16602,13 @@ Random Race
 }
 
 STRING 2795
-// Items: I00J (Goblins), Hotkey (Hotkey)
+// Items: I00W (Hardcore Random), Hotkey (Hotkey)
 {
 X
 }
 
 STRING 2796
-// Items: I00Z (Galaxy), Hotkey (Hotkey)
+// Abilities: A07Q ( Allow 02 - Blue), Hotkey (Hotkey - Normal)
 {
 W
 }
@@ -16866,7 +16620,7 @@ Galaxy
 }
 
 STRING 2798
-// Items: I01A (Workers Union [Geno]), Hotkey (Hotkey)
+// Items: I00H (Tavern), Hotkey (Hotkey)
 {
 A
 }
@@ -16878,7 +16632,7 @@ E
 }
 
 STRING 2800
-// Items: I00W (Hardcore Random), Hotkey (Hotkey)
+// Items: I025 (High Elf Farm), Hotkey (Hotkey)
 {
 X
 }
@@ -16889,12 +16643,6 @@ STRING 2801
 High Elf Farm
 }
 
-STRING 2802
-// Items: I026 (Shrine of Buffs), Hotkey (Hotkey)
-{
-Q
-}
-
 STRING 2803
 // Units: u01B ([Builder] - Bringer of Buffs), EditorSuffix (Name - Editor Suffix)
 {
@@ -16902,15 +16650,9 @@ Shrine of Buffs
 }
 
 STRING 2804
-// Items: I027 (Uniques [Geno]), Hotkey (Hotkey)
+// Items: I01A (Workers Union [Geno]), Hotkey (Hotkey)
 {
 A
-}
-
-STRING 2805
-// Items: I02D (Loot Boxers [Geno]), Hotkey (Hotkey)
-{
-Q
 }
 
 STRING 2806
@@ -16932,7 +16674,7 @@ Teleport
 }
 
 STRING 2809
-// Units: u04C ([Loot Boxers] - Premium Deluxe Extravaganza Box), Hotkey (Hotkey)
+// Units: oC7B ([Naxx] - Alexandros Mograine), Hotkey (Hotkey)
 {
 Z
 }
@@ -16944,13 +16686,13 @@ STRING 2810
 }
 
 STRING 2811
-// Items: I007 (Orc Stronghold [Geno]), Hotkey (Hotkey)
+// Units: oC7J ([Naxxramas] - Sapphiron), Hotkey (Hotkey)
 {
 Z
 }
 
 STRING 2812
-// Items: I008 (Naga Temple [DISABLED]), Hotkey (Hotkey)
+// Units: u02B (Death Rune [Level 3]), Hotkey (Hotkey)
 {
 Z
 }
@@ -16968,49 +16710,43 @@ G
 }
 
 STRING 2815
-// Items: I025 (High Elf Farm), Hotkey (Hotkey)
+// Abilities: A025 (Starfall), Hotkey (Hotkey - Normal)
 {
 X
 }
 
 STRING 2816
-// Items: I00I (Corrupted Night Elves), Hotkey (Hotkey)
+// Units: u02D (Life Rune [Level 3]), Hotkey (Hotkey)
 {
 Z
 }
 
 STRING 2817
-// Items: I00M (Gnoll Republic), Hotkey (Hotkey)
+// Units: u02F (Nature Rune [Level 3]), Hotkey (Hotkey)
 {
 Z
 }
 
 STRING 2818
-// Items: I00V (Random), Hotkey (Hotkey)
+// Units: u031 (Fire Rune [Level 3]), Hotkey (Hotkey)
 {
 Z
 }
 
 STRING 2819
-// Abilities: A00F (Entangle), Hotkey (Hotkey - Normal)
+// Units: u033 (Air Rune [Level 3]), Hotkey (Hotkey)
 {
 Z
 }
 
 STRING 2820
-// Abilities: A015 (Poison Arrows), Hotkey (Hotkey - Normal)
+// Units: u035 (Water Rune [Level 3]), Hotkey (Hotkey)
 {
 Z
 }
 
-STRING 2821
-// Abilities: A03V (Assertiveness Training), Hotkey (Hotkey - Normal)
-{
-Q
-}
-
 STRING 2822
-// Abilities: A015 (Poison Arrows), Unhotkey (Hotkey - Turn Off)
+// Units: u039 (Purgatory - Level 2), Hotkey (Hotkey)
 {
 Z
 }
@@ -17028,7 +16764,7 @@ Silver's STARoids deal 500 dmg to up to 15 targets
 }
 
 STRING 2825
-// Abilities: A03A (Transfuse), Hotkey (Hotkey - Normal)
+// Units: u03A (Decay - Level 2), Hotkey (Hotkey)
 {
 Z
 }
@@ -17045,12 +16781,6 @@ STRING 2827
  (Unholy Aura)
 }
 
-STRING 2828
-// Abilities: A078 (Dazzle), Hotkey (Hotkey - Normal)
-{
-Q
-}
-
 STRING 2829
 // Abilities: A07C (Summon Companion), EditorSuffix (Editor Suffix)
 {
@@ -17064,19 +16794,19 @@ E
 }
 
 STRING 2831
-// Abilities: A07F ( Allow 05 - Yellow), Hotkey (Hotkey - Normal)
+// Items: I027 (Uniques [Geno]), Hotkey (Hotkey)
 {
 A
 }
 
 STRING 2832
-// Abilities: A03F (Weak Enchantment), Hotkey (Hotkey - Normal)
+// Units: u03B (Wildfire - Level 2), Hotkey (Hotkey)
 {
 Z
 }
 
 STRING 2833
-// Abilities: A07I ( Allow 04 - Purple), Hotkey (Hotkey - Normal)
+// Items: I00N (Angel's Gateway), Hotkey (Hotkey)
 {
 R
 }
@@ -17088,7 +16818,7 @@ S
 }
 
 STRING 2835
-// Abilities: A07K ( Allow 08 - Pink), Hotkey (Hotkey - Normal)
+// Items: I00Q (Cavernous Creatures [Geno]), Hotkey (Hotkey)
 {
 F
 }
@@ -17105,31 +16835,13 @@ STRING 2837
 C
 }
 
-STRING 2838
-// Abilities: A07N ( Allow 01 - Red), Hotkey (Hotkey - Normal)
-{
-Q
-}
-
 STRING 2839
-// Abilities: A025 (Starfall), Hotkey (Hotkey - Normal)
+// Abilities: A07O ( Allow 10 - Light Blue), Hotkey (Hotkey - Normal)
 {
 X
 }
 
-STRING 2840
-// Abilities: A07P ( Deny 01 - Red), Hotkey (Hotkey - Normal)
-{
-Q
-}
-
 STRING 2841
-// Abilities: A07Q ( Allow 02 - Blue), Hotkey (Hotkey - Normal)
-{
-W
-}
-
-STRING 2842
 // Abilities: A07R ( Deny 02 - Blue), Hotkey (Hotkey - Normal)
 {
 W
@@ -17142,13 +16854,13 @@ E
 }
 
 STRING 2844
-// Abilities: A07T ( Deny 04 - Purple), Hotkey (Hotkey - Normal)
+// Abilities: A07I ( Allow 04 - Purple), Hotkey (Hotkey - Normal)
 {
 R
 }
 
 STRING 2845
-// Abilities: A07U ( Deny 05 - Yellow), Hotkey (Hotkey - Normal)
+// Abilities: A07F ( Allow 05 - Yellow), Hotkey (Hotkey - Normal)
 {
 A
 }
@@ -17166,19 +16878,19 @@ D
 }
 
 STRING 2848
-// Abilities: A07X ( Deny 08 - Pink), Hotkey (Hotkey - Normal)
+// Abilities: A07K ( Allow 08 - Pink), Hotkey (Hotkey - Normal)
 {
 F
 }
 
 STRING 2849
-// Abilities: A03L (Starfall), Hotkey (Hotkey - Normal)
+// Units: u03C (Wildfire - Level 3), Hotkey (Hotkey)
 {
 Z
 }
 
 STRING 2850
-// Abilities: A07O ( Allow 10 - Light Blue), Hotkey (Hotkey - Normal)
+// Abilities: A07Z ( Deny 10 - Light Blue), Hotkey (Hotkey - Normal)
 {
 X
 }
@@ -17190,61 +16902,49 @@ C
 }
 
 STRING 2852
-// Abilities: A03P (Monsoon), Hotkey (Hotkey - Normal)
+// Units: u03D (Sandstorm - Level 2), Hotkey (Hotkey)
 {
 Z
 }
 
 STRING 2853
-// Abilities: A03R (Berserk), Hotkey (Hotkey - Normal)
+// Units: u04C ([Loot Boxers] - Premium Deluxe Extravaganza Box), Hotkey (Hotkey)
 {
 Z
 }
 
 STRING 2854
-// Abilities: A04C (Drunken Haze), Hotkey (Hotkey - Normal)
+// Items: I007 (Orc Stronghold [Geno]), Hotkey (Hotkey)
 {
 Z
 }
 
 STRING 2855
-// Abilities: A04D (Breath of Fire), Hotkey (Hotkey - Normal)
+// Items: I008 (Naga Temple [DISABLED]), Hotkey (Hotkey)
 {
 Z
 }
 
-STRING 2856
-// Abilities: A09Z ([Workers Union] Angry, Angry Workers), Hotkey (Hotkey - Normal)
-{
-Q
-}
-
-STRING 2857
-// Abilities: A09Z ([Workers Union] Angry, Angry Workers), Unhotkey (Hotkey - Turn Off)
-{
-Q
-}
-
 STRING 2858
-// Abilities: A07Z ( Deny 10 - Light Blue), Hotkey (Hotkey - Normal)
+// Abilities: A0A7 (Infuse), Hotkey (Hotkey - Normal)
 {
 X
 }
 
 STRING 2859
-// Abilities: A07H ( Allow 09 - Grey), Hotkey (Hotkey - Normal)
+// Items: I00I (Corrupted Night Elves), Hotkey (Hotkey)
 {
 Z
 }
 
 STRING 2860
-// Abilities: A07Y ( Deny 09 - Grey), Hotkey (Hotkey - Normal)
+// Items: I00M (Gnoll Republic), Hotkey (Hotkey)
 {
 Z
 }
 
 STRING 2861
-// Abilities: A0A7 (Infuse), Hotkey (Hotkey - Normal)
+// Abilities: A0AX ([Orc Stronghold] Summon Huffer), Hotkey (Hotkey - Normal)
 {
 X
 }
@@ -17262,31 +16962,31 @@ C
 }
 
 STRING 2864
-// Abilities: A08L (Destiny Bond), Hotkey (Hotkey - Normal)
+// Items: I00V (Random), Hotkey (Hotkey)
 {
 Z
 }
 
 STRING 2865
-// Abilities: A095 ([Void Cult] Void Restoration), Hotkey (Hotkey - Normal)
+// Abilities: A00F (Entangle), Hotkey (Hotkey - Normal)
 {
 Z
 }
 
 STRING 2866
-// Abilities: A09E ([Void Cult] Consume Soul), Hotkey (Hotkey - Normal)
+// Abilities: A015 (Poison Arrows), Hotkey (Hotkey - Normal)
 {
 Z
 }
 
 STRING 2867
-// Abilities: A09O ([Void Cult] Void Energies), Hotkey (Hotkey - Normal)
+// Abilities: A015 (Poison Arrows), Unhotkey (Hotkey - Turn Off)
 {
 Z
 }
 
 STRING 2868
-// Abilities: A0AX ([Orc Stronghold] Summon Huffer), Hotkey (Hotkey - Normal)
+// Abilities: A0BJ ([Void Cult] Summon Void Beast), Hotkey (Hotkey - Normal)
 {
 X
 }
@@ -17298,79 +16998,79 @@ C
 }
 
 STRING 2870
-// Abilities: A0B0 (Alchemical Transmutation), Hotkey (Hotkey - Normal)
+// Items: I019 (Void Altar [Geno]), Hotkey (Hotkey)
 {
 V
 }
 
 STRING 2871
-// Abilities: A0AJ (Sacrifice), Hotkey (Hotkey - Normal)
+// Abilities: A03A (Transfuse), Hotkey (Hotkey - Normal)
 {
 Z
 }
 
 STRING 2872
-// Abilities: A0AW ([Orc Stronghold] Summon Misha), Hotkey (Hotkey - Normal)
+// Abilities: A03F (Weak Enchantment), Hotkey (Hotkey - Normal)
 {
 Z
 }
 
 STRING 2873
-// Abilities: A0BB ([Void Cult] Summon Void Being), Hotkey (Hotkey - Normal)
+// Abilities: A03L (Starfall), Hotkey (Hotkey - Normal)
 {
 Z
 }
 
 STRING 2874
-// Abilities: A0BD ([Night Elf] Chimaera Transform), Hotkey (Hotkey - Normal)
+// Abilities: A03P (Monsoon), Hotkey (Hotkey - Normal)
 {
 Z
 }
 
 STRING 2875
-// Abilities: A0BD ([Night Elf] Chimaera Transform), Unhotkey (Hotkey - Turn Off)
+// Abilities: A03R (Berserk), Hotkey (Hotkey - Normal)
 {
 Z
 }
 
 STRING 2876
-// Abilities: A0BF ([Void Cult] Pay the Toll), Hotkey (Hotkey - Normal)
+// Abilities: A04C (Drunken Haze), Hotkey (Hotkey - Normal)
 {
 Z
 }
 
 STRING 2877
-// Abilities: A0BJ ([Void Cult] Summon Void Beast), Hotkey (Hotkey - Normal)
-{
-X
-}
-
-STRING 2878
 // Abilities: A0C7 ([Cavernous Creatures] Transfer Mana), Hotkey (Hotkey - Normal)
 {
 X
 }
 
-STRING 2879
+STRING 2878
 // Abilities: A0C8 ([Cavernous Creatures] Transfer Mana), Hotkey (Hotkey - Normal)
 {
 X
 }
 
+STRING 2879
+// Abilities: A0C9 ([Cavernous Creatures] Transfer Mana), Hotkey (Hotkey - Normal)
+{
+X
+}
+
 STRING 2880
-// Abilities: A0BT ([Night Elf] Chimaera Transform), Hotkey (Hotkey - Normal)
+// Abilities: A04D (Breath of Fire), Hotkey (Hotkey - Normal)
 {
 Z
 }
 
 STRING 2881
-// Abilities: A0BT ([Night Elf] Chimaera Transform), Unhotkey (Hotkey - Turn Off)
+// Abilities: A07H ( Allow 09 - Grey), Hotkey (Hotkey - Normal)
 {
 Z
 }
 
 STRING 2882
-// Abilities: A0BU ([Night Elf] Chimaera Transform), Hotkey (Hotkey - Normal)
+// Abilities: A07Y ( Deny 09 - Grey), Hotkey (Hotkey - Normal)
 {
 Z
 }
@@ -17400,7 +17100,7 @@ Dummy
 }
 
 STRING 2887
-// Abilities: A0BU ([Night Elf] Chimaera Transform), Unhotkey (Hotkey - Turn Off)
+// Abilities: A08L (Destiny Bond), Hotkey (Hotkey - Normal)
 {
 Z
 }
@@ -17418,13 +17118,13 @@ Plague
 }
 
 STRING 2890
-// Abilities: A0BV ([Night Elf] Chimaera Transform), Hotkey (Hotkey - Normal)
+// Abilities: A095 ([Void Cult] Void Restoration), Hotkey (Hotkey - Normal)
 {
 Z
 }
 
 STRING 2891
-// Abilities: A0BV ([Night Elf] Chimaera Transform), Unhotkey (Hotkey - Turn Off)
+// Abilities: A09E ([Void Cult] Consume Soul), Hotkey (Hotkey - Normal)
 {
 Z
 }
@@ -17436,7 +17136,7 @@ Disease Cloud
 }
 
 STRING 2893
-// Abilities: A0C9 ([Cavernous Creatures] Transfer Mana), Hotkey (Hotkey - Normal)
+// Abilities: A0EB (Move), Hotkey (Hotkey - Normal)
 {
 X
 }
@@ -17454,13 +17154,13 @@ STRING 2895
 }
 
 STRING 2896
-// Abilities: A0CA ([Cavernous Creatures] Resurrect), Hotkey (Hotkey - Normal)
+// Abilities: A09O ([Void Cult] Void Energies), Hotkey (Hotkey - Normal)
 {
 Z
 }
 
 STRING 2897
-// Abilities: A0CE ([Cavernous Creatures] Exponential Growth), Hotkey (Hotkey - Normal)
+// Abilities: A0AJ (Sacrifice), Hotkey (Hotkey - Normal)
 {
 Z
 }
@@ -17478,19 +17178,19 @@ Tornado
 }
 
 STRING 2900
-// Abilities: A0CT (Siphon Energy), Hotkey (Hotkey - Normal)
+// Abilities: A0AW ([Orc Stronghold] Summon Misha), Hotkey (Hotkey - Normal)
 {
 Z
 }
 
 STRING 2901
-// Abilities: A0EB (Move), Hotkey (Hotkey - Normal)
+// Upgrades: R001 (Cloud), Hotkey (Hotkey)
 {
 X
 }
 
 STRING 2902
-// Abilities: A0BL ([Void Cult] Summon Void Lord), Hotkey (Hotkey - Normal)
+// Abilities: A0B0 (Alchemical Transmutation), Hotkey (Hotkey - Normal)
 {
 V
 }
@@ -17531,22 +17231,10 @@ STRING 2908
 Kel'Thuzad
 }
 
-STRING 2909
-// Units: oC7K ([Naxxramas] - Kel'Thuzad), Ubertip (Tooltip - Extended)
-{
-|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.30|n|cffffcc00Damage:|r 600 - 600|n|cffffcc00Range:|r 900|n|cffffcc00Ability:|r Multishot; attacks up to 3 enemy targets at once.|n|cffffcc00Ability (2):|r Sunder Armor; reduces the armor of enemies hit based on the movement speed they lost.|n
-}
-
 STRING 2910
 // Abilities: A01Q (Glacier Caster Shell), Ubertip (Tooltip - Normal - Extended)
 {
 Loads a Glacier Caster Shell into the cannon. slowing the enimies when it hits. .50% slow in a 300 AOE 7.00 cooldown
-}
-
-STRING 2911
-// Upgrades: R001 (Cloud), Hotkey (Hotkey)
-{
-X
 }
 
 STRING 2912
@@ -17591,12 +17279,6 @@ STRING 2918
 (Spell Book)
 }
 
-STRING 2919
-// Abilities: A0FL (Build Test Tower), Hotkey (Hotkey - Normal)
-{
-Q
-}
-
 STRING 2920
 // Abilities: A01R (Raining Death), Name (Name)
 {
@@ -17627,10 +17309,89 @@ STRING 2924
 Builds a test tower for testing purposes.
 }
 
+STRING 2925
+// Units: h023 ([Summons] - Dire Spirit Wolf), EditorSuffix (Name - Editor Suffix)
+{
+[T1 Upgrade]
+}
+
+STRING 2926
+// Units: h024 ([Summons] - Great Spirit Wolf), EditorSuffix (Name - Editor Suffix)
+{
+[T1 Upgrade]
+}
+
 STRING 2927
 // Abilities: A00T (Straight To), Name (Name)
 {
 Straight To
+}
+
+STRING 2928
+// Units: h03N ([Summons] - Angry Spirit Bear), EditorSuffix (Name - Editor Suffix)
+{
+[T3 Upgrade]
+}
+
+STRING 2929
+// Units: o00F ([Dragons] - Red Dragon Whelp), Ubertip (Tooltip - Extended)
+{
+Red Dragon Towers have relatively high damage, low splash at higher levels, normal damage, and support auras.|n|cffffcc00Attack:|r Normal|n|cffffcc00Cooldown:|r 0.50|n|cffffcc00Damage:|r 75 - 90|n|cffffcc00Range:|r 700|n|cffffcc00Ability:|r Inspiring Aura: Increases damage by 5%
+}
+
+STRING 2930
+// Units: o00I ([Dragons] - Black Dragon Whelp), Ubertip (Tooltip - Extended)
+{
+Black Dragon Towers are the strongest line of Dragons. They have weak splash which gets stronger the more upgraded they are.|n|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.35|n|cffffcc00Damage:|r 100|n|cffffcc00Range:|r 700
+|cffffcc00Ability:|r Splash; the area of effect is 45
+}
+
+STRING 2931
+// Units: o00J ([Dragons] - Blue Dragon Whelp), Ubertip (Tooltip - Extended)
+{
+Blue Dragons Towers are relatively poor against ground units, but immensely powerful anti-air towers.
+
+|cffffcc00Attack (1):|r Magic
+|cffffcc00Cooldown:|r 1.40
+|cffffcc00Damage:|r 25 - 35
+|cffffcc00Range:|r 500
+|cffffcc00Ability:|r Splash; the area of effect is 75
+
+|cffffcc00Attack (2):|r Magic
+|cffffcc00Cooldown:|r 0.35
+|cffffcc00Damage:|r 80 - 100
+|cffffcc00Range:|r 800
+|cffffcc00Ability:|r Splash; the area of effect is 125
+
+|cffffcc00Ability:|r Frost Attack; Decreases movement speed of units hit
+}
+
+STRING 2932
+// Units: o00M ([Dragons] - Bronze Dragon Whelp), Ubertip (Tooltip - Extended)
+{
+Bronze Dragon Towers have a fairly weak attack, but to compensate they have strong utility such as slows, stuns, and armor reduction.|n|cffffcc00Attack:|r Magic|n|cffffcc00Cooldown:|r 0.90|n|cffffcc00Damage:|r 60 - 80|n|cffffcc00Range:|r 650|n|cffffcc00Ability:|r Slow: Auto-Castable single target slow which reduces the targets movement speed by 35%.
+}
+
+STRING 2933
+// Units: o010 ([Dragons] - Red Drake), Ubertip (Tooltip - Extended)
+{
+The Red Drake gains weak splash, longer range, and a stronger support aura.
+|n|cffffcc00Attack:|r Normal|n|cffffcc00Cooldown:|r 0.50|n|cffffcc00Damage:|r 200 - 225|n|cffffcc00Range:|r 750
+|cffffcc00Ability:|r Splash; the area of effect is 80
+|cffffcc00Ability:|r Inspiring Aura: Increases damage by 10% 
+|cffffcc00Ability:|r Fierce Inspiration: Increases attack speed by 5%
+}
+
+STRING 2934
+// Units: o011 ([Outland] - Nether Drake), EditorSuffix (Name - Editor Suffix)
+{
+[T2 Upgrade]
+}
+
+STRING 2935
+// Units: o016 ([Outland] - Black Citadel Warmachine), Name (Name)
+{
+[Outland] - Black Citadel Warmachine
 }
 
 STRING 2936
@@ -17639,16 +17400,474 @@ STRING 2936
 Unleashes a huge volley of cannons every 12 seconds, dealing 460 damage to enemy land units only.
 }
 
+STRING 2937
+// Units: o016 ([Outland] - Black Citadel Warmachine), Tip (Tooltip - Basic)
+{
+Build Black Citadel Warmachine
+}
+
+STRING 2938
+// Units: o018 ([Dragons] - Black Drake), Ubertip (Tooltip - Extended)
+{
+The Black Drake greatly increases damage and splash. It has a minor range increase, and a slight attack speed decease.|n|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.30|n|cffffcc00Damage:|r 400|n|cffffcc00Range:|r 775
+|cffffcc00Ability:|r Splash; the area of effect is 75
+}
+
+STRING 2939
+// Units: o01D ([Dragons] - Blue Drake), Ubertip (Tooltip - Extended)
+{
+Blue Dragons Towers are relatively poor against ground units, but immensely powerful anti-air towers.
+
+|cffffcc00Attack (1):|r Magic
+|cffffcc00Cooldown:|r 1.20
+|cffffcc00Damage:|r 80 - 110
+|cffffcc00Range:|r 550
+|cffffcc00Ability:|r Splash; the area of effect is 140
+
+|cffffcc00Attack (2):|r Magic
+|cffffcc00Cooldown:|r 0.25
+|cffffcc00Damage:|r 300 - 350
+|cffffcc00Range:|r 850
+|cffffcc00Ability:|r Splash; the area of effect is 180
+
+|cffffcc00Ability:|r Frost Attack; Decreases movement speed of units hit
+}
+
+STRING 2940
+// Units: o01F ([Dragons] - Bronze Drake), Ubertip (Tooltip - Extended)
+{
+The Bronze Drake is a fair bit stronger with better range and attack speed. It also gains a stun.|n|cffffcc00Attack:|r Magic|n|cffffcc00Cooldown:|r 0.75|n|cffffcc00Damage:|r 160 - 180|n|cffffcc00Range:|r 750|n|cffffcc00Ability (1):|r Slow: Castable single target slow which reduces the targets movement speed by 35%.|n|cffffcc00Ability (2):|r Time-Lock: Each attack has a 15% chance to stun the target.
+}
+
+STRING 2941
+// Units: o01H ([Dragons] - Red Dragon), Ubertip (Tooltip - Extended)
+{
+The Red Dragon has a better splash, longer range, and a stronger support aura.|n|cffffcc00Attack:|r Normal|n|cffffcc00Cooldown:|r 0.50|n|cffffcc00Damage:|r 375 - 400|n|cffffcc00Range:|r 825
+|cffffcc00Ability:|r Splash; the area of effect is 150
+|cffffcc00Ability:|r Inspiring Aura: Increases damage by 15% 
+|cffffcc00Ability:|r Fierce Inspiration: Increases attack speed by 10%
+}
+
+STRING 2942
+// Units: o01I ([Dragons] - Black Dragon), Ubertip (Tooltip - Extended)
+{
+The Black Dragon has fantastic splash, damage, longer range and faster attack speed than the Drake.|n|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.15|n|cffffcc00Damage:|r 1000|n|cffffcc00Range:|r 850
+|cffffcc00Ability:|r Splash; the area of effect is 360
+}
+
+STRING 2943
+// Units: o01J ([Dragons] - Blue Dragon), Ubertip (Tooltip - Extended)
+{
+Blue Dragons Towers are relatively poor against ground units, but immensely powerful anti-air towers.
+
+|cffffcc00Attack (1):|r Magic
+|cffffcc00Cooldown:|r 0.85
+|cffffcc00Damage:|r 250 - 300
+|cffffcc00Range:|r 600
+|cffffcc00Ability:|r Splash; the area of effect is 200
+
+|cffffcc00Attack (2):|r Magic
+|cffffcc00Cooldown:|r 0.20
+|cffffcc00Damage:|r 750 - 800
+|cffffcc00Range:|r 850
+|cffffcc00Ability:|r Splash; the area of effect is 300
+
+|cffffcc00Ability:|r Frost Attack; Decreases movement speed of units hit
+}
+
+STRING 2944
+// Units: o01K ([Dragons] - Bronze Dragon), Ubertip (Tooltip - Extended)
+{
+The Bronze Dragon is a solid single target tower. It now reduces the target's armor by 7 in addition to the effects inherited from the Drake.|n|cffffcc00Attack:|r Magic|n|cffffcc00Cooldown:|r 0.67|n|cffffcc00Damage:|r 320|n|cffffcc00Range:|r 875|n|cffffcc00Ability (1):|r Slow: Castable single target slow which reduces the targets movement speed by 35%.|n|cffffcc00Ability (2):|r Time-Lock: Each attack has a 15% chance to stun the target.
+|cffffcc00Ability (3):|r The Dragon's attacks reduce the targets armor by 7 for 20 seconds.
+}
+
+STRING 2945
+// Units: oC14 ([Giants] - Sasquatch), EditorSuffix (Name - Editor Suffix)
+{
+[T1]
+}
+
+STRING 2946
+// Units: u03E ([Uniques] - Zergling Hive), EditorSuffix (Name - Editor Suffix)
+{
+[T2]
+}
+
+STRING 2947
+// Units: u046 ([Loot Boxers] - "Canvas" Loot Bag), EditorSuffix (Name - Editor Suffix)
+{
+[T4]
+}
+
+STRING 2948
+// Units: oC58 ([Orc Stronghold] - Barrelmaster), EditorSuffix (Name - Editor Suffix)
+{
+[T3]
+}
+
+STRING 2949
+// Units: o00Z ([High Elven] - Ballista), EditorSuffix (Name - Editor Suffix)
+{
+[T5]
+}
+
+STRING 2950
+// Units: o016 ([Outland] - Black Citadel Warmachine), EditorSuffix (Name - Editor Suffix)
+{
+[T6]
+}
+
+STRING 2951
+// Units: oC67 ([Giants] - Ogre Lord), EditorSuffix (Name - Editor Suffix)
+{
+[T7]
+}
+
+STRING 2952
+// Units: u03F ([Uniques] - Sammy the Kobold Shoveler), EditorSuffix (Name - Editor Suffix)
+{
+[T8]
+}
+
+STRING 2953
+// Abilities: A07U ( Deny 05 - Yellow), Hotkey (Hotkey - Normal)
+{
+A
+}
+
+STRING 2956
+// Abilities: A07X ( Deny 08 - Pink), Hotkey (Hotkey - Normal)
+{
+F
+}
+
+STRING 2957
+// Abilities: A0BU ([Night Elf] Chimaera Transform), Hotkey (Hotkey - Normal)
+{
+Z
+}
+
+STRING 2958
+// Abilities: A0BU ([Night Elf] Chimaera Transform), Unhotkey (Hotkey - Turn Off)
+{
+Z
+}
+
+STRING 2959
+// Abilities: A0BV ([Night Elf] Chimaera Transform), Hotkey (Hotkey - Normal)
+{
+Z
+}
+
+STRING 2960
+// Abilities: A0DA (Slow), Hotkey (Hotkey - Normal)
+{
+E
+}
+
+STRING 2961
+// Abilities: A0BV ([Night Elf] Chimaera Transform), Unhotkey (Hotkey - Turn Off)
+{
+Z
+}
+
+STRING 2962
+// Abilities: A0CA ([Cavernous Creatures] Resurrect), Hotkey (Hotkey - Normal)
+{
+Z
+}
+
+STRING 2963
+// Abilities: A0CE ([Cavernous Creatures] Exponential Growth), Hotkey (Hotkey - Normal)
+{
+Z
+}
+
+STRING 2964
+// Abilities: A0CT (Siphon Energy), Hotkey (Hotkey - Normal)
+{
+Z
+}
+
 STRING 2965
 // Buffs/Effects: B00I (), Bufftip (Tooltip)
 {
 Fear From Above
 }
 
+STRING 2966
+// Abilities: A0DV (Awaken), Hotkey (Hotkey - Normal)
+{
+Z
+}
+
+STRING 2967
+// Abilities: A0E3 (Drink), Hotkey (Hotkey - Normal)
+{
+Z
+}
+
+STRING 2969
+// Units: h011 ([Goblins] - Pocket Factory), Ubertip (Tooltip - Extended)
+{
+This sweatshop factory is packed with wage-slave Goblins who continuously churn out Mecha-Goblins. Has no attack of its own, but spawns Mecha-Goblins to bash on enemies.|n|cffffcc00Attack:|r Normal|n|cffffcc00Cooldown:|r 0.40|n|cffffcc00Damage:|r 28 (Ground only)
+}
+
+STRING 2970
+// Units: h01E ([Tavern] - Gnoll Warden), Name (Name)
+{
+[Tavern] - Gnoll Warden
+}
+
+STRING 2971
+// Units: o01A ([Arachnid] - Parasitic Broodmother), EditorSuffix (Name - Editor Suffix)
+{
+[T6]
+}
+
+STRING 2972
+// Units: o01N ([Goblins] - Shredder), Ubertip (Tooltip - Extended)
+{
+Equipped with a powerful war suit, this Goblin is ready to shred some faces!|n
+|cffffcc00Attack:|r Normal|n|cffffcc00Cooldown:|r 0.10|n|cffffcc00Damage:|r 500|n|cffffcc00Range:|r Melee
+|cffffcc00Ability:|r Splash; the area of effect is 75
+}
+
+STRING 2973
+// Units: o01O ([Goblins] - Alchemist), Ubertip (Tooltip - Extended)
+{
+Riding atop his ogre slave, the clever Alchemist douses his enemies in corrosive and deadly concoctions.|n|cffffcc00Attack:|r Magic|n|cffffcc00Cooldown:|r 0.45|n|cffffcc00Damage:|r 450 - 475|n|cffffcc00Range:|r 730|n|cffffcc00Ability:|r Splash; the area of effect is 150
+|cffffcc00Ability (1):|r Acid Bomb: Splashes a group of enemies, dealing periodic damage and lowering armor.
+}
+
 STRING 2974
 // Buffs/Effects: B00I (), Buffubertip (Tooltip - Extended)
 {
 This unit Fears The Undead Sky Barge; it has reduced armor and movement speed.
+}
+
+STRING 2975
+// Units: o01P ([Goblins] - Goblin Blademaster), Ubertip (Tooltip - Extended)
+{
+After a lengthy stay at the Orcish Stronghold, this goblin returned to his bretheren as a follower of the bushido.|n
+|cffffcc00Attack:|r Normal|n|cffffcc00Cooldown:|r 0.05|n|cffffcc00Damage:|r 1500 - 1700|n|cffffcc00Range:|r Melee|n|cffffcc00Ability:|r Has a 8% chance to spawn mirror images when attacking.
+}
+
+STRING 2976
+// Units: o01R ([Goblins] - Goblin Minelayer), Ubertip (Tooltip - Extended)
+{
+Just in case you don't feel like there's enough explosions, the Goblin Minelayer has you covered.|n
+|cffffcc00Attack:|r Siege|n|cffffcc00Cooldown:|r 1.25|n|cffffcc00Damage:|r 20|n|cffffcc00Range:|r 1000|n|cffffcc00Ability:|r Mine Plant: When attacking with full mana, spawns a land mine at the feet of the attacked unit. The mine detonates after a few seconds, dealing 1500 damage to all units in an area.
+}
+
+STRING 2977
+// Units: o01S ([Goblins] - Tinker), Ubertip (Tooltip - Extended)
+{
+Chief Executive Officer Tinker sports enough heavy fire power to crush any and all enemies.|n|cffffcc00Attack:|r Magic|n|cffffcc00Cooldown:|r 0.20|n|cffffcc00Damage:|r 1200|n|cffffcc00Range:|r 800
+|cffffcc00Ability:|r Splash; the area of effect is 120
+|cffffcc00Ability (1):|r Has a 5% chance to fire a barrage of missiles when attacking.
+}
+
+STRING 2978
+// Units: u044 ([Loot Boxers] - Parent-Unfriendly Lootbox), EditorSuffix (Name - Editor Suffix)
+{
+[T1]
+}
+
+STRING 2979
+// Units: u045 ([Loot Boxers] - Big Boy Box), EditorSuffix (Name - Editor Suffix)
+{
+[T2]
+}
+
+STRING 2980
+// Units: u047 ([Loot Boxers] - Enigma Chest), EditorSuffix (Name - Editor Suffix)
+{
+[T3]
+}
+
+STRING 2981
+// Units: u048 ([Loot Boxers] - Skinner Box), EditorSuffix (Name - Editor Suffix)
+{
+[T5]
+}
+
+STRING 2982
+// Units: u049 ([Loot Boxers] - Augmented Box), EditorSuffix (Name - Editor Suffix)
+{
+[T6]
+}
+
+STRING 2983
+// Units: u04A ([Loot Boxers] - Prime Loot Bundle), EditorSuffix (Name - Editor Suffix)
+{
+[T7]
+}
+
+STRING 2984
+// Units: u04B ([Loot Boxers] - Gold Elite Lootbox), EditorSuffix (Name - Editor Suffix)
+{
+[T8]
+}
+
+STRING 2985
+// Units: u04C ([Loot Boxers] - Premium Deluxe Extravaganza Box), EditorSuffix (Name - Editor Suffix)
+{
+[T9]
+}
+
+STRING 2986
+// Abilities: A0E6 (Upgrade to Undead - Level 2), Hotkey (Hotkey - Normal)
+{
+Z
+}
+
+STRING 2987
+// Units: o00U ([Aviaries] - Phoenix), Ubertip (Tooltip - Extended)
+{
+The best aerial unit. It combines the speed of the chimeara with splash. Though its damage is lower than the chimeara it makes up for it with its splash.|n|n|cffffcc00Attack:|r Normal|n|cffffcc00Cooldown:|r 0.00|n|cffffcc00Damage:|r 200 - 250|n|cffffcc00Range:|r 700|n|cffffcc00Ability:|r Splash; the area of effect is 150
+}
+
+STRING 2989
+// Units: oC76 ([Naxxramas] - Ghoul), Ubertip (Tooltip - Extended)
+{
+|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.25|n|cffffcc00Damage:|r 30|n|cffffcc00Range:|r Melee|n
+}
+
+STRING 2990
+// Units: oC77 ([Naxxramas] - Horseman), Ubertip (Tooltip - Extended)
+{
+|cffffcc00Attack:|r None 
+|cffffcc00Ability:|r Can be upgraded to one of the four horsemen.|n
+}
+
+STRING 2991
+// Units: oC78 ([Naxx] - Sir Zeliek), Ubertip (Tooltip - Extended)
+{
+|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.05|n|cffffcc00Damage:|r 140|n|cffffcc00Range:|r Melee|n
+}
+
+STRING 2992
+// Units: oC79 ([Naxx] - Lady Blaumeux), Ubertip (Tooltip - Extended)
+{
+|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.05|n|cffffcc00Damage:|r 140|n|cffffcc00Range:|r Melee|n
+}
+
+STRING 2993
+// Units: oC7A ([Naxx] - Thane Korth'azz), Ubertip (Tooltip - Extended)
+{
+|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.05|n|cffffcc00Damage:|r 140|n|cffffcc00Range:|r Melee|n
+}
+
+STRING 2994
+// Units: oC7B ([Naxx] - Alexandros Mograine), Ubertip (Tooltip - Extended)
+{
+|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.05|n|cffffcc00Damage:|r 140|n|cffffcc00Range:|r Melee|n
+}
+
+STRING 2995
+// Units: oC7D ([Naxxramas] - Feugen), Ubertip (Tooltip - Extended)
+{
+|cffffcc00Attack:|r Normal|n|cffffcc00Cooldown:|r 1.00|n|cffffcc00Damage:|r 650 - 700|n|cffffcc00Range:|r Melee|n|cffffcc00Ability:|r Construct Thaddius; merges Feugen and Stalagg into one.|n
+}
+
+STRING 2996
+// Units: oC7E ([Naxxramas] - Stalagg), Ubertip (Tooltip - Extended)
+{
+|cffffcc00Attack:|r Normal|n|cffffcc00Cooldown:|r 1.00|n|cffffcc00Damage:|r 650 - 700|n|cffffcc00Range:|r Melee|n|cffffcc00Ability:|r Construct Thaddius; merges Feugen and Stalagg into one.|n
+}
+
+STRING 2997
+// Units: oC7F ([Naxxramas] - Thaddius), Ubertip (Tooltip - Extended)
+{
+|cffffcc00Attack:|r Magic|n|cffffcc00Cooldown:|r 2.00|n|cffffcc00Damage:|r 1|n|cffffcc00Range:|r 700|n|cffffcc00Ability:|r Lightning Attack; attacks trigger a chain lightning dealing 1000 damage, bounces up to 10 times.|n
+}
+
+STRING 2998
+// Units: oC7G ([Naxxramas] - Maexxna), Ubertip (Tooltip - Extended)
+{
+|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.20|n|cffffcc00Damage:|r 200|n|cffffcc00Range:|r Melee|n|cffffcc00Ability:|r Splash; the area of effect is 100.|n|cffffcc00Ability (2):|r Poison Sting; inflicts enemies hit by Maexxnas attacks with a strong poison.|n
+}
+
+STRING 2999
+// Units: oC7J ([Naxxramas] - Sapphiron), Ubertip (Tooltip - Extended)
+{
+|cffffcc00Attack:|r Magic|n|cffffcc00Cooldown:|r 1.00|n|cffffcc00Damage:|r 2000|n|cffffcc00Range:|r 850|n|cffffcc00Ability:|r Splash; the area of effect is 400.|n|cffffcc00Ability(2):|r Creeping Frost; attacks drain energy from enemy foes to strengthen Sapphirons slow aura up to 35% slow. Resets on round end.|n
+}
+
+STRING 3000
+// Units: oC7K ([Naxxramas] - Kel'Thuzad), Ubertip (Tooltip - Extended)
+{
+|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.30|n|cffffcc00Damage:|r 600|n|cffffcc00Range:|r 900|n|cffffcc00Ability:|r Multishot; attacks up to 3 enemy targets at once.|n|cffffcc00Ability (2):|r Sunder Armor; reduces the armor of enemies hit based on the movement speed they lost.|n
+}
+
+STRING 3002
+// Abilities: A0EX ([Loot Boxers] Open Lootbox), Hotkey (Hotkey - Normal)
+{
+Z
+}
+
+STRING 3003
+// Abilities: A0F5 (Construct Thaddius), Hotkey (Hotkey - Normal)
+{
+Z
+}
+
+STRING 3004
+// Abilities: A0F5 (Construct Thaddius), Ubertip (Tooltip - Normal - Extended)
+{
+Combines Stalagg with Feugen to create Thaddius.
+
+|cffffcc00Attack:|r Magic|n|cffffcc00Cooldown:|r 2.00|n|cffffcc00Damage:|r 1|n|cffffcc00Range:|r 700|n|cffffcc00Ability:|r Lightning Attack; attacks trigger a chain lightning dealing 1000 damage, bounces up to 10 times.|n
+}
+
+STRING 3005
+// Upgrades: R000 (Cloud), Hotkey (Hotkey)
+{
+Z
+}
+
+STRING 3006
+// Upgrades: R002 (Cloud), Hotkey (Hotkey)
+{
+V
+}
+
+STRING 3007
+// Units: o006 ([Shrine of Buffs] - Chaos Kodo Beast), Ubertip (Tooltip - Extended)
+{
+This unit has alot more damage as well as higher range than the Chaos Champion.  Its speed however is the same. It increases nearby towers damage by 20%|n|n|cffffcc00Attack:|r Piercing|n|cffffcc00Cooldown:|r 0.90|n|cffffcc00Damage:|r 300 - 400|n|cffffcc00Range:|r 1000|n|cffffcc00Ability:|r Command Aura; friendly towers within range has their attack damage increased by 20%
+}
+
+STRING 3008
+// Units: o008 ([Shrine of Buffs] - Grom Hellscream), Ubertip (Tooltip - Extended)
+{
+This unit is the strongest chaos orc unit. It has the best speed/damage/range as well as the fear aura which slows enemies by 35%|n|n|cffffcc00Attack:|r Piercing|n|cffffcc00Cooldown:|r 0.40|n|cffffcc00Damage:|r 462 - 1062|n|cffffcc00Range:|r 1000|n|cffffcc00Ability:|r Crippling Fear; slows enemy units within an area of 700 by 35%
+}
+
+STRING 3009
+// Units: o013 ([Shrine of Buffs] - Chaos Pool), Ubertip (Tooltip - Extended)
+{
+This is the best support tower on the map. It increases the attack speed of friendly towers in a large area around it|n|n|cffffcc00Attack:|r None|n|cffffcc00Range:|r 1000|n|cffffcc00Ability:|r Blood Aura; friendly towers within range has their attack speed increased by 60%
+}
+
+STRING 3010
+// Units: oC60 ([Aviaries] - Wyvern), Ubertip (Tooltip - Extended)
+{
+A truly helpful Tower for any situation. It removes 15% of any non-boss opponents current health. |n|n|cffffcc00Attack:|r Magic|n|cffffcc00Cooldown:|r 2.50|n|cffffcc00Damage:|r 400|n|cffffcc00Range:|r Melee|n|cffffcc00Ability:|r Splash; the area of effect is 128|n|cffffcc00Ability(2):|r Deadly Venom; enemies hit by this tower has their current health reduced by 15%
+}
+
+STRING 3011
+// Abilities: A07T ( Deny 04 - Purple), Hotkey (Hotkey - Normal)
+{
+R
+}
+
+STRING 3012
+// Abilities: A0DA (Slow), Unhotkey (Hotkey - Turn Off)
+{
+E
 }
 
 STRING 3017
@@ -19380,19 +19599,19 @@ BrandTheOne, hunts people to go to hell for the above.  Earns slight money for e
 }
 
 STRING 4478
-// Abilities: A0DV (Awaken), Hotkey (Hotkey - Normal)
+// Abilities: A0BB ([Void Cult] Summon Void Being), Hotkey (Hotkey - Normal)
 {
 Z
 }
 
 STRING 4571
-// Abilities: A0E3 (Drink), Hotkey (Hotkey - Normal)
+// Abilities: A0BD ([Night Elf] Chimaera Transform), Hotkey (Hotkey - Normal)
 {
 Z
 }
 
 STRING 4670
-// Abilities: A0E6 (Upgrade to Undead - Level 2), Hotkey (Hotkey - Normal)
+// Abilities: A0BD ([Night Elf] Chimaera Transform), Unhotkey (Hotkey - Turn Off)
 {
 Z
 }
@@ -19404,7 +19623,7 @@ Choose Angel's Gateway
 }
 
 STRING 4694
-// Abilities: A0EX ([Loot Boxers] Open Lootbox), Hotkey (Hotkey - Normal)
+// Abilities: A0BF ([Void Cult] Pay the Toll), Hotkey (Hotkey - Normal)
 {
 Z
 }
@@ -19476,7 +19695,7 @@ STRING 5008
 }
 
 STRING 5009
-// Abilities: A0F5 (Construct Thaddius), Hotkey (Hotkey - Normal)
+// Abilities: A0BT ([Night Elf] Chimaera Transform), Hotkey (Hotkey - Normal)
 {
 Z
 }
@@ -20230,7 +20449,7 @@ This unit has a leader in sight; his attack damage has been increased.
 }
 
 STRING 5309
-// Upgrades: R000 (Cloud), Hotkey (Hotkey)
+// Abilities: A0BT ([Night Elf] Chimaera Transform), Unhotkey (Hotkey - Turn Off)
 {
 Z
 }
@@ -23267,7 +23486,7 @@ STRING 7406
 }
 
 STRING 7418
-// Upgrades: R002 (Cloud), Hotkey (Hotkey)
+// Abilities: A0BL ([Void Cult] Summon Void Lord), Hotkey (Hotkey - Normal)
 {
 V
 }
