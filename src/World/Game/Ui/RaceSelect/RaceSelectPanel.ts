@@ -1,4 +1,4 @@
-import {Frame, Trigger} from 'w3ts';
+import {Frame, Timer, Trigger} from 'w3ts';
 import {WarcraftMaul} from '../../../WarcraftMaul';
 import {trackUiPress} from '../UiPress';
 import {Defender} from '../../../Entity/Players/Defender';
@@ -27,6 +27,8 @@ const INFO_WIDTH = 0.19;
 const INFO_ICON = 0.05;
 const PICK_BUTTON_WIDTH = 0.1;
 const PICK_BUTTON_HEIGHT = 0.03;
+// A sent pick that never comes back (it always should) frees the button after this long
+const PICK_TIMEOUT = 3;
 const CLOSE_BUTTON = 0.022;
 
 const PANEL_WIDTH = PADDING + CATEGORY_WIDTH + PADDING + LIST_WIDTH + SCROLLBAR_WIDTH + PADDING + INFO_WIDTH + PADDING;
@@ -48,6 +50,8 @@ export class RaceSelectPanel {
     private readonly infoName: Frame;
     private readonly infoText: Frame;
     private readonly pickButton: Frame;
+    private pickInFlight: boolean = false;
+    private readonly pickSettle: Timer = Timer.create();
     // Local client state
     private selectedTier: RaceTier = 'Beginner';
     private currentItems: RaceItemDef[] = [];
@@ -145,7 +149,13 @@ export class RaceSelectPanel {
             }
             this.pickButton.setEnabled(false);
             this.pickButton.setEnabled(true);
-            if (this.highlightedItem !== undefined) {
+            // One pick at a time: clicks land faster than the sync comes back, and every
+            // click used to send another pick, so a spammed button bought the race several
+            // times over whenever the player had picks left (Blitz hands out extra ones)
+            if (this.highlightedItem !== undefined && !this.pickInFlight) {
+                this.pickInFlight = true;
+                this.pickButton.setEnabled(false);
+                this.pickSettle.start(PICK_TIMEOUT, false, () => this.settlePick());
                 game.playerSync.send('race-pick', this.highlightedItem);
             }
         });
@@ -196,6 +206,9 @@ export class RaceSelectPanel {
 
     /** Applies a pick sent from the panel; runs on every client. */
     private pick(player: Defender, itemId: string): void {
+        if (player.isLocal()) {
+            this.settlePick();
+        }
         const item = RaceItems[itemId];
         const race: Race | undefined = this.game.worldMap.races.find(candidate => candidate.itemid === itemId);
         const isRandomPick = itemId === RANDOM_PICK_ITEMS.normal || itemId === RANDOM_PICK_ITEMS.hardcore
@@ -217,6 +230,13 @@ export class RaceSelectPanel {
         if (player.races.length > 0 || player.hasHybridRandomed) {
             this.close(player);
         }
+    }
+
+    /** Local: the sent pick has been applied (or given up on); the button takes clicks again. */
+    private settlePick(): void {
+        this.pickInFlight = false;
+        this.pickSettle.pause();
+        this.pickButton.setEnabled(true);
     }
 
     /** Local: fills the list with the races of a tier. */
