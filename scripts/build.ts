@@ -120,7 +120,16 @@ export function createMapFromDir(output: string, dir: string) {
   }
   map.import('war3map.imp', buildImportList(imports));
 
-  const result = map.save();
+  let result: ArrayBuffer | null;
+  try {
+    result = map.save();
+  } catch (error) {
+    // war3map.w3i in a format the parser does not know (the World Editor writes 39, this repo
+    // keeps 31): the map information is only read to decide whether to prepend the header that
+    // maps before 1.31 carry, which this map does not need, so the archive is written directly.
+    logger.warn(`Could not read war3map.w3i (${error}); writing the archive without a map header.`);
+    result = map.archive.save();
+  }
 
   if (!result) {
     logger.error("Failed to save archive.");
