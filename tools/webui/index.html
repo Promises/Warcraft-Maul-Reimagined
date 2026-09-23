@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Warcraft 3 UI</title>
+        <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, minimal-ui" />
+        <!-- The game's menus are this page: it serves itself at /webui/index.html out of
+             <install>/_retail_/webui/ and the glue bundle below draws the whole UI, talking to
+             the game over a websocket. This wrapper keeps hold of that socket, because a second
+             connection of our own is accepted but never receives a reply. -->
+        <script>
+            window.wcmaul = {socket: null, sent: []};
+            (function () {
+                var Native = window.WebSocket;
+                function Wrapped(url, protocols) {
+                    var socket = protocols === undefined ? new Native(url) : new Native(url, protocols);
+                    if (String(url).indexOf('/webui-socket/') !== -1 && !window.wcmaul.socket) {
+                        window.wcmaul.socket = socket;
+                        var nativeSend = socket.send.bind(socket);
+                        socket.send = function (data) {
+                            try {
+                                var parsed = JSON.parse(data);
+                                if (/CreateLobby|LobbyStart|NetProvider/.test(parsed.message || '')) {
+                                    window.wcmaul.sent.push(String(data).slice(0, 500));
+                                }
+                            } catch (error) { /* not ours to read */ }
+                            return nativeSend(data);
+                        };
+                    }
+                    return socket;
+                }
+                Wrapped.prototype = Native.prototype;
+                Wrapped.CONNECTING = 0; Wrapped.OPEN = 1; Wrapped.CLOSING = 2; Wrapped.CLOSED = 3;
+                window.WebSocket = Wrapped;
+            })();
+        </script>
+    </head>
+    <body>
+        <div id="root"></div>
+        <div id="portal"></div>
+        <script src="GlueManager.js"></script>
+        <script>
+            // With a fresh autostart.json beside this page, ask the game for the same three
+            // things the menus ask for when a player creates a single player game, and start it.
+            // Without that file the page behaves exactly like the stock one.
+            //
+            //   {"map": "<file>.w3x", "folder": "<subfolder of Maps>", "expires": <epoch ms>,
+            //    "settle": <ms to wait for the menus>, "trace": <log every message to a file>}
+            (function () {
+                var status = null;
+                var lines = [];
+
+                function note(text) {
+                    if (!status) {
+                        status = document.createElement('div');
+                        // Top left and click-through, so it never covers a menu button
+                        status.style.cssText = 'position:fixed;left:8px;top:8px;z-index:99999;white-space:pre-wrap;'
+                            + 'pointer-events:none;max-width:60vw;font:12px/1.4 monospace;color:#ffcc00;'
+                            + 'background:rgba(0,0,0,.6);padding:4px 8px';
+                        document.body.appendChild(status);
+                    }
+                    lines.push(text);
+                    if (lines.length > 5) { lines.shift(); }
+                    status.textContent = 'wcmaul:\n' + lines.join('\n');
+                }
+
+                function drive(config) {
+                    var socket = window.wcmaul.socket;
+                    var folderEntry = null;
+                    var tried = [];
+                    var lobbySent = false;
+                    var startSent = false;
+
+                    // With "trace": true in autostart.json every message is posted to
+                    // tools/webui/trace-server.py, which writes them to a file
+                    function trace(line) {
+                        if (!config.trace) { return; }
+                        try { fetch('http://127.0.0.1:8777/', {method: 'POST', mode: 'no-cors', body: line}); } catch (error) { /* no logger */ }
+                    }
+
+                    function send(message, payload) {
+                        trace('-> ' + message + ' ' + JSON.stringify(payload || {}).slice(0, 300));
+                        socket.send(JSON.stringify({type: 'webui', message: message, payload: payload || {}}));
+                    }
+
+                    // The payload the create screen sends, down to the game name: the defaults
+                    // matter, an empty mapSettings makes the game call the map corrupt
+                    function createLobby(filename) {
+                        lobbySent = true;
+                        note('creating the lobby on ' + filename);
+                        send('CreateLobby', {
+                            filename: filename,
+                            gameName: 'Single Player',
+                            gameSpeed: 2,
+                            privateGame: false,
+                            mapSettings: {
+                                flagLockTeams: true,
+                                flagPlaceTeamsTogether: true,
+                                flagFullSharedUnitControl: false,
+                                flagRandomRaces: false,
+                                flagRandomHero: false,
+                                settingObservers: 0,
+                                settingVisibility: 0
+                            }
+                        });
+                    }
+
+                    socket.addEventListener('message', function (event) {
+                        var data;
+                        try { data = JSON.parse(event.data); } catch (error) { return; }
+                        // The game answers with {messageType, payload}
+                        var message = data.messageType;
+                        var payload = data.payload || {};
+                        if (!/Localization|RankedSeason|Leaderboard|Friend|Clan|MMStats|Profile|Chat|Toon|Collection|GetOptions|Hotkey|OptionsData/i.test(message || '')) {
+                            trace('<- ' + message + ' ' + JSON.stringify(payload).slice(0, 160));
+                        }
+
+                        if (message === 'MapList' && !lobbySent) {
+                            var maps = (payload.mapList && payload.mapList.maps) || [];
+                            var match = null;
+                            for (var i = 0; i < maps.length; i++) {
+                                var name = (maps[i].filename || '') + '';
+                                if (!maps[i].isFolder && name.toLowerCase() === config.map.toLowerCase()) {
+                                    match = maps[i];
+                                    break;
+                                }
+                                if (maps[i].isFolder && config.folder && name.toLowerCase() === config.folder.toLowerCase()) {
+                                    folderEntry = maps[i];
+                                }
+                            }
+                            if (!match && folderEntry) {
+                                // Entries carry an absolute filepath; the subdirectory request wants
+                                // the same with a trailing separator
+                                var path = folderEntry.filepath + folderEntry.filename + '/';
+                                if (tried.indexOf(path) === -1) {
+                                    tried.push(path);
+                                    note('opening ' + folderEntry.filename);
+                                    send('GetMapList', {subdirectory: path});
+                                    return;
+                                }
+                            }
+                            if (!match) {
+                                note('no ' + config.map + ' among ' + maps.length + ' entries');
+                                return;
+                            }
+                            createLobby((match.filepath || '') + match.filename);
+                        }
+
+                        if (message === 'GameLobbySetup' && lobbySent && !startSent) {
+                            startSent = true;
+                            note('starting');
+                            setTimeout(function () { send('LobbyStart'); }, 800);
+                        }
+                    });
+
+                    // Both provider messages, with empty payloads, exactly as the menus send them:
+                    // with a provider id instead the client stays online, where a local custom map
+                    // is refused as unavailable or corrupted
+                    // Both provider messages with empty payloads, then the listing, exactly in
+                    // the order the menus use. The listing is not optional: a CreateLobby naming
+                    // a map the engine has not just listed comes back "unavailable or corrupted",
+                    // however right the path is.
+                    var settle = config.settle === undefined ? 8000 : config.settle;
+                    note('waiting ' + (settle / 1000) + 's for the menus');
+                    setTimeout(function () {
+                        send('InitializeNetProvider', {});
+                        send('InitializeLocalNetProvider', {});
+                        note('asking for the map list');
+                        setTimeout(function () { send('GetMapList', {useLastMap: true}); }, 1000);
+                    }, settle);
+                    setTimeout(function () { if (!lobbySent) { note('no lobby yet'); } }, 9000);
+                }
+
+                function watch() {
+                    setInterval(function () {
+                        var sent = window.wcmaul.sent;
+                        if (sent.length) { lines = []; note(sent.slice(-4).join('\n')); }
+                    }, 1000);
+                }
+
+                function whenReady(config, tries) {
+                    var socket = window.wcmaul.socket;
+                    if (socket && socket.readyState === 1) { drive(config); return; }
+                    if (tries > 300) { note('the menus never opened their socket'); return; }
+                    setTimeout(function () { whenReady(config, tries + 1); }, 100);
+                }
+
+                fetch('autostart.json', {cache: 'no-store'})
+                    .then(function (response) { return response.ok ? response.json() : null; })
+                    .then(function (config) {
+                        if (!config || (config.expires && Date.now() > config.expires)) { return; }
+                        if (config.watch) { watch(); return; }
+                        if (config.map) { whenReady(config, 0); }
+                    })
+                    .catch(function () { /* no autostart file: the stock menus, untouched */ });
+            })();
+        </script>
+    </body>
+</html>
