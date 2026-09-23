@@ -8,9 +8,7 @@ export class DebugGoldButton extends AbstractActionButton {
     }
 
     public clickAction(): void {
-        this.disable();
         this.game.players.get(0)?.giveGold(1000);
-        this.enable();
     }
 
 }

@@ -16,8 +16,6 @@ export class RaceSelectButton extends AbstractActionButton {
         if (!player) {
             return;
         }
-        this.disable();
         this.game.raceSelectPanel.toggle(player);
-        this.enable();
     }
 }

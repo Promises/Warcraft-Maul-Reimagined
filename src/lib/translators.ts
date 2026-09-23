@@ -14,7 +14,9 @@ export function DecodeFourCC(fourcc: number): string {
 
 export function SendMessage(this: void, msg: any): void {
     if (bj_FORCE_ALL_PLAYERS) {
-        DisplayTimedTextToForce(bj_FORCE_ALL_PLAYERS, 10, `${msg}`);
+        // Every client shows it to its own player: the same as the whole force, but through
+        // the native that GameMessages patches
+        DisplayTimedTextToPlayer(GetLocalPlayer(), 0, 0, 10, `${msg}`);
         return;
     }
     print(msg)

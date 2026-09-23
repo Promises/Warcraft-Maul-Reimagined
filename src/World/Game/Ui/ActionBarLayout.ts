@@ -1,7 +1,5 @@
-// Geometry of the action bar rail, shared by the bar and its buttons, all placed with absolute
-// points. Custom UI hangs off the world frame so the game's dialogs (message log, ESC menu)
-// draw over it; the console artwork does too, so the rail sits just above the console (its
-// art ends at y 0.176) rather than on its ledge.
+// Geometry of the action bar rail: centred on the console ledge. The rail is placed
+// absolutely, its buttons relative to its centre.
 export const RAIL_CENTER_X = 0.4;
 export const RAIL_CENTER_Y = 0.16;
 export const RAIL_HEIGHT = 0.042;

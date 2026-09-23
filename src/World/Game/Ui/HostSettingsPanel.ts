@@ -1,8 +1,9 @@
-import {Frame, Trigger} from 'w3ts';
+import {Frame} from 'w3ts';
 import * as settings from '../../GlobalSettings';
 import {WarcraftMaul} from '../../WarcraftMaul';
 import {Defender} from '../../Entity/Players/Defender';
 import {Util} from '../../../lib/translators';
+import {createBackdrop, createPanel, createText, createTextButton, onLocalClick} from './Frames';
 
 const PANEL_CENTER_X = 0.4;
 const PANEL_CENTER_Y = 0.40;
@@ -24,60 +25,41 @@ const RADIO_DOT = 'UI\\Widgets\\EscMenu\\Human\\radiobutton-button.blp';
 
 /**
  * A column of mutually exclusive options drawn as radio buttons. The game's GLUECHECKBOX
- * toggles itself and its checked state cannot be set reliably from script, so each option is
- * a plain button carrying the ESC-menu radio art (war3skins: radiobutton-background, and
- * radiobutton-button as the dot) and the column shows the dot on exactly one of them. An
- * invisible button over each label makes the text clickable too.
+ * toggles itself and its checked state cannot be set reliably from script, so each row is the
+ * ESC-menu radio art (war3skins: radiobutton-background, and radiobutton-button as the dot)
+ * and a label, with one plain button over the whole row taking the click; the column shows
+ * the dot on exactly one row.
  */
 class OptionColumn {
     private readonly dots: Frame[] = [];
     private selected: number = 0;
 
-    constructor(game: WarcraftMaul, name: string, parent: Frame, left: number, top: number,
-                header: string, labels: string[]) {
-        const title = Frame.createType(`${name}Header`, parent, 0, 'TEXT', '')!;
+    /** Placed with its top-left at (left, top) from the parent's top-left. */
+    constructor(name: string, parent: Frame, left: number, top: number, header: string, labels: string[]) {
+        const title = createText(`${name}Header`, parent, header);
         title.setSize(COLUMN_WIDTH, HEADER_HEIGHT);
-        title.setAbsPoint(FRAMEPOINT_TOPLEFT, left, top);
-        title.setText(header);
-        BlzFrameSetTextAlignment(title.handle, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
+        title.setPoint(FRAMEPOINT_TOPLEFT, parent, FRAMEPOINT_TOPLEFT, left, top);
 
         labels.forEach((label, index) => {
-            const rowTop = top - HEADER_HEIGHT - index * ROW_SPACING;
-            const rowCenterY = rowTop - ROW_HEIGHT / 2;
+            const row = Frame.createType(`${name}Row${index}`, parent, 0, 'FRAME', '')!;
+            row.setSize(COLUMN_WIDTH, ROW_HEIGHT);
+            row.setPoint(FRAMEPOINT_TOPLEFT, title, FRAMEPOINT_BOTTOMLEFT, 0, -index * ROW_SPACING);
 
-            const radio = Frame.createType(`${name}Row${index}Radio`, parent, 0, 'BUTTON', '')!;
-            radio.setSize(RADIO_SIZE, RADIO_SIZE);
-            radio.setAbsPoint(FRAMEPOINT_LEFT, left + RADIO_INSET, rowCenterY);
-            const ring = Frame.createType(`${name}Row${index}Ring`, radio, 0, 'BACKDROP', '')!;
-            ring.setAllPoints(radio);
-            ring.setTexture(RADIO_RING, 0, true);
-            ring.setLevel(1);
-            const dot = Frame.createType(`${name}Row${index}Dot`, radio, 0, 'BACKDROP', '')!;
-            dot.setAllPoints(radio);
-            dot.setTexture(RADIO_DOT, 0, true);
-            dot.setLevel(2);
+            const ring = createBackdrop(`${name}Row${index}Ring`, row, RADIO_RING);
+            ring.setSize(RADIO_SIZE, RADIO_SIZE);
+            ring.setPoint(FRAMEPOINT_LEFT, row, FRAMEPOINT_LEFT, RADIO_INSET, 0);
+            const dot = createBackdrop(`${name}Row${index}Dot`, ring, RADIO_DOT);
+            dot.setAllPoints(ring);
 
-            const text = Frame.createType(`${name}Row${index}Label`, parent, 0, 'TEXT', '')!;
+            const text = createText(`${name}Row${index}Label`, row, label, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
+            text.setPoint(FRAMEPOINT_LEFT, ring, FRAMEPOINT_RIGHT, LABEL_GAP, 0);
             text.setSize(COLUMN_WIDTH - RADIO_INSET - RADIO_SIZE - LABEL_GAP, ROW_HEIGHT);
-            text.setAbsPoint(FRAMEPOINT_LEFT, left + RADIO_INSET + RADIO_SIZE + LABEL_GAP, rowCenterY);
-            text.setText(label);
-            BlzFrameSetTextAlignment(text.handle, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
-            const labelButton = Frame.createType(`${name}Row${index}Hit`, parent, 0, 'BUTTON', '')!;
-            labelButton.setAllPoints(text);
 
-            // Clicks fire on every client with the acting player; the selection is the local view
-            for (const button of [radio, labelButton]) {
-                const trigger = Trigger.create();
-                trigger.triggerRegisterFrameEvent(button, FRAMEEVENT_CONTROL_CLICK);
-                trigger.addAction(() => {
-                    if (GetTriggerPlayer() !== GetLocalPlayer()) {
-                        return;
-                    }
-                    button.setEnabled(false);
-                    button.setEnabled(true);
-                    this.select(index);
-                });
-            }
+            // Created last, so it lies over the radio and the label
+            const button = Frame.createType(`${name}Row${index}Button`, row, 0, 'BUTTON', '')!;
+            button.setAllPoints(row);
+            // The selection is the local view
+            onLocalClick(button, () => this.select(index));
             this.dots.push(dot);
         });
         this.select(0);
@@ -106,57 +88,32 @@ export class HostSettingsPanel {
     constructor(game: WarcraftMaul,
                 onConfirm: (this: void, mode: number, difficulty: number) => void,
                 onVote: (this: void) => void) {
-        const gameUi = Frame.fromOrigin(ORIGIN_FRAME_WORLD_FRAME, 0)!;
         const rows = Math.max(settings.GAME_MODE_STRINGS.length, settings.DIFFICULTIES.length);
         const width = PADDING + COLUMN_WIDTH + COLUMN_GAP + COLUMN_WIDTH + PADDING;
         const height = PADDING + TITLE_HEIGHT + PADDING + HEADER_HEIGHT + rows * ROW_SPACING + PADDING + BUTTON_HEIGHT + PADDING;
-        const left = PANEL_CENTER_X - width / 2;
-        const top = PANEL_CENTER_Y + height / 2;
-        const bottom = PANEL_CENTER_Y - height / 2;
 
-        this.panel = Frame.createType('hostSettingsPanel', gameUi, 0, 'BACKDROP', 'BoxedTextBackgroundTemplate')!;
-        this.panel.setSize(width, height);
+        this.panel = createPanel('hostSettingsPanel', width, height);
         this.panel.setAbsPoint(FRAMEPOINT_CENTER, PANEL_CENTER_X, PANEL_CENTER_Y);
 
-        const title = Frame.createType('hostSettingsTitle', this.panel, 0, 'TEXT', '')!;
+        const title = createText('hostSettingsTitle', this.panel, 'Game settings');
         title.setSize(width - 2 * PADDING, TITLE_HEIGHT);
-        title.setAbsPoint(FRAMEPOINT_TOP, PANEL_CENTER_X, top - PADDING);
-        title.setText('Game settings');
-        BlzFrameSetTextAlignment(title.handle, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
+        title.setPoint(FRAMEPOINT_TOP, this.panel, FRAMEPOINT_TOP, 0, -PADDING);
 
-        const columnsTop = top - PADDING - TITLE_HEIGHT - PADDING;
-        this.modes = new OptionColumn(game, 'hostSettingsMode', this.panel, left + PADDING, columnsTop, 'Game mode',
+        const columnsTop = -PADDING - TITLE_HEIGHT - PADDING;
+        this.modes = new OptionColumn('hostSettingsMode', this.panel, PADDING, columnsTop, 'Game mode',
             settings.GAME_MODE_STRINGS.map((mode, i) => Util.ColourString(settings.GAME_MODE_COLOURS[i], mode)));
-        this.difficulties = new OptionColumn(game, 'hostSettingsDifficulty', this.panel,
-            left + PADDING + COLUMN_WIDTH + COLUMN_GAP, columnsTop, 'Difficulty',
+        this.difficulties = new OptionColumn('hostSettingsDifficulty', this.panel,
+            PADDING + COLUMN_WIDTH + COLUMN_GAP, columnsTop, 'Difficulty',
             settings.DIFFICULTIES.map((difficulty, i) =>
                 Util.ColourString(settings.DIFFICULTY_COLOURS[i], `${difficulty}% ${settings.DIFFICULTY_STRINGS[i]}`)));
 
-        // CustomTextButton comes from war3mapImported\ui\CustomTextButton.fdf. Both actions
-        // are sent from the clicker's client only; the vote logic checks it is the host.
-        this.addButton(game, 'hostSettingsVote', 'Let players vote', left + PADDING, bottom + PADDING,
-            () => onVote());
-        this.addButton(game, 'hostSettingsConfirm', 'Confirm', left + width - PADDING - BUTTON_WIDTH, bottom + PADDING,
-            () => onConfirm(this.modes.selection, this.difficulties.selection));
-
-        this.panel.setVisible(false);
-    }
-
-    private addButton(game: WarcraftMaul, name: string, text: string, left: number, bottom: number, action: () => void): void {
-        const button = Frame.create('CustomTextButton', this.panel, 0, 0)!;
-        button.setSize(BUTTON_WIDTH, BUTTON_HEIGHT);
-        button.setAbsPoint(FRAMEPOINT_BOTTOMLEFT, left, bottom);
-        button.setText(text);
-        const trigger = Trigger.create();
-        trigger.triggerRegisterFrameEvent(button, FRAMEEVENT_CONTROL_CLICK);
-        trigger.addAction(() => {
-            if (GetTriggerPlayer() !== GetLocalPlayer()) {
-                return;
-            }
-            button.setEnabled(false);
-            button.setEnabled(true);
-            action();
-        });
+        // Both actions are sent from the clicker's client only; the vote logic checks it is the host
+        const vote = createTextButton(this.panel, 'Let players vote', BUTTON_WIDTH, BUTTON_HEIGHT);
+        vote.setPoint(FRAMEPOINT_BOTTOMLEFT, this.panel, FRAMEPOINT_BOTTOMLEFT, PADDING, PADDING);
+        onLocalClick(vote, () => onVote());
+        const confirm = createTextButton(this.panel, 'Confirm', BUTTON_WIDTH, BUTTON_HEIGHT);
+        confirm.setPoint(FRAMEPOINT_BOTTOMRIGHT, this.panel, FRAMEPOINT_BOTTOMRIGHT, -PADDING, PADDING);
+        onLocalClick(confirm, () => onConfirm(this.modes.selection, this.difficulties.selection));
     }
 
     /** Local UI: the panel appears on the given player's client only. */

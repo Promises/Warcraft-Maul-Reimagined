@@ -2,6 +2,7 @@ import {Frame, Trigger} from 'w3ts';
 import {WarcraftMaul} from '../../../WarcraftMaul';
 import {RaceItemDef} from '../../Races/RaceItems';
 import {trackUiPress} from '../UiPress';
+import {createBackdrop, onLocalClick} from '../Frames';
 
 const ICON_INSET = 0.003;
 
@@ -17,6 +18,7 @@ export class RaceListRow {
     private name: string = '';
     private selected: boolean = false;
 
+    /** Placed with its top-left at (x, y) from the parent's top-left. */
     constructor(game: WarcraftMaul, name: string, parent: Frame, x: number, y: number,
                 width: number, height: number, onClick: (itemId: string) => void, onWheel: (up: boolean) => void) {
         // CustomListButton (war3mapImported\\ui\\CustomTextButton.fdf): a text button whose own
@@ -24,29 +26,21 @@ export class RaceListRow {
         // name is the button's text rather than a child TEXT frame, which would swallow clicks.
         this.button = Frame.create('CustomListButton', parent, 0, 0)!;
         this.button.setSize(width, height);
-        this.button.setAbsPoint(FRAMEPOINT_TOPLEFT, x, y);
+        this.button.setPoint(FRAMEPOINT_TOPLEFT, parent, FRAMEPOINT_TOPLEFT, x, y);
 
-        this.highlight = Frame.createType(`${name}Highlight`, this.button, 0, 'BACKDROP', '')!;
-        this.highlight.setAllPoints(this.button);
         // A dark translucent bar: frame alpha applies reliably where a vertex-colour tint does not
-        this.highlight.setTexture('Textures\\Black32.blp', 0, true);
+        this.highlight = createBackdrop(`${name}Highlight`, this.button, 'Textures\\Black32.blp');
+        this.highlight.setAllPoints(this.button);
         this.highlight.setAlpha(150);
         this.highlight.setVisible(false);
 
         this.icon = Frame.createType(`${name}Icon`, this.button, 0, 'BACKDROP', '')!;
         this.icon.setSize(height - 2 * ICON_INSET, height - 2 * ICON_INSET);
-        this.icon.setAbsPoint(FRAMEPOINT_TOPLEFT, x + ICON_INSET, y - ICON_INSET);
+        this.icon.setPoint(FRAMEPOINT_LEFT, this.button, FRAMEPOINT_LEFT, ICON_INSET, 0);
 
         // Frame events fire on every client with the acting player; the row only ever shows
         // and changes the local player's view, so other clients ignore the event entirely
-        const trigger = Trigger.create();
-        trigger.triggerRegisterFrameEvent(this.button, FRAMEEVENT_CONTROL_CLICK);
-        trigger.addAction(() => {
-            if (GetTriggerPlayer() !== GetLocalPlayer()) {
-                return;
-            }
-            this.button.setEnabled(false);
-            this.button.setEnabled(true);
+        onLocalClick(this.button, () => {
             if (this.itemId !== undefined) {
                 onClick(this.itemId);
             }
@@ -60,7 +54,6 @@ export class RaceListRow {
             onWheel(Frame.getEventValue() > 0);
         });
         trackUiPress(game, this.button);
-
     }
 
     /** Local UI: shows an item, or hides the row when item is undefined. */

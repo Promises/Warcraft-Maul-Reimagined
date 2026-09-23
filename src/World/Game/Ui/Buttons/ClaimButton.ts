@@ -25,9 +25,7 @@ export class ClaimButton extends AbstractActionButton {
         if (GetTriggerPlayer() !== GetLocalPlayer()) {
             return;
         }
-        this.disable();
         this.game.playerSync.send('claim');
-        this.enable();
     }
 
 

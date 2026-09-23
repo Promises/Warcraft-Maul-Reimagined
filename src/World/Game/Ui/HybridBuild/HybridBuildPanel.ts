@@ -3,6 +3,7 @@ import {WarcraftMaul} from '../../../WarcraftMaul';
 import {Defender} from '../../../Entity/Players/Defender';
 import {IconButton} from '../IconButton';
 import {Timer} from 'w3ts';
+import {createPanel} from '../Frames';
 
 // Layout: a 4x3 grid like the command card, sitting above the action bar. The console
 // area itself never passes mouse input to custom frames, so the panel cannot overlay it.
@@ -45,37 +46,31 @@ export class HybridBuildPanel {
     private readonly openFor: boolean[] = [];
 
     constructor(private readonly game: WarcraftMaul) {
-        const gameUi = Frame.fromOrigin(ORIGIN_FRAME_WORLD_FRAME, 0)!;
         const width = COLUMNS * BUTTON_SPACING + PANEL_PADDING;
         const height = ROWS * BUTTON_SPACING + PANEL_PADDING;
 
-        this.panel = Frame.createType('hybridBuildPanel', gameUi, 0, 'BACKDROP', 'BoxedTextBackgroundTemplate')!;
-        this.panel.setSize(width, height);
+        this.panel = createPanel('hybridBuildPanel', width, height);
         this.panel.setAbsPoint(FRAMEPOINT_BOTTOM, PANEL_CENTER_X, PANEL_BOTTOM_Y);
 
-        const slotCenter = (slot: number): [number, number] => {
-            const column = slot % COLUMNS;
-            const row = Math.floor(slot / COLUMNS);
-            return [
-                PANEL_CENTER_X + (column - (COLUMNS - 1) / 2) * BUTTON_SPACING,
-                PANEL_BOTTOM_Y + height - PANEL_PADDING / 2 - (row + 0.5) * BUTTON_SPACING,
-            ];
+        // Grid slots centred on a BUTTON_SPACING pitch, from the panel's top-left
+        const place = (button: IconButton, slot: number): void => {
+            button.frame.setPoint(FRAMEPOINT_CENTER, this.panel, FRAMEPOINT_TOPLEFT,
+                PANEL_PADDING / 2 + (slot % COLUMNS + 0.5) * BUTTON_SPACING,
+                -PANEL_PADDING / 2 - (Math.floor(slot / COLUMNS) + 0.5) * BUTTON_SPACING);
         };
 
         // A closure per tier: a classic for loop would share one loop variable in the generated Lua
         for (const tier of Array.from({length: TIERS}, (_, index) => index)) {
-            const [x, y] = slotCenter(slotOfTier(tier));
-            const button = new IconButton(game, `hybridBuildTier${tier}`, this.panel, x, y, BUTTON_SIZE,
+            const button = new IconButton(game, `hybridBuildTier${tier}`, this.panel, BUTTON_SIZE,
                 player => this.pick(player, tier));
+            place(button, slotOfTier(tier));
             button.setHotkey(HOTKEY_LABELS[slotOfTier(tier)]);
             this.tierButtons.push(button);
         }
-        const [cancelX, cancelY] = slotCenter(CANCEL_SLOT);
-        this.cancelButton = new IconButton(game, 'hybridBuildCancel', this.panel, cancelX, cancelY, BUTTON_SIZE,
+        this.cancelButton = new IconButton(game, 'hybridBuildCancel', this.panel, BUTTON_SIZE,
             player => this.close(player));
+        place(this.cancelButton, CANCEL_SLOT);
         this.cancelButton.setHotkey(HOTKEY_LABELS[CANCEL_SLOT]);
-
-        this.panel.setVisible(false);
 
         // Gold changes all the time (kills, wave rewards); keep the dimming current while open.
         // Runs on every client and only touches the local player's view.

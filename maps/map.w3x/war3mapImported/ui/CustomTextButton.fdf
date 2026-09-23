@@ -36,62 +36,25 @@ Frame "BACKDROP" "BoxedTextBackgroundTemplate" {
         BackdropEdgeFile  "ToolTipBorder", //the border File
         BackdropBlendAll,
 }
-// -- Frames -------------------------------------------------------
-Frame "BACKDROP" "BoxedText" INHERITS "BoxedTextBackgroundTemplate" {
-   UseActiveContext,
-
-   Frame "TEXT" "BoxedTextTitle" {
-       UseActiveContext,
-       DecorateFileNames,
-       SetPoint TOPLEFT, "BoxedText", TOPLEFT, 0.005, -0.005, //Positionate "BoxedTextSimpleTitle"'s TOPLEFT to "BoxedText"'s TOPLEFT with an offset
-       SetPoint TOPRIGHT, "BoxedText", TOPRIGHT, -0.005, -0.005,
-       FontFlags "FIXEDSIZE",
-       FrameFont "MasterFont", 0.011, "",
-       FontColor 1.0 1.0 1.0 1.0, //Red Green Blue Alpha 0.0 to 1.0
-       FontShadowColor 0.0 0.0 0.0 0.9,
-       FontShadowOffset 0.001 -0.001,
-   }
-
-   Frame "TEXT" "BoxedTextValue" {
-       UseActiveContext,
-       DecorateFileNames,
-       SetPoint TOPLEFT, "BoxedText", TOPLEFT, 0.005, -0.035,
-       SetPoint BOTTOMRIGHT,  "BoxedText", BOTTOMRIGHT, -0.005, 0.005,
-       FontFlags "FIXEDSIZE",
-       FrameFont "MasterFont", 0.011, "",
-       FontColor 1.0 1.0 1.0 1.0,
-       FontShadowColor 0.0 0.0 0.0 0.9,
-       FontShadowOffset 0.001 -0.001,
-   }
-
-    Frame "BACKDROP" "CustomRadioButtonNotActiveBackdrop" {
-        UseActiveContext,
-        BackdropBlendAll,
-        Height 0.010,
-        Width 0.010,
-        SetPoint TOPLEFT, "BoxedText", TOPLEFT, 0.005, -0.02,
-        BackdropBackground  "UI\Widgets\ToolTips\Human\ToolTipGoldIcon.blp",
-    }
-
-       Frame "TEXT" "BoxedTextGoldValue" {
-           UseActiveContext,
-           DecorateFileNames,
-           SetPoint TOPLEFT, "BoxedText", TOPLEFT, 0.02, -0.02,
-           SetPoint BOTTOMRIGHT,  "BoxedText", BOTTOMRIGHT, -0.005, 0.025,
-           FontFlags "FIXEDSIZE",
-           FrameFont "MasterFont", 0.011, "",
-           FontColor 1.0 0.8 0.0 1.0,
-           FontShadowColor 0.0 0.0 0.0 0.9,
-           FontShadowOffset 0.001 -0.001,
-       }
-}
-
-// An icon button: a plain BUTTON with the standard mouse-over glow; the script adds the icon
-// as a child backdrop. Hover feedback (glow, tooltip) is left to the engine: registering
-// mouse enter/leave events on a frame makes the engine reset its hover every tick.
+// An icon button: a plain BUTTON with the standard mouse-over glow; the script lays it over an
+// icon backdrop as that backdrop's child, so the glow draws over the icon. Hover feedback
+// (glow, tooltip) is left to the engine: registering mouse enter/leave events on a frame
+// makes the engine reset its hover every tick.
 Frame "BUTTON" "CustomIconButton" {
     ControlStyle "AUTOTRACK|HIGHLIGHTONMOUSEOVER",
     ControlMouseOverHighlight "CustomIconButtonHighlight",
     Frame "HIGHLIGHT" "CustomIconButtonHighlight" INHERITS "StandardButtonMouseOverHighlightTemplate" {
     }
+}
+
+// Game messages, drawn by GameMessages in place of the hidden ORIGIN_FRAME_UNIT_MSG so that
+// our panels can cover them: white, bottom-left justified, with a shadow for the terrain.
+Frame "TEXT" "CustomGameMessageText" {
+    DecorateFileNames,
+    FrameFont "MasterFont", 0.012, "",
+    FontJustificationH JUSTIFYLEFT,
+    FontJustificationV JUSTIFYBOTTOM,
+    FontColor 1.0 1.0 1.0 1.0,
+    FontShadowColor 0.0 0.0 0.0 0.9,
+    FontShadowOffset 0.001 -0.001,
 }

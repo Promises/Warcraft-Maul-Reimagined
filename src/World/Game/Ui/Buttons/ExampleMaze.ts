@@ -34,27 +34,20 @@ export class ExampleMaze extends AbstractActionButton {
         if (!player) {
             return;
         }
-        this.disable();
         this.players.delete(player.id);
         this.backdropHandle.setAlpha(255);
         const firstSpawn: CheckPoint | undefined = this.game.worldMap.playerSpawns[player.lane].spawnOne;
         if (firstSpawn === undefined) {
-            this.enable();
-
             return;
         }
 
         const firstCheckpoint: CheckPoint | undefined = firstSpawn.next;
         if (firstCheckpoint === undefined) {
-            this.enable();
-
             return;
         }
 
         const secondCheckpoint: CheckPoint | undefined = firstCheckpoint.next;
         if (secondCheckpoint === undefined) {
-            this.enable();
-
             return;
         }
 
@@ -71,7 +64,6 @@ export class ExampleMaze extends AbstractActionButton {
             player.setHoloMaze(undefined);
             this.setIcon(false);
         }
-        this.enable();
     }
 
     public setIcon(enabled: boolean): void {

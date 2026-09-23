@@ -6,6 +6,7 @@ import {Race} from '../../Races/Race';
 import {RACE_TIERS, RaceItemDef, RaceItems, RaceTier, RANDOM_PICK_ITEMS} from '../../Races/RaceItems';
 import {IconButton} from '../IconButton';
 import {RaceListRow} from './RaceListRow';
+import {createPanel, createText, createTextButton, onLocalClick} from '../Frames';
 
 // Three columns: [categories] [scrolling race list] [information]
 // Slightly right of centre so the left edge clears the vote panel (0.00-0.14) with a gap
@@ -60,44 +61,25 @@ export class RaceSelectPanel {
     private visibleLocally: boolean = false;
 
     constructor(private readonly game: WarcraftMaul) {
-        const gameUi = Frame.fromOrigin(ORIGIN_FRAME_WORLD_FRAME, 0)!;
-        const left = PANEL_CENTER_X - PANEL_WIDTH / 2;
-        const top = PANEL_CENTER_Y + PANEL_HEIGHT / 2;
-        const bottom = PANEL_CENTER_Y - PANEL_HEIGHT / 2;
-
-        this.panel = Frame.createType('raceSelectPanel', gameUi, 0, 'BACKDROP', 'BoxedTextBackgroundTemplate')!;
-        this.panel.setSize(PANEL_WIDTH, PANEL_HEIGHT);
+        this.panel = createPanel('raceSelectPanel', PANEL_WIDTH, PANEL_HEIGHT);
         this.panel.setAbsPoint(FRAMEPOINT_CENTER, PANEL_CENTER_X, PANEL_CENTER_Y);
 
         // Categories: the normal tiers, plus a Dev tab in debug builds for the races you cannot
         // normally select (disabled races and the random-only Loot Boxer)
         const tiers: RaceTier[] = game.debugMode ? [...RACE_TIERS, 'Dev'] : RACE_TIERS;
-        const categoryLeft = left + PADDING;
         tiers.forEach((tier, index) => {
-            const button = Frame.create('CustomTextButton', this.panel, 0, 0)!;
-            button.setSize(CATEGORY_WIDTH, CATEGORY_HEIGHT);
-            button.setAbsPoint(FRAMEPOINT_TOPLEFT, categoryLeft, top - PADDING - index * CATEGORY_SPACING);
-            button.setText(tier);
-            const trigger = Trigger.create();
-            trigger.triggerRegisterFrameEvent(button, FRAMEEVENT_CONTROL_CLICK);
-            trigger.addAction(() => {
-                if (GetTriggerPlayer() !== GetLocalPlayer()) {
-                    return;
-                }
-                button.setEnabled(false);
-                button.setEnabled(true);
-                this.showTier(tier);
-            });
+            const button = createTextButton(this.panel, tier, CATEGORY_WIDTH, CATEGORY_HEIGHT);
+            button.setPoint(FRAMEPOINT_TOPLEFT, this.panel, FRAMEPOINT_TOPLEFT, PADDING, -PADDING - index * CATEGORY_SPACING);
+            onLocalClick(button, () => this.showTier(tier));
             trackUiPress(game, button);
             this.categoryButtons.set(tier, button);
         });
 
-        // Scrolling race list
-        const listLeft = categoryLeft + CATEGORY_WIDTH + PADDING;
-        const listTop = top - PADDING;
+        // Scrolling race list, offsets from the panel's top-left
+        const listLeft = PADDING + CATEGORY_WIDTH + PADDING;
         for (const index of Array.from({length: VISIBLE_ROWS}, (_, i) => i)) {
             this.rows.push(new RaceListRow(game, `raceSelectRow${index}`, this.panel,
-                listLeft, listTop - index * ROW_HEIGHT, LIST_WIDTH, ROW_HEIGHT,
+                listLeft, -PADDING - index * ROW_HEIGHT, LIST_WIDTH, ROW_HEIGHT,
                 itemId => this.highlight(itemId),
                 up => this.wheelScroll(up)));
         }
@@ -105,11 +87,10 @@ export class RaceSelectPanel {
         // Scrollbar down the right of the list. Flow is one-directional to avoid a feedback
         // loop: the wheel and showTier move the slider value, and only the slider's
         // value-changed event scrolls the rows. scrollTo never writes the slider.
-        const scrollbarLeft = listLeft + LIST_WIDTH;
         this.scrollbar = Frame.createType('raceSelectScroll', this.panel, 0, 'SLIDER', 'EscMenuScrollBarTemplate');
         if (this.scrollbar) {
             this.scrollbar.setSize(SCROLLBAR_WIDTH, VISIBLE_ROWS * ROW_HEIGHT);
-            this.scrollbar.setAbsPoint(FRAMEPOINT_TOPRIGHT, scrollbarLeft + SCROLLBAR_WIDTH, listTop);
+            this.scrollbar.setPoint(FRAMEPOINT_TOPLEFT, this.panel, FRAMEPOINT_TOPLEFT, listLeft + LIST_WIDTH, -PADDING);
             this.scrollbar.setStepSize(1);
             const scrollTrigger = Trigger.create();
             scrollTrigger.triggerRegisterFrameEvent(this.scrollbar, FRAMEEVENT_SLIDER_VALUE_CHANGED);
@@ -124,31 +105,21 @@ export class RaceSelectPanel {
         }
 
         // Information
-        const infoLeft = scrollbarLeft + SCROLLBAR_WIDTH + PADDING;
+        const infoLeft = listLeft + LIST_WIDTH + SCROLLBAR_WIDTH + PADDING;
         this.infoIcon = Frame.createType('raceSelectInfoIcon', this.panel, 0, 'BACKDROP', '')!;
         this.infoIcon.setSize(INFO_ICON, INFO_ICON);
-        this.infoIcon.setAbsPoint(FRAMEPOINT_TOPLEFT, infoLeft, top - PADDING);
-        this.infoName = Frame.createType('raceSelectInfoName', this.panel, 0, 'TEXT', '')!;
+        this.infoIcon.setPoint(FRAMEPOINT_TOPLEFT, this.panel, FRAMEPOINT_TOPLEFT, infoLeft, -PADDING);
+        this.infoName = createText('raceSelectInfoName', this.panel, '', TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
         this.infoName.setSize(INFO_WIDTH - INFO_ICON - 0.006, INFO_ICON);
-        this.infoName.setAbsPoint(FRAMEPOINT_TOPLEFT, infoLeft + INFO_ICON + 0.006, top - PADDING);
-        this.infoText = Frame.createType('raceSelectInfoText', this.panel, 0, 'TEXT', '')!;
+        this.infoName.setPoint(FRAMEPOINT_TOPLEFT, this.infoIcon, FRAMEPOINT_TOPRIGHT, 0.006, 0);
+        this.infoText = createText('raceSelectInfoText', this.panel, '', TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_LEFT);
         this.infoText.setSize(INFO_WIDTH, PANEL_HEIGHT - 2 * PADDING - INFO_ICON - PICK_BUTTON_HEIGHT - 0.02);
-        this.infoText.setAbsPoint(FRAMEPOINT_TOPLEFT, infoLeft, top - PADDING - INFO_ICON - 0.008);
+        this.infoText.setPoint(FRAMEPOINT_TOPLEFT, this.infoIcon, FRAMEPOINT_BOTTOMLEFT, 0, -0.008);
 
-        // CustomTextButton comes from war3mapImported\ui\CustomTextButton.fdf
-        this.pickButton = Frame.create('CustomTextButton', this.panel, 0, 0)!;
-        this.pickButton.setSize(PICK_BUTTON_WIDTH, PICK_BUTTON_HEIGHT);
-        this.pickButton.setAbsPoint(FRAMEPOINT_BOTTOMRIGHT, left + PANEL_WIDTH - PADDING, bottom + PADDING);
-        this.pickButton.setText('Pick');
-        const pickTrigger = Trigger.create();
-        pickTrigger.triggerRegisterFrameEvent(this.pickButton, FRAMEEVENT_CONTROL_CLICK);
-        pickTrigger.addAction(() => {
-            // Only the clicker's client sends; the sync handler applies the pick everywhere
-            if (GetTriggerPlayer() !== GetLocalPlayer()) {
-                return;
-            }
-            this.pickButton.setEnabled(false);
-            this.pickButton.setEnabled(true);
+        this.pickButton = createTextButton(this.panel, 'Pick', PICK_BUTTON_WIDTH, PICK_BUTTON_HEIGHT);
+        this.pickButton.setPoint(FRAMEPOINT_BOTTOMRIGHT, this.panel, FRAMEPOINT_BOTTOMRIGHT, -PADDING, PADDING);
+        // Only the clicker's client sends; the sync handler applies the pick everywhere
+        onLocalClick(this.pickButton, () => {
             // One pick at a time: clicks land faster than the sync comes back, and every
             // click used to send another pick, so a spammed button bought the race several
             // times over whenever the player had picks left (Blitz hands out extra ones)
@@ -162,9 +133,9 @@ export class RaceSelectPanel {
         trackUiPress(game, this.pickButton);
 
         // Close: just outside the top-right corner so it never overlaps the race name
-        const close = new IconButton(game, 'raceSelectClose', this.panel,
-            left + PANEL_WIDTH - CLOSE_BUTTON / 2, top + PADDING + CLOSE_BUTTON / 2, CLOSE_BUTTON,
+        const close = new IconButton(game, 'raceSelectClose', this.panel, CLOSE_BUTTON,
             player => this.close(player), false);
+        close.frame.setPoint(FRAMEPOINT_BOTTOMRIGHT, this.panel, FRAMEPOINT_TOPRIGHT, 0, PADDING);
         for (const player of game.players.values()) {
             close.setContent(player, {
                 icon: 'ReplaceableTextures\\CommandButtons\\BTNCancel.blp',
@@ -177,7 +148,6 @@ export class RaceSelectPanel {
         game.playerSync.on('race-pick', (player, itemId) => this.pick(player, itemId));
 
         this.showTier(this.selectedTier);
-        this.panel.setVisible(false);
     }
 
     /**

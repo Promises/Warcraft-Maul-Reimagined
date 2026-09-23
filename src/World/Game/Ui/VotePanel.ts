@@ -1,6 +1,7 @@
-import {Frame, Trigger} from 'w3ts';
+import {Frame} from 'w3ts';
 import {WarcraftMaul} from '../../WarcraftMaul';
 import {Defender} from '../../Entity/Players/Defender';
+import {createPanel, createText, createTextButton, onLocalClick} from './Frames';
 
 // Flush with the left screen edge: the centred race panel starts at x 0.142, and the two are shown together
 const PANEL_LEFT = 0.00;
@@ -27,32 +28,19 @@ export class VotePanel {
     private optionCount: number = 0;
 
     constructor(game: WarcraftMaul) {
-        const gameUi = Frame.fromOrigin(ORIGIN_FRAME_WORLD_FRAME, 0)!;
         const height = PADDING + TITLE_HEIGHT + PADDING + MAX_OPTIONS * OPTION_SPACING + PADDING;
-        const top = PANEL_CENTER_Y + height / 2;
 
-        this.panel = Frame.createType('votePanel', gameUi, 0, 'BACKDROP', 'BoxedTextBackgroundTemplate')!;
-        this.panel.setSize(PANEL_WIDTH, height);
-        this.panel.setAbsPoint(FRAMEPOINT_TOPLEFT, PANEL_LEFT, top);
+        this.panel = createPanel('votePanel', PANEL_WIDTH, height);
+        this.panel.setAbsPoint(FRAMEPOINT_TOPLEFT, PANEL_LEFT, PANEL_CENTER_Y + height / 2);
 
-        this.title = Frame.createType('votePanelTitle', this.panel, 0, 'TEXT', '')!;
+        this.title = createText('votePanelTitle', this.panel);
         this.title.setSize(PANEL_WIDTH - 2 * PADDING, TITLE_HEIGHT);
-        this.title.setAbsPoint(FRAMEPOINT_TOP, PANEL_LEFT + PANEL_WIDTH / 2, top - PADDING);
-        BlzFrameSetTextAlignment(this.title.handle, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
+        this.title.setPoint(FRAMEPOINT_TOP, this.panel, FRAMEPOINT_TOP, 0, -PADDING);
 
         for (const index of Array.from({length: MAX_OPTIONS}, (_, i) => i)) {
-            const button = Frame.create('CustomTextButton', this.panel, 0, 0)!;
-            button.setSize(PANEL_WIDTH - 2 * PADDING, OPTION_HEIGHT);
-            button.setAbsPoint(FRAMEPOINT_TOP, PANEL_LEFT + PANEL_WIDTH / 2,
-                top - PADDING - TITLE_HEIGHT - PADDING - index * OPTION_SPACING);
-            const trigger = Trigger.create();
-            trigger.triggerRegisterFrameEvent(button, FRAMEEVENT_CONTROL_CLICK);
-            trigger.addAction(() => {
-                if (GetTriggerPlayer() !== GetLocalPlayer()) {
-                    return;
-                }
-                button.setEnabled(false);
-                button.setEnabled(true);
+            const button = createTextButton(this.panel, '', PANEL_WIDTH - 2 * PADDING, OPTION_HEIGHT);
+            button.setPoint(FRAMEPOINT_TOP, this.title, FRAMEPOINT_BOTTOM, 0, -PADDING - index * OPTION_SPACING);
+            onLocalClick(button, () => {
                 if (index < this.optionCount) {
                     // Hide immediately for responsiveness; the tally is applied when the sync arrives
                     this.panel.setVisible(false);
@@ -61,8 +49,6 @@ export class VotePanel {
             });
             this.options.push(button);
         }
-
-        this.panel.setVisible(false);
     }
 
     /** Shows the panel with a title and options, and the callback for a click (local UI). */

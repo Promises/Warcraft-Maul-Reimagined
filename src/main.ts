@@ -7,6 +7,7 @@ import {FileSink} from './lib/Serilog/Sinks/FileSink';
 import {CreepAbilityHandler} from "./World/Entity/CreepAbilities/CreepAbilityHandler";
 import {WarcraftMaul} from "./World/WarcraftMaul";
 import {writeLobbyStamp} from "./World/Game/LobbyStamp";
+import {installGameMessages} from "./World/Game/Ui/GameMessages";
 import {AbilityTypes} from "war3-objectdata-th";
 import BuildTinyScoutTower = AbilityTypes.BuildTinyScoutTower;
 
@@ -39,6 +40,7 @@ function tsMain() {
     PatchNatives();
     BlzLoadTOCFile('uiImport\\Templates.toc');
     BlzLoadTOCFile('war3mapImported\\ui\\templates.toc');
+    installGameMessages();
     Log.addSink((new StringSink(LogLevel.Error)));
     Log.addSink(new FileSink('warcraft-maul.txt'));
     try {

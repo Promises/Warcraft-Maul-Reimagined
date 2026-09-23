@@ -1,77 +1,55 @@
-import {Frame, Trigger} from 'w3ts';
+import {Frame} from 'w3ts';
 import {WarcraftMaul} from '../../WarcraftMaul';
 import {Defender} from '../../Entity/Players/Defender';
 import {trackUiPress} from './UiPress';
+import {createText, onClick, Tooltip} from './Frames';
 
 const TOOLTIP_WIDTH = 0.29;
-const TOOLTIP_PADDING = 0.0315;
-const TOOLTIP_LEVEL = 20;
 
 export interface IconButtonContent {
     icon: string;
     title: string;
     description: string;
-    /** Shown on the gold line of the tooltip; omit to leave it empty */
+    /** Shown on the last line of the tooltip; omit to leave it out */
     goldCost?: number;
 }
 
 /**
- * A square icon button (CustomIconButton from our FDF: a BUTTON with the standard mouse-over
- * glow) with a BoxedText tooltip (title, description, gold cost) the engine shows. No mouse
- * enter/leave events are registered on it, see UiPress.
+ * A square icon button: the icon is a BACKDROP and a CustomIconButton (our FDF: a BUTTON with
+ * the standard mouse-over glow) covers it as its child, with the hotkey label and the tooltip
+ * on the button (see Frames). Place it through `frame`.
  * Frames are shared by all clients, so content is only ever set for the local player.
  * A click event fires on every client with the clicking player, so onClick runs everywhere
  * and gets that player: per-player game logic may run directly (it stays in step), but
  * anything visual must be gated to `player.isLocal()`.
  */
 export class IconButton {
+    /** The icon; the root of the button, to place and show/hide it */
+    public readonly frame: Frame;
     private readonly button: Frame;
-    private readonly icon: Frame;
-    private readonly tooltip: Frame | undefined;
-    private readonly title: Frame | undefined;
-    private readonly description: Frame | undefined;
-    private readonly goldCost: Frame | undefined;
+    private readonly tooltip: Tooltip | undefined;
     private readonly hotkeyLabel: Frame;
 
-    constructor(game: WarcraftMaul, name: string, parent: Frame, x: number, y: number, size: number,
-                onClick: (this: void, player: Defender) => void, showTooltip: boolean = true) {
-        this.button = Frame.createType(name, parent, 0, 'BUTTON', 'CustomIconButton')!;
-        this.button.setSize(size, size);
-        this.button.setAbsPoint(FRAMEPOINT_CENTER, x, y);
+    constructor(game: WarcraftMaul, name: string, parent: Frame, size: number,
+                handler: (this: void, player: Defender) => void, showTooltip: boolean = true) {
+        this.frame = Frame.createType(`${name}Icon`, parent, 0, 'BACKDROP', '')!;
+        this.frame.setSize(size, size);
 
-        this.icon = Frame.createType(`${name}Icon`, this.button, 0, 'BACKDROP', '')!;
-        this.icon.setAllPoints(this.button);
-
-        // BoxedText comes from war3mapImported\ui\CustomTextButton.fdf: title, description, gold icon, gold value.
-        // A panel with its own details pane passes showTooltip=false to avoid a hover box over it.
-        this.tooltip = showTooltip ? Frame.create('BoxedText', this.button, 0, 0) : undefined;
-        if (this.tooltip) {
-            this.tooltip.setPoint(FRAMEPOINT_BOTTOM, this.button, FRAMEPOINT_TOP, 0, 0.006);
-            // A tooltip covers the tiles above its button; its own high level keeps the draw order stable
-            this.tooltip.setLevel(TOOLTIP_LEVEL);
-            this.button.setTooltip(this.tooltip);
-            this.title = this.tooltip.getChild(0);
-            this.description = this.tooltip.getChild(1);
-            this.goldCost = this.tooltip.getChild(3);
-        }
+        this.button = Frame.createType(name, this.frame, 0, 'BUTTON', 'CustomIconButton')!;
+        this.button.setAllPoints(this.frame);
 
         // Hotkey letter in the corner, like the command card's; empty until setHotkey
-        this.hotkeyLabel = Frame.createType(`${name}Hotkey`, this.button, 0, 'TEXT', '')!;
-        this.hotkeyLabel.setSize(size, size * 0.4);
+        this.hotkeyLabel = createText(`${name}Hotkey`, this.button, '', TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_RIGHT);
         this.hotkeyLabel.setPoint(FRAMEPOINT_BOTTOMRIGHT, this.button, FRAMEPOINT_BOTTOMRIGHT, -0.002, 0.001);
-        BlzFrameSetTextAlignment(this.hotkeyLabel.handle, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_RIGHT);
-        this.hotkeyLabel.setLevel(2);
-        this.hotkeyLabel.setText('');
+        this.hotkeyLabel.setSize(size, size * 0.4);
 
-        const trigger = Trigger.create();
-        trigger.triggerRegisterFrameEvent(this.button, FRAMEEVENT_CONTROL_CLICK);
-        trigger.addAction(() => {
-            // Drop keyboard focus so the button does not swallow hotkeys afterwards
-            this.button.setEnabled(false);
-            this.button.setEnabled(true);
-            const player = game.players.get(GetPlayerId(GetTriggerPlayer()!));
+        // A panel with its own details pane passes showTooltip=false to avoid a hover box over it
+        this.tooltip = showTooltip ? new Tooltip(name, this.button, TOOLTIP_WIDTH) : undefined;
+
+        onClick(this.button, clicker => {
+            const player = game.players.get(clicker.id);
             if (player) {
-                onClick(player);
+                handler(player);
             }
         });
         trackUiPress(game, this.button);
@@ -82,15 +60,13 @@ export class IconButton {
         if (!player.isLocal()) {
             return;
         }
-        this.icon.setTexture(content.icon, 0, true);
-        this.title?.setText(GetLocalizedString(content.title) ?? content.title);
-        this.description?.setText(GetLocalizedString(content.description) ?? content.description);
-        this.goldCost?.setText(content.goldCost === undefined ? '' : `${content.goldCost}`);
-        this.fitTooltip();
+        this.frame.setTexture(content.icon, 0, true);
+        this.tooltip?.setText(GetLocalizedString(content.title) ?? content.title,
+            GetLocalizedString(content.description) ?? content.description, content.goldCost);
     }
 
     public setVisible(visible: boolean): void {
-        this.button.setVisible(visible);
+        this.frame.setVisible(visible);
     }
 
     /** The key label shown in the corner; the same on every client. */
@@ -101,18 +77,7 @@ export class IconButton {
     /** Dim the icon, e.g. for an unavailable choice; local UI only. */
     public setDimmed(player: Defender, dimmed: boolean): void {
         if (player.isLocal()) {
-            this.icon.setAlpha(dimmed ? 90 : 255);
+            this.frame.setAlpha(dimmed ? 90 : 255);
         }
-    }
-
-    private fitTooltip(): void {
-        if (!this.tooltip) {
-            return;
-        }
-        for (const text of [this.title, this.description, this.goldCost]) {
-            text?.setSize(TOOLTIP_WIDTH - 0.01, 0);
-        }
-        const height = (this.title?.height ?? 0) + (this.description?.height ?? 0) + (this.goldCost?.height ?? 0);
-        this.tooltip.setSize(TOOLTIP_WIDTH, height + TOOLTIP_PADDING);
     }
 }

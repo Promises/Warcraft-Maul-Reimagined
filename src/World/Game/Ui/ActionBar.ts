@@ -11,6 +11,7 @@ import { RaceSelectButton } from './Buttons/RaceSelectButton';
 import { RangeCheckButton } from './Buttons/RangeCheckButton';
 import {Frame} from "w3ts";
 import {Defender} from '../../Entity/Players/Defender';
+import {createBackdrop, uiRoot} from './Frames';
 import {BUTTON_PITCH, BUTTON_SIZE, RAIL_CENTER_X, RAIL_CENTER_Y, RAIL_HEIGHT, RAIL_PADDING} from './ActionBarLayout';
 
 // Design handoff "Action bar, full rail": a rail on the console ledge, 0.042 tall, holding
@@ -32,16 +33,10 @@ export class ActionBar {
 
     constructor(game: WarcraftMaul) {
         this.game = game;
-        // On the game UI, not the world frame: the world frame is hidden by the console art
-        // below y 0.176, and the rail sits on the console ledge
-        const gameUi = Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0)!;
-
         // The game's recessed control backdrop (EscMenuTemplates, loaded through our TOC)
-        this.rail = Frame.createType('actionbarRail', gameUi, 0, 'BACKDROP', 'EscMenuControlBackdropTemplate')!;
+        this.rail = Frame.createType('actionbarRail', uiRoot(), 0, 'BACKDROP', 'EscMenuControlBackdropTemplate')!;
         this.rail.setSize(ActionBar.clusterSpan() + 2 * RAIL_PADDING, RAIL_HEIGHT);
         this.rail.setAbsPoint(FRAMEPOINT_CENTER, RAIL_CENTER_X, RAIL_CENTER_Y);
-        // Below the game's dialogs (Message Log, ESC menu), which sit at level 0 on the game UI
-        this.rail.setLevel(-1);
 
         this.hybridBuild = this.initializeButtons();
         // Only a hybrid random player has a build menu; the button appears when they random
@@ -73,19 +68,17 @@ export class ActionBar {
         this.buttons.push(new RaceSelectButton(this.game, this.rail, offset(3), BUTTON_SIZE, 3));
         this.buttons.push(new RangeCheckButton(this.game, this.rail, offset(4), BUTTON_SIZE, 4));
 
-        const divider = Frame.createType('actionbarDivider', this.rail, 0, 'BACKDROP', '')!;
+        const divider = createBackdrop('actionbarDivider', this.rail, DIVIDER_TEXTURE);
         divider.setSize(0.001, BUTTON_SIZE);
-        divider.setAbsPoint(FRAMEPOINT_CENTER,
-            RAIL_CENTER_X + first + BUTTON_COUNT * BUTTON_PITCH - BUTTON_PITCH / 2 + DIVIDER_GAP, RAIL_CENTER_Y);
-        divider.setTexture(DIVIDER_TEXTURE, 0, true);
+        divider.setPoint(FRAMEPOINT_CENTER, this.rail, FRAMEPOINT_CENTER,
+            first + BUTTON_COUNT * BUTTON_PITCH - BUTTON_PITCH / 2 + DIVIDER_GAP, 0);
         divider.setAlpha(110);
 
         // Reserved wells: empty frames, dimmed, where the next buttons go
         for (let i = 0; i < RESERVED_WELLS; i++) {
-            const well = Frame.createType(`actionbarReserved${i}`, this.rail, 0, 'BACKDROP', '')!;
+            const well = createBackdrop(`actionbarReserved${i}`, this.rail, WELL_TEXTURE);
             well.setSize(BUTTON_SIZE, BUTTON_SIZE);
-            well.setAbsPoint(FRAMEPOINT_CENTER, RAIL_CENTER_X + offset(BUTTON_COUNT + i), RAIL_CENTER_Y);
-            well.setTexture(WELL_TEXTURE, 0, true);
+            well.setPoint(FRAMEPOINT_CENTER, this.rail, FRAMEPOINT_CENTER, offset(BUTTON_COUNT + i), 0);
             well.setAlpha(107);
         }
         return hybridBuild;

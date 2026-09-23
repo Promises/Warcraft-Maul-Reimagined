@@ -21,13 +21,11 @@ export class RangeCheckButton extends AbstractActionButton {
         if (!player) {
             return;
         }
-        this.disable();
         const on = player.toggleRangeCheck();
         const local = GetTriggerPlayer() === GetLocalPlayer();
         if (local) {
             this.backdropHandle.setTexture(on ? RangeCheckButton.onIcon : RangeCheckButton.offIcon, 0, true);
         }
         this.setOn(on, local);
-        this.enable();
     }
 }

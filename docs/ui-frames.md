@@ -143,8 +143,10 @@ Top-level, instantiable definitions. `<-` = inherits.
    `ScriptDialogButton`), text set on the button itself. A `BUTTON`/`GLUEBUTTON` with a `TEXT`
    child has a hit area that does not match what is drawn, and the child swallows clicks
    (the host settings and race list rows both had to be rebuilt this way).
-2. An icon button: `BUTTON` + `BACKDROP` child inheriting `ButtonBackdropTemplate`, texture via
-   `BlzFrameSetTexture`. Tooltip: `BoxedText` from our FDF, `BlzFrameSetTooltip`.
+2. An icon button: an icon `BACKDROP` with a `CustomIconButton` child over it (the glow then
+   draws over the icon). Tooltip: a `BoxedTextBackgroundTemplate` box wrapped around one
+   auto-sized, disabled `TEXT`, set with `BlzFrameSetTooltip`. The build conventions (UI root,
+   relative points, disabled text) are in `src/World/Game/Ui/Frames.ts`.
 3. `BlzFrameSetVertexColor` does not take on backdrops; `BlzFrameSetAlpha` and a colour code in
    the text do.
 4. Frame events fire on every client with `GetTriggerPlayer()` = the clicker; gate view changes

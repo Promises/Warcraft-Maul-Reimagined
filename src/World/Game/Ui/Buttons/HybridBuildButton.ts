@@ -17,8 +17,6 @@ export class HybridBuildButton extends AbstractActionButton {
         if (!player) {
             return;
         }
-        this.disable();
         this.game.hybridBuildPanel.toggle(player);
-        this.enable();
     }
 }
