@@ -162,7 +162,14 @@ export function compileMap(config: IProjectConfig) {
   updateTSConfig(config.mapFolder);
 
   logger.info("Transpiling TypeScript to Lua...");
-  execSync('tstl -p tsconfig.json', { stdio: 'inherit' });
+  // The project's own compiler, not whatever tstl is on PATH: a different version writes
+  // different Lua, and a global install shadowed the pinned one on a contributor's machine
+  const tstl = path.resolve('node_modules', '.bin', process.platform === 'win32' ? 'tstl.cmd' : 'tstl');
+  if (!fs.existsSync(tstl)) {
+    logger.error('typescript-to-lua is not installed; run "npm install" (with dev dependencies).');
+    return false;
+  }
+  execSync(`"${tstl}" -p tsconfig.json`, { stdio: 'inherit' });
 
   if (!fs.existsSync(tsLua)) {
     logger.error(`Could not find "${tsLua}"`);
