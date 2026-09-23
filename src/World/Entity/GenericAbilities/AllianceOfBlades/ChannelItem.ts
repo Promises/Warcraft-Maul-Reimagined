@@ -40,7 +40,7 @@ export class ChannelItem extends GenericAbility implements AbilityOnEffectTarget
             if (tower) {
                 const targetUnit = Unit.fromHandle(GetSpellTargetUnit());
                 if (targetUnit && this.allianceTowers.includes(targetUnit.typeId)) {
-                    const item = tower.unit.getItemInSlot(1);
+                    const item = tower.unit.getItemInSlot(0);
                     if (item) {
                         targetUnit.addItem(item);
                     }

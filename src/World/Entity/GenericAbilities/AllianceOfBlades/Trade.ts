@@ -26,7 +26,7 @@ export class Trade extends GenericAbility implements AbilityOnEffectTargetsUnit 
         if (owner) {
             const tower: Tower | undefined = owner.GetTower(triggerUnit.id);
             if (tower) {
-                const item: Item | undefined = tower.unit.getItemInSlot(1);
+                const item: Item | undefined = tower.unit.getItemInSlot(0);
                 if (item && item.level === 1) {
                     const indx: number = AOB_ITEM_LOOT_LEVEL_ONE.indexOf(item.typeId);
                     const mana: number = tower.unit.mana + 1;

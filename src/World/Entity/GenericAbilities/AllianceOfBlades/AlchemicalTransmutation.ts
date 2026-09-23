@@ -22,7 +22,7 @@ export class AlchemicalTransmutation extends GenericAbility implements AbilityOn
         if (owner) {
             const tower: Tower | undefined = owner.GetTower(unit?.id!);
             if (tower) {
-                const item = tower.unit.getItemInSlot(1)
+                const item = tower.unit.getItemInSlot(0)
                 if (item && item.level === 1) {
                     const indx: number = AOB_ITEM_LOOT_LEVEL_ONE.indexOf(item.typeId);
                     item.destroy();

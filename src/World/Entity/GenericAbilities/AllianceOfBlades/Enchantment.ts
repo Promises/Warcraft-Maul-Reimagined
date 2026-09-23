@@ -25,7 +25,7 @@ export class Enchantment extends GenericAbility implements AbilityOnEffectTarget
         if (owner) {
             const tower: Tower | undefined = owner.GetTower(triggerUnit.id);
             if (tower) {
-                const itemInSlot: Item | undefined = tower.unit.getItemInSlot(1);
+                const itemInSlot: Item | undefined = tower.unit.getItemInSlot(0);
                 if (itemInSlot && itemInSlot.level === 1) {
                     const indx: number = AOB_ITEM_LOOT_LEVEL_ONE.indexOf(itemInSlot.typeId);
                     const lvlTwoItem: number = AOB_ITEM_LOOT_LEVEL_TWO[indx];

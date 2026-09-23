@@ -25,7 +25,7 @@ export class Infuse extends GenericAbility implements AbilityOnEffectTargetsUnit
         if (owner) {
             const tower: Tower | undefined = owner.GetTower(triggerUnit.id);
             if (tower) {
-                const itemInSlot: Item | undefined = tower.unit.getItemInSlot(1);
+                const itemInSlot: Item | undefined = tower.unit.getItemInSlot(0);
                 if (itemInSlot && itemInSlot.level === 2) {
                     const indx: number = AOB_ITEM_LOOT_LEVEL_TWO.indexOf(itemInSlot.typeId);
                     itemInSlot.destroy();

@@ -24,7 +24,7 @@ export class Transfuse extends GenericAbility implements AbilityOnEffectTargetsU
         if (owner) {
             const tower: Tower | undefined = owner.GetTower(triggerUnit.id);
             if (tower) {
-                const item: Item | undefined = tower.unit.getItemInSlot(1);
+                const item: Item | undefined = tower.unit.getItemInSlot(0);
                 if (item && item.level === 2) {
                     item.destroy();
                     tower.unit.mana += 1.00;
