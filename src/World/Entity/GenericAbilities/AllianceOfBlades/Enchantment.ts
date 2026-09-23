@@ -9,6 +9,8 @@ import { Tower } from '../../Tower/Specs/Tower';
 import { AOB_ITEM_LOOT_LEVEL_ONE, AOB_ITEM_LOOT_LEVEL_TWO } from '../../../GlobalSettings';
 import {MapPlayer,Item, Unit} from "w3ts";
 
+const ENCHANTMENT_GOLD_COST: number = 5;
+
 
 export class Enchantment extends GenericAbility implements AbilityOnEffectTargetsUnit {
     constructor(game: WarcraftMaul) {
@@ -31,6 +33,8 @@ export class Enchantment extends GenericAbility implements AbilityOnEffectTarget
                     const lvlTwoItem: number = AOB_ITEM_LOOT_LEVEL_TWO[indx];
                     itemInSlot.destroy();
                     tower.unit.addItemById(lvlTwoItem);
+                } else {
+                    owner.giveGold(ENCHANTMENT_GOLD_COST);
                 }
             }
         }
