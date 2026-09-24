@@ -19,6 +19,19 @@
 
   Follows for free: the sample maze and the "you cannot build on a checkpoint" rule read the rectangles live, as do creep orders.
 
+## Tools
+- [x] Launch straight into the map: the game's menus are a page it serves from `<install>/_retail_/webui`, so `tools/webui/index.html` sits there and talks to the game on the same socket the menus use. `npm run play -- --auto` goes from build to in-game with no clicking.
+- [ ] Two accounts in one game on this machine (`scripts/play-two.sh`). Working, with one caveat.
+
+  How it fits together:
+  - `tools/webui/trace-server.py` is a small management server. Each instance checks in, reports which screen it is on, and asks for work; `scripts/wc3.sh` sends the orders (`who`, `host`, `join`, `start`, `leave`, `raw`) so games can be started whenever and told what to do afterwards.
+  - The account is decided by which Battle.net client starts the game, and the only scripted way to ask a particular client is its dock menu (`scripts/launch-from-dock.applescript`): a client's own menus carry no launch action, `battlenet://launch/W3` only opens the window, and `--exec` spawns a fresh, logged out client. Pointing the game at another data root with `CFFIXED_USER_HOME`/`HOME` moves its files but not its session.
+  - The second client is a copy of the app with its own bundle id, started once with `open -n -a "/Applications/Battle.net Alt.app" --env CFFIXED_USER_HOME=$ALT --env HOME=$ALT`. Its data root keeps its own preferences, logs and `CustomMapData`, with the Maps folder linked to the real one, which also settles the shared lobby stamp below.
+  - Lobbies are made private with a password, since a Battle.net custom game is listed publicly while it exists.
+  - The message order matters: `InitializeNetProvider` and `InitializeLocalNetProvider` both with empty payloads, then `GetMapList` for the map's own directory, then `CreateLobby`; a lobby naming a map the engine has not just listed is refused as "unavailable or corrupted". The joiner sends `JoinGameByGameName` with the password after the engine asks for one.
+
+  The caveat: one game per account, and Battle.net sometimes bounces a session ("Login Queue"), which drops the host's lobby. Re-sending `host` and `join` picks it up again.
+
 ## Backlog
 - [x] Audit follow-ups from the Buildtools comparison: Wyvern radius 128 vs 500 (TODOs in code), Iron Golem spike angles, `-killall` uses RemoveUnit instead of KillUnit.
 - [x] `war3map.imp` regeneration defect in the build (imports listed twice / stale entries). The build now generates it from the archive contents.
