@@ -29,7 +29,10 @@ const INFO_ICON = 0.05;
 const PICK_BUTTON_WIDTH = 0.1;
 const PICK_BUTTON_HEIGHT = 0.03;
 // A sent pick that never comes back (it always should) frees the button after this long
+// How long the Pick button stays disabled waiting for the sent pick to come back, and how
+// often that wait is checked
 const PICK_TIMEOUT = 3;
+const PICK_SETTLE_TICK = 0.25;
 const CLOSE_BUTTON = 0.022;
 
 const PANEL_WIDTH = PADDING + CATEGORY_WIDTH + PADDING + LIST_WIDTH + SCROLLBAR_WIDTH + PADDING + INFO_WIDTH + PADDING;
@@ -52,7 +55,11 @@ export class RaceSelectPanel {
     private readonly infoText: Frame;
     private readonly pickButton: Frame;
     private pickInFlight: boolean = false;
-    private readonly pickSettle: Timer = Timer.create();
+    // When the wait for the sent pick gives up, as a wall clock reading rather than a game
+    // timer: only the clicking player's client is waiting, and a game timer started on one
+    // client and not the others is a desync (it dropped that client the moment Pick was
+    // clicked, every time). Watched by a timer every client starts, below.
+    private pickDeadline: number = 0;
     // Local client state
     private selectedTier: RaceTier = 'Beginner';
     private currentItems: RaceItemDef[] = [];
@@ -126,7 +133,7 @@ export class RaceSelectPanel {
             if (this.highlightedItem !== undefined && !this.pickInFlight) {
                 this.pickInFlight = true;
                 this.pickButton.setEnabled(false);
-                this.pickSettle.start(PICK_TIMEOUT, false, () => this.settlePick());
+                this.pickDeadline = os.clock() + PICK_TIMEOUT;
                 game.playerSync.send('race-pick', this.highlightedItem);
             }
         });
@@ -146,6 +153,14 @@ export class RaceSelectPanel {
 
         // Opening/closing is local UI; only the pick changes game state and is synced
         game.playerSync.on('race-pick', (player, itemId) => this.pick(player, itemId));
+
+        // Started on every client, so no client is running a timer the others are not. Only
+        // the player who clicked Pick has a wait to give up on, so it does nothing elsewhere.
+        Timer.create().start(PICK_SETTLE_TICK, true, () => {
+            if (this.pickInFlight && os.clock() >= this.pickDeadline) {
+                this.settlePick();
+            }
+        });
 
         this.showTier(this.selectedTier);
     }
@@ -210,7 +225,7 @@ export class RaceSelectPanel {
     /** Local: the sent pick has been applied (or given up on); the button takes clicks again. */
     private settlePick(): void {
         this.pickInFlight = false;
-        this.pickSettle.pause();
+        this.pickDeadline = 0;
         this.refreshPickButton();
     }
 
