@@ -154,6 +154,10 @@
     not the 12 s it lasts. Creeps walking through rarely meet two, but a boss would take one
     monsoon and no more. Options: set A03P's duration fields and see, or strike from a trigger
     instead of the ability.
+  - [ ] Corrupted Night Elves' Roots (n02H): its aura A08E (from AUau, targets enemies + ground,
+    area 128, buff B01T) never put its buff on a creep standing 96 away, in two runs
+    (2026-09-26/27). Not looked into yet: whether the aura fails for any enemy (AUau with enemy
+    targets, its data values) or only for the test's target.
   - [x] Berserker (o00E, A03K) and Flesh Golem (o00G, A03R): their berserk (from Absk) kept Absk's
     requirement (the Berserker Upgrade research), so it never cast. Fixed: areq cleared on both
     in war3map.w3a.
@@ -178,12 +182,23 @@
     handler today).
   - Open: creep ability level is `currentWave + 1` (CreepAbility.ts:54 and others), while
     Creep.MorningPerson uses `currentWave` - one of the two is off by one.
-- [ ] VenomTower (h045) does nothing but order itself to 'stop' after each attack; its tooltip
-  promises "25 dps + 30% slow for 3 s". Is the stop intended (a retarget?) or a leftover?
+- [x] VenomTower (h045) ordered itself to 'stop' after each attack (an old try at attacking at
+  random). Now it attacks a random enemy in range, a new one each attack
+  (Specs/RandomTargeting.ts); the race test gives it 8 targets and checks the spread. Human race
+  test passes: 77 attacks over all 8 targets, at most 16 on one. (2026-09-27)
+  - [ ] It rolls every second attack, not every attack: the order onto the rolled creep does not
+    cancel the swing already started, so the old target takes that one and the rolled one takes
+    two in a row. Rolling on every swing would fix it for Venom, but a tower whose swing the order
+    does cancel would then never finish an attack - test on a second tower first.
+  - [ ] Not tried: a creep that walks out of range while the tower is ordered onto it.
+- [ ] IceTrollPriest leaks: every tick makes a boolexpr with Condition(...) that is never
+  destroyed, and `targets` is never emptied, so it grows with every creep ever seen (dead ones
+  included) and the Frost Nova can pick a dead or removed unit.
 - [ ] -repick doesn't clear player.races, hasNormalPicked or repickCounter: re-picking the same
   race is refused ("You already have ...") and hybrid is blocked after a repick.
-- [ ] Loot Boxer (I02D) shows in the Advanced tab (its tooltip says Advanced); comments in
-  RaceSelectPanel say it only appears in the Dev tab.
+- [x] Loot Boxer (I02D) showed in the Advanced tab (its tooltip says Advanced) and could be picked
+  there. Now random-only (Race.randomOnly): rolled by the random picks, shown only in the Dev tab.
+  (2026-09-27)
 
 ## Backlog
 - [x] Audit follow-ups from the Buildtools comparison: Wyvern radius 128 vs 500 (TODOs in code), Iron Golem spike angles, `-killall` uses RemoveUnit instead of KillUnit.
