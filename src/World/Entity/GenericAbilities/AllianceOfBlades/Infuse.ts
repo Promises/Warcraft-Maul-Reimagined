@@ -8,6 +8,7 @@ import { Defender } from '../../Players/Defender';
 import { Tower } from '../../Tower/Specs/Tower';
 import { AOB_ITEM_LOOT_LEVEL_THREE, AOB_ITEM_LOOT_LEVEL_TWO } from '../../../GlobalSettings';
 import {MapPlayer,Item, Unit} from "w3ts";
+import {Util} from '../../../../lib/translators';
 
 
 export class Infuse extends GenericAbility implements AbilityOnEffectTargetsUnit {
@@ -31,7 +32,7 @@ export class Infuse extends GenericAbility implements AbilityOnEffectTargetsUnit
                     itemInSlot.destroy();
                     const mana: number = tower.unit.mana;
                     tower.unit.mana = 0;
-                    if (10 * mana > Math.floor(Math.random() * 100)) {
+                    if (10 * mana > Util.RandomInt(0, 99)) {
                         tower.unit.addItemById(AOB_ITEM_LOOT_LEVEL_THREE[indx]);
                     }
                 }

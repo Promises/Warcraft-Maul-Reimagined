@@ -104,7 +104,7 @@ export class CreepAbilityHandler {
 
     private ShuffleArray(arr: any[]): void {
         for (let i: number = arr.length - 1; i > 0; i--) {
-            const j: number = Math.floor(Math.random() * (i + 1)); // random index from 0 to i
+            const j: number = GetRandomInt(0, i); // random index from 0 to i
             // [arr[i], arr[j]] = [arr[j], arr[i]]; // swap elements
 
             const temp: any = arr[i];

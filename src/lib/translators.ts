@@ -105,13 +105,21 @@ export class Util {
         return `|cFF${colour.substr(1)}${str}|r`;
     }
 
+    /**
+     * The game's generator, never Lua's. Every client runs the same simulation and must roll
+     * the same numbers, and only the game's generator is part of that simulation: Lua's is
+     * nothing the game promises to keep in step (in traces so far it has been, which is no
+     * guarantee), so game state must never depend on it. Anything that changes game state - a proc, a loot
+     * roll, a random race - belongs here. A local-only branch must not call it at all: that
+     * would consume a number on one client and pull the shared generator apart.
+     */
     public static RandomInt(min: number, max: number): number {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
+        return GetRandomInt(min, max);
     }
 
     public static ShuffleArray(arr: any[]): void {
         for (let i: number = arr.length - 1; i > 0; i--) {
-            const j: number = Math.floor(Math.random() * (i + 1)); // random index from 0 to i
+            const j: number = GetRandomInt(0, i); // random index from 0 to i
             // [arr[i], arr[j]] = [arr[j], arr[i]]; // swap elements
 
             const temp: any = arr[i];
@@ -126,14 +134,14 @@ export class Util {
         const characters: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         const charactersLength: number = characters.length;
         for (let i: number = 0; i < length; i++) {
-            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+            result += characters.charAt(GetRandomInt(0, charactersLength - 1));
         }
         return result;
     }
 
 
     public static GetRandomKey(collection: Map<any, any>): any {
-        const index: number = Math.floor(Math.random() * collection.size);
+        const index: number = GetRandomInt(0, collection.size - 1);
         let cntr: number = 0;
         for (const key of collection.keys()) {
             if (cntr++ === index) {

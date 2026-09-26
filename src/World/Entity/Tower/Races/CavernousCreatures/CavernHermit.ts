@@ -2,6 +2,7 @@ import { Tower } from '../../Specs/Tower';
 import { AttackActionTower } from '../../Specs/AttackActionTower';
 import { GenericAutoAttackTower } from '../../Specs/GenericAutoAttackTower';
 import { Unit } from "w3ts";
+import {Util} from '../../../../../lib/translators';
 
 export class CavernHermit extends Tower implements AttackActionTower, GenericAutoAttackTower {
     public AttackAction(): void {
@@ -13,7 +14,7 @@ export class CavernHermit extends Tower implements AttackActionTower, GenericAut
         const targetUnit = Unit.fromHandle(this.game.gameDamageEngineGlobals.udg_DamageEventTarget);
 
         if (sourceUnit === this.unit && targetUnit) {
-            if (Math.floor(Math.random() * 3) + 1 !== 1) {
+            if (Util.RandomInt(1, 3) !== 1) {
                 return;
             }
 
