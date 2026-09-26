@@ -1,6 +1,7 @@
 import { Race } from './Race';
 import { Defender } from '../../Entity/Players/Defender';
 import {Unit} from "w3ts";
+import {SyncTrace} from '../../../lib/SyncTrace';
 
 export class RaceLootBoxer extends Race {
     public get randomOnly(): boolean {
@@ -15,7 +16,7 @@ export class RaceLootBoxer extends Race {
         }
 
         player.lootBoxer = Unit.create(player, FourCC(this.id), player.getCenterX(), player.getCenterY(), bj_UNIT_FACING);
+        SyncTrace.note('race', `p${player.id} got builder ${this.id} id=${SyncTrace.unit(player.lootBoxer)}`);
         player.builders.push(player.lootBoxer!);
-
     }
 }

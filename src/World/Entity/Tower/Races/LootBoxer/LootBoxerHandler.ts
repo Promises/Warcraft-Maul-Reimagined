@@ -1,4 +1,5 @@
 import {Log} from '../../../../../lib/Serilog/Serilog';
+import {SyncTrace} from '../../../../../lib/SyncTrace';
 import {Defender} from '../../../Players/Defender';
 import {TowerConstruction} from '../../TowerConstruction';
 import {WarcraftMaul} from '../../../../WarcraftMaul';
@@ -94,85 +95,85 @@ export class LootBoxerHandler {
     }
 
 
+    /**
+     * Gives the Loot Boxer the loot of a box of that tier (0-based): rolls 1-100 and picks by the
+     * tier's odds. Every roll goes to the log file (and the test trace), so the odds can be
+     * checked from a real game.
+     */
     private AddItemToLootBoxer(tier: number, lootBoxer: Unit): void {
-        const randomInt: number = Util.RandomInt(1, 100);
+        const roll: number = Util.RandomInt(1, 100);
+        const [itemId, charges] = this.Loot(tier, roll);
+        const item = lootBoxer.addItemById(FourCC(itemId));
+        // On the item just given: GetLastCreatedItem() is not set by UnitAddItemById
+        if (item && charges > 0) {
+            item.charges = charges;
+        }
+        const text = `p${lootBoxer.owner.id} tier=${tier + 1} roll=${roll} item=${itemId} charges=${charges}`;
+        Log.Info(`Loot Boxer: ${text}`);
+        SyncTrace.note('lootbox', text);
+    }
 
+    /** The item a box of that tier (0-based) gives for a roll of 1-100, and its charges (0: as made). */
+    private Loot(tier: number, roll: number): [string, number] {
         if (tier < 3) {
-            if (randomInt <= 100 - (5 * (tier + 1))) {
-                lootBoxer.addItemById(FourCC('I02F'));
-            } else if (randomInt <= 100 - 2 * (tier + 1)) {
-                lootBoxer.addItemById(FourCC('I029'));
-            } else {
-                lootBoxer.addItemById(FourCC('I02B'));
+            if (roll <= 100 - (5 * (tier + 1))) {
+                return ['I02F', 0];
+            } else if (roll <= 100 - 2 * (tier + 1)) {
+                return ['I029', 0];
             }
-        } else {
-            switch (tier + 1) {
-                case 4:
-                case 5:
-                    if (randomInt <= 100 - 20 + 10 * (tier - 4 + 1)) {
-                        lootBoxer.addItemById(FourCC('I02F'));
-                        SetItemCharges(GetLastCreatedItem()!, GetRandomInt(1, tier));
-                    } else if (randomInt <= 100 - 10 + 5 * (tier - 4 + 1)) {
-                        lootBoxer.addItemById(FourCC('I029'));
-                    } else if (randomInt <= 100 - 2 * (tier - 3 + 1)) {
-                        lootBoxer.addItemById(FourCC('I02B'));
-                    } else {
-                        lootBoxer.addItemById(FourCC('I028'));
-                    }
-                    break;
-                case 6:
-                    if (randomInt <= 100 - 20 + 10 * (tier - 4 + 1)) {
-                        lootBoxer.addItemById(FourCC('I02F'));
-                        SetItemCharges(GetLastCreatedItem()!, GetRandomInt(1, tier));
-                    } else if (randomInt <= 100 - 10 + 5 * (tier - 4 + 1)) {
-                        lootBoxer.addItemById(FourCC('I02B'));
-                    } else if (randomInt <= 100 - 2 * (tier - 3 + 1)) {
-                        lootBoxer.addItemById(FourCC('I028'));
-                    } else {
-                        lootBoxer.addItemById(FourCC('I02A'));
-                    }
-                    break;
-                case 7:
-                    this.GetRandomItem(tier, randomInt, lootBoxer, 'I028', 70, 'I02B', 85, 'I02A', 95, 'I02C');
-                    break;
-                case 8:
-                    this.GetRandomItem(tier, randomInt, lootBoxer, 'I028', 65, 'I02A', 80, 'I02B', 92, 'I02C');
-                    break;
-                case 9:
-                    this.GetRandomItem(tier, randomInt, lootBoxer, 'I028', 60, 'I02A', 80, 'I02B', 90, 'I02C');
-                    break;
-
-                default:
-                    Log.Fatal('failed to get loot boxer item tier');
-                    this.AddItemToLootBoxer(1, lootBoxer);
-                    break;
-            }
+            return ['I02B', 0];
+        }
+        switch (tier + 1) {
+            case 4:
+            case 5:
+                if (roll <= 100 - 20 + 10 * (tier - 4 + 1)) {
+                    return ['I02F', GetRandomInt(1, tier)];
+                } else if (roll <= 100 - 10 + 5 * (tier - 4 + 1)) {
+                    return ['I029', 0];
+                } else if (roll <= 100 - 2 * (tier - 3 + 1)) {
+                    return ['I02B', 0];
+                }
+                return ['I028', 0];
+            case 6:
+                if (roll <= 100 - 20 + 10 * (tier - 4 + 1)) {
+                    return ['I02F', GetRandomInt(1, tier)];
+                } else if (roll <= 100 - 10 + 5 * (tier - 4 + 1)) {
+                    return ['I02B', 0];
+                } else if (roll <= 100 - 2 * (tier - 3 + 1)) {
+                    return ['I028', 0];
+                }
+                return ['I02A', 0];
+            case 7:
+                return this.HighTierLoot(tier, roll, 'I028', 70, 'I02B', 85, 'I02A', 95, 'I02C');
+            case 8:
+                return this.HighTierLoot(tier, roll, 'I028', 65, 'I02A', 80, 'I02B', 92, 'I02C');
+            case 9:
+                return this.HighTierLoot(tier, roll, 'I028', 60, 'I02A', 80, 'I02B', 90, 'I02C');
+            default:
+                Log.Fatal('failed to get loot boxer item tier');
+                return this.Loot(1, roll);
         }
     }
 
-    private GetRandomItem(tier: number,
-                          randomInt: number,
-                          lootBoxer: Unit,
-                          itemOne: string,
-                          chanceOne: number,
-                          itemTwo: string,
-                          chanceTwo: number,
-                          itemThree: string,
-                          chanceThree: number,
-                          defaultItem: string): void {
-        if (randomInt <= 100 - 20 + 10 * (tier - 4 + 1)) {
-            lootBoxer.addItemById(FourCC('I02F'));
-            SetItemCharges(GetLastCreatedItem()!, GetRandomInt(1 + (tier - 5), tier));
-        } else if (randomInt <= chanceOne) {
-            lootBoxer.addItemById(FourCC(itemOne));
-        } else if (randomInt <= chanceTwo) {
-            lootBoxer.addItemById(FourCC(itemTwo));
-        } else if (randomInt <= chanceThree) {
-            lootBoxer.addItemById(FourCC(itemThree));
-        } else {
-            lootBoxer.addItemById(FourCC(defaultItem));
+    private HighTierLoot(tier: number,
+                         roll: number,
+                         itemOne: string,
+                         chanceOne: number,
+                         itemTwo: string,
+                         chanceTwo: number,
+                         itemThree: string,
+                         chanceThree: number,
+                         defaultItem: string): [string, number] {
+        if (roll <= 100 - 20 + 10 * (tier - 4 + 1)) {
+            return ['I02F', GetRandomInt(1 + (tier - 5), tier)];
+        } else if (roll <= chanceOne) {
+            return [itemOne, 0];
+        } else if (roll <= chanceTwo) {
+            return [itemTwo, 0];
+        } else if (roll <= chanceThree) {
+            return [itemThree, 0];
         }
-
+        return [defaultItem, 0];
     }
 
     private IsUpgradeAbility(): boolean {
@@ -195,16 +196,17 @@ export class LootBoxerHandler {
             instance.Sell();
         }
 
+        // The box's tier, while the unit is still the box: the tower it turns into is no box
+        const tier = this.constuction.lootBoxerTowers.indexOf(tower.typeId);
         tower = ReplaceUnit(
             tower,
-            this.GetId(this.constuction.lootBoxerTowers.indexOf(tower.typeId)),
+            this.GetId(tier),
             bj_UNIT_STATE_METHOD_DEFAULTS)!;
 
         const lootBoxer = owner.getLootBoxer();
 
         if (lootBoxer) {
-            this.AddItemToLootBoxer(this.constuction.lootBoxerTowers.indexOf(tower.typeId), lootBoxer);
-
+            this.AddItemToLootBoxer(tier, lootBoxer);
         }
 
         this.constuction.SetupTower(tower, owner);
