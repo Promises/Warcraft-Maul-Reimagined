@@ -218,9 +218,10 @@ export class RaceSelectPanel {
             || itemId === RANDOM_PICK_ITEMS.hybrid;
         // Debug builds may pick disabled / random-only races from the Dev tab; a secondary race
         // is disabled for the normal tabs and random picks, and pickable from its own tab
-        if (!item || (!isRandomPick && !race?.enabled && !race?.secondary && !this.game.debugMode)) {
+        const pickable = race !== undefined && (race.secondary || (race.enabled && !race.randomOnly));
+        if (!item || (!isRandomPick && !pickable && !this.game.debugMode)) {
             SyncTrace.note('race', `p${player.id} refused ${itemId}: item=${item !== undefined}`
-                + ` enabled=${race?.enabled} debug=${this.game.debugMode}`);
+                + ` enabled=${race?.enabled} randomOnly=${race?.randomOnly} debug=${this.game.debugMode}`);
             return;
         }
         if (race?.secondary && !player.hasPrimaryRace()) {
@@ -278,7 +279,7 @@ export class RaceSelectPanel {
             const normalTiers: RaceTier[] = ['Beginner', 'Intermediate', 'Advanced'];
             this.currentItems = this.game.worldMap.races
                 .filter(race => RaceItems[race.itemid] !== undefined && !race.secondary
-                    && !(race.enabled && normalTiers.indexOf(RaceItems[race.itemid].tier) !== -1))
+                    && !(race.enabled && !race.randomOnly && normalTiers.indexOf(RaceItems[race.itemid].tier) !== -1))
                 .map(race => RaceItems[race.itemid]);
         } else if (tier === 'Secondary') {
             this.currentItems = this.game.worldMap.races
@@ -286,7 +287,7 @@ export class RaceSelectPanel {
                 .map(race => RaceItems[race.itemid]);
         } else {
             this.currentItems = this.game.worldMap.races
-                .filter(race => race.enabled && RaceItems[race.itemid]?.tier === tier)
+                .filter(race => race.enabled && !race.randomOnly && RaceItems[race.itemid]?.tier === tier)
                 .map(race => RaceItems[race.itemid]);
             if (tier === 'Random') {
                 this.currentItems.push(RaceItems[RANDOM_PICK_ITEMS.normal], RaceItems[RANDOM_PICK_ITEMS.hardcore],

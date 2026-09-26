@@ -3,6 +3,10 @@ import { Defender } from '../../Entity/Players/Defender';
 import {Unit} from "w3ts";
 
 export class RaceLootBoxer extends Race {
+    public get randomOnly(): boolean {
+        return true;
+    }
+
     public pickAction(player: Defender): void {
         if (player.lootBoxer) {
             player.sendMessage('I\'m sorry Dave, I\'m afraid I can\'t do that');

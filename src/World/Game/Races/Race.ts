@@ -32,6 +32,11 @@ export class Race {
         return RaceItems[this.itemid]?.tier === 'Secondary';
     }
 
+    /** Only ever given by a random pick: not in the picker's normal tabs, and not picked there. */
+    public get randomOnly(): boolean {
+        return false;
+    }
+
     public pickAction(player: Defender): void {
         const builder = Unit.create(player, FourCC(this.id), player.getCenterX(), player.getCenterY(), bj_UNIT_FACING)!;
         SyncTrace.note('race', `p${player.id} got builder ${this.id} id=${SyncTrace.unit(builder)}`);
