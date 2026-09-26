@@ -196,6 +196,22 @@
   included) and the Frost Nova can pick a dead or removed unit.
 - [ ] -repick doesn't clear player.races, hasNormalPicked or repickCounter: re-picking the same
   race is refused ("You already have ...") and hybrid is blocked after a repick.
+- [ ] Loot Boxer loot, found while writing its test (fixed, test not run yet):
+  - [x] Boxes of tier 4-9 gave tier-1 loot, in practice always I02F: UpgradeToTower read the
+    tier from the unit after replacing the box with its tower (indexOf gave -1, and tier -1
+    gives I02F for every roll). The tier is now read from the box.
+  - [x] I02F's charges went to GetLastCreatedItem(), which UnitAddItemById does not set: the
+    charges were never on the item given. Now set on it.
+  - [x] Each roll is logged (Log.Info, in the log file after -log): player, tier, roll 1-100,
+    item and charges; a tester asked to see that it really rolls up to 100.
+  - [x] Race test test_loot_boxer (wc3-slop-lan races.py): 24 boxes, tiers 1-9, checks tier,
+    roll range, item table, charges and the tower left in each box's place. Passes; rolls ran
+    4-97 over 24 boxes (1-100 in an earlier run). Tier 4-9 boxes open only with mana (1-6, regen
+    0.01/s, or the Stick/Coin/MaulKoinz items); the test sets it.
+  - [ ] Tiers 6-9 always give Rocks (I02F): the Rocks threshold `100 - 20 + 10 * (tier - 4 + 1)`
+    (tier 0-based) is 100, 110, 120, 130 for them, so no roll of 1-100 gets past it, and their
+    Stick/Coin/Lootbag/MaulKoinz branches are unreachable. Tier 4 gives Rocks at 80 or below, tier 5
+    at 90 or below. Decide the odds, then give the test the exact table to check.
 - [x] Loot Boxer (I02D) showed in the Advanced tab (its tooltip says Advanced) and could be picked
   there. Now random-only (Race.randomOnly): rolled by the random picks, shown only in the Dev tab.
   (2026-09-27)
