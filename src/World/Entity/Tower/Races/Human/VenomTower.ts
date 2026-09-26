@@ -1,12 +1,12 @@
 import { Tower } from '../../Specs/Tower';
-import { AttackActionTower } from '../../Specs/AttackActionTower';
+import { GenericAutoAttackTower } from '../../Specs/GenericAutoAttackTower';
+import { RandomTargeting } from '../../Specs/RandomTargeting';
 
-export class VenomTower extends Tower implements AttackActionTower {
-    public AttackAction(): void {
-        const u: unit | undefined = this.game.gameDamageEngineGlobals.udg_DamageEventSource;
+/** Attacks a random enemy in range, a new one each attack. */
+export class VenomTower extends Tower implements GenericAutoAttackTower {
+    private readonly targeting: RandomTargeting = new RandomTargeting(this.unit);
 
-        if (u === this.unit.handle) {
-            this.unit.issueImmediateOrder('stop');
-        }
+    public GenericAttack(): void {
+        this.targeting.attackStarted(GetTriggerUnit()!);
     }
 }
