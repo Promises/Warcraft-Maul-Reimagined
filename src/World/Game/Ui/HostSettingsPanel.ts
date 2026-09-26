@@ -88,7 +88,7 @@ export class HostSettingsPanel {
     constructor(game: WarcraftMaul,
                 onConfirm: (this: void, mode: number, difficulty: number) => void,
                 onVote: (this: void) => void) {
-        const rows = Math.max(settings.GAME_MODE_STRINGS.length, settings.DIFFICULTIES.length);
+        const rows = Math.max(settings.PLAYER_GAME_MODES.length, settings.DIFFICULTIES.length);
         const width = PADDING + COLUMN_WIDTH + COLUMN_GAP + COLUMN_WIDTH + PADDING;
         const height = PADDING + TITLE_HEIGHT + PADDING + HEADER_HEIGHT + rows * ROW_SPACING + PADDING + BUTTON_HEIGHT + PADDING;
 
@@ -101,7 +101,8 @@ export class HostSettingsPanel {
 
         const columnsTop = -PADDING - TITLE_HEIGHT - PADDING;
         this.modes = new OptionColumn('hostSettingsMode', this.panel, PADDING, columnsTop, 'Game mode',
-            settings.GAME_MODE_STRINGS.map((mode, i) => Util.ColourString(settings.GAME_MODE_COLOURS[i], mode)));
+            settings.PLAYER_GAME_MODES.map(mode =>
+                Util.ColourString(settings.GAME_MODE_COLOURS[mode], settings.GAME_MODE_STRINGS[mode])));
         this.difficulties = new OptionColumn('hostSettingsDifficulty', this.panel,
             PADDING + COLUMN_WIDTH + COLUMN_GAP, columnsTop, 'Difficulty',
             settings.DIFFICULTIES.map((difficulty, i) =>
@@ -113,7 +114,7 @@ export class HostSettingsPanel {
         onLocalClick(vote, () => onVote());
         const confirm = createTextButton(this.panel, 'Confirm', BUTTON_WIDTH, BUTTON_HEIGHT);
         confirm.setPoint(FRAMEPOINT_BOTTOMRIGHT, this.panel, FRAMEPOINT_BOTTOMRIGHT, -PADDING, PADDING);
-        onLocalClick(confirm, () => onConfirm(this.modes.selection, this.difficulties.selection));
+        onLocalClick(confirm, () => onConfirm(settings.PLAYER_GAME_MODES[this.modes.selection], this.difficulties.selection));
     }
 
     /** Local UI: the panel appears on the given player's client only. */

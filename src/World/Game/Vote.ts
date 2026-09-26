@@ -4,6 +4,7 @@ import {MultiBoard} from './MultiBoard';
 import {Log} from '../../lib/Serilog/Serilog';
 import {ClassicGameRound} from './ClassicMaul/ClassicGameRound';
 import {BlitzGameRound} from './BlitzMaul/BlitzGameRound';
+import {DebugGameRound} from './DebugMaul/DebugGameRound';
 import {MapPlayer, Timer} from "w3ts";
 import {SendMessage, Util} from "../../lib/translators";
 import {VotePanel} from './Ui/VotePanel';
@@ -82,21 +83,34 @@ export class Vote {
         });
     }
 
+    /** The host's choice from their panel, as "mode:difficulty index". */
     private applyHostSettings(player: Defender, data: string): void {
-        if (!this.awaitingHost || player.id !== this.awaitingHost.id) {
-            return;
-        }
         const [mode, difficultyIndex] = data.split(':').map(value => Number(value));
-        if (!(mode >= 0 && mode < settings.GAME_MODE_STRINGS.length)
-            || !(difficultyIndex >= 0 && difficultyIndex < settings.DIFFICULTIES.length)) {
-            return;
+        if (difficultyIndex >= 0 && difficultyIndex < settings.DIFFICULTIES.length) {
+            this.applyHostChoice(player, mode, settings.DIFFICULTIES[difficultyIndex]);
+        }
+    }
+
+    /**
+     * The host's choice of mode and difficulty (a whole percentage from the lowest difficulty to
+     * the highest - 250 is fine, as a vote can end up there too); ignored from anyone but the
+     * host the game waits for. Returns whether it was taken.
+     */
+    public applyHostChoice(player: Defender, mode: number, difficulty: number): boolean {
+        if (!this.awaitingHost || player.id !== this.awaitingHost.id) {
+            return false;
+        }
+        if (!(mode >= 0 && mode < settings.GAME_MODE_STRINGS.length) || difficulty !== Math.floor(difficulty)
+            || !(difficulty >= settings.DIFFICULTIES[0] && difficulty <= settings.DIFFICULTIES[settings.DIFFICULTIES.length - 1])) {
+            return false;
         }
         this.awaitingHost = undefined;
         this.hostPanel.hide(player);
         SendMessage(`${player.getNameWithColour()} set the game mode to ${this.modeName(mode)}`);
         this.applyMode(mode);
-        this.applyDifficulty(settings.DIFFICULTIES[difficultyIndex]);
+        this.applyDifficulty(difficulty);
         this.openRaceSelection();
+        return true;
     }
 
     private hostChoseVote(player: Defender): void {
@@ -110,10 +124,10 @@ export class Vote {
     }
 
     private startModeVote(): void {
-        for (let i = 0; i < settings.GAME_MODE_STRINGS.length; i++) {
+        for (let i = 0; i < settings.PLAYER_GAME_MODES.length; i++) {
             this.votedMode[i] = 0;
         }
-        const labels = settings.GAME_MODE_STRINGS.map((_, i) => this.modeName(i));
+        const labels = settings.PLAYER_GAME_MODES.map(mode => this.modeName(mode));
         this.panel.show('Game mode vote', labels, index => this.game.playerSync.send('vote-mode', `${index}`));
         Timer.create().start(VOTE_LENGTH, false, () => this.resolveModeVote());
     }
@@ -125,7 +139,7 @@ export class Vote {
         this.hasVotedMode[player.id] = true;
         this.votedMode[index]++;
         this.panel.hide(this.game.players.get(player.id)!);
-        SendMessage(`${this.playerName(player)} voted for: ${this.modeName(index)}`);
+        SendMessage(`${this.playerName(player)} voted for: ${this.modeName(settings.PLAYER_GAME_MODES[index])}`);
     }
 
     private resolveModeVote(): void {
@@ -135,8 +149,9 @@ export class Vote {
                 winningMode = i;
             }
         }
-        SendMessage(`${this.modeName(winningMode)} won with ${this.votedMode[winningMode]} votes.`);
-        this.applyMode(winningMode);
+        const mode = settings.PLAYER_GAME_MODES[winningMode];
+        SendMessage(`${this.modeName(mode)} won with ${this.votedMode[winningMode]} votes.`);
+        this.applyMode(mode);
 
         // Difficulty is voted on while the race selection is already open
         this.startDiffVote();
@@ -154,6 +169,9 @@ export class Vote {
                 break;
             case settings.GAME_MODES.BLITZ:
                 this.game.worldMap.gameRoundHandler = new BlitzGameRound(this.game);
+                break;
+            case settings.GAME_MODES.DEBUG:
+                this.game.worldMap.gameRoundHandler = new DebugGameRound(this.game);
                 break;
             default:
                 Log.Fatal('Invalid game mode, defaulting to classic.');

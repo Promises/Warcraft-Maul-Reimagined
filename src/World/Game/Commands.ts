@@ -1,5 +1,5 @@
 import {WarcraftMaul} from '../WarcraftMaul';
-import {COLOUR_CODES, NO_LIVES_LOST} from '../GlobalSettings';
+import {COLOUR_CODES, DIFFICULTIES, GAME_MODES, NO_LIVES_LOST} from '../GlobalSettings';
 import {Defender} from '../Entity/Players/Defender';
 import {Log} from '../../lib/Serilog/Serilog';
 import {CheckPoint} from '../Entity/CheckPoint';
@@ -15,12 +15,13 @@ import {Maze, Walkable} from '../Antiblock/Maze';
 import {COLOUR, DecodeFourCC, SendMessage, Util} from "../../lib/translators";
 import {Effect, Frame, MapPlayer, Timer, Trigger, Unit} from "w3ts";
 import {Image} from "../../JassOverrides/Image";
+import {DebugGameRound} from './DebugMaul/DebugGameRound';
 
 /**
- * Gets a random number between a range.
+ * One of the array, rolled on the game's generator so every client picks the same one.
  */
 function RandomChoice<T>(a: Array<T>): T {
-    return a[Math.floor(Math.random() * a.length)];
+    return a[Util.RandomInt(0, a.length - 1)];
 }
 
 // A lane's two waypoints are each marked by one tile of Cityscape white marble on the lane's
@@ -446,15 +447,78 @@ export class Commands {
         if (!player) {
             return;
         }
-        if (GetEventPlayerChatString()!.substr(0, 1) !== '-') {
-            // Log.Debug(GetEventPlayerChatString());
-            Log.Event(0, `{"message":"${GetEventPlayerChatString()}", "sender": "${player.GetLogStr()}"}`);
+        this.runCommand(player, GetEventPlayerChatString() ?? '');
+    }
+
+    /**
+     * -start: in Debug mode (no wave progression) starts the current wave, in any build; debug
+     * builds also take it in the other modes (handleDebugCommand).
+     */
+    private startWave(player: Defender): void {
+        const round = this.game.worldMap.gameRoundHandler;
+        if (!(round instanceof DebugGameRound)) {
+            return;
+        }
+        if (!round.StartWave()) {
+            player.sendMessage('|cFF999999A wave is already on its way|r');
+        }
+    }
+
+    /**
+     * -s / -settings (or .s / .settings) [mode] [difficulty]: the host's game settings in one line,
+     * for host bots and automated tests - the same choice as the host's panel, so only the
+     * detected host, while the game waits for it. Mode: n/normal (classic, the default),
+     * b/blitz, d/debug (no wave progression); difficulty: any whole percentage from 100 to 400
+     * (100 by default), in between too, as a vote can give.
+     */
+    private hostSettings(player: Defender, words: string[]): void {
+        const lowest: number = DIFFICULTIES[0];
+        const highest: number = DIFFICULTIES[DIFFICULTIES.length - 1];
+        let mode: number = GAME_MODES.CLASSIC;
+        let difficulty: number = lowest;
+        for (const word of words) {
+            const percent: number = Number(word);
+            if (word === 'n' || word === 'normal') {
+                mode = GAME_MODES.CLASSIC;
+            } else if (word === 'b' || word === 'blitz') {
+                mode = GAME_MODES.BLITZ;
+            } else if (word === 'd' || word === 'debug') {
+                mode = GAME_MODES.DEBUG;
+            } else if (word !== '' && percent === Math.floor(percent) && percent >= lowest && percent <= highest) {
+                difficulty = percent;
+            } else if (word !== '') {
+                player.sendMessage(`|cFF999999Usage: -s [n|normal / b|blitz / d|debug] [${lowest}-${highest}]|r`);
+                return;
+            }
+        }
+        if (!this.game.diffVote.applyHostChoice(player, mode, difficulty)) {
+            player.sendMessage('|cFF999999Only the host sets the game, while it waits for their choice|r');
+        }
+    }
+
+    /**
+     * Runs one chat line as the player who sent it. Split out from the chat event so the same
+     * line can arrive from somewhere else and behave identically - under the wc3-slop-lan test
+     * harness its commands arrive as sync data (see SlopHooks), so every client runs them here
+     * with the same sender.
+     */
+    public runCommand(player: Defender, chat: string): void {
+        // The settings command also answers to a dot, the prefix host bots use for their own
+        if (chat.substr(0, 1) === '.') {
+            const words: string[] = chat.substr(1).toLowerCase().split(' ');
+            if (words[0] === 's' || words[0] === 'settings') {
+                this.hostSettings(player, words.slice(1));
+                return;
+            }
+        }
+        if (chat.substr(0, 1) !== '-') {
+            Log.Event(0, `{"message":"${chat}", "sender": "${player.GetLogStr()}"}`);
 
             return;
         }
 
-        const playerCommand: string = GetEventPlayerChatString()!.substr(1).toLowerCase();
-        const playerCommand2: string = GetEventPlayerChatString()!.substr(1);
+        const playerCommand: string = chat.substr(1).toLowerCase();
+        const playerCommand2: string = chat.substr(1);
         const command: string[] = playerCommand.split(' ');
         const command2: string[] = playerCommand2.split(' ');
 
@@ -487,6 +551,10 @@ export class Commands {
 |cFF154360Heavy:|r 2 / 5 / 13 / 15 / 20 / 25 / 30 / 32 / 35
 |cFFCA8500Fortified:|r 10 / 18 / 22 / 26 / 31
 |cFF7525FFHero:|r 36`);
+        } else if (command[0] === 's' || command[0] === 'settings') {
+            this.hostSettings(player, command.slice(1));
+        } else if ((command[0] === 'start' || command[0] === 'startwave') && !this.game.debugMode) {
+            this.startWave(player);
         } else if (command[0] === 'buffs') {
             player.sendMessage(
                 '|cFFFFCC00Hardened Skin:|r Creeps ignore 2x creep level incoming physical damage\n' +

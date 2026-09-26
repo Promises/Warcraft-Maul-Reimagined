@@ -20,17 +20,24 @@ export const SELL_REFUND_RATE: number = 0.75;
 export enum GAME_MODES {
     CLASSIC,
     BLITZ,
+    DEBUG,
 }
 
 export const GAME_MODE_STRINGS: string[] = [
     'Classic Maul',
     'Blitz',
+    'Debug (no waves)',
 ];
 
 export const GAME_MODE_COLOURS: string[] = [
     '#00A651',
     '#FF0000',
+    '#C8A2C8',
 ];
+
+// The modes on the host's panel and in the players' vote; Debug (no wave progression) is only
+// set with the settings command (-s debug), by tests and host bots
+export const PLAYER_GAME_MODES: GAME_MODES[] = [GAME_MODES.CLASSIC, GAME_MODES.BLITZ];
 
 
 export const DIFFICULTIES: number[] = [

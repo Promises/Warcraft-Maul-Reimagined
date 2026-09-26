@@ -57,7 +57,7 @@ export class ClassicGameRound extends AbstractGameRound {
 
     }
 
-    private RoundEnd(): void {
+    protected RoundEnd(): void {
 
         if (this.currentWave === this.game.worldMap.waveCreeps.length) {
             this.BonusRoundsOver();
