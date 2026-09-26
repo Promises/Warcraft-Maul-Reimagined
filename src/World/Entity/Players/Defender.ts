@@ -17,6 +17,7 @@ import {VOID_FRAGMENT_CAP} from "../Tower/Races/Void/VoidFragmentCosts";
 import {RangeIndicator} from "./RangeIndicator";
 import {AntiJuggleTower} from "../AntiJuggle/AntiJuggleTower";
 import {HYBRID_BUILD_HOTKEYS} from "../../Game/Ui/HybridBuild/HybridBuildPanel";
+import {SyncTrace} from '../../../lib/SyncTrace';
 
 // The hybrid builder's build ability (AUbu); its command card button is hidden
 export const HYBRID_BUILD_ABILITY: number = FourCC('AUbu');
@@ -554,6 +555,11 @@ export class Defender extends AbstractPlayer {
         return this._races.indexOf(race) !== -1;
     }
 
+    /** Whether the player has a race other than a secondary one: what a secondary pick needs. */
+    public hasPrimaryRace(): boolean {
+        return this._races.some(race => !race.secondary);
+    }
+
 
     get lane(): number {
         return this._lane;
@@ -967,6 +973,10 @@ export class Defender extends AbstractPlayer {
 
     private SelectUnit(): void {
         const unit = Unit.fromEvent();
+        // Traced because this handler changes game state (unpausing) and creates the range ring's
+        // handle: both would desync if a selection event ever reached only the selecting client
+        SyncTrace.note('select', `p${this.id} unit=${SyncTrace.unit(unit)}`
+            + ` mine=${unit?.owner.id === this.id} rangeCheck=${this._rangeCheck}`);
         if (unit?.owner.id === this.id) {
             unit.paused = false;
         }
@@ -982,6 +992,7 @@ export class Defender extends AbstractPlayer {
     /** Flips range check mode and returns the new state. */
     public toggleRangeCheck(): boolean {
         this._rangeCheck = !this._rangeCheck;
+        SyncTrace.note('range', `p${this.id} range check ${this._rangeCheck}`);
         if (!this._rangeCheck) {
             this.rangeIndicator.hide();
         }

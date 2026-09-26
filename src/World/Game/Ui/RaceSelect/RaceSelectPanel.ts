@@ -7,6 +7,7 @@ import {RACE_TIERS, RaceItemDef, RaceItems, RaceTier, RANDOM_PICK_ITEMS} from '.
 import {IconButton} from '../IconButton';
 import {RaceListRow} from './RaceListRow';
 import {createPanel, createText, createTextButton, onLocalClick} from '../Frames';
+import {SyncTrace} from '../../../../lib/SyncTrace';
 
 // Three columns: [categories] [scrolling race list] [information]
 // Slightly right of centre so the left edge clears the vote panel (0.00-0.14) with a gap
@@ -71,9 +72,10 @@ export class RaceSelectPanel {
         this.panel = createPanel('raceSelectPanel', PANEL_WIDTH, PANEL_HEIGHT);
         this.panel.setAbsPoint(FRAMEPOINT_CENTER, PANEL_CENTER_X, PANEL_CENTER_Y);
 
-        // Categories: the normal tiers, plus a Dev tab in debug builds for the races you cannot
-        // normally select (disabled races and the random-only Loot Boxer)
-        const tiers: RaceTier[] = game.debugMode ? [...RACE_TIERS, 'Dev'] : RACE_TIERS;
+        // Categories: the normal tiers, the Secondary tab (shown to a player once they have a race),
+        // and a Dev tab in debug builds for the races you cannot normally select (disabled races
+        // and the random-only Loot Boxer)
+        const tiers: RaceTier[] = [...RACE_TIERS, 'Secondary', ...(game.debugMode ? ['Dev' as RaceTier] : [])];
         tiers.forEach((tier, index) => {
             const button = createTextButton(this.panel, tier, CATEGORY_WIDTH, CATEGORY_HEIGHT);
             button.setPoint(FRAMEPOINT_TOPLEFT, this.panel, FRAMEPOINT_TOPLEFT, PADDING, -PADDING - index * CATEGORY_SPACING);
@@ -81,6 +83,7 @@ export class RaceSelectPanel {
             trackUiPress(game, button);
             this.categoryButtons.set(tier, button);
         });
+        this.categoryButtons.get('Secondary')?.setVisible(false);
 
         // Scrolling race list, offsets from the panel's top-left
         const listLeft = PADDING + CATEGORY_WIDTH + PADDING;
@@ -180,8 +183,21 @@ export class RaceSelectPanel {
         }
     }
 
-    /** Opens for a player (local visibility); used at game start and after repick. */
+    /**
+     * Opens for a player (local visibility); used at game start and after repick. A player who
+     * has a race sees the Secondary tab, and the panel opens on it.
+     */
     public open(player: Defender): void {
+        if (player.isLocal()) {
+            const secondary = player.hasPrimaryRace();
+            this.categoryButtons.get('Secondary')?.setVisible(secondary);
+            // Opens on the Secondary tab while there is a secondary race still to pick
+            if (secondary && !player.races.some(race => race.secondary)) {
+                this.showTier('Secondary');
+            } else if (this.selectedTier === 'Secondary') {
+                this.showTier('Beginner');
+            }
+        }
         this.setVisible(player, true);
     }
 
@@ -191,6 +207,8 @@ export class RaceSelectPanel {
 
     /** Applies a pick sent from the panel; runs on every client. */
     private pick(player: Defender, itemId: string): void {
+        SyncTrace.note('race', `p${player.id} asked for ${itemId}`
+            + ` gold=${player.getGold()} lumber=${player.getLumber()} races=${player.races.length}`);
         if (player.isLocal()) {
             this.settlePick();
         }
@@ -198,18 +216,28 @@ export class RaceSelectPanel {
         const race: Race | undefined = this.game.worldMap.races.find(candidate => candidate.itemid === itemId);
         const isRandomPick = itemId === RANDOM_PICK_ITEMS.normal || itemId === RANDOM_PICK_ITEMS.hardcore
             || itemId === RANDOM_PICK_ITEMS.hybrid;
-        // Debug builds may pick disabled / random-only races from the Dev tab
-        if (!item || (!isRandomPick && !race?.enabled && !this.game.debugMode)) {
+        // Debug builds may pick disabled / random-only races from the Dev tab; a secondary race
+        // is disabled for the normal tabs and random picks, and pickable from its own tab
+        if (!item || (!isRandomPick && !race?.enabled && !race?.secondary && !this.game.debugMode)) {
+            SyncTrace.note('race', `p${player.id} refused ${itemId}: item=${item !== undefined}`
+                + ` enabled=${race?.enabled} debug=${this.game.debugMode}`);
+            return;
+        }
+        if (race?.secondary && !player.hasPrimaryRace()) {
+            SyncTrace.note('race', `p${player.id} refused ${itemId}: no race yet for a secondary`);
+            player.sendMessage('Pick your first race before a secondary race');
             return;
         }
         // A race is picked once; only the random picks can repeat
         if (race && !isRandomPick && player.hasRace(race)) {
+            SyncTrace.note('race', `p${player.id} already has ${itemId}`);
             player.sendMessage(`You already have ${GetLocalizedString(item.name) ?? item.name}`);
             return;
         }
         // The shops charged for the item before the pick rules ran, and those rules refund
         // lumber on an invalid pick, so the same cost is charged here.
         if (player.getLumber() < item.lumberCost || player.getGold() < item.goldCost) {
+            SyncTrace.note('race', `p${player.id} cannot afford ${itemId}`);
             player.sendMessage('You have no race picks left');
             return;
         }
@@ -249,8 +277,12 @@ export class RaceSelectPanel {
             // the random-only Loot Boxer
             const normalTiers: RaceTier[] = ['Beginner', 'Intermediate', 'Advanced'];
             this.currentItems = this.game.worldMap.races
-                .filter(race => RaceItems[race.itemid] !== undefined
+                .filter(race => RaceItems[race.itemid] !== undefined && !race.secondary
                     && !(race.enabled && normalTiers.indexOf(RaceItems[race.itemid].tier) !== -1))
+                .map(race => RaceItems[race.itemid]);
+        } else if (tier === 'Secondary') {
+            this.currentItems = this.game.worldMap.races
+                .filter(race => race.secondary && RaceItems[race.itemid] !== undefined)
                 .map(race => RaceItems[race.itemid]);
         } else {
             this.currentItems = this.game.worldMap.races

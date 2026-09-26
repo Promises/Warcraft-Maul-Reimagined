@@ -1,4 +1,4 @@
-export type RaceTier = 'Beginner' | 'Intermediate' | 'Advanced' | 'Random' | 'Dev' | 'Other';
+export type RaceTier = 'Beginner' | 'Intermediate' | 'Advanced' | 'Random' | 'Secondary' | 'Dev' | 'Other';
 
 export interface RaceItemDef {
     /** Object data item id, e.g. 'I02G' */
@@ -48,6 +48,9 @@ export const RaceItems: Record<string, RaceItemDef> = compiletime(({objectData})
         }
         // The string table uses both real newlines and WC3's |n line break
         const first = resolve(description).split(/\n|\|n/)[0].replace(/\|c[0-9a-fA-F]{8}|\|r/g, '').trim();
+        if (first === 'Secondary Race') {
+            return 'Secondary';
+        }
         return ['Beginner', 'Intermediate', 'Advanced'].indexOf(first) !== -1 ? first : 'Other';
     };
 
