@@ -13,6 +13,7 @@ import {Trigger, Unit} from "w3ts";
 import {COLOUR, DecodeFourCC, ReplaceUnit} from "../../../lib/translators";
 import {DummyTowersMap} from "../../Game/Races/HybridRandom";
 import {Walkable} from "../../Antiblock/Maze";
+import {SyncTrace} from '../../../lib/SyncTrace';
 
 export class TowerConstruction {
     private races: RaceTowers[] = [];
@@ -183,6 +184,7 @@ export class TowerConstruction {
      * the anti-block check only runs for real construction.
      */
     public placeTower(owner: Defender, typeId: number, x: number, y: number): Unit | undefined {
+        SyncTrace.note('build', `p${owner.id} type=${typeId} at=${Math.floor(x)},${Math.floor(y)}`);
         if (!this.isBuildable(x, y)) {
             return undefined;
         }

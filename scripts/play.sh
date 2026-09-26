@@ -11,8 +11,9 @@
 #   npm run play -- -a      drive the menus from the game's own UI instead of clicking them
 #
 # The game's menus are a web page it serves itself from <install>/_retail_/webui/index.html.
-# With -a that page is replaced by tools/webui/index.html, which opens the same websocket the
-# menus use and asks the game to create a lobby on the staged map and start it. Anything
+# With -a that page is replaced by wc3-slop-lan's harness/webui/index.html (from ../wc3-slop-lan,
+# or WC3_SLOP), which opens the same websocket the menus use and asks the game to create a lobby
+# on the staged map and start it. Anything
 # already in that folder (W3Champions installs its overlay there) is backed up first.
 #
 # The Battle.net route is what W3Champions does: the client is told to launch the game, which
@@ -24,6 +25,7 @@ set -euo pipefail
 GAME="/Applications/Warcraft III/_retail_/x86_64/Warcraft III.app/Contents/MacOS/Warcraft III"
 BNET="/Applications/Battle.net.app/Contents/MacOS/Battle.net"
 WEBUI_DIR="/Applications/Warcraft III/_retail_/webui"
+SLOP="${WC3_SLOP:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/wc3-slop-lan}"
 MAPS_DIR="$HOME/Library/Application Support/Blizzard/Warcraft III/Maps/WarcraftMaulDev"
 STAGED_MAP="$MAPS_DIR/WarcraftMaulDev.w3x"
 MENU_PATH="Single Player > Custom Game > WarcraftMaulDev"
@@ -73,11 +75,13 @@ echo "Staged $(basename "$map") -> Maps/WarcraftMaulDev/WarcraftMaulDev.w3x"
 
 if [[ "$auto_ui" == true ]]; then
   [[ -d "$WEBUI_DIR" ]] || { echo "No webui folder at $WEBUI_DIR" >&2; exit 1; }
-  if [[ -f "$WEBUI_DIR/index.html" ]] && ! /usr/bin/grep -q 'wcmaul' "$WEBUI_DIR/index.html"; then
-    cp "$WEBUI_DIR/index.html" "$WEBUI_DIR/index.html.before-wcmaul"
-    echo "Backed up the page that was in the game's webui folder -> index.html.before-wcmaul"
+  [[ -f "$SLOP/harness/webui/index.html" ]] || { echo "No wc3-slop-lan at $SLOP (set WC3_SLOP)" >&2; exit 1; }
+  if [[ -f "$WEBUI_DIR/index.html" ]] && ! /usr/bin/grep -qE 'window\.(slop|wcmaul)' "$WEBUI_DIR/index.html" \
+      && [[ ! -f "$WEBUI_DIR/index.html.before-slop" ]]; then
+    cp "$WEBUI_DIR/index.html" "$WEBUI_DIR/index.html.before-slop"
+    echo "Backed up the page that was in the game's webui folder -> index.html.before-slop"
   fi
-  cp "$root/tools/webui/index.html" "$WEBUI_DIR/index.html"
+  cp "$SLOP/harness/webui/index.html" "$WEBUI_DIR/index.html"
   # Only this launch is driven: the page ignores the file once it has expired
   printf '{"map":"%s","folder":"%s","expires":%s}\n' \
     "$(basename "$STAGED_MAP")" "$(basename "$MAPS_DIR")" \

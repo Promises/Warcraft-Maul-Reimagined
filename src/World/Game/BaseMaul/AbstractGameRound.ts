@@ -6,6 +6,7 @@ import { CreepAbility } from '../../Entity/CreepAbilities/specs/CreepAbility';
 import { SpawnedCreeps } from '../../Entity/SpawnedCreeps';
 import {Trigger} from "w3ts";
 import {CREEP_TYPE, SendMessage} from "../../../lib/translators";
+import {SyncTrace} from '../../../lib/SyncTrace';
 
 export abstract class AbstractGameRound {
 
@@ -61,6 +62,7 @@ export abstract class AbstractGameRound {
 
     public SpawnCreeps(): void {
         const wave: WaveCreep = this.game.worldMap.waveCreeps[this._currentWave - 1];
+        SyncTrace.note('wave', `${this._currentWave} type=${wave.GetTypeID()}`);
         SendMessage(`Level ${this._currentWave} - ${wave.GetName()}`);
 
         let spawnAmount: number = 10;

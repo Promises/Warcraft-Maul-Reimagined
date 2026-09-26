@@ -4,6 +4,7 @@ import { WorldMap } from '../WorldMap';
 import { Defender } from './Players/Defender';
 import { Tower } from './Tower/Specs/Tower';
 import {Trigger, Unit} from "w3ts";
+import {SyncTrace} from '../../lib/SyncTrace';
 
 export class SpawnedCreeps {
     public unitMap: Map<number, Creep> = new Map<number, Creep>();
@@ -44,6 +45,7 @@ export class SpawnedCreeps {
 
     private RemoveDeadCreeps(): void {
         const dyingUnit = Unit.fromHandle(GetDyingUnit());
+        SyncTrace.note('death', `${SyncTrace.unit(dyingUnit)} type=${dyingUnit?.typeId}`);
         const creep: Creep | undefined = this.unitMap.get(dyingUnit?.id!);
         if (!creep) {
             // Handle spawns? spiders and alike?

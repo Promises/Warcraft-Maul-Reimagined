@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "wc3-slop": {
+      "command": "../wc3-slop-lan/slop",
+      "args": ["mcp", "warcraft-maul"]
+    }
+  }
+}

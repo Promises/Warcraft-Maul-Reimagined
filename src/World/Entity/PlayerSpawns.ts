@@ -11,6 +11,7 @@ import { WaveCreep } from './WaveCreep';
 import { AbstractGameRound } from '../Game/BaseMaul/AbstractGameRound';
 import {Trigger, MapPlayer,Unit} from "w3ts";
 import {COLOUR} from "../../lib/translators";
+import {SyncTrace} from '../../lib/SyncTrace';
 
 export class PlayerSpawns {
     private _spawnOne: CheckPoint | undefined;
@@ -111,6 +112,7 @@ export class PlayerSpawns {
                 this.getSpawnFace(this.colourId)
             )!;
             spawned.set(creep.id, new Creep(creep, gameRound, abilities, this.worldMap.game));
+            SyncTrace.note('spawn', `${SyncTrace.unit(creep)} type=${wave.GetTypeID()} lane=${this.colourId} owner=${creepOwner}`);
 
             if (wave.GetWaveNumber() !== 37 && this.spawnTwo) {
                 creep = Unit.create(
@@ -121,6 +123,7 @@ export class PlayerSpawns {
                     this.getSpawnFace(this.colourId)
                 )!;
                 spawned.set(creep.id, new Creep(creep, gameRound, abilities, this.worldMap.game));
+                SyncTrace.note('spawn', `${SyncTrace.unit(creep)} type=${wave.GetTypeID()} lane=${this.colourId} owner=${creepOwner}`);
             }
         }
     }

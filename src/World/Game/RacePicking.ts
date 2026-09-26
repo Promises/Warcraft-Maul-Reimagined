@@ -16,6 +16,7 @@ import {
 import {Unit} from "w3ts";
 import {SendMessage, Util} from "../../lib/translators";
 import {GameTowerDef} from "./Races/HybridRandom.types";
+import {SyncTrace} from '../../lib/SyncTrace';
 
 export class RacePicking {
     private game: WarcraftMaul;
@@ -27,6 +28,7 @@ export class RacePicking {
     }
 
     public PickRaceForPlayerByItem(player: Defender, raceItem: number): void {
+        SyncTrace.note('pick', `p${player.id} item=${raceItem}`);
         if (raceItem === FourCC('I00W')) { // Hardcore random
             if (player.hasHybridRandomed) {
                 player.giveLumber(1);
@@ -131,12 +133,15 @@ export class RacePicking {
         }
 
         player.races.push(randomedRace);
+        SyncTrace.note('rolled', `p${player.id} race=${randomedRace.name}`);
         this.GiveBuyingPlayerBuilder(player, randomedRace);
         return randomedRace;
     }
 
     private randomChoice(myarr: any[], blacklist: any[] = []): any {
-        let choice = myarr[Math.floor(Math.random() * myarr.length)];
+        // The game's generator: a hybrid random rolled with math.random gave every client a
+        // different set of towers, which is a desync as soon as one of them is built
+        let choice = myarr[GetRandomInt(0, myarr.length - 1)];
         if (blacklist.indexOf(choice) >= 0) {
             choice = this.randomChoice(myarr, blacklist);
         }
@@ -177,6 +182,9 @@ export class RacePicking {
         }
 
         player.hasHybridRandomed = true;
+        // The rolls every client has to agree on: a hybrid set that differs is a desync the
+        // moment one of those towers is built
+        SyncTrace.note('hybrid', `p${player.id} ${player.hybridTowers.map(tower => tower.name).join(',')}`);
 
         // print(player.hybridBuilder?.name)
 

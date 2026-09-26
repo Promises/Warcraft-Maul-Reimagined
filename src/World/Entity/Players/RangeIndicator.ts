@@ -1,5 +1,6 @@
 import {Effect, MapPlayer, Unit} from 'w3ts';
 import {Defender} from './Defender';
+import {SyncTrace} from '../../../lib/SyncTrace';
 
 // Range is measured from the building's edge; a 2x2 tower's half width
 const TOWER_HALF_WIDTH = 64;
@@ -31,6 +32,7 @@ export class RangeIndicator {
     public show(tower: Unit): void {
         this.hide();
         const range = BlzGetUnitWeaponRealField(tower.handle, UNIT_WEAPON_RF_ATTACK_RANGE, 0);
+        SyncTrace.note('range', `p${this.player.id} ring for ${SyncTrace.unit(tower)} range=${range}`);
         if (range <= 0) {
             return;
         }
@@ -38,6 +40,8 @@ export class RangeIndicator {
         const scale = radius * RADIUS_TRIM / MODEL_RADIUS;
         const variant = RING_MODELS.find(candidate => scale <= candidate.maxScale) ?? RING_MODELS[RING_MODELS.length - 1];
         this.ring = Effect.create(this.player.isLocal() ? variant.model : '', tower.x, tower.y);
+        SyncTrace.note('range', `p${this.player.id} ring scale=${string.format('%.2f', scale)}`
+            + ` model=${variant.model} made=${this.ring !== undefined}`);
         if (!this.ring) {
             return;
         }

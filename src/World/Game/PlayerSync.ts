@@ -2,6 +2,7 @@ import {Trigger} from 'w3ts';
 import {WarcraftMaul} from '../WarcraftMaul';
 import {Defender} from '../Entity/Players/Defender';
 import {Log} from '../../lib/Serilog/Serilog';
+import {SyncTrace} from '../../lib/SyncTrace';
 
 export type SyncHandler = (player: Defender, data: string) => void;
 
@@ -27,33 +28,39 @@ export class PlayerSync {
     private static readonly PREFIX = 'wm';
     private readonly handlers: Map<string, SyncHandler> = new Map<string, SyncHandler>();
 
-    constructor(game: WarcraftMaul) {
+    constructor(private readonly game: WarcraftMaul) {
         const trigger = Trigger.create();
         for (const player of game.players.values()) {
             trigger.registerPlayerSyncEvent(player, PlayerSync.PREFIX, false);
         }
-        trigger.addAction(() => {
-            // Payload is "<senderId> <command>:<data>"
-            const message = BlzGetTriggerSyncData() ?? '';
-            const space = message.indexOf(' ');
-            const senderId = space === -1 ? -1 : Number(message.substring(0, space));
-            const rest = space === -1 ? '' : message.substring(space + 1);
-            const separator = rest.indexOf(':');
-            const command = separator === -1 ? rest : rest.substring(0, separator);
-            const data = separator === -1 ? '' : rest.substring(separator + 1);
-            const player = game.players.get(senderId);
-            const handler = this.handlers.get(command);
-            if (!player || !handler) {
-                Log.Warning(`Unhandled sync message '${message}'`);
-                return;
-            }
-            // A Lua error inside a trigger action is otherwise swallowed without a trace
-            try {
-                handler(player, data);
-            } catch (error) {
-                Log.Error(`sync '${message}' failed: ${error}`);
-            }
-        });
+        trigger.addAction(() => this.dispatch(BlzGetTriggerSyncData() ?? ''));
+    }
+
+    /**
+     * Applies one "<senderId> <command>:<data>" message as that player. Called for every sync
+     * event on every client, and under the wc3-slop-lan test harness also by SlopHooks, which
+     * feeds "@" commands from its host through here so a test can act as any player.
+     */
+    public dispatch(message: string): void {
+        const space = message.indexOf(' ');
+        const senderId = space === -1 ? -1 : Number(message.substring(0, space));
+        const rest = space === -1 ? '' : message.substring(space + 1);
+        const separator = rest.indexOf(':');
+        const command = separator === -1 ? rest : rest.substring(0, separator);
+        const data = separator === -1 ? '' : rest.substring(separator + 1);
+        SyncTrace.note('sync', message);
+        const player = this.game.players.get(senderId);
+        const handler = this.handlers.get(command);
+        if (!player || !handler) {
+            Log.Warning(`Unhandled sync message '${message}'`);
+            return;
+        }
+        // A Lua error inside a trigger action is otherwise swallowed without a trace
+        try {
+            handler(player, data);
+        } catch (error) {
+            Log.Error(`sync '${message}' failed: ${error}`);
+        }
     }
 
     public on(command: string, handler: SyncHandler): void {

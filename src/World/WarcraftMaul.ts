@@ -34,6 +34,7 @@ import {TimedEventQueue} from "../lib/WCEventQueue/TimedEventQueue";
 import {Effect, MapPlayer, Timer} from "w3ts";
 import {COLOUR, DecodeFourCC, SendMessage, SendMessageUnlogged, Util} from "../lib/translators";
 import {StringSink} from "../lib/Serilog/Sinks/StringSink";
+import {installSlopHooks} from './Game/SlopHooks';
 
 /** True when built with WCM_DEV=1 (npm run build:dev); enables debug mode regardless of player names. */
 const DEV_BUILD = compiletime(() => process.env.WCM_DEV === '1') as boolean;
@@ -138,7 +139,9 @@ export class WarcraftMaul {
         this.safeEventQueue = new SafeEventQueue(this);
         this.timedEventQueue = new TimedEventQueue(this);
         // Debug mode: dev builds (npm run build:dev), or player red is the World Editor / offline test player
-        const redName = FourCC(MapPlayer.fromIndex(COLOUR.RED)!.name);
+        // FourCC reads four characters and throws on fewer, which a LAN or offline name can be
+        const redPlayerName = MapPlayer.fromIndex(COLOUR.RED)!.name;
+        const redName = redPlayerName.length >= 4 ? FourCC(redPlayerName.substring(0, 4)) : 0;
         if (DEV_BUILD || redName === FourCC('Worl') || redName === FourCC('Loca')) {
             this.debugMode = true;
             Log.replaceSinks((new StringSink(LogLevel.Debug)));
@@ -155,6 +158,11 @@ export class WarcraftMaul {
         this.gameCommandHandler = new Commands(this);
         // Set up all players
         for (let i: number = 0; i < bj_MAX_PLAYER_SLOTS; i++) {
+            // Under the wc3-slop-lan test harness its host may play a seat of its own, to send
+            // commands from - never a defender
+            if (Slop !== undefined && i === Slop.seat) {
+                continue;
+            }
             if (MapPlayer.fromIndex(i)?.slotState === PLAYER_SLOT_STATE_PLAYING) {
                 if (MapPlayer.fromIndex(i)?.controller === MAP_CONTROL_USER) {
                     this.players.set(i, new Defender(i, this));
@@ -216,6 +224,7 @@ export class WarcraftMaul {
         this.raceSelectPanel = new RaceSelectPanel(this);
         this.diffVote = new Vote(this);
         this.actionBar = new ActionBar(this);
+        installSlopHooks(this);
     }
 
     public DefeatAllPlayers(): void {
