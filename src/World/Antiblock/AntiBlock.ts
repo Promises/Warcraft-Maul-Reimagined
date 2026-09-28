@@ -43,10 +43,22 @@ export class AntiBlock {
 
 
 
+        let playerSpawnId: number | undefined;
+        for (let i: number = 0; i < this._worldMap.game.mapSettings.PLAYER_AREAS.length; i++) {
+            if (this._worldMap.game.mapSettings.PLAYER_AREAS[i].ContainsUnit(consUnit)) {
+                playerSpawnId = i;
+                break;
+            }
+        }
+        // A tower on exactly an anti-juggle blocker's footprint takes nothing from the creeps (that
+        // footprint is closed to them already), so it is never a juggle, whoever stands near
+        const onBlocker: boolean = playerSpawnId !== undefined
+            && this._worldMap.playerMazes[playerSpawnId].antiJugglerAt(x, y) !== undefined;
+
         const isWaveInProgress: boolean = !!this._worldMap.gameRoundHandler && this._worldMap.gameRoundHandler.isWaveInProgress;
         const antiJuggleEnabled: boolean = !!this._worldMap.gameRoundHandler && this._worldMap.gameRoundHandler.antiJuggleEnabled;
         const antiJuggleCreeps: Creep[] = [];
-        if (isWaveInProgress && antiJuggleEnabled) {
+        if (isWaveInProgress && antiJuggleEnabled && !onBlocker) {
             let isJuggling: boolean = false;
             const grp = Group.create()!;
             grp.enumUnitsInRange(consUnit.x, consUnit.y, 128.00, () => true);
@@ -84,14 +96,6 @@ export class AntiBlock {
         if (consUnit.getAbilityLevel(FourCC('A0CR')) > 0) {
             if (!player.getRectangle().ContainsUnit(consUnit)) {
                 return this.homesick(consUnit, player);
-            }
-        }
-
-        let playerSpawnId: number | undefined;
-        for (let i: number = 0; i < this._worldMap.game.mapSettings.PLAYER_AREAS.length; i++) {
-            if (this._worldMap.game.mapSettings.PLAYER_AREAS[i].ContainsUnit(consUnit)) {
-                playerSpawnId = i;
-                break;
             }
         }
 
