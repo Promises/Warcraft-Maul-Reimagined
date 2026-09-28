@@ -1,5 +1,7 @@
 import {WarcraftMaul} from '../WarcraftMaul';
 import {DecodeFourCC} from '../../lib/translators';
+import {DebugGameRound} from './DebugMaul/DebugGameRound';
+import {BlitzGameRound} from './BlitzMaul/BlitzGameRound';
 
 /**
  * What Warcraft Maul adds to wc3-slop-lan's map library when its test harness runs the map
@@ -11,7 +13,8 @@ import {DecodeFourCC} from '../../lib/translators';
  *    with "@", as a PlayerSync message from that player ("@race-pick:I006") - what their own UI
  *    would have sent, so a test can pick, build or vote without a click;
  *  - `.towers` lists the player's towers with the class that gives each its behaviour;
- *  - the heartbeat gets lives, wave, the wave timer and creeps, and kills and towers per player;
+ *  - the heartbeat gets lives, wave, the wave timer and creeps, the game mode and whether this is a
+ *    dev build (its debug commands: -wave, -lives, ...), and kills and towers per player;
  *  - the events that decide a game are written to the trace at once, not on the next flush.
  *
  * Does nothing when the library is absent, which is every game not started by the harness.
@@ -45,7 +48,12 @@ export function installSlopHooks(game: WarcraftMaul): void {
     });
     Slop.heartbeat(() => {
         const round = game.worldMap.gameRoundHandler;
+        // No round until the host's settings or the vote made one
+        const mode = round === undefined ? 'none'
+            : round instanceof DebugGameRound ? 'debug' : round instanceof BlitzGameRound ? 'blitz' : 'classic';
         return [
+            `mode=${mode}`,
+            `dev=${game.debugMode}`,
             `lives=${game.gameLives}`,
             `wave=${round !== undefined ? round.currentWave : 0}`,
             `spawning=${round !== undefined ? round.isWaveInProgress : false}`,
