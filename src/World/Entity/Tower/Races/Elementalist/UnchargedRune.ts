@@ -14,7 +14,8 @@ export class UnchargedRune extends Tower {
 
     private AddAbilities(): void {
         const nums: number[] = [];
-        for (let i = 0; i < ELEMENTALIST_ABILITIES.length - 1; i++) {
+        // Every element, Life (the last) included: stopping one short never gave a rune Life
+        for (let i = 0; i < ELEMENTALIST_ABILITIES.length; i++) {
             nums.push(i);
             this.unit.removeAbility(ELEMENTALIST_ABILITIES[i]);
         }

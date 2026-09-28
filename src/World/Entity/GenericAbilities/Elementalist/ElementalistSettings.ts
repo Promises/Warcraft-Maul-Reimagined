@@ -25,7 +25,7 @@ export class ElementalistSettings {
         this.AddCombination('n01S', 'n023', 'u027'); // Fire + Air = Blaze
 
         this.AddDoubling('n024', 'u02A'); // Death*2 = Death Rune [Level 2]
-        this.AddDoubling('n025', 'u02C'); // Life*2 = Death Rune [Level 2]
+        this.AddDoubling('n025', 'u02C'); // Life*2 = Life Rune [Level 2]
         this.AddDoubling('n022', 'u02E'); // Nature*2 = Nature Rune [Level 2]
         this.AddDoubling('n01S', 'u030'); // Fire*2 = Fire Rune [Level 2]
         this.AddDoubling('n023', 'u032'); // Air*2 = Air Rune [Level 2]
