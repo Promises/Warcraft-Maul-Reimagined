@@ -195,11 +195,16 @@
     two in a row. Rolling on every swing would fix it for Venom, but a tower whose swing the order
     does cancel would then never finish an attack - test on a second tower first.
   - [ ] Not tried: a creep that walks out of range while the tower is ordered onto it.
-- [ ] IceTrollPriest leaks: every tick makes a boolexpr with Condition(...) that is never
-  destroyed, and `targets` is never emptied, so it grows with every creep ever seen (dead ones
-  included) and the Frost Nova can pick a dead or removed unit.
-- [ ] -repick doesn't clear player.races, hasNormalPicked or repickCounter: re-picking the same
-  race is refused ("You already have ...") and hybrid is blocked after a repick.
+- [x] IceTrollPriest leaked: a boolexpr (Condition) every tick, and a `targets` list that was
+  never emptied, so it grew with every creep ever seen, dead ones included. Now one group for all,
+  no filter, and this tick's live creeps only. test_ice_troll_priest_frost_nova (wc3-slop-lan
+  races.py) keeps it casting on live creeps; the leak itself is not visible to a test. (2026-09-29)
+- [x] -repick didn't forget the pick: the same race was refused ("You already have ..."), and
+  Hybrid Random after a chosen race. Defender.forgetRacePicks clears the races, the chosen flag,
+  the builders and the Loot Boxer / Void builder. Hybrid Random now asks only that the player has
+  no race, so a repick opens it whatever was picked before; there is still no repick from it.
+  repickCounter stays: it shrinks the normal random's gold and bars Hardcore after a normal
+  random. test_repick_starts_over (wc3-slop-lan tests.py) passes. (2026-09-29)
 - [ ] Loot Boxer loot, found while writing its test (fixed; items not tried, below):
   - [x] Boxes of tier 4-9 gave tier-1 loot, in practice always I02F: UpgradeToTower read the
     tier from the unit after replacing the box with its tower (indexOf gave -1, and tier -1
