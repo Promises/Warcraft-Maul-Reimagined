@@ -2400,8 +2400,8 @@ STRING 392
 // Abilities: A0EX ([Loot Boxers] Open Lootbox), Ubertip (Tooltip - Normal - Extended)
 {
 95% Rocks
-4% "Premium" Tower
-1% Lootchest
+3% "Premium" Tower
+2% Lootchest
 }
 
 STRING 393
@@ -2416,8 +2416,8 @@ STRING 394
 // Abilities: A0EX ([Loot Boxers] Open Lootbox), Ubertip (Tooltip - Normal - Extended)
 {
 85% Rocks
-10% "Premium" Tower
-5% Lootchest
+9% "Premium" Tower
+6% Lootchest
 }
 
 STRING 395
@@ -2434,15 +2434,14 @@ STRING 396
 {
 70% Rocks
 15% "Premium" Tower
-10% Lootchest
-5% Stick
+11% Lootchest
+4% Stick
 }
 
 STRING 397
 // Abilities: A0EX ([Loot Boxers] Open Lootbox), Ubertip (Tooltip - Normal - Extended)
 {
-30% Rocks
-30% Stick
+60% Stick
 20% Coin
 10% Lootchest
 10% MaulKoinz
@@ -2451,8 +2450,7 @@ STRING 397
 STRING 398
 // Abilities: A0EX ([Loot Boxers] Open Lootbox), Ubertip (Tooltip - Normal - Extended)
 {
-40% Rocks
-25% Stick
+65% Stick
 15% Coin
 12% Lootchest
 8% MaulKoinz
@@ -2461,8 +2459,7 @@ STRING 398
 STRING 399
 // Abilities: A0EX ([Loot Boxers] Open Lootbox), Ubertip (Tooltip - Normal - Extended)
 {
-50% Rocks
-20% Stick
+70% Stick
 15% Lootchest
 10% Coin
 5% MaulKoinz
@@ -2473,8 +2470,8 @@ STRING 400
 {
 60% Rocks
 20% Lootchest
-15% Wood
-5% Coin
+14% Stick
+6% Coin
 }
 
 STRING 401
