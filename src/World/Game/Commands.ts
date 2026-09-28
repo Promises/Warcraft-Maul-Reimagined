@@ -907,7 +907,7 @@ export class Commands {
 
                 this.RemoveAllKickedPlayerTowers();
                 if (this.game.scoreBoard) {
-                    MultiboardSetItemValueBJ(this.game.scoreBoard.board, 1, 7 + this.voteAgainstPlayer.scoreSlot,
+                    MultiboardSetItemValueBJ(this.game.scoreBoard.board, 1, this.game.scoreBoard.playerRow(this.voteAgainstPlayer.scoreSlot),
                         Util.ColourString(this.voteAgainstPlayer.getColourCode(), '<Kicked>'));
                 }
                 this.game.players.delete(this.voteAgainstPlayer.id);

@@ -631,7 +631,7 @@ export class Defender extends AbstractPlayer {
         if (this.game.scoreBoard && this._scoreSlot > -1) {
 
             MultiboardSetItemValueBJ(
-                this.game.scoreBoard.board, 1, 7 + this._scoreSlot,
+                this.game.scoreBoard.board, 1, this.game.scoreBoard.playerRow(this._scoreSlot),
                 Util.ColourString(this.getColourCode(), '<Quit>'));
             this._scoreSlot = -1;
         }
@@ -662,8 +662,9 @@ export class Defender extends AbstractPlayer {
 
     public GiveKillCount(): void {
         this._kills++;
-        if (this.game.scoreBoard) {
-            MultiboardSetItemValueBJ(this.game.scoreBoard.board, 2, 7 + this._scoreSlot, `${this._kills}`);
+        // A player who left has no row any more (slot -1)
+        if (this.game.scoreBoard && this._scoreSlot > -1) {
+            MultiboardSetItemValueBJ(this.game.scoreBoard.board, 2, this.game.scoreBoard.playerRow(this._scoreSlot), `${this._kills}`);
         }
         if (this.killHook) {
             this.killHook();

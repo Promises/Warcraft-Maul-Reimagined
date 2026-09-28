@@ -4,6 +4,8 @@ import { Defender } from '../Entity/Players/Defender';
 import {Util} from "../../lib/translators";
 
 export class MultiBoard {
+    // Rows are 1-based: the game's lines, then a gap, the Player / Kills header, and the players
+    private static readonly HEADER_ROW: number = 7;
     board: multiboard;
     game: WarcraftMaul;
     scoreboardColumnWidth: number[] = [];
@@ -13,7 +15,7 @@ export class MultiBoard {
 
         this.scoreboardColumnWidth[1] = 10.00;
         this.scoreboardColumnWidth[2] = 8.00;
-        this.board = CreateMultiboardBJ(2, this.game.players.size + 6, this.game.mapSettings.GAME_NAME)!;
+        this.board = CreateMultiboardBJ(2, MultiBoard.HEADER_ROW + this.game.players.size, this.game.mapSettings.GAME_NAME)!;
         MultiboardSetItemValueBJ(this.board, 1, 1, 'Starting in');
         MultiboardSetItemValueBJ(this.board, 2, 1, `${this.game.waveTimer}`);
         MultiboardSetItemValueBJ(this.board, 1, 2, 'Level');
@@ -29,8 +31,8 @@ export class MultiBoard {
         MultiboardSetItemValueBJ(
             this.board, 2, 5,
             Util.ColourString(ARMOUR_TYPE_COLOURS[this.game.worldMap.waveCreeps[0].getArmourType()], armourType));
-        MultiboardSetItemValueBJ(this.board, 1, 7, 'Player');
-        MultiboardSetItemValueBJ(this.board, 2, 7, 'Kills');
+        MultiboardSetItemValueBJ(this.board, 1, MultiBoard.HEADER_ROW, 'Player');
+        MultiboardSetItemValueBJ(this.board, 2, MultiBoard.HEADER_ROW, 'Kills');
 
         MultiboardSetItemWidthBJ(this.board, 1, 1, this.scoreboardColumnWidth[1]); // Game time
         MultiboardSetItemWidthBJ(this.board, 2, 1, this.scoreboardColumnWidth[2]);
@@ -44,8 +46,8 @@ export class MultiBoard {
         MultiboardSetItemWidthBJ(this.board, 2, 5, this.scoreboardColumnWidth[2]);
         MultiboardSetItemWidthBJ(this.board, 1, 6, this.scoreboardColumnWidth[1]); // Level Type 2
         MultiboardSetItemWidthBJ(this.board, 2, 6, this.scoreboardColumnWidth[2]);
-        // MultiboardSetItemWidthBJ(this.board, 1, 7, this.scoreboardColumnWidth[1]); // Kills
-        // MultiboardSetItemWidthBJ(this.board, 2, 7, this.scoreboardColumnWidth[2]);
+        MultiboardSetItemWidthBJ(this.board, 1, MultiBoard.HEADER_ROW, this.scoreboardColumnWidth[1]); // Player / Kills
+        MultiboardSetItemWidthBJ(this.board, 2, MultiBoard.HEADER_ROW, this.scoreboardColumnWidth[2]);
 
         MultiboardSetItemStyleBJ(this.board, 1, 1, true, false);
         MultiboardSetItemStyleBJ(this.board, 2, 1, true, false);
@@ -59,12 +61,17 @@ export class MultiBoard {
         MultiboardSetItemStyleBJ(this.board, 2, 5, true, false);
         MultiboardSetItemStyleBJ(this.board, 1, 6, true, false);
         MultiboardSetItemStyleBJ(this.board, 2, 6, true, false);
-        // MultiboardSetItemStyleBJ(this.board, 1, 7, true, false);
-        // MultiboardSetItemStyleBJ(this.board, 2, 7, true, false);
+        MultiboardSetItemStyleBJ(this.board, 1, MultiBoard.HEADER_ROW, true, false);
+        MultiboardSetItemStyleBJ(this.board, 2, MultiBoard.HEADER_ROW, true, false);
 
         this.InitializePlayerScores();
 
         MultiboardDisplayBJ(true, this.board);
+    }
+
+    /** The row of the player in that score slot (0 for the first player), under the header. */
+    public playerRow(scoreSlot: number): number {
+        return MultiBoard.HEADER_ROW + 1 + scoreSlot;
     }
 
     private InitializePlayerScores(): void {
@@ -73,17 +80,16 @@ export class MultiBoard {
             const player: Defender | undefined = this.game.players.get(i);
             if (player) {
                 player.scoreSlot = count;
-                MultiboardSetItemValueBJ(this.board, 1, 7 + count, player.getNameWithColour());
-                MultiboardSetItemValueBJ(this.board, 2, 7 + count, `${player.kills}`);
-                MultiboardSetItemStyleBJ(this.board, 1, 7 + count, true, false);
-                MultiboardSetItemStyleBJ(this.board, 2, 7 + count, true, false);
-                MultiboardSetItemWidthBJ(this.board, 1, 7 + count, this.scoreboardColumnWidth[1]); // Kills
-                MultiboardSetItemWidthBJ(this.board, 2, 7 + count, this.scoreboardColumnWidth[2]);
+                const row = this.playerRow(count);
+                MultiboardSetItemValueBJ(this.board, 1, row, player.getNameWithColour());
+                MultiboardSetItemValueBJ(this.board, 2, row, `${player.kills}`);
+                MultiboardSetItemStyleBJ(this.board, 1, row, true, false);
+                MultiboardSetItemStyleBJ(this.board, 2, row, true, false);
+                MultiboardSetItemWidthBJ(this.board, 1, row, this.scoreboardColumnWidth[1]); // Kills
+                MultiboardSetItemWidthBJ(this.board, 2, row, this.scoreboardColumnWidth[2]);
                 count++;
             }
         }
-        // MultiboardSetItemStyleBJ(this.board, 1, 7 + count, true, false);
-        // MultiboardSetItemStyleBJ(this.board, 2, 7 + count, true, false);
 
 
     }
