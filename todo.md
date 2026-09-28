@@ -165,8 +165,9 @@
   - CreepAbilityHandler.ts:87 `slice(0, length - 1)` drops the last creep ability (MorningPerson),
     and :102 `slice(0, IMinBJ(picks - 1, ...))` hands out one ability too few: Medium (200%)
     gets none, Hard one instead of two. Should be `slice(0)` and `slice(0, Math.min(picks, length))`.
-  - UnchargedRune.ts:17 loops to `ELEMENTALIST_ABILITIES.length - 1`, so the 6th element (A0C3,
-    Life Rune) is never rolled - nor are its five combinations.
+  - [x] UnchargedRune.ts:17 looped to `ELEMENTALIST_ABILITIES.length - 1`, so the 6th element
+    (A0C3, Life Rune) was never rolled - nor its five combinations. Seen in a game: 0 Life in
+    20 runes. Fixed; test_elementalist_runes (wc3-slop-lan) now gets Life on 8 of 20. (2026-09-28)
   - MultiBoard.ts: the first player is written to row 7, over the "Player / Kills" header (rows
     are 1-based; players should start at 8, and the board needs size + 7 rows). Same base in
     Defender.ts:634/666 and Commands.ts:851.
