@@ -84,7 +84,8 @@ export class CreepAbilityHandler {
             return [];
         }
         currentDiff -= 100;
-        const allAbilities: CreepAbility[] = this.activeAbilities.slice(0, this.activeAbilities.length - 1);
+        // Every ability, MorningPerson (the last) included
+        const allAbilities: CreepAbility[] = this.activeAbilities.slice(0);
         // allAbilities.sort(() => 0.5 - Math.random());
         if (wave.getCreepType() === CREEP_TYPE.BOSS) {
             return allAbilities;
@@ -99,7 +100,8 @@ export class CreepAbilityHandler {
         if (picks === 0) {
             return [];
         }
-        return allAbilities.slice(0, IMinBJ(picks - 1, allAbilities.length - 1));
+        // One ability per pick: 200% gives one, 300% two, 400% three
+        return allAbilities.slice(0, Math.min(picks, allAbilities.length));
     }
 
     private ShuffleArray(arr: any[]): void {
