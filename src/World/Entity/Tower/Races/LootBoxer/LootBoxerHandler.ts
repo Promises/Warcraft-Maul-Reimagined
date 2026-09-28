@@ -113,7 +113,11 @@ export class LootBoxerHandler {
         SyncTrace.note('lootbox', text);
     }
 
-    /** The item a box of that tier (0-based) gives for a roll of 1-100, and its charges (0: as made). */
+    /**
+     * The item a box of that tier (0-based) gives for a roll of 1-100, and its charges (0: as made).
+     * From tier 4 the chance of Rocks falls by 10 a tier (80% at tier 4, 60% at tier 6), and the
+     * better items take its place; tiers 7-9 give no Rocks.
+     */
     private Loot(tier: number, roll: number): [string, number] {
         if (tier < 3) {
             if (roll <= 100 - (5 * (tier + 1))) {
@@ -126,37 +130,37 @@ export class LootBoxerHandler {
         switch (tier + 1) {
             case 4:
             case 5:
-                if (roll <= 100 - 20 + 10 * (tier - 4 + 1)) {
+                if (roll <= 100 - 20 - 10 * (tier - 4 + 1)) {
                     return ['I02F', GetRandomInt(1, tier)];
-                } else if (roll <= 100 - 10 + 5 * (tier - 4 + 1)) {
+                } else if (roll <= 100 - 10 - 5 * (tier - 4 + 1)) {
                     return ['I029', 0];
                 } else if (roll <= 100 - 2 * (tier - 3 + 1)) {
                     return ['I02B', 0];
                 }
                 return ['I028', 0];
             case 6:
-                if (roll <= 100 - 20 + 10 * (tier - 4 + 1)) {
+                if (roll <= 100 - 20 - 10 * (tier - 4 + 1)) {
                     return ['I02F', GetRandomInt(1, tier)];
-                } else if (roll <= 100 - 10 + 5 * (tier - 4 + 1)) {
+                } else if (roll <= 100 - 10 - 5 * (tier - 4 + 1)) {
                     return ['I02B', 0];
                 } else if (roll <= 100 - 2 * (tier - 3 + 1)) {
                     return ['I028', 0];
                 }
                 return ['I02A', 0];
             case 7:
-                return this.HighTierLoot(tier, roll, 'I028', 70, 'I02B', 85, 'I02A', 95, 'I02C');
+                return this.HighTierLoot(roll, 'I028', 70, 'I02B', 85, 'I02A', 95, 'I02C');
             case 8:
-                return this.HighTierLoot(tier, roll, 'I028', 65, 'I02A', 80, 'I02B', 92, 'I02C');
+                return this.HighTierLoot(roll, 'I028', 65, 'I02A', 80, 'I02B', 92, 'I02C');
             case 9:
-                return this.HighTierLoot(tier, roll, 'I028', 60, 'I02A', 80, 'I02B', 90, 'I02C');
+                return this.HighTierLoot(roll, 'I028', 60, 'I02A', 80, 'I02B', 90, 'I02C');
             default:
                 Log.Fatal('failed to get loot boxer item tier');
                 return this.Loot(1, roll);
         }
     }
 
-    private HighTierLoot(tier: number,
-                         roll: number,
+    /** Tiers 7-9: no Rocks, the item each chance is up to, and the default above them all. */
+    private HighTierLoot(roll: number,
                          itemOne: string,
                          chanceOne: number,
                          itemTwo: string,
@@ -164,9 +168,7 @@ export class LootBoxerHandler {
                          itemThree: string,
                          chanceThree: number,
                          defaultItem: string): [string, number] {
-        if (roll <= 100 - 20 + 10 * (tier - 4 + 1)) {
-            return ['I02F', GetRandomInt(1 + (tier - 5), tier)];
-        } else if (roll <= chanceOne) {
+        if (roll <= chanceOne) {
             return [itemOne, 0];
         } else if (roll <= chanceTwo) {
             return [itemTwo, 0];
