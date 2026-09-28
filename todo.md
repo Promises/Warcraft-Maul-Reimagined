@@ -209,10 +209,13 @@
     roll range, item table, charges and the tower left in each box's place. Passes; rolls ran
     4-97 over 24 boxes (1-100 in an earlier run). Tier 4-9 boxes open only with mana (1-6, regen
     0.01/s, or the Stick/Coin/MaulKoinz items); the test sets it.
-  - [ ] Tiers 6-9 always give Rocks (I02F): the Rocks threshold `100 - 20 + 10 * (tier - 4 + 1)`
-    (tier 0-based) is 100, 110, 120, 130 for them, so no roll of 1-100 gets past it, and their
-    Stick/Coin/Lootbag/MaulKoinz branches are unreachable. Tier 4 gives Rocks at 80 or below, tier 5
-    at 90 or below. Decide the odds, then give the test the exact table to check.
+  - [x] Tiers 6-9 always gave Rocks (I02F), and tier 5 more than tier 4: the thresholds
+    `100 - 20 + 10 * (tier - 4 + 1)` and `100 - 10 + 5 * (...)` grew with the tier (100-130 for
+    tiers 6-9, past any roll). Now `-`: Rocks 80/70/60% for tiers 4-6, and tiers 7-9 give no
+    Rocks at all, only their Stick/Coin/Lootbag/MaulKoinz tables. The test checks every roll
+    against the exact table. (2026-09-28)
+  - [ ] Not tried in a game: Rocks to a Lootbag (a stack of 9 used), and Stick/Coin/MaulKoinz
+    restoring a box's mana (only when the box itself uses them) - the harness cannot use items.
 - [x] Loot Boxer (I02D) showed in the Advanced tab (its tooltip says Advanced) and could be picked
   there. Now random-only (Race.randomOnly): rolled by the random picks, shown only in the Dev tab.
   (2026-09-27)
