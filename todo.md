@@ -162,23 +162,26 @@
     requirement (the Berserker Upgrade research), so it never cast. Fixed: areq cleared on both
     in war3map.w3a.
 - [ ] Off-by-one audit (2026-09-26), checked in the code:
-  - CreepAbilityHandler.ts:87 `slice(0, length - 1)` drops the last creep ability (MorningPerson),
-    and :102 `slice(0, IMinBJ(picks - 1, ...))` hands out one ability too few: Medium (200%)
-    gets none, Hard one instead of two. Should be `slice(0)` and `slice(0, Math.min(picks, length))`.
+  - [x] CreepAbilityHandler.ts dropped the last creep ability (MorningPerson) and handed out one
+    ability too few (none at 200%, one at 300%). Fixed; test_creep_abilities_by_difficulty
+    (wc3-slop-lan tests.py) sees 0/1/2/3 at 100-400% and all 10 on a boss wave. (2026-09-28)
   - [x] UnchargedRune.ts:17 looped to `ELEMENTALIST_ABILITIES.length - 1`, so the 6th element
     (A0C3, Life Rune) was never rolled - nor its five combinations. Seen in a game: 0 Life in
     20 runes. Fixed; test_elementalist_runes (wc3-slop-lan) now gets Life on 8 of 20. (2026-09-28)
-  - MultiBoard.ts: the first player is written to row 7, over the "Player / Kills" header (rows
-    are 1-based; players should start at 8, and the board needs size + 7 rows). Same base in
-    Defender.ts:634/666 and Commands.ts:851.
-  - Defender.ts:666 GiveKillCount after a leave writes to row 7 + (-1) = 6 (the creep-type cell):
-    guard `_scoreSlot > -1`.
-  - Commands.ts:841 votekick needs `players.size / 2 + 1` votes as a float: with 3 players 3.5
-    votes out of 2 possible voters - a kick is impossible. `Math.floor(size / 2) + 1`.
-  - Wyvern.ts:9 skips waves 34 and 35 instead of 35 and 36 (`currentWave + 1`); likely a port of a
-    0-based counter.
-  - LootBoxerHandler.ts:198-207 looks the tier up after ReplaceUnit, gets -1 and always gives the
-    tier-1 item; the tier 3+ item table is unreachable.
+  - [x] MultiBoard.ts wrote the first player to row 7, over the "Player / Kills" header, and the
+    board was a row short. Rows now come from MultiBoard.playerRow (players from row 8), in
+    Defender and Commands too, and the header has its width and style. Seen in a game. (2026-09-29)
+  - [x] Defender.GiveKillCount after a leave wrote to row 6 (the creep-type cell): guarded.
+  - [x] Votekick needed `players.size / 2 + 1` votes, a fraction (2.5 of 2 possible voters with 3
+    players): now a majority, `Math.floor(size / 2) + 1`. Also: a new votekick kept the last one's
+    votes (its voters could not vote again), and a votekick's 5-minute expiry could end a later
+    one. Not tried in a game: the harness has two players, and a kick takes three. (2026-09-29)
+  - [x] Wyvern spared waves 34-35 (`currentWave + 1`) instead of the bosses: now the boss waves
+    (35-37, by creep type). Its lightning also skipped Navy's creeps (`owner > NAVY`), and made a
+    boolexpr on every attack. Fixed; test_wyvern_lightning (wc3-slop-lan races.py): all four
+    creep players struck on wave 1, none on wave 35. (2026-09-29)
+  - [x] LootBoxerHandler.ts looked the tier up after ReplaceUnit, got -1 and always gave the
+    tier-1 item. Fixed (see Loot Boxer loot below).
   - DamageEngine.ts:285/297 purge loops are inverted (dormant: nothing deals damage from a damage
     handler today).
   - Open: creep ability level is `currentWave + 1` (CreepAbility.ts:54 and others), while
@@ -197,7 +200,7 @@
   included) and the Frost Nova can pick a dead or removed unit.
 - [ ] -repick doesn't clear player.races, hasNormalPicked or repickCounter: re-picking the same
   race is refused ("You already have ...") and hybrid is blocked after a repick.
-- [ ] Loot Boxer loot, found while writing its test (fixed, test not run yet):
+- [ ] Loot Boxer loot, found while writing its test (fixed; items not tried, below):
   - [x] Boxes of tier 4-9 gave tier-1 loot, in practice always I02F: UpgradeToTower read the
     tier from the unit after replacing the box with its tower (indexOf gave -1, and tier -1
     gives I02F for every roll). The tier is now read from the box.
@@ -205,9 +208,9 @@
     charges were never on the item given. Now set on it.
   - [x] Each roll is logged (Log.Info, in the log file after -log): player, tier, roll 1-100,
     item and charges; a tester asked to see that it really rolls up to 100.
-  - [x] Race test test_loot_boxer (wc3-slop-lan races.py): 24 boxes, tiers 1-9, checks tier,
-    roll range, item table, charges and the tower left in each box's place. Passes; rolls ran
-    4-97 over 24 boxes (1-100 in an earlier run). Tier 4-9 boxes open only with mana (1-6, regen
+  - [x] Race test test_loot_boxer (wc3-slop-lan races.py): 38 boxes, tiers 1-9, checks tier,
+    roll range, the exact item for each roll, charges and the tower left in each box's place.
+    Passes (rolls 1-100 seen across runs). Tier 4-9 boxes open only with mana (1-6, regen
     0.01/s, or the Stick/Coin/MaulKoinz items); the test sets it.
   - [x] Tiers 6-9 always gave Rocks (I02F), and tier 5 more than tier 4: the thresholds
     `100 - 20 + 10 * (tier - 4 + 1)` and `100 - 10 + 5 * (...)` grew with the tier (100-130 for
