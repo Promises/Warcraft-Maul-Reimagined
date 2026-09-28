@@ -555,6 +555,20 @@ export class Defender extends AbstractPlayer {
         return this._races.indexOf(race) !== -1;
     }
 
+    /**
+     * Forgets the player's picks, for a repick (whose units are gone by then): the races, that a
+     * race was chosen, and the builders. The random counter stays, so a repick does not bring the
+     * normal random's gold back, nor Hardcore Random after a normal random; Hybrid Random is open
+     * again (it asks only that the player has no race).
+     */
+    public forgetRacePicks(): void {
+        this._races = [];
+        this._hasNormalPicked = false;
+        this._builders = [];
+        this._lootBoxer = undefined;
+        this._voidBuilder = undefined;
+    }
+
     /** Whether the player has a race other than a secondary one: what a secondary pick needs. */
     public hasPrimaryRace(): boolean {
         return this._races.some(race => !race.secondary);

@@ -779,6 +779,8 @@ export class Commands {
         player.setLumber(1);
         ForGroupBJ(grp, () => this.RemovePlayerUnits(player));
         DestroyGroup(grp);
+        // A fresh pick: the same race again, or Hybrid Random after a chosen race
+        player.forgetRacePicks();
         this.game.raceSelectPanel.open(player);
     }
 

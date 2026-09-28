@@ -59,7 +59,9 @@ export class RacePicking {
                 this.NormalRandomRace(player);
             }
         } else if (raceItem === FourCC('I00X')) { // Hybrid Random
-            if (player.repickCounter === 0 && !player.hasHardcoreRandomed && !player.hasNormalPicked) {
+            // Only as the player's race: not on top of a chosen or random one, but after a repick
+            // (which leaves none), whatever was picked before it. There is no repick from it.
+            if (!player.hasPrimaryRace() && !player.hasHardcoreRandomed) {
                 this.HybridRandomRace(player);
                 player.giveGold(50);
             } else {
