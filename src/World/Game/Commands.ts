@@ -44,6 +44,8 @@ export class Commands {
     private voteKickInProgress: boolean = false;
     private voteAgainstPlayer: Defender | undefined;
     private hasVotedToKick: boolean[] = [];
+    // Counts votekicks, so a votekick's expiry cannot end a later one
+    private voteKickNumber: number = 0;
     private voteKickTimer: timer = CreateTimer();
     private drawings: Image[][] = [];
     // Debug: waypoint marker tiles painted by -wptest, so they can be put back
@@ -854,8 +856,13 @@ export class Commands {
                     `${player.getNameWithColour()} has started a votekick for ${receivingPlayer.getNameWithColour()} (say -y to vote)`);
                 this.voteKickInProgress = true;
                 this.voteAgainstPlayer = receivingPlayer;
+                // A fresh vote: the last votekick's votes do not count, and its voters may vote again
+                for (let i: number = 0; i < bj_MAX_PLAYER_SLOTS; i++) {
+                    this.hasVotedToKick[i] = false;
+                }
                 this.hasVotedToKick[player.id] = true;
-                this.game.timedEventQueue.AddEvent(new TimedEvent(() => this.VotekickExpire(), 300, false));
+                const number: number = ++this.voteKickNumber;
+                this.game.timedEventQueue.AddEvent(new TimedEvent(() => this.VotekickExpire(number), 300, false));
 
             } else {
                 player.sendMessage('You idiot, you cannot stomp your own ass with the front of your own foot.');
@@ -868,7 +875,10 @@ export class Commands {
 
     }
 
-    private VotekickExpire(): boolean {
+    private VotekickExpire(number: number): boolean {
+        if (number !== this.voteKickNumber || !this.voteKickInProgress) {
+            return true;
+        }
         const count: number = this.CountCurrentVotes();
         if (this.voteAgainstPlayer) {
             SendMessage(`Votekick for ${this.voteAgainstPlayer.getNameWithColour()} has ended with ${count} votes`);
@@ -897,7 +907,8 @@ export class Commands {
 
     private CheckVotes(): void {
         const currentVotes: number = this.CountCurrentVotes();
-        const neededVotes: number = (this.game.players.size / 2) + 1;
+        // A majority of the players, the one voted on included: with 3 players 2 votes, with 4 three
+        const neededVotes: number = Math.floor(this.game.players.size / 2) + 1;
         const missingVotes: number = neededVotes - currentVotes;
 
 
