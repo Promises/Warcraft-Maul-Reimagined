@@ -7,6 +7,7 @@
   "main": "src/main.ts",
   "scripts": {
     "test": "ts-node --transpile-only scripts/test.ts",
+    "test:lua": "tstl -p tests/lua/tsconfig.json && bash scripts/lua32.sh dist/lua-tests tests.lua",
     "quest": "ts-node --transpile-only scripts/quest.ts",
     "prebuild": "ts-node --transpile-only --dir scripts create-config.ts && ts-node --transpile-only scripts/quest.ts",
     "build": "ts-node --transpile-only scripts/build.ts",

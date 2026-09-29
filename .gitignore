@@ -92,3 +92,6 @@ typings/
 .dynamodb/
 
 config.json
+
+# The 32-bit Lua the unit tests run on (scripts/lua32.sh builds it)
+tools/lua32

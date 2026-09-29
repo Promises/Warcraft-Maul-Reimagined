@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "ESNext",
+    "lib": ["ESNext"],
+    "moduleResolution": "node",
+    "rootDir": "../..",
+    "outDir": "../../dist/lua-tests",
+    "types": [
+      "@typescript-to-lua/language-extensions",
+      "lua-types/core/coroutine",
+      "lua-types/core/global",
+      "lua-types/core/math",
+      "lua-types/core/metatable",
+      "lua-types/core/modules",
+      "lua-types/core/string",
+      "lua-types/core/table",
+      "lua-types/core/os",
+      "lua-types/special/5.3"
+    ]
+  },
+  "include": ["*.test.ts"],
+  "tstl": {
+    "luaTarget": "5.3",
+    "noHeader": true,
+    "luaLibImport": "require",
+    "noImplicitSelf": true,
+    "luaBundle": "../../dist/lua-tests/tests.lua",
+    "luaBundleEntry": "./run.test.ts"
+  }
+}
