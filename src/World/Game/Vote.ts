@@ -10,6 +10,7 @@ import {SendMessage, Util} from "../../lib/translators";
 import {VotePanel} from './Ui/VotePanel';
 import {HostSettingsPanel} from './Ui/HostSettingsPanel';
 import {Defender} from '../Entity/Players/Defender';
+import {SyncTrace} from '../../lib/SyncTrace';
 
 // Host detection answers within a second or two; after this the players vote instead
 const HOST_WAIT = 3.00;
@@ -24,7 +25,8 @@ const VOTE_LENGTH = 10.00;
  * selection already open, since the difficulty does not change what can be picked.
  *
  * Panel clicks are frame events; the acting client sends a sync message and every client
- * applies the result in the handler, so the outcome is identical everywhere.
+ * applies the result in the handler, so the outcome is identical everywhere. A vote ends when
+ * every player has voted, or else when its time is up.
  */
 export class Vote {
     public game: WarcraftMaul;
@@ -36,6 +38,9 @@ export class Vote {
     private hasVotedMode: boolean[] = [];
     private votedDiff: number[] = [];
     private totalVotedDiff: number = 0;
+    // A vote ends when everyone has voted or its time is up, whichever comes first - once
+    private modeVoteOpen: boolean = false;
+    private diffVoteOpen: boolean = false;
     public difficulty: number = 0;
     public forceBlitz: boolean = false;
 
@@ -129,6 +134,7 @@ export class Vote {
         }
         const labels = settings.PLAYER_GAME_MODES.map(mode => this.modeName(mode));
         this.panel.show('Game mode vote', labels, index => this.game.playerSync.send('vote-mode', `${index}`));
+        this.modeVoteOpen = true;
         Timer.create().start(VOTE_LENGTH, false, () => this.resolveModeVote());
     }
 
@@ -140,9 +146,26 @@ export class Vote {
         this.votedMode[index]++;
         this.panel.hide(this.game.players.get(player.id)!);
         SendMessage(`${this.playerName(player)} voted for: ${this.modeName(settings.PLAYER_GAME_MODES[index])}`);
+        if (this.everyoneVoted(defender => this.hasVotedMode[defender.id])) {
+            this.resolveModeVote();
+        }
+    }
+
+    /** Whether every player has voted: then the vote need not wait for its time. */
+    private everyoneVoted(hasVoted: (defender: Defender) => boolean): boolean {
+        for (const defender of this.game.players.values()) {
+            if (!hasVoted(defender)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private resolveModeVote(): void {
+        if (!this.modeVoteOpen) {
+            return;
+        }
+        this.modeVoteOpen = false;
         let winningMode: number = 0;
         for (let i = 1; i < this.votedMode.length; i++) {
             if (this.votedMode[i] > this.votedMode[winningMode]) {
@@ -151,6 +174,7 @@ export class Vote {
         }
         const mode = settings.PLAYER_GAME_MODES[winningMode];
         SendMessage(`${this.modeName(mode)} won with ${this.votedMode[winningMode]} votes.`);
+        SyncTrace.note('vote', `mode=${mode} votes=${this.votedMode[winningMode]}`);
         this.applyMode(mode);
 
         // Difficulty is voted on while the race selection is already open
@@ -184,6 +208,7 @@ export class Vote {
         const labels = settings.DIFFICULTIES.map((diff, i) =>
             Util.ColourString(settings.DIFFICULTY_COLOURS[i], `${diff}% ${settings.DIFFICULTY_STRINGS[i]}`));
         this.panel.show('Difficulty vote', labels, index => this.game.playerSync.send('vote-diff', `${index}`));
+        this.diffVoteOpen = true;
         Timer.create().start(VOTE_LENGTH, false, () => this.resolveDiffVote());
     }
 
@@ -194,9 +219,16 @@ export class Vote {
         this.votedDiff[player.id] = settings.DIFFICULTIES[index];
         this.panel.hide(this.game.players.get(player.id)!);
         SendMessage(`${this.playerName(player)} voted for: ${Util.ColourString(settings.DIFFICULTY_COLOURS[index], settings.DIFFICULTY_STRINGS[index])}`);
+        if (this.everyoneVoted(defender => this.votedDiff[defender.id] !== undefined)) {
+            this.resolveDiffVote();
+        }
     }
 
     private resolveDiffVote(): void {
+        if (!this.diffVoteOpen) {
+            return;
+        }
+        this.diffVoteOpen = false;
         let voteCount: number = 0;
         for (const player of this.game.players.values()) {
             if (!this.votedDiff[player.id]) {
@@ -213,6 +245,7 @@ export class Vote {
         } else {
             this.applyDifficulty(this.totalVotedDiff / voteCount);
         }
+        SyncTrace.note('vote', `difficulty=${this.difficulty} votes=${voteCount}`);
     }
 
     /** Sets the difficulty (a percentage, possibly a vote average) and everything that hangs off it. */
