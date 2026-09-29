@@ -10,14 +10,16 @@ export const SURGE = 'AP02';
  * Siphon Energy (A0CT) is added to the mature pieces a Primal is made of, so they can fuse, and
  * Ascend and Surge to the Primals.
  */
-export const {LICH, THUNDERHEAD, LICH_KING, EYE_OF_THE_STORM, PRIMAL_INGREDIENTS} = compiletime(({objectData}) => {
+export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LICH_KING, EYE_OF_THE_STORM, ENDLESS_STORM,
+    AVATAR_OF_LIFE, NORDRASSIL, FIRELORD, PRIMAL_INGREDIENTS} = compiletime(({objectData}) => {
     // Ascend and Surge: the ids are the ASCEND and SURGE above (compiletime code cannot see them)
     require(require('path').resolve('scripts/primal-abilities.js')).addPrimalAbilities([
         {
             id: 'AP01', order: 'avatar', name: '[Elementalists] Ascend', tooltip: 'Ascend [|cffffcc00V|r]',
-            extended: 'At Attunement 15, this Primal ascends: a Lich becomes the Lich King (400 gold), a Thunderhead the '
-                + 'Eye of the Storm (500 gold). An Ascended tower gains 5% of its base damage every wave it stands, '
-                + 'with no cap. One of each Ascended per player.',
+            extended: 'At Attunement 15, this Primal ascends: the Lich into the Lich King (400 gold), the Thunderhead '
+                + 'into the Eye of the Storm (500), the Haboob into the Endless Storm (500), the Heart of Life into the '
+                + 'Avatar of Life (600), the World Tree into Nordrassil (450), the Inferno into the Firelord (400). An '
+                + 'Ascended tower gains 5% of its power every wave it stands, with no cap. One of each Ascended per player.',
             icon: 'ReplaceableTextures\\CommandButtons\\BTNAvatar.blp', hotkey: 'V', x: 1, y: 2,
         },
         {
@@ -28,8 +30,10 @@ export const {LICH, THUNDERHEAD, LICH_KING, EYE_OF_THE_STORM, PRIMAL_INGREDIENTS
         },
     ]);
 
-    // Undead L2 and Death Rune L3: the Lich; Air Rune L3 and Water Rune L3: Thunderhead
-    const ingredients = ['u038', 'u02B', 'u033', 'u035'];
+    // Undead L2 and Death Rune L3: the Lich; Air Rune L3 and Water Rune L3: Thunderhead; Sandstorm L2
+    // and Air Rune L3: Haboob; two Life Rune L3: Heart of Life; Tree and Nature Rune L3: World Tree;
+    // Purgatory L2 and Fire Rune L3: Inferno
+    const ingredients = ['u038', 'u02B', 'u033', 'u035', 'u03D', 'u02D', 'u036', 'u02F', 'u039', 'u031'];
     for (const id of ingredients) {
         const unit: Unit | undefined = objectData.units.get(id);
         if (unit && String(unit.normal ?? '').split(',').indexOf('A0CT') === -1) {
@@ -74,8 +78,58 @@ export const {LICH, THUNDERHEAD, LICH_KING, EYE_OF_THE_STORM, PRIMAL_INGREDIENTS
     thunderhead.tooltipExtended = 'A Primal fusion of an Air Rune Level 3 and a Water Rune Level 3 (Siphon Energy, 600 gold).'
         + '|n|nAttacks air only: about 1,500 chaos damage, range 1,000, 700 splash against air, as fast '
         + 'as the Dalaran Guard Tower. Gains Attunement: 2% of its base damage per wave it stands, up to 15.';
+    // Placeholder models from the game's own art until each gets one of its own (see the design doc)
+    const primal = (from: string, id: string, name: string, extended: string) => {
+        const unit = objectData.units.copy(objectData.units.get(from)!, id)!;
+        unit.name = name;
+        unit.tooltipBasic = name;
+        unit.tooltipExtended = extended;
+        return unit;
+    };
+    const attunement = 'Gains Attunement: 2% of its power per wave it stands, up to 15.';
+
+    // Haboob: Sandstorm L2's many-target attack (its Barrage is set to 8 targets and 500 range per
+    // tower, Haboob.ts), harder and further
+    const haboob = primal('u03D', 'uP03', 'Haboob', 'A Primal fusion of Sandstorm Level 2 and an Air Rune Level 3 '
+        + '(Siphon Energy, 400 gold).|n|nHits up to 8 targets, air and ground: 1,300 chaos damage, range 500. ' + attunement);
+    haboob.scalingValueundefined = 0.55;
+    haboob.iconGameInterface = 'ReplaceableTextures\\CommandButtons\\BTNTornado.blp';
+    haboob.attack1DamageBase = 1299;
+    haboob.attack1Range = 500;
+    haboob.acquisitionRange = 500;
+
+    // Heart of Life: two Life Rune L3, the race's boss killer: melee, one target, a heavy hit
+    const heart = primal('u02D', 'uP04', 'Heart of Life', 'A Primal fusion of two Life Rune Level 3 '
+        + '(Siphon Energy, 500 gold).|n|nA boss killer: melee, one target, 4,300 normal damage a second. ' + attunement);
+    heart.scalingValueundefined = 0.8;
+    heart.attack1DamageBase = 4299;
+
+    // World Tree: Nature Rune L3's siege attack with splash
+    const worldTree = primal('u02F', 'uP05', 'World Tree', 'A Primal fusion of a Tree and a Nature Rune Level 3 '
+        + '(Siphon Energy, 400 gold).|n|nGround splash: 1,400 siege damage a second, range 800, 250 splash. ' + attunement);
+    worldTree.modelFile = 'buildings\\nightelf\\TreeofLife\\TreeofLife';
+    worldTree.scalingValueundefined = 0.45;
+    worldTree.iconGameInterface = 'ReplaceableTextures\\CommandButtons\\BTNTreeOfLife.blp';
+    worldTree.attack1WeaponType = 'msplash';
+    worldTree.attack1DamageBase = 1399;
+    worldTree.attack1CooldownTime = 1;
+    worldTree.attack1AreaOfEffectFullDamage = 250;
+    worldTree.attack1AreaOfEffectMediumDamage = 250;
+    worldTree.attack1AreaOfEffectSmallDamage = 250;
+    worldTree.attack1AreaOfEffectTargets = 'ground,enemies';
+
+    // Inferno: Purgatory L2's burn, far hotter and wider. The burn is in code (Inferno.ts), so
+    // Purgatory's immolation ability goes
+    const inferno = primal('u039', 'uP06', 'Inferno', 'A Primal fusion of Purgatory Level 2 and a Fire Rune Level 3 '
+        + '(Siphon Energy, 350 gold).|n|nImmolation: 400 damage a second to every enemy within 400. For clumped '
+        + 'ground waves; weak on bosses. ' + attunement);
+    inferno.modelFile = 'units\\demon\\Infernal\\Infernal';
+    inferno.scalingValueundefined = 1.1;
+    inferno.iconGameInterface = 'ReplaceableTextures\\CommandButtons\\BTNInfernal.blp';
+    inferno.normal = String(inferno.normal ?? '').split(',').filter(id => id !== 'A0E7').join(',');
+
     // The Primals can Ascend and Surge
-    for (const primal of [lich, thunderhead]) {
+    for (const primal of [lich, thunderhead, haboob, heart, worldTree, inferno]) {
         primal.normal = String(primal.normal ?? '').split(',').concat('AP01', 'AP02').join(',');
     }
 
@@ -101,6 +155,42 @@ export const {LICH, THUNDERHEAD, LICH_KING, EYE_OF_THE_STORM, PRIMAL_INGREDIENTS
     eye.tooltipExtended = 'The Thunderhead, ascended (500 gold). Attacks air only: about 2,100 chaos damage, range 1,100, '
         + '900 splash against air. Gains 5% of its base damage every wave it stands, with no cap.';
 
-    return {LICH: lich.newId, THUNDERHEAD: thunderhead.newId, LICH_KING: lichKing.newId, EYE_OF_THE_STORM: eye.newId,
-        PRIMAL_INGREDIENTS: ingredients};
-}) as {LICH: string, THUNDERHEAD: string, LICH_KING: string, EYE_OF_THE_STORM: string, PRIMAL_INGREDIENTS: string[]};
+    const ascended = (from: Unit, id: string, name: string, extended: string) => {
+        const unit = objectData.units.copy(from, id)!;
+        unit.name = name;
+        unit.normal = withoutPrimalAbilities(unit.normal);
+        unit.tooltipBasic = name;
+        unit.tooltipExtended = extended;
+        return unit;
+    };
+    const uncapped = 'Gains 5% of its power every wave it stands, with no cap.';
+    const endlessStorm = ascended(haboob, 'uA03', 'Endless Storm', 'The Haboob, ascended (500 gold). Hits up to 8 '
+        + 'targets, air and ground: 2,000 chaos damage, range 500. ' + uncapped);
+    endlessStorm.attack1DamageBase = 1999;
+    endlessStorm.scalingValueundefined = 0.7;
+    const avatar = ascended(heart, 'uA04', 'Avatar of Life', 'The Heart of Life, ascended (600 gold). Melee, one '
+        + 'target, 9,000 normal damage a second, and half again against bosses. ' + uncapped);
+    avatar.attack1DamageBase = 8999;
+    avatar.scalingValueundefined = 1.0;
+    const nordrassil = ascended(worldTree, 'uA05', 'Nordrassil', 'The World Tree, ascended (450 gold). Ground splash: '
+        + '3,000 siege damage a second, range 900, 300 splash; every fifth attack roots its target for a second '
+        + '(not bosses). ' + uncapped);
+    nordrassil.modelFile = 'buildings\\nightelf\\TreeofEternity\\TreeofEternity';
+    nordrassil.iconGameInterface = 'ReplaceableTextures\\CommandButtons\\BTNTreeOfEternity.blp';
+    nordrassil.attack1DamageBase = 2999;
+    nordrassil.attack1Range = 900;
+    nordrassil.acquisitionRange = 900;
+    nordrassil.attack1AreaOfEffectFullDamage = 300;
+    nordrassil.attack1AreaOfEffectMediumDamage = 300;
+    nordrassil.attack1AreaOfEffectSmallDamage = 300;
+    const firelord = ascended(inferno, 'uA06', 'Firelord', 'The Inferno, ascended (400 gold). Immolation: 900 damage '
+        + 'a second to every enemy within 450. ' + uncapped);
+    firelord.scalingValueundefined = 1.4;
+
+    return {LICH: lich.newId, THUNDERHEAD: thunderhead.newId, HABOOB: haboob.newId, HEART_OF_LIFE: heart.newId,
+        WORLD_TREE: worldTree.newId, INFERNO: inferno.newId, LICH_KING: lichKing.newId, EYE_OF_THE_STORM: eye.newId,
+        ENDLESS_STORM: endlessStorm.newId, AVATAR_OF_LIFE: avatar.newId, NORDRASSIL: nordrassil.newId,
+        FIRELORD: firelord.newId, PRIMAL_INGREDIENTS: ingredients};
+}) as {LICH: string, THUNDERHEAD: string, HABOOB: string, HEART_OF_LIFE: string, WORLD_TREE: string, INFERNO: string,
+    LICH_KING: string, EYE_OF_THE_STORM: string, ENDLESS_STORM: string, AVATAR_OF_LIFE: string, NORDRASSIL: string,
+    FIRELORD: string, PRIMAL_INGREDIENTS: string[]};

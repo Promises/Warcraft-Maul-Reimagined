@@ -14,8 +14,15 @@ import { Plague } from './Plague';
 import { Lich } from './Lich';
 import { Thunderhead } from './Thunderhead';
 import { LichKing } from './LichKing';
-import { AscendedTower, MaturePiece } from '../../Specs/AttunedTower';
-import { EYE_OF_THE_STORM, LICH, LICH_KING, THUNDERHEAD } from '../../../../Game/Races/ElementalistPrimals';
+import { AscendedTower, AttunedTower, MaturePiece } from '../../Specs/AttunedTower';
+import { EndlessStorm, Haboob } from './Haboob';
+import { Firelord, Inferno } from './Inferno';
+import { AvatarOfLife } from './AvatarOfLife';
+import { Nordrassil } from './Nordrassil';
+import {
+    AVATAR_OF_LIFE, ENDLESS_STORM, EYE_OF_THE_STORM, FIRELORD, HABOOB, HEART_OF_LIFE, INFERNO, LICH, LICH_KING, NORDRASSIL,
+    THUNDERHEAD, WORLD_TREE,
+} from '../../../../Game/Races/ElementalistPrimals';
 
 // The mature pieces: the top of each line, which gain Attunement (Undead L2, Undead2, has its own class)
 const MATURE_PIECES: string[] = [
@@ -48,6 +55,14 @@ export class ElementalistTowers extends RaceTowers {
         list.add(FourCC(THUNDERHEAD), Thunderhead);
         list.add(FourCC(LICH_KING), LichKing);
         list.add(FourCC(EYE_OF_THE_STORM), AscendedTower);
+        list.add(FourCC(HABOOB), Haboob);
+        list.add(FourCC(ENDLESS_STORM), EndlessStorm);
+        list.add(FourCC(HEART_OF_LIFE), AttunedTower);
+        list.add(FourCC(AVATAR_OF_LIFE), AvatarOfLife);
+        list.add(FourCC(WORLD_TREE), AttunedTower);
+        list.add(FourCC(NORDRASSIL), Nordrassil);
+        list.add(FourCC(INFERNO), Inferno);
+        list.add(FourCC(FIRELORD), Firelord);
         for (const id of MATURE_PIECES) {
             list.add(FourCC(id), MaturePiece);
         }

@@ -64,8 +64,18 @@
     levels (60 each) then refused, Ascend refused below Attunement 15, made at 15 for 500; the Eye
     gains 102 a wave (5% of 2,050); 17,129 dps against air right after ascending - it keeps its
     +30% Attunement, so it starts well past Dalaran, not at parity: tune.
-  - [ ] The other Primals (Haboob, Heart of Life, World Tree, Inferno). Remixer is credited in
-    the changelog (5.0.0) for the Storm Spire.
+  - [x] The other Primals and their Ascended forms (branch), from the design plan's numbers:
+    Haboob uP03 (Sandstorm L2 + Air L3, 400; Barrage set per tower to 8 targets, range 500) ->
+    Endless Storm uA03; Heart of Life uP04 (two Life L3, 500) -> Avatar of Life uA04 (+50% in the
+    boss waves 35-37); World Tree uP05 (Tree + Nature L3, 400; siege splash 250) -> Nordrassil uA05
+    (every 5th attack roots 1 s, not in boss waves); Inferno uP06 (Purgatory L2 + Fire L3, 350;
+    burns 400/s within 400, in code) -> Firelord uA06 (900/s within 450). test_primals (wc3-slop-lan
+    measure.py) puts the ingredients down with the map's .tower hook, and checks fees, classes,
+    Barrage count, splash, burn, roots and the boss bonus. Remixer is credited for the Storm Spire.
+  - [ ] Models for the four new Primals and their Ascended forms: placeholders from the game's art
+    (Altar of Storms, Fountain of Health, Tree of Life / Eternity, Infernal), not looked at in game.
+  - [ ] Sandstorm L2's tooltip says "up to 5 targets"; its Barrage (A0E4, field 5) hits 7 (the
+    field is extra targets minus one, measured on the Haboob).
   - [x] Recipe discovery, as in the "Elementalist Recipe Tree" design doc (branch): the first Siphon
     on an undiscovered Primal pair reveals it for free and the next makes it; a pair with no recipe
     says "Nothing stirs", with a hint when a tower goes into an undiscovered Primal; the first of

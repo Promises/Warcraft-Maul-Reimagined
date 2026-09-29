@@ -1,3 +1,4 @@
+import {Unit} from 'w3ts';
 import {WarcraftMaul} from '../WarcraftMaul';
 import {DecodeFourCC} from '../../lib/translators';
 import {DebugGameRound} from './DebugMaul/DebugGameRound';
@@ -13,6 +14,9 @@ import {BlitzGameRound} from './BlitzMaul/BlitzGameRound';
  *    with "@", as a PlayerSync message from that player ("@race-pick:I006") - what their own UI
  *    would have sent, so a test can pick, build or vote without a click;
  *  - `.towers` lists the player's towers with the class that gives each its behaviour;
+ *  - `.tower <type> <x> <y>` puts a tower of that type down for the player, set up as a built one
+ *    (its class, its place in the game's lists), so a test can start from any tower - a Primal's
+ *    ingredients, say - without the builds and random rolls that lead to it;
  *  - the heartbeat gets lives, wave, the wave timer and creeps, the game mode and whether this is a
  *    dev build (its debug commands: -wave, -lives, ...), and kills and towers per player;
  *  - the events that decide a game are written to the trace at once, not on the next flush.
@@ -37,6 +41,18 @@ export function installSlopHooks(game: WarcraftMaul): void {
                     + ` class=${(tower as unknown as {constructor: {name: string}}).constructor.name}`);
             }
             Slop.note('tower', `p${player.id} end`);
+            return true;
+        }
+        if (line.startsWith('.tower ')) {
+            const [, type, x, y] = line.split(' ');
+            const unit = Unit.create(player, FourCC(type), Number(x), Number(y), bj_UNIT_FACING);
+            if (unit === undefined) {
+                Slop.note('tower', `p${player.id} could not make ${type}`);
+                return true;
+            }
+            const tower = game.worldMap.towerConstruction.SetupTower(unit, player);
+            Slop.note('tower', `p${player.id} made id=${Slop.ref(unit.handle)} type=${type}`
+                + ` class=${(tower as unknown as {constructor: {name: string}}).constructor.name}`);
             return true;
         }
         if (line.startsWith('@')) {

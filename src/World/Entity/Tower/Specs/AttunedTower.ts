@@ -64,9 +64,14 @@ export class AttunedTower extends Tower implements EndOfRoundTower {
         this.applyDamage();
     }
 
-    private applyDamage(): void {
-        const share = 1 + ATTUNEMENT_PER_LEVEL * this.attunement + this.growthPerWave * this.waves;
-        this.unit.setBaseDamage(Math.floor(this.baseDamage * share) + this.bonusDamage, 0);
+    /** What Attunement and Ascended growth make of the tower's power: 1 plus their share of it. */
+    protected growthShare(): number {
+        return 1 + ATTUNEMENT_PER_LEVEL * this.attunement + this.growthPerWave * this.waves;
+    }
+
+    /** Puts the growth on the tower: its base damage, unless its power is elsewhere (Inferno). */
+    protected applyDamage(): void {
+        this.unit.setBaseDamage(Math.floor(this.baseDamage * this.growthShare()) + this.bonusDamage, 0);
     }
 }
 

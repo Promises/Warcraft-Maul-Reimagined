@@ -3,7 +3,7 @@ import {Defender} from '../../Players/Defender';
 import {SavePart} from '../../../Game/Saves';
 import {BitReader, BitWriter} from '../../../../lib/Save/Bits';
 import {SyncTrace} from '../../../../lib/SyncTrace';
-import {LICH, THUNDERHEAD} from '../../../Game/Races/ElementalistPrimals';
+import {HABOOB, HEART_OF_LIFE, INFERNO, LICH, THUNDERHEAD, WORLD_TREE} from '../../../Game/Races/ElementalistPrimals';
 import {RecipeBookPanel} from '../../../Game/Ui/RecipeBookPanel';
 
 const SIPHON = FourCC('A0CT');
@@ -15,6 +15,7 @@ const SIPHON = FourCC('A0CT');
 const RESULTS: string[] = [
     'n026', 'u01D', 'n028', 'n030', 'u01E', 'u01F', 'u020', 'u021', 'u022', 'u023', 'u024', 'u025', 'u026',
     'u028', 'u027', 'u02A', 'u02C', 'u02E', 'u030', 'u032', 'u034', LICH, THUNDERHEAD,
+    HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO,
 ];
 
 /** A unit type's name without its race prefix ("[Elementalist] - Lich" is "Lich"). */

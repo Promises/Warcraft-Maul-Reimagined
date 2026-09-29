@@ -1,5 +1,8 @@
 import { Log } from '../../../../lib/Serilog/Serilog';
-import { EYE_OF_THE_STORM, LICH, LICH_KING, THUNDERHEAD } from '../../../Game/Races/ElementalistPrimals';
+import {
+    AVATAR_OF_LIFE, ENDLESS_STORM, EYE_OF_THE_STORM, FIRELORD, HABOOB, HEART_OF_LIFE, INFERNO, LICH, LICH_KING, NORDRASSIL,
+    THUNDERHEAD, WORLD_TREE,
+} from '../../../Game/Races/ElementalistPrimals';
 
 /** A Primal fusion: two grown towers, a fee, and a line on what the Primal does. */
 export interface PrimalRecipe {
@@ -60,12 +63,21 @@ export class ElementalistSettings {
         // Primal fusions of mature pieces, for a fee
         this.AddPrimal('u038', 'u02B', LICH, 250, 'keeps all the Undead\'s damage and grows 100 a wave'); // Undead L2 + Death Rune L3
         this.AddPrimal('u033', 'u035', THUNDERHEAD, 600, 'strikes air units with chaos splash'); // Air Rune L3 + Water Rune L3
+        this.AddPrimal('u03D', 'u033', HABOOB, 400, 'hits up to 8 targets, air and ground'); // Sandstorm L2 + Air Rune L3
+        this.AddPrimal('u02D', 'u02D', HEART_OF_LIFE, 500, 'kills bosses: melee, one target, a heavy hit'); // two Life Rune L3
+        this.AddPrimal('u036', 'u02F', WORLD_TREE, 400, 'splashes ground waves with siege damage'); // Tree + Nature Rune L3
+        this.AddPrimal('u039', 'u031', INFERNO, 350, 'burns every enemy near it'); // Purgatory L2 + Fire Rune L3
 
         // What each Primal ascends to, and for how much; one of each Ascended per player
         this.ascensions.set(LICH, {ascended: LICH_KING, fee: 400});
         this.ascensions.set(THUNDERHEAD, {ascended: EYE_OF_THE_STORM, fee: 500});
-        this.limits.set(LICH_KING, 1);
-        this.limits.set(EYE_OF_THE_STORM, 1);
+        this.ascensions.set(HABOOB, {ascended: ENDLESS_STORM, fee: 500});
+        this.ascensions.set(HEART_OF_LIFE, {ascended: AVATAR_OF_LIFE, fee: 600});
+        this.ascensions.set(WORLD_TREE, {ascended: NORDRASSIL, fee: 450});
+        this.ascensions.set(INFERNO, {ascended: FIRELORD, fee: 400});
+        for (const ascended of [LICH_KING, EYE_OF_THE_STORM, ENDLESS_STORM, AVATAR_OF_LIFE, NORDRASSIL, FIRELORD]) {
+            this.limits.set(ascended, 1);
+        }
 
     }
 
