@@ -1,4 +1,5 @@
 import {Frame, MapPlayer, Trigger} from 'w3ts';
+import {Log} from '../../../lib/Serilog/Serilog';
 
 /**
  * How custom frames are built (the same approach as scourge-survival):
@@ -105,19 +106,99 @@ export function onClick(button: Frame, handler: (this: void, player: MapPlayer) 
     trigger.addAction(() => {
         const player = MapPlayer.fromEvent()!;
         if (player.handle === GetLocalPlayer()) {
-            button.setEnabled(false);
-            button.setEnabled(true);
+            dropFocus(button.handle);
         }
         handler(player);
     });
 }
 
-/** A click handler for the clicker's own client only: local view changes and sync sends. */
-export function onLocalClick(button: Frame, handler: (this: void) => void): void {
-    onClick(button, player => {
-        if (player.handle === GetLocalPlayer()) {
-            handler();
+/*
+ * Clicks without the wait (hiveworkshop.com/threads/async-zero-latency-buttons.357700). A frame
+ * click event is synced, so it reaches even the clicker's own client a round trip after the
+ * click. But a local handler has nothing to sync: it changes the local view or sends a sync of
+ * its own. So the clicker's client watches the button itself. A button with a pushed backdrop and
+ * a mouse-over highlight shows the one while the mouse holds it down and the other while the mouse
+ * is over it: when the pushed backdrop goes away with the mouse still over the button, that is the
+ * click, and the handler runs then. An EscMenuButtonTemplate button (CustomTextButton,
+ * CustomListButton, like ScriptDialogButton) has them as children 1 and 5. (A button template of
+ * our own with a pushed backdrop and a highlight, for the host settings rows, crashed the game as
+ * it loaded; those rows keep the synced click.) The synced click still comes; it only runs the handler when
+ * the watch did not (a button of another kind, or a press it missed), so nothing is lost.
+ */
+// Where an EscMenuButtonTemplate button has them
+const PUSHED_CHILD = 1;
+const HIGHLIGHT_CHILD = 5;
+// How often the clicker's client looks at its buttons: well under a frame
+const WATCH_SECONDS = 0.01;
+
+interface WatchedButton {
+    button: framehandle;
+    pushed: framehandle;
+    highlight: framehandle;
+    handler: (this: void) => void;
+    held: boolean;
+    // Clicks the watch ran the handler for, whose synced click is still to come
+    ahead: number;
+}
+
+const watchedButtons: WatchedButton[] = [];
+
+/**
+ * Starts the watch: one timer, made on every client alike (it is a handle), called once while
+ * the map starts. What it does in its ticks is local: reading this client's frames and running
+ * local handlers.
+ */
+export function installAsyncClicks(): void {
+    const timer = CreateTimer()!;
+    TimerStart(timer, WATCH_SECONDS, true, () => {
+        for (const watched of watchedButtons) {
+            const held = BlzFrameIsVisible(watched.pushed);
+            if (held === watched.held) {
+                continue;
+            }
+            watched.held = held;
+            // Let go over the button: a click (let go elsewhere is not one, as with the engine's)
+            if (!held && BlzFrameIsVisible(watched.highlight) && BlzFrameGetEnable(watched.button)) {
+                // The focus is left to the synced click (onClick): toggling the button now, as
+                // the engine makes its click, could lose that click
+                watched.ahead++;
+                watched.handler();
+            }
         }
+    });
+}
+
+/** Gives a clicked button's keyboard focus up, so it does not swallow hotkeys. Local. */
+function dropFocus(button: framehandle): void {
+    BlzFrameSetEnable(button, false);
+    BlzFrameSetEnable(button, true);
+}
+
+/**
+ * A click handler for the clicker's own client only: local view changes and sync sends. On an
+ * EscMenuButtonTemplate button it runs as the button is let go (see installAsyncClicks); on any
+ * other it runs with the synced click.
+ */
+export function onLocalClick(button: Frame, handler: (this: void) => void): void {
+    let watched: WatchedButton | undefined;
+    if (BlzFrameGetChildrenCount(button.handle) > HIGHLIGHT_CHILD) {
+        const pushed = BlzFrameGetChild(button.handle, PUSHED_CHILD);
+        const highlight = BlzFrameGetChild(button.handle, HIGHLIGHT_CHILD);
+        if (pushed !== undefined && highlight !== undefined) {
+            watched = {button: button.handle, pushed, highlight, handler, held: false, ahead: 0};
+            watchedButtons.push(watched);
+        }
+    }
+    Log.Debug(`onLocalClick ${BlzFrameGetName(button.handle)}: ${watched ? 'at once' : 'with the synced click'}`);
+    onClick(button, player => {
+        if (player.handle !== GetLocalPlayer()) {
+            return;
+        }
+        if (watched !== undefined && watched.ahead > 0) {
+            watched.ahead--;
+            return;
+        }
+        handler();
     });
 }
 

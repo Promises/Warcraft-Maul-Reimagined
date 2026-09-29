@@ -8,6 +8,7 @@ import {CreepAbilityHandler} from "./World/Entity/CreepAbilities/CreepAbilityHan
 import {WarcraftMaul} from "./World/WarcraftMaul";
 import {writeLobbyStamp} from "./World/Game/LobbyStamp";
 import {installGameMessages} from "./World/Game/Ui/GameMessages";
+import {installAsyncClicks} from "./World/Game/Ui/Frames";
 import {AbilityTypes} from "war3-objectdata-th";
 import BuildTinyScoutTower = AbilityTypes.BuildTinyScoutTower;
 
@@ -41,6 +42,7 @@ function tsMain() {
     BlzLoadTOCFile('uiImport\\Templates.toc');
     BlzLoadTOCFile('war3mapImported\\ui\\templates.toc');
     installGameMessages();
+    installAsyncClicks();
     Log.addSink((new StringSink(LogLevel.Error)));
     Log.addSink(new FileSink('warcraft-maul.txt'));
     try {
