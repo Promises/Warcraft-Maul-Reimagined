@@ -11,6 +11,18 @@ interface Quest {
 
 export const Quests: Quest[] = [
     {
+        title: `5.0.0 - 5`,
+        icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
+        stype: 0,
+        body: `Updates:\n- Fixed: Elementalist runes could never roll Life\n- Fixed: Loot Boxer tier 4-9 boxes always gave Rocks, and Rocks lost their charges\n- Fixed: Wyvern lightning skipped Navy's creeps and spared waves 34-35 instead of the bosses\n- Fixed: votekick could never pass; it now needs a majority\n- Fixed: the scoreboard wrote the first player over its header\n- Fixed: High Priest's Monsoon cancelled its attacks; Berserker and Flesh Golem never berserked\n- Fixed: Pay the Toll failed silently without 50 gold; Void Restoration did nothing\n- Fixed: Ice Troll Priest could Frost Nova dead creeps\n- Fixed: Alliance of Blades enchantment checks and refunds\n- Fixed: desyncs when a race was picked`,
+    },
+    {
+        title: `5.0.0 - 4`,
+        icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
+        stype: 0,
+        body: `Updates:\n- Buttons on the race, vote and settings panels react the moment you click, without waiting on the network\n- A vote ends as soon as everyone has voted\n- Creep abilities by difficulty: one per 100% above Normal (Medium 1, Hard 2, Extreme 3), and bosses get all ten\n- Venom Tower attacks a random enemy in range\n- Loot Boxer: higher tiers give fewer Rocks, tiers 7-9 none; every roll is logged (-log). Loot Boxer is random-only\n- Repick starts over: the same race again, or Hybrid Random after any pick\n- Shrine of Buffs is a secondary race, picked from its own tab once you have a race\n- The host can set mode and difficulty with -s (for host bots)`,
+    },
+    {
         title: `5.0.0 - 3`,
         icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
         stype: 0,
