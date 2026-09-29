@@ -159,8 +159,9 @@ export class WarcraftMaul {
         // Set up all players
         for (let i: number = 0; i < bj_MAX_PLAYER_SLOTS; i++) {
             // Under the wc3-slop-lan test harness its host may play a seat of its own, to send
-            // commands from - never a defender
-            if (Slop !== undefined && i === Slop.seat) {
+            // commands from: not a defender, unless a test seats it in a lane - then it is one more
+            // player, driven by the test's commands (a third voter, say)
+            if (Slop !== undefined && i === Slop.seat && i >= this.mapSettings.PLAYER_AREAS.length) {
                 continue;
             }
             if (MapPlayer.fromIndex(i)?.slotState === PLAYER_SLOT_STATE_PLAYING) {

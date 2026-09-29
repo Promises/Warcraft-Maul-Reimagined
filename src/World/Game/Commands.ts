@@ -16,6 +16,7 @@ import {COLOUR, DecodeFourCC, SendMessage, Util} from "../../lib/translators";
 import {Effect, Frame, MapPlayer, Timer, Trigger, Unit} from "w3ts";
 import {Image} from "../../JassOverrides/Image";
 import {DebugGameRound} from './DebugMaul/DebugGameRound';
+import {SyncTrace} from '../../lib/SyncTrace';
 
 /**
  * One of the array, rolled on the game's generator so every client picks the same one.
@@ -912,6 +913,8 @@ export class Commands {
         // A majority of the players, the one voted on included: with 3 players 2 votes, with 4 three
         const neededVotes: number = Math.floor(this.game.players.size / 2) + 1;
         const missingVotes: number = neededVotes - currentVotes;
+        SyncTrace.note('votekick', `p${this.voteAgainstPlayer?.id} votes=${currentVotes} needed=${neededVotes}`
+            + ` players=${this.game.players.size}`);
 
 
         if (currentVotes >= neededVotes) {
@@ -928,6 +931,7 @@ export class Commands {
                 this.game.grayVacancy.laneVacated(this.voteAgainstPlayer.lane, this.voteAgainstPlayer);
 
                 SendMessage(`Votekick for ${this.voteAgainstPlayer.getNameWithColour()} has succeeded!`);
+                SyncTrace.note('votekick', `p${this.voteAgainstPlayer.id} kicked`);
                 CustomDefeatBJ(this.voteAgainstPlayer.handle, 'Kicked!');
 
                 // DestroyTimer(this.voteKickTimer);
