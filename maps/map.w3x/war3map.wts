@@ -28274,7 +28274,7 @@ Siphon Energy
 STRING 9658
 // Abilities: A0CT (Siphon Energy), Ubertip (Tooltip - Normal - Extended)
 {
-Siphons the energy out of another level 1 rune. The target rune is turned to solid rock and this rune will become a fusion between the target and itself.|n|nPrimal fusions:|n- Undead Level 2 and a Death Rune Level 3 become a Lich (250 gold), which keeps all the Undead's damage|n- An Air Rune Level 3 and a Water Rune Level 3 become a Thunderhead (600 gold), which attacks air|nA Primal keeps the higher Attunement of the two.
+Siphons the energy out of another rune or grown tower. The target is turned to solid rock and this tower becomes a fusion of the two.|n|nTwo grown towers can fuse into a Primal, for gold. The first Siphon on a pair you have not tried shows what it makes, for free; Siphon again to make it. A Primal keeps the higher Attunement of the two.
 }
 
 STRING 9660

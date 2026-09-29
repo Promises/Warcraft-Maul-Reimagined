@@ -57,6 +57,11 @@ export abstract class AbstractPlayer extends MapPlayer {
         return Util.ColourString(this.getColourCode(), this.getPlayerName());
     }
 
+    /** The name the player joined with (Name#1234 on Battle.net), before the map shortens or colours it. */
+    public getBattleTag(): string {
+        return this.battleTag;
+    }
+
     public getPlayerName(): string {
         return this.name;
     }

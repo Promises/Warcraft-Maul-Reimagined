@@ -64,8 +64,22 @@
     levels (60 each) then refused, Ascend refused below Attunement 15, made at 15 for 500; the Eye
     gains 102 a wave (5% of 2,050); 17,129 dps against air right after ascending - it keeps its
     +30% Attunement, so it starts well past Dalaran, not at parity: tune.
-  - [ ] The other Primals (Haboob, Heart of Life, World Tree, Inferno); credit Remixer in the
-    changelog when Thunderhead ships.
+  - [ ] The other Primals (Haboob, Heart of Life, World Tree, Inferno). Remixer is credited in
+    the changelog (5.0.0) for the Storm Spire.
+  - [x] Recipe discovery, as in the "Elementalist Recipe Tree" design doc (branch): the first Siphon
+    on an undiscovered Primal pair reveals it for free and the next makes it; a pair with no recipe
+    says "Nothing stirs", with a hint when a tower goes into an undiscovered Primal; the first of
+    each Primal in a game is announced; Siphon's tooltip lists the Primal recipes the player knows.
+    Debug command -forget empties the book. test_recipe_discovery (wc3-slop-lan measure.py).
+  - [x] Saves, as in the "Warcraft Maul Save Format" design doc: src/lib/Save (bit-packed sections,
+    signed and scrambled with a key tied to the battletag), src/World/Game/Saves.ts (read by the
+    owner's client a second in, synced through PlayerSync, written on change; unknown sections
+    kept). The recipe book is section 1. Codec unit tests: `npm run test:lua`, on a 32-bit Lua 5.3
+    like the game's (math.maxinteger is 2^31-1 in game; a desktop Lua hid a float-constant bug).
+    test_recipe_discovery: a file written in one game loads on both clients in the next, and an
+    edited file is rejected.
+  - [ ] The recipe book panel (known recipes, the rest as "???" by tier); until then Siphon's
+    tooltip carries the known Primal recipes.
 
 - [x] The mode and difficulty votes end as soon as every player has voted, instead of always
   waiting their 10 s (the timer still ends them for players who do not vote). The results go to

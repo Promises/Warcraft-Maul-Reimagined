@@ -225,6 +225,11 @@ export class Commands {
                 print('Nothing here')
 
                 break;
+            case 'forget':
+                // Empties the player's Elementalist recipe book, and their save's copy of it
+                this.game.recipeBook.forget(player);
+                player.sendMessage('Your recipe book is empty');
+                break;
             case 'diff':
                 amount = Util.ParsePositiveInt(command[1]);
                 if (!amount) {

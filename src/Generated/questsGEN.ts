@@ -11,6 +11,12 @@ interface Quest {
 
 export const Quests: Quest[] = [
     {
+        title: `5.0.0 - 6`,
+        icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
+        stype: 0,
+        body: `Updates:\n- Elementalist: grown towers gain Attunement every wave (+2% damage a level, up to 15) and keep it when they fuse\n- Primals: Siphon fuses two grown towers into a Primal, for gold. The Lich (Undead L2 + Death Rune L3) keeps the Undead's damage and grows every wave; the Thunderhead (Air Rune L3 + Water Rune L3) strikes air with chaos splash\n- Surge buys a Primal Attunement, 60 gold a level, 10 at most; at Attunement 15 it can Ascend into the Lich King or the Eye of the Storm\n- Discover the recipes: the first Siphon on an untried pair of grown towers shows what it makes, for free, and the next makes it. A pair with no recipe says so. Your recipe book is saved on your computer and loads in your next game\n- Thunderhead model: Pandarian Storm Spire by Remixer`,
+    },
+    {
         title: `5.0.0 - 5`,
         icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
         stype: 0,

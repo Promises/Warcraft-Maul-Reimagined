@@ -21,6 +21,8 @@ import {VoidTicker} from './Game/VoidTicker';
 import {ActionBar} from './Game/Ui/ActionBar';
 import {HybridBuildPanel} from './Game/Ui/HybridBuild/HybridBuildPanel';
 import {PlayerSync} from './Game/PlayerSync';
+import {Saves} from './Game/Saves';
+import {RecipeBook} from './Entity/GenericAbilities/Elementalist/RecipeBook';
 import {HostDetection} from './Game/HostDetection';
 import {LaneTransfer} from './Game/LaneTransfer';
 import {GrayVacancy} from './Game/GrayVacancy';
@@ -100,6 +102,8 @@ export class WarcraftMaul {
     public laneHolders: Map<number, Defender> = new Map<number, Defender>();
     public hybridBuildPanel: HybridBuildPanel;
     public playerSync: PlayerSync;
+    public saves: Saves;
+    public recipeBook: RecipeBook;
     public hostDetection: HostDetection;
     public laneTransfer: LaneTransfer;
     public raceSelectPanel: RaceSelectPanel;
@@ -217,6 +221,8 @@ export class WarcraftMaul {
         SendMessage('Welcome to Warcraft Maul Reimagined');
         SendMessage(`|cff999999Build ${BUILD_STAMP}${DEV_BUILD ? ', dev' : ''}|r`);
         this.playerSync = new PlayerSync(this);
+        this.saves = new Saves(this);
+        this.recipeBook = new RecipeBook(this);
         this.hostDetection = new HostDetection(this);
         this.laneTransfer = new LaneTransfer(this);
         this.grayVacancy = new GrayVacancy(this);

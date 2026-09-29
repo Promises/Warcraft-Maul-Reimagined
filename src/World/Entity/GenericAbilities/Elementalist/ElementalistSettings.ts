@@ -1,7 +1,17 @@
 import { Log } from '../../../../lib/Serilog/Serilog';
 import { EYE_OF_THE_STORM, LICH, LICH_KING, THUNDERHEAD } from '../../../Game/Races/ElementalistPrimals';
 
+/** A Primal fusion: two grown towers, a fee, and a line on what the Primal does. */
+export interface PrimalRecipe {
+    a: string;
+    b: string;
+    result: string;
+    fee: number;
+    role: string;
+}
+
 export class ElementalistSettings {
+    private readonly primals: PrimalRecipe[] = [];
     private combinations: Map<string, string> = new Map<string, string>();
     // What a fusion costs in gold (Primal fusions of mature pieces); free when not listed
     private fees: Map<string, number> = new Map<string, number>();
@@ -39,8 +49,8 @@ export class ElementalistSettings {
         this.AddDoubling('n01R', 'u034'); // Water*2 = Water Rune [Level 2]
 
         // Primal fusions of mature pieces, for a fee
-        this.AddCombination('u038', 'u02B', LICH, 250); // Undead L2 + Death Rune L3 = Lich
-        this.AddCombination('u033', 'u035', THUNDERHEAD, 600); // Air Rune L3 + Water Rune L3 = Thunderhead
+        this.AddPrimal('u038', 'u02B', LICH, 250, 'keeps all the Undead\'s damage and grows 100 a wave'); // Undead L2 + Death Rune L3
+        this.AddPrimal('u033', 'u035', THUNDERHEAD, 600, 'strikes air units with chaos splash'); // Air Rune L3 + Water Rune L3
 
         // What each Primal ascends to, and for how much; one of each Ascended per player
         this.ascensions.set(LICH, {ascended: LICH_KING, fee: 400});
@@ -50,6 +60,21 @@ export class ElementalistSettings {
 
     }
 
+
+    private AddPrimal(a: string, b: string, result: string, fee: number, role: string): void {
+        this.AddCombination(a, b, result, fee);
+        this.primals.push({a, b, result, fee, role});
+    }
+
+    /** The Primal fusions, in the order they were added. */
+    public GetPrimalRecipes(): PrimalRecipe[] {
+        return this.primals;
+    }
+
+    /** The Primal a fusion makes, when it makes one. */
+    public GetPrimalRecipe(result: string): PrimalRecipe | undefined {
+        return this.primals.find(recipe => recipe.result === result);
+    }
 
     private AddCombination(a: string, b: string, c: string, fee: number = 0): void {
         this.combinations.set(a + b, c);
