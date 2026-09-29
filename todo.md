@@ -19,6 +19,31 @@
 
   Follows for free: the sample maze and the "you cannot build on a checkpoint" rule read the rectangles live, as do creep orders.
 
+- [ ] Async (zero-latency) local clicks (hiveworkshop.com/threads/async-zero-latency-buttons.357700):
+  onLocalClick watches an EscMenuButtonTemplate button's pushed backdrop (child 1) and highlight
+  (child 5) and runs its handler as the button is let go, instead of a round trip later with the
+  synced click; the synced click still runs it when the watch did not. 24 buttons watched (race
+  picker, vote, host settings' vote/confirm, gray claim); the host settings rows (plain BUTTONs)
+  keep the synced click. Clicked through by hand in two-client games (host settings, player
+  vote, race picks): no desync, the clients' traces agree, one pick each. (2026-09-29)
+  - [ ] The host settings rows: a BUTTON template of our own with a pushed backdrop and a
+    highlight (CustomRowButton) crashed the game as the map loaded (twice, in the engine's frame
+    code). Try it without any lookup of its children first, then built like CustomIconButton.
+- [ ] Pay the Toll (A0BF; Void husks, Elementalists' Depleted Rocks) did nothing, in silence, for a
+  player with less than 50 gold, and the cast still went off. Now it says it costs 50 gold and the
+  cast is called off. Paying it works (seen in a game). Not tried in a game yet: the refusal.
+- [ ] Void Restoration (A095, the Void Priest h02F): its class in Void/VoidRestoration.ts is named
+  PayTheToll and never registered, so the ability has never done anything (its tooltip: +10 void
+  fragments). Register it under its own name? A gameplay change - decide first.
+- [ ] Elementalists fall off late: their best towers are ~1,300-1,400 dps (Sandstorm L2 on up to
+  5 targets, Life Rune L3, Undead L2 by round 30), against 5,000-40,000 for other races' finishers;
+  wave 34 is 825,000 hp a lane at 100%. A balance question.
+
+- [x] The mode and difficulty votes end as soon as every player has voted, instead of always
+  waiting their 10 s (the timer still ends them for players who do not vote). The results go to
+  the trace ('vote'). test_vote_ends_when_everyone_voted (wc3-slop-lan tests.py): mode within 2 s
+  of the host leaving it to a vote, difficulty 1 s after both voted. (2026-09-29)
+
 ## Tools
 - [x] Launch straight into the map: the game's menus are a page it serves from `<install>/_retail_/webui`, so the page (now wc3-slop-lan's harness/webui/index.html) sits there and talks to the game on the same socket the menus use. `npm run play -- --auto` goes from build to in-game with no clicking.
 - [ ] Two accounts in one game on this machine (`scripts/play-two.sh`). Working, with one caveat.
@@ -175,7 +200,8 @@
   - [x] Votekick needed `players.size / 2 + 1` votes, a fraction (2.5 of 2 possible voters with 3
     players): now a majority, `Math.floor(size / 2) + 1`. Also: a new votekick kept the last one's
     votes (its voters could not vote again), and a votekick's 5-minute expiry could end a later
-    one. Not tried in a game: the harness has two players, and a kick takes three. (2026-09-29)
+    one. Seen in a game with a third player (the harness host seated at teal, which the map now
+    takes as a defender when seated in a lane): 2 votes of 3 kicked blue. (2026-09-29)
   - [x] Wyvern spared waves 34-35 (`currentWave + 1`) instead of the bosses: now the boss waves
     (35-37, by creep type). Its lightning also skipped Navy's creeps (`owner > NAVY`), and made a
     boolexpr on every attack. Fixed; test_wyvern_lightning (wc3-slop-lan races.py): all four
