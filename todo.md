@@ -45,8 +45,15 @@
   in progress ("Elementalist Improvements": Attunement, Primal fusions, Ascension), on the
   `elementalist` branch. Measured (wc3-slop-lan measure.py, 2026-09-29): finishers 3,750-41,250
   dps (Giant Revenant, Blademaster, Dalaran ~6 attacks/s, Illidan, ...), Elementalist L3 runes
-  133-1,441. Income from the code: ~1,600 gold by wave 20, ~3,100 by 30, ~3,900 by 34. Next:
-  measure Sandstorm L2, Undead L2, Tree, Air L3; then prototype the Lich.
+  133-1,441; Sandstorm L2 ~6,900 on 5 targets, Tree 373, Air L3 352. Income from the code:
+  ~1,600 gold by wave 20, ~3,100 by 30, ~3,900 by 34.
+  - [x] Lich prototype (branch): Attunement (AttunedTower: +2%/wave to 15, flat per-wave growth,
+    carried through Tower.Upgrade and into fusions), mature pieces, the Lich unit (uP01, made at
+    build time in ElementalistPrimals.ts), Siphon's fee checked at cast. test_lich (wc3-slop-lan
+    measure.py) passes: fee refused and taken, Undead's damage kept, +25/wave. Measured ~330 dps
+    after 5 rounds: flat +25/wave is far too slow for the late game - tune the growth.
+  - [x] Undead L1 -> L2 threw its +5 stacks away (ReplaceUnit reset the damage); now carried.
+  - [ ] The other Primals, Ascension, Surge; the growth numbers.
 
 - [x] The mode and difficulty votes end as soon as every player has voted, instead of always
   waiting their 10 s (the timer still ends them for players who do not vote). The results go to
