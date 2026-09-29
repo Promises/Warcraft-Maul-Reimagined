@@ -10,6 +10,10 @@ import { AntiJuggleTower } from '../../AntiJuggle/AntiJuggleTower';
 import {Unit} from "w3ts";
 
 
+// What Pay the Toll costs (its tooltip says so too)
+const TOLL = 50;
+
+/** Void husks and Elementalists' Depleted Rocks: pay the toll and the unit is removed. */
 export class PayTheToll extends GenericAbility implements AbilityOnCastTargetsUnit {
 
     constructor(game: WarcraftMaul) {
@@ -22,8 +26,14 @@ export class PayTheToll extends GenericAbility implements AbilityOnCastTargetsUn
 
         if (owner) {
             const tower = owner.GetTower(spellAbilityUnit.id);
-            if (tower && owner.getGold() >= 50) {
-                owner.giveGold(-50);
+            if (tower && owner.getGold() < TOLL) {
+                // Said, and the cast called off before it takes effect: it used to pass in silence
+                owner.sendMessage(`Pay the Toll costs ${TOLL} gold`);
+                spellAbilityUnit.issueImmediateOrder('stop');
+                return;
+            }
+            if (tower) {
+                owner.giveGold(-TOLL);
 
                 if (tower.GetTypeID() === FourCC('h02S')) {
                     owner.SetVoidFragmentTick(owner.GetVoidFragmentTick() - 1);
