@@ -42,8 +42,11 @@
   Void Being: items). (2026-09-29)
 - [ ] Elementalists fall off late: their best towers are ~1,300-1,400 dps (Sandstorm L2 on up to
   5 targets, Life Rune L3, Undead L2 by round 30); wave 34 is 825,000 hp a lane at 100%. Redesign
-  in progress ("Elementalist Improvements": Attunement, Primal fusions, Ascension). Next: measure
-  real per-tower dps and gold per wave in a harness game, then prototype the Lich.
+  in progress ("Elementalist Improvements": Attunement, Primal fusions, Ascension), on the
+  `elementalist` branch. Measured (wc3-slop-lan measure.py, 2026-09-29): finishers 3,750-41,250
+  dps (Giant Revenant, Blademaster, Dalaran ~6 attacks/s, Illidan, ...), Elementalist L3 runes
+  133-1,441. Income from the code: ~1,600 gold by wave 20, ~3,100 by 30, ~3,900 by 34. Next:
+  measure Sandstorm L2, Undead L2, Tree, Air L3; then prototype the Lich.
 
 - [x] The mode and difficulty votes end as soon as every player has voted, instead of always
   waiting their 10 s (the timer still ends them for players who do not vote). The results go to
