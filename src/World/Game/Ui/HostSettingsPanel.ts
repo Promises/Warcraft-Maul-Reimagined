@@ -27,7 +27,7 @@ const RADIO_DOT = 'UI\\Widgets\\EscMenu\\Human\\radiobutton-button.blp';
  * A column of mutually exclusive options drawn as radio buttons. The game's GLUECHECKBOX
  * toggles itself and its checked state cannot be set reliably from script, so each row is the
  * ESC-menu radio art (war3skins: radiobutton-background, and radiobutton-button as the dot)
- * and a label, with one plain button over the whole row taking the click; the column shows
+ * and a label, with one invisible button over the whole row taking the click; the column shows
  * the dot on exactly one row.
  */
 class OptionColumn {
@@ -55,9 +55,12 @@ class OptionColumn {
             text.setPoint(FRAMEPOINT_LEFT, ring, FRAMEPOINT_RIGHT, LABEL_GAP, 0);
             text.setSize(COLUMN_WIDTH - RADIO_INSET - RADIO_SIZE - LABEL_GAP, ROW_HEIGHT);
 
-            // Created last, so it lies over the radio and the label
-            const button = Frame.createType(`${name}Row${index}Button`, row, 0, 'BUTTON', '')!;
+            // Created last, so it lies over the radio and the label. An ESC-menu button drawn with
+            // alpha 0: nothing of it shows, but it has the pushed backdrop and highlight that let
+            // its clicks run at once (Frames.onLocalClick); a plain BUTTON has neither
+            const button = createTextButton(row, '', COLUMN_WIDTH, ROW_HEIGHT);
             button.setAllPoints(row);
+            button.setAlpha(0);
             // The selection is the local view
             onLocalClick(button, () => this.select(index));
             this.dots.push(dot);
