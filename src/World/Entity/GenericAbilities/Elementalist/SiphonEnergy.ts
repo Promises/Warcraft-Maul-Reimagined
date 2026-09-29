@@ -22,10 +22,18 @@ export class SiphonEnergy extends GenericAbility implements AbilityOnEffectTarge
         if (!pair) {
             return;
         }
-        const {owner, fee} = pair;
-        if (owner.getGold() < fee) {
-            owner.sendMessage(`This fusion costs ${fee} gold`);
-            SyncTrace.note('siphon', `p${owner.id} refused fee=${fee} gold=${owner.getGold()}`);
+        const {owner, combination, fee} = pair;
+        const limit = this.game.abilityHandler.elementalistSettings.GetLimit(combination);
+        const have = owner.towersArray.filter(tower => DecodeFourCC(tower.GetTypeID()) === combination).length;
+        let refusal: string | undefined;
+        if (limit !== undefined && have >= limit) {
+            refusal = `You may have ${limit} of these`;
+        } else if (owner.getGold() < fee) {
+            refusal = `This fusion costs ${fee} gold`;
+        }
+        if (refusal !== undefined) {
+            owner.sendMessage(refusal);
+            SyncTrace.note('siphon', `p${owner.id} refused ${combination} fee=${fee} gold=${owner.getGold()} have=${have}`);
             Unit.fromHandle(GetSpellAbilityUnit())!.issueImmediateOrder('stop');
         }
     }
@@ -36,7 +44,9 @@ export class SiphonEnergy extends GenericAbility implements AbilityOnEffectTarge
             return;
         }
         const {owner, source, target, combination, fee} = pair;
-        if (owner.getGold() < fee) {
+        const limit = this.game.abilityHandler.elementalistSettings.GetLimit(combination);
+        const have = owner.towersArray.filter(tower => DecodeFourCC(tower.GetTypeID()) === combination).length;
+        if (owner.getGold() < fee || (limit !== undefined && have >= limit)) {
             return;
         }
         owner.giveGold(-fee);

@@ -5,9 +5,9 @@ import {Unit} from "war3-objectdata-th";
  * mature pieces they fuse: new unit types, so they need no World Editor save. Siphon Energy (A0CT)
  * is added to the mature pieces a Primal is made of, so they can fuse.
  */
-export const {LICH, PRIMAL_INGREDIENTS} = compiletime(({objectData}) => {
-    // Undead L2 and Death Rune L3: the Lich
-    const ingredients = ['u038', 'u02B'];
+export const {LICH, THUNDERHEAD, PRIMAL_INGREDIENTS} = compiletime(({objectData}) => {
+    // Undead L2 and Death Rune L3: the Lich; Air Rune L3 and Water Rune L3: Thunderhead
+    const ingredients = ['u038', 'u02B', 'u033', 'u035'];
     for (const id of ingredients) {
         const unit: Unit | undefined = objectData.units.get(id);
         if (unit && String(unit.normal ?? '').split(',').indexOf('A0CT') === -1) {
@@ -30,7 +30,23 @@ export const {LICH, PRIMAL_INGREDIENTS} = compiletime(({objectData}) => {
     lich.normal = String(lich.normal ?? '').split(',').filter(id => id !== 'A0E6' && id !== 'A0CT').join(',');
     lich.tooltipBasic = 'Lich';
     lich.tooltipExtended = 'A Primal fusion of Undead Level 2 and a Death Rune Level 3 (Siphon Energy, 250 gold).|n|n'
-        + 'Keeps all the damage the Undead gained, attacks from range 600, and gains 25 damage every wave, '
+        + 'Keeps all the damage the Undead gained, attacks from range 600, and gains 100 damage every wave, '
         + 'plus Attunement: 2% of its base damage per wave it stands, up to 15.';
-    return {LICH: lich.newId, PRIMAL_INGREDIENTS: ingredients};
-}) as {LICH: string, PRIMAL_INGREDIENTS: string[]};
+
+    // Thunderhead: the Dalaran Guard Tower's weapon (splash, air only, the same attack animation),
+    // with chaos damage for the bosses' Hero armour, and the Air Rune's look until it has its own
+    const thunderhead = objectData.units.copy(objectData.units.get('h00L')!, 'uP02')!;
+    const airRune: Unit = objectData.units.get('u033')!;
+    thunderhead.name = 'Thunderhead';
+    thunderhead.modelFile = airRune.modelFile;
+    thunderhead.scalingValueundefined = airRune.scalingValueundefined;
+    thunderhead.iconGameInterface = airRune.iconGameInterface;
+    thunderhead.attack1AttackType = 'chaos';
+    thunderhead.attack1DamageBase = 1450;
+    thunderhead.attack1AreaOfEffectFullDamage = 700;
+    thunderhead.tooltipBasic = 'Thunderhead';
+    thunderhead.tooltipExtended = 'A Primal fusion of an Air Rune Level 3 and a Water Rune Level 3 (Siphon Energy, 600 gold). '
+        + 'One per player.|n|nAttacks air only: about 1,500 chaos damage, range 1,000, 700 splash against air, as fast '
+        + 'as the Dalaran Guard Tower. Gains Attunement: 2% of its base damage per wave it stands, up to 15.';
+    return {LICH: lich.newId, THUNDERHEAD: thunderhead.newId, PRIMAL_INGREDIENTS: ingredients};
+}) as {LICH: string, THUNDERHEAD: string, PRIMAL_INGREDIENTS: string[]};

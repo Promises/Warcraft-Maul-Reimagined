@@ -51,9 +51,13 @@
     carried through Tower.Upgrade and into fusions), mature pieces, the Lich unit (uP01, made at
     build time in ElementalistPrimals.ts), Siphon's fee checked at cast. test_lich (wc3-slop-lan
     measure.py) passes: fee refused and taken, Undead's damage kept, +25/wave. Measured ~330 dps
-    after 5 rounds: flat +25/wave is far too slow for the late game - tune the growth.
+    after 5 rounds: flat +25/wave was far too slow for the late game; now +100 (~680 dps after 5
+    rounds, ~5,000 by wave 35 from a wave-15 Lich).
+  - [x] Thunderhead (uP02, branch): Air Rune L3 + Water Rune L3, 600 gold, one per player; Dalaran's
+    weapon with chaos damage (~1,500), air only. test_thunderhead: fee refused and taken, a second
+    refused, never hits ground; measured 8,827 dps against air (Dalaran 12,118).
   - [x] Undead L1 -> L2 threw its +5 stacks away (ReplaceUnit reset the damage); now carried.
-  - [ ] The other Primals, Ascension, Surge; the growth numbers.
+  - [ ] The other Primals (Haboob, Heart of Life, World Tree, Inferno), Ascension, Surge.
 
 - [x] The mode and difficulty votes end as soon as every player has voted, instead of always
   waiting their 10 s (the timer still ends them for players who do not vote). The results go to

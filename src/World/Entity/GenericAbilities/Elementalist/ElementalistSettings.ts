@@ -1,10 +1,12 @@
 import { Log } from '../../../../lib/Serilog/Serilog';
-import { LICH } from '../../../Game/Races/ElementalistPrimals';
+import { LICH, THUNDERHEAD } from '../../../Game/Races/ElementalistPrimals';
 
 export class ElementalistSettings {
     private combinations: Map<string, string> = new Map<string, string>();
     // What a fusion costs in gold (Primal fusions of mature pieces); free when not listed
     private fees: Map<string, number> = new Map<string, number>();
+    // How many of a fusion's result a player may have; any number when not listed
+    private limits: Map<string, number> = new Map<string, number>();
 
     constructor() {
         this.SetupCombinations();
@@ -36,6 +38,8 @@ export class ElementalistSettings {
 
         // Primal fusions of mature pieces, for a fee
         this.AddCombination('u038', 'u02B', LICH, 250); // Undead L2 + Death Rune L3 = Lich
+        this.AddCombination('u033', 'u035', THUNDERHEAD, 600); // Air Rune L3 + Water Rune L3 = Thunderhead
+        this.limits.set(THUNDERHEAD, 1);
 
     }
 
@@ -47,6 +51,11 @@ export class ElementalistSettings {
             this.fees.set(a + b, fee);
             this.fees.set(b + a, fee);
         }
+    }
+
+    /** How many towers of that type (a fusion's result) a player may have, or undefined for any number. */
+    public GetLimit(result: string): number | undefined {
+        return this.limits.get(result);
     }
 
     /** The gold a fusion costs (0 for runes). */
