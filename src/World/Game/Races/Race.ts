@@ -4,6 +4,8 @@ import {Unit} from "w3ts";
 import {SyncTrace} from '../../../lib/SyncTrace';
 import {RaceItems} from './RaceItems';
 
+const ELEMENTALIST_BUILDER = 'e00W';
+
 export class Race {
     id: string;
     name: string;
@@ -41,5 +43,8 @@ export class Race {
         const builder = Unit.create(player, FourCC(this.id), player.getCenterX(), player.getCenterY(), bj_UNIT_FACING)!;
         SyncTrace.note('race', `p${player.id} got builder ${this.id} id=${SyncTrace.unit(builder)}`);
         player.builders.push(builder);
+        if (this.id === ELEMENTALIST_BUILDER) {
+            this.map.game.actionBar.showRecipeBook(player);
+        }
     }
 }

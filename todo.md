@@ -78,8 +78,11 @@
     like the game's (math.maxinteger is 2^31-1 in game; a desktop Lua hid a float-constant bug).
     test_recipe_discovery: a file written in one game loads on both clients in the next, and an
     edited file is rejected.
-  - [ ] The recipe book panel (known recipes, the rest as "???" by tier); until then Siphon's
-    tooltip carries the known Primal recipes.
+  - [x] The recipe book panel: an action bar button (Elementalists only) or -book opens the
+    player's book, Primals with recipe, fee and role, first fusions in two columns, the rest as
+    "???". A local view; test_recipe_discovery checks the button and -book on both clients.
+    Its layout has not been looked at: the harness cannot capture the game windows ("could not
+    create image from window"), though screencapture by window id works for other apps.
 
 - [x] The mode and difficulty votes end as soon as every player has voted, instead of always
   waiting their 10 s (the timer still ends them for players who do not vote). The results go to

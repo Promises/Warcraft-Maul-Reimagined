@@ -10,7 +10,16 @@ export interface PrimalRecipe {
     role: string;
 }
 
+/** Any fusion: two towers (the same one twice for a doubled rune) and what they make. */
+export interface Recipe {
+    a: string;
+    b: string;
+    result: string;
+    fee: number;
+}
+
 export class ElementalistSettings {
+    private readonly recipes: Recipe[] = [];
     private readonly primals: PrimalRecipe[] = [];
     private combinations: Map<string, string> = new Map<string, string>();
     // What a fusion costs in gold (Primal fusions of mature pieces); free when not listed
@@ -76,7 +85,13 @@ export class ElementalistSettings {
         return this.primals.find(recipe => recipe.result === result);
     }
 
+    /** Every fusion, in the order they were added: first fusions, then Primals. */
+    public GetRecipes(): Recipe[] {
+        return this.recipes;
+    }
+
     private AddCombination(a: string, b: string, c: string, fee: number = 0): void {
+        this.recipes.push({a, b, result: c, fee});
         this.combinations.set(a + b, c);
         this.combinations.set(b + a, c);
         if (fee > 0) {
@@ -102,6 +117,7 @@ export class ElementalistSettings {
 
 
     private AddDoubling(a: string, c: string): void {
+        this.recipes.push({a, b: a, result: c, fee: 0});
         this.combinations.set(a + a, c);
     }
 

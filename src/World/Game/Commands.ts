@@ -652,6 +652,8 @@ export class Commands {
             player.ClaimTowers();
         } else if (command[0] === 'range') {
             player.toggleRangeCheck();
+        } else if (command[0] === 'book') {
+            this.game.recipeBook.togglePanel(player);
         } else if (command[0] === 'gray' || command[0] === 'grey') {
             this.game.laneTransfer.moveToGray(player);
         } else if (command[0] === 'forceblitz') {

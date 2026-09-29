@@ -9,17 +9,18 @@ import { ClaimButton } from './Buttons/ClaimButton';
 import { HybridBuildButton } from './Buttons/HybridBuildButton';
 import { RaceSelectButton } from './Buttons/RaceSelectButton';
 import { RangeCheckButton } from './Buttons/RangeCheckButton';
+import { RecipeBookButton } from './Buttons/RecipeBookButton';
 import {Frame} from "w3ts";
 import {Defender} from '../../Entity/Players/Defender';
 import {createBackdrop, uiRoot} from './Frames';
 import {BUTTON_PITCH, BUTTON_SIZE, RAIL_CENTER_X, RAIL_CENTER_Y, RAIL_HEIGHT, RAIL_PADDING} from './ActionBarLayout';
 
 // Design handoff "Action bar, full rail": a rail on the console ledge, 0.042 tall, holding
-// the buttons at 0.026 on a 0.032 pitch as one cluster: the five buttons, a divider, and
-// two reserved wells. The rail is sized to the cluster plus padding and centred above the
+// the buttons at 0.026 on a 0.032 pitch as one cluster: the six buttons, a divider, and
+// a reserved well. The rail is sized to the cluster plus padding and centred above the
 // console (anchoring it to the minimap and inventory frames collapsed it to a line).
-const BUTTON_COUNT = 5;
-const RESERVED_WELLS = 2;
+const BUTTON_COUNT = 6;
+const RESERVED_WELLS = 1;
 // Extra room either side of the divider
 const DIVIDER_GAP = 0.006;
 const WELL_TEXTURE = 'uiImport\\CommandButtons\\frame-icon.dds';
@@ -30,6 +31,7 @@ export class ActionBar {
     private readonly rail: Frame;
     private readonly buttons: AbstractActionButton[] = [];
     private readonly hybridBuild: HybridBuildButton;
+    private readonly recipeBook: RecipeBookButton;
 
     constructor(game: WarcraftMaul) {
         this.game = game;
@@ -41,6 +43,18 @@ export class ActionBar {
         this.hybridBuild = this.initializeButtons();
         // Only a hybrid random player has a build menu; the button appears when they random
         this.hybridBuild.setVisible(false);
+        const span = ActionBar.clusterSpan();
+        this.recipeBook = new RecipeBookButton(game, this.rail, -span / 2 + BUTTON_PITCH / 2 + 5 * BUTTON_PITCH, BUTTON_SIZE, 5);
+        this.buttons.push(this.recipeBook);
+        // Only an Elementalist has a recipe book; the button appears when they pick the race
+        this.recipeBook.setVisible(false);
+    }
+
+    /** Shows the recipe book button on that player's client. */
+    public showRecipeBook(player: Defender): void {
+        if (player.isLocal()) {
+            this.recipeBook.setVisible(true);
+        }
     }
 
     /** Shows the hybrid build button on that player's client. */
@@ -56,7 +70,8 @@ export class ActionBar {
     }
 
     private initializeButtons(): HybridBuildButton {
-        // Cluster layout in pitches, centred: buttons 0..4, divider, two wells
+        // Cluster layout in pitches, centred: buttons 0..5 (5, the recipe book, is made by the
+        // constructor), divider, the well
         const span = ActionBar.clusterSpan();
         const first = -span / 2 + BUTTON_PITCH / 2;
         const offset = (index: number): number => first + index * BUTTON_PITCH + (index >= BUTTON_COUNT ? 2 * DIVIDER_GAP : 0);
