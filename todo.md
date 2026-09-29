@@ -53,11 +53,19 @@
     measure.py) passes: fee refused and taken, Undead's damage kept, +25/wave. Measured ~330 dps
     after 5 rounds: flat +25/wave was far too slow for the late game; now +100 (~680 dps after 5
     rounds, ~5,000 by wave 35 from a wave-15 Lich).
-  - [x] Thunderhead (uP02, branch): Air Rune L3 + Water Rune L3, 600 gold, one per player; Dalaran's
-    weapon with chaos damage (~1,500), air only. test_thunderhead: fee refused and taken, a second
-    refused, never hits ground; measured 8,827 dps against air (Dalaran 12,118).
+  - [x] Thunderhead (uP02, branch): Air Rune L3 + Water Rune L3, 600 gold (no per-player limit);
+    Dalaran's weapon with chaos damage (~1,500), air only; the Pandarian Storm Spire model (Remixer)
+    with a lightning-ball missile. test_thunderhead: fee refused and taken, never hits ground;
+    8,827 dps against air (Dalaran 12,118).
   - [x] Undead L1 -> L2 threw its +5 stacks away (ReplaceUnit reset the damage); now carried.
-  - [ ] The other Primals (Haboob, Heart of Life, World Tree, Inferno), Ascension, Surge.
+  - [x] Ascend (AP01) and Surge (AP02), abilities added to the built map by
+    scripts/primal-abilities.js; the Ascended Lich King (uA01, +160/wave) and Eye of the Storm (uA02,
+    ~2,100 a hit), +5% of base a wave uncapped, one of each per player. test_ascension: Surge 10
+    levels (60 each) then refused, Ascend refused below Attunement 15, made at 15 for 500; the Eye
+    gains 102 a wave (5% of 2,050); 17,129 dps against air right after ascending - it keeps its
+    +30% Attunement, so it starts well past Dalaran, not at parity: tune.
+  - [ ] The other Primals (Haboob, Heart of Life, World Tree, Inferno); credit Remixer in the
+    changelog when Thunderhead ships.
 
 - [x] The mode and difficulty votes end as soon as every player has voted, instead of always
   waiting their 10 s (the timer still ends them for players who do not vote). The results go to
