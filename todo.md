@@ -26,18 +26,24 @@
   picker, vote, host settings' vote/confirm, gray claim); the host settings rows (plain BUTTONs)
   keep the synced click. Clicked through by hand in two-client games (host settings, player
   vote, race picks): no desync, the clients' traces agree, one pick each. (2026-09-29)
-  - [ ] The host settings rows: a BUTTON template of our own with a pushed backdrop and a
-    highlight (CustomRowButton) crashed the game as the map loaded (twice, in the engine's frame
-    code). Try it without any lookup of its children first, then built like CustomIconButton.
-- [ ] Pay the Toll (A0BF; Void husks, Elementalists' Depleted Rocks) did nothing, in silence, for a
+  - [x] The host settings rows: a template of our own (CustomRowButton) loaded fine, but looking
+    up its children (BlzFrameGetName, then Frame.fromName) crashed the game as the map loaded. The
+    rows are now CustomTextButtons drawn with alpha 0 (children 1 and 5 as everywhere else): the
+    map loads, and all 22 text buttons are watched. Not clicked by hand yet. (2026-09-29)
+- [x] Pay the Toll (A0BF; Void husks, Elementalists' Depleted Rocks) did nothing, in silence, for a
   player with less than 50 gold, and the cast still went off. Now it says it costs 50 gold and the
-  cast is called off. Paying it works (seen in a game). Not tried in a game yet: the refusal.
-- [ ] Void Restoration (A095, the Void Priest h02F): its class in Void/VoidRestoration.ts is named
-  PayTheToll and never registered, so the ability has never done anything (its tooltip: +10 void
-  fragments). Register it under its own name? A gameplay change - decide first.
+  cast is called off. test_pay_the_toll_on_a_depleted_rock (wc3-slop-lan races.py): a rock made by
+  Siphon Energy, refused at 10 gold, paid (50) and gone at 100. (2026-09-29)
+- [x] Void Restoration (A095, the Void Priest h02F): its class was named PayTheToll and never
+  registered, so it never did anything. Now VoidRestoration, registered: +10 void fragments (capped)
+  when it heals a tower bought with fragments. Its targeting (organic, not invulnerable) already
+  keeps it to those (Being and up); the engine refuses it on a Worshipper. test_void_restoration
+  (wc3-slop-lan races.py) sees both; a restoration that pays is untested (the harness cannot buy a
+  Void Being: items). (2026-09-29)
 - [ ] Elementalists fall off late: their best towers are ~1,300-1,400 dps (Sandstorm L2 on up to
-  5 targets, Life Rune L3, Undead L2 by round 30), against 5,000-40,000 for other races' finishers;
-  wave 34 is 825,000 hp a lane at 100%. A balance question.
+  5 targets, Life Rune L3, Undead L2 by round 30); wave 34 is 825,000 hp a lane at 100%. Redesign
+  in progress ("Elementalist Improvements": Attunement, Primal fusions, Ascension). Next: measure
+  real per-tower dps and gold per wave in a harness game, then prototype the Lich.
 
 - [x] The mode and difficulty votes end as soon as every player has voted, instead of always
   waiting their 10 s (the timer still ends them for players who do not vote). The results go to
