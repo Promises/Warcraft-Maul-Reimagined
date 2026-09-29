@@ -13,8 +13,9 @@ import { HighTide } from './HighTide';
 import { Plague } from './Plague';
 import { Lich } from './Lich';
 import { Thunderhead } from './Thunderhead';
-import { MaturePiece } from '../../Specs/AttunedTower';
-import { LICH, THUNDERHEAD } from '../../../../Game/Races/ElementalistPrimals';
+import { LichKing } from './LichKing';
+import { AscendedTower, MaturePiece } from '../../Specs/AttunedTower';
+import { EYE_OF_THE_STORM, LICH, LICH_KING, THUNDERHEAD } from '../../../../Game/Races/ElementalistPrimals';
 
 // The mature pieces: the top of each line, which gain Attunement (Undead L2, Undead2, has its own class)
 const MATURE_PIECES: string[] = [
@@ -45,6 +46,8 @@ export class ElementalistTowers extends RaceTowers {
         list.add(FourCC('u020'), Plague);
         list.add(FourCC(LICH), Lich);
         list.add(FourCC(THUNDERHEAD), Thunderhead);
+        list.add(FourCC(LICH_KING), LichKing);
+        list.add(FourCC(EYE_OF_THE_STORM), AscendedTower);
         for (const id of MATURE_PIECES) {
             list.add(FourCC(id), MaturePiece);
         }

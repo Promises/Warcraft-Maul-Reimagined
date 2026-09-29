@@ -18,6 +18,8 @@ import { Trade } from './AllianceOfBlades/Trade';
 import { AwakenDormantPheonixEgg } from './Elementalist/AwakenDormantPheonixEgg';
 import { PayTheToll } from './Void/PayTheToll';
 import { VoidRestoration } from './Void/VoidRestoration';
+import { Ascend } from './Elementalist/Ascend';
+import { Surge } from './Elementalist/Surge';
 import { VoidLordAbility } from './Void/VoidLordAbility';
 import { PurchaseVoidBeast } from './Void/PurchaseVoidBeast';
 import { PurchaseVoidBeing } from './Void/PurchaseVoidBeing';
@@ -71,6 +73,8 @@ export class GenericAbilityHandler {
         this.abilities.push(UndeadUpgrade);
         this.abilities.push(PayTheToll);
         this.abilities.push(VoidRestoration);
+        this.abilities.push(Ascend);
+        this.abilities.push(Surge);
         this.abilities.push(VoidLordAbility);
         this.abilities.push(PurchaseVoidBeing);
         this.abilities.push(PurchaseVoidBeast);

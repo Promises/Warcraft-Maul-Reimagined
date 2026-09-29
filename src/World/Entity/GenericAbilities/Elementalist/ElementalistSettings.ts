@@ -1,12 +1,14 @@
 import { Log } from '../../../../lib/Serilog/Serilog';
-import { LICH, THUNDERHEAD } from '../../../Game/Races/ElementalistPrimals';
+import { EYE_OF_THE_STORM, LICH, LICH_KING, THUNDERHEAD } from '../../../Game/Races/ElementalistPrimals';
 
 export class ElementalistSettings {
     private combinations: Map<string, string> = new Map<string, string>();
     // What a fusion costs in gold (Primal fusions of mature pieces); free when not listed
     private fees: Map<string, number> = new Map<string, number>();
-    // How many of a fusion's result a player may have; any number when not listed
+    // How many of a tower (a fusion's or an ascension's result) a player may have; any number when not listed
     private limits: Map<string, number> = new Map<string, number>();
+    // A Primal's Ascended form and its fee
+    private ascensions: Map<string, {ascended: string, fee: number}> = new Map<string, {ascended: string, fee: number}>();
 
     constructor() {
         this.SetupCombinations();
@@ -39,7 +41,12 @@ export class ElementalistSettings {
         // Primal fusions of mature pieces, for a fee
         this.AddCombination('u038', 'u02B', LICH, 250); // Undead L2 + Death Rune L3 = Lich
         this.AddCombination('u033', 'u035', THUNDERHEAD, 600); // Air Rune L3 + Water Rune L3 = Thunderhead
-        this.limits.set(THUNDERHEAD, 1);
+
+        // What each Primal ascends to, and for how much; one of each Ascended per player
+        this.ascensions.set(LICH, {ascended: LICH_KING, fee: 400});
+        this.ascensions.set(THUNDERHEAD, {ascended: EYE_OF_THE_STORM, fee: 500});
+        this.limits.set(LICH_KING, 1);
+        this.limits.set(EYE_OF_THE_STORM, 1);
 
     }
 
@@ -53,7 +60,12 @@ export class ElementalistSettings {
         }
     }
 
-    /** How many towers of that type (a fusion's result) a player may have, or undefined for any number. */
+    /** What a Primal ascends to, and for how much; undefined for a tower that does not ascend. */
+    public GetAscension(primal: string): {ascended: string, fee: number} | undefined {
+        return this.ascensions.get(primal);
+    }
+
+    /** How many towers of that type a player may have, or undefined for any number. */
     public GetLimit(result: string): number | undefined {
         return this.limits.get(result);
     }
