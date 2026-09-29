@@ -18,6 +18,12 @@ import { AntiJuggleTower } from '../../AntiJuggle/AntiJuggleTower';
 import {Unit} from "w3ts";
 import {ReplaceUnit, Util} from "../../../../lib/translators";
 
+/** What a grown tower hands on when it becomes another: its Attunement and the flat damage it gained. */
+export interface Carried {
+    attunement: number;
+    bonusDamage: number;
+}
+
 // A tower paid for while a wave was running is never fully refundable
 const PAID_DURING_WAVE: number = -1;
 
@@ -94,12 +100,24 @@ export class Tower {
     }
 
     public Upgrade(newTypeId: number): Tower {
+        // Taken before the unit is replaced: ReplaceUnit resets the unit's damage to its new type's
+        const carried = this.carry();
         this.Sell();
         const u = ReplaceUnit(this.unit, newTypeId)!;
         const newTower: Tower = this.game.worldMap.towerConstruction.SetupTower(u, this.owner);
         newTower._towerValue += this._towerValue;
         newTower._fullRefundValue += this.refundableValue;
+        newTower.receive(carried);
         return newTower;
+    }
+
+    /** What this tower hands on to the tower it becomes: nothing, but for grown towers (AttunedTower). */
+    public carry(): Carried {
+        return {attunement: 0, bonusDamage: 0};
+    }
+
+    /** Takes what the tower it came from (or, for a fusion, each ingredient) handed on. */
+    public receive(carried: Carried): void {
     }
 
     public IsEndOfRoundTower(): this is EndOfRoundTower {

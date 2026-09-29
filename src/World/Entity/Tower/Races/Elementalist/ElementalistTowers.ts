@@ -11,6 +11,20 @@ import { Blaze } from './Blaze';
 import { Tornado } from './Tornado';
 import { HighTide } from './HighTide';
 import { Plague } from './Plague';
+import { Lich } from './Lich';
+import { MaturePiece } from '../../Specs/AttunedTower';
+import { LICH } from '../../../../Game/Races/ElementalistPrimals';
+
+// The mature pieces: the top of each line, which gain Attunement (Undead L2, Undead2, has its own class)
+const MATURE_PIECES: string[] = [
+    'u02B', 'u02D', 'u02F', 'u031', 'u033', 'u035', // Rune L3: Death, Life, Nature, Fire, Air, Water
+    'u036', // Tree
+    'u037', // Fully Grown Moss
+    'u03D', // Sandstorm L2
+    'u039', // Purgatory L2
+    'u03A', // Decay L2
+    'u03C', // Wildfire L3
+];
 
 
 export class ElementalistTowers extends RaceTowers {
@@ -28,6 +42,10 @@ export class ElementalistTowers extends RaceTowers {
         list.add(FourCC('u026'), Bubbles);
         list.add(FourCC('u027'), Blaze);
         list.add(FourCC('u020'), Plague);
+        list.add(FourCC(LICH), Lich);
+        for (const id of MATURE_PIECES) {
+            list.add(FourCC(id), MaturePiece);
+        }
     }
 
 }

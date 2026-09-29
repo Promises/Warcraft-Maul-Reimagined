@@ -28274,7 +28274,7 @@ Siphon Energy
 STRING 9658
 // Abilities: A0CT (Siphon Energy), Ubertip (Tooltip - Normal - Extended)
 {
-Siphons the energy out of another level 1 rune. The target rune is turned to solid rock and this rune will become a fusion between the target and itself.
+Siphons the energy out of another level 1 rune. The target rune is turned to solid rock and this rune will become a fusion between the target and itself.|n|nPrimal fusion (250 gold): Undead Level 2 and a Death Rune Level 3 become a Lich, which keeps all the Undead's damage and the higher Attunement of the two.
 }
 
 STRING 9660

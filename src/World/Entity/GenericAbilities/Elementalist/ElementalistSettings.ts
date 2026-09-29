@@ -1,7 +1,10 @@
 import { Log } from '../../../../lib/Serilog/Serilog';
+import { LICH } from '../../../Game/Races/ElementalistPrimals';
 
 export class ElementalistSettings {
     private combinations: Map<string, string> = new Map<string, string>();
+    // What a fusion costs in gold (Primal fusions of mature pieces); free when not listed
+    private fees: Map<string, number> = new Map<string, number>();
 
     constructor() {
         this.SetupCombinations();
@@ -31,12 +34,24 @@ export class ElementalistSettings {
         this.AddDoubling('n023', 'u032'); // Air*2 = Air Rune [Level 2]
         this.AddDoubling('n01R', 'u034'); // Water*2 = Water Rune [Level 2]
 
+        // Primal fusions of mature pieces, for a fee
+        this.AddCombination('u038', 'u02B', LICH, 250); // Undead L2 + Death Rune L3 = Lich
+
     }
 
 
-    private AddCombination(a: string, b: string, c: string): void {
+    private AddCombination(a: string, b: string, c: string, fee: number = 0): void {
         this.combinations.set(a + b, c);
         this.combinations.set(b + a, c);
+        if (fee > 0) {
+            this.fees.set(a + b, fee);
+            this.fees.set(b + a, fee);
+        }
+    }
+
+    /** The gold a fusion costs (0 for runes). */
+    public GetFee(a: string, b: string): number {
+        return this.fees.get(a + b) ?? 0;
     }
 
 

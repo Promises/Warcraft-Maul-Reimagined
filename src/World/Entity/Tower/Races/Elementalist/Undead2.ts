@@ -1,10 +1,9 @@
-import { Tower } from '../../Specs/Tower';
-import { EndOfRoundTower } from '../../Specs/EndOfRoundTower';
+import { AttunedTower } from '../../Specs/AttunedTower';
 
-export class Undead2 extends Tower implements EndOfRoundTower {
-
-    public EndOfRoundAction(): void {
-        this.unit.setBaseDamage(this.unit.getBaseDamage(0) + 15, 0);
-    }
-
+/**
+ * Gains 15 damage every wave, on top of what it had gained as Undead (it once started again from
+ * its base), and Attunement as a mature piece. Fused with a Death Rune L3 it becomes the Lich.
+ */
+export class Undead2 extends AttunedTower {
+    protected flatPerWave: number = 15;
 }
