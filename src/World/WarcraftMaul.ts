@@ -23,6 +23,7 @@ import {HybridBuildPanel} from './Game/Ui/HybridBuild/HybridBuildPanel';
 import {PlayerSync} from './Game/PlayerSync';
 import {Saves} from './Game/Saves';
 import {RecipeBook} from './Entity/GenericAbilities/Elementalist/RecipeBook';
+import {ObserverSupport} from './Game/ObserverSupport';
 import {HostDetection} from './Game/HostDetection';
 import {LaneTransfer} from './Game/LaneTransfer';
 import {GrayVacancy} from './Game/GrayVacancy';
@@ -105,6 +106,7 @@ export class WarcraftMaul {
     public saves: Saves;
     public recipeBook: RecipeBook;
     public hostDetection: HostDetection;
+    public observerSupport: ObserverSupport;
     public laneTransfer: LaneTransfer;
     public raceSelectPanel: RaceSelectPanel;
     public actionBar: ActionBar;
@@ -168,6 +170,10 @@ export class WarcraftMaul {
             if (Slop !== undefined && i === Slop.seat && i >= this.mapSettings.PLAYER_AREAS.length) {
                 continue;
             }
+            // An observer (a spectator, or a host bot) watches: it has no lane and is no defender
+            if (IsPlayerObserver(Player(i)!)) {
+                continue;
+            }
             if (MapPlayer.fromIndex(i)?.slotState === PLAYER_SLOT_STATE_PLAYING) {
                 if (MapPlayer.fromIndex(i)?.controller === MAP_CONTROL_USER) {
                     this.players.set(i, new Defender(i, this));
@@ -224,6 +230,7 @@ export class WarcraftMaul {
         this.saves = new Saves(this);
         this.recipeBook = new RecipeBook(this);
         this.hostDetection = new HostDetection(this);
+        this.observerSupport = new ObserverSupport(this);
         this.laneTransfer = new LaneTransfer(this);
         this.grayVacancy = new GrayVacancy(this);
         this.playerSync.on('build', (player, data) => player.placeTower(data));

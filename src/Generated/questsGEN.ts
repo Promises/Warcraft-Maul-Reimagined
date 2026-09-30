@@ -62,7 +62,7 @@ export const Quests: Quest[] = [
         title: `5.0.0 - 5`,
         icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
         stype: 0,
-        body: `Updates:\n- Fixed: Elementalist runes could never roll Life\n- Fixed: Loot Boxer tier 4-9 boxes always gave Rocks, and Rocks lost their charges\n- Fixed: Wyvern lightning skipped Navy's creeps and spared waves 34-35 instead of the bosses\n- Fixed: votekick could never pass; it now needs a majority\n- Fixed: the scoreboard wrote the first player over its header\n- Fixed: High Priest's Monsoon cancelled its attacks; Berserker and Flesh Golem never berserked\n- Fixed: Pay the Toll failed silently without 50 gold; Void Restoration did nothing\n- Fixed: Ice Troll Priest could Frost Nova dead creeps\n- Fixed: Alliance of Blades enchantment checks and refunds\n- Fixed: desyncs when a race was picked`,
+        body: `Updates:\n- Fixed: Elementalist runes could never roll Life\n- Fixed: Loot Boxer tier 4-9 boxes always gave Rocks, and Rocks lost their charges\n- Fixed: Wyvern lightning skipped Navy's creeps and spared waves 34-35 instead of the bosses\n- Fixed: votekick could never pass; it now needs a majority\n- Fixed: the scoreboard wrote the first player over its header\n- Fixed: High Priest's Monsoon cancelled its attacks; Berserker and Flesh Golem never berserked\n- Fixed: Pay the Toll failed silently without 50 gold; Void Restoration did nothing\n- Fixed: Ice Troll Priest could Frost Nova dead creeps\n- Fixed: Alliance of Blades enchantment checks and refunds\n- Fixed: desyncs when a race was picked\n- Observers watch without a lane, and their game ends by itself once every player has left`,
     },
     {
         title: `5.0.0 - 4`,
