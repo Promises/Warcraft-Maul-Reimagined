@@ -11,10 +11,16 @@ interface Quest {
 
 export const Quests: Quest[] = [
     {
+        title: `5.0.0 - 14`,
+        icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
+        stype: 0,
+        body: `Updates:\n- Observers watch without a lane, and their game ends by itself once every player has left`,
+    },
+    {
         title: `5.0.0 - 13`,
         icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
         stype: 0,
-        body: `Updates:\n- Anti-juggle blockers (left where a tower is sold during a wave) go as soon as they guard nothing, not only at the end of the round: once opening one would change no creep's way to its checkpoint. A blocker in the second checkpoint's maze goes while the wave is still on its way to the first\n- When a tower is built during a wave, the creeps in that lane plan their way again around it\n- Fixed: Hybrid Random towers skipped the anti-block, anti-juggle and too-far-from-home checks, so a hybrid builder could close a lane completely\n- Fixed: losing the game paid the gold for completing the level\n- The sample maze button shows the three sample mazes in turn, one each click (a simple circle, a basic maze, a more advanced one), then hides it\n- Fixed: the Ancient Golem grew to many times its size; it now grows from small to its full size over its seven minutes of Growing Moss`,
+        body: `Updates:\n- Anti-juggle blockers (left where a tower is sold during a wave) go as soon as they guard nothing, not only at the end of the round: once opening one would change no creep's way to its checkpoint. A blocker in the second checkpoint's maze goes while the wave is still on its way to the first\n- When a tower is built during a wave, the creeps in that lane plan their way again around it\n- Fixed: Hybrid Random towers skipped the anti-block, anti-juggle and too-far-from-home checks, so a hybrid builder could close a lane completely\n- Fixed: losing the game paid the gold for completing the level\n- The sample maze button shows the three sample mazes in turn, one each click (a simple circle, a basic maze, a more advanced one), then hides it\n- Fixed: the Ancient Golem grew to many times its size; it now grows from small to its full size over its seven minutes of Growing Moss\n- Fixed: the Bronze Dragon Whelp, Drake and Dragon never cast their Slow`,
     },
     {
         title: `5.0.0 - 12`,
@@ -62,7 +68,7 @@ export const Quests: Quest[] = [
         title: `5.0.0 - 5`,
         icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
         stype: 0,
-        body: `Updates:\n- Fixed: Elementalist runes could never roll Life\n- Fixed: Loot Boxer tier 4-9 boxes always gave Rocks, and Rocks lost their charges\n- Fixed: Wyvern lightning skipped Navy's creeps and spared waves 34-35 instead of the bosses\n- Fixed: votekick could never pass; it now needs a majority\n- Fixed: the scoreboard wrote the first player over its header\n- Fixed: High Priest's Monsoon cancelled its attacks; Berserker and Flesh Golem never berserked\n- Fixed: Pay the Toll failed silently without 50 gold; Void Restoration did nothing\n- Fixed: Ice Troll Priest could Frost Nova dead creeps\n- Fixed: Alliance of Blades enchantment checks and refunds\n- Fixed: desyncs when a race was picked\n- Observers watch without a lane, and their game ends by itself once every player has left`,
+        body: `Updates:\n- Fixed: Elementalist runes could never roll Life\n- Fixed: Loot Boxer tier 4-9 boxes always gave Rocks, and Rocks lost their charges\n- Fixed: Wyvern lightning skipped Navy's creeps and spared waves 34-35 instead of the bosses\n- Fixed: votekick could never pass; it now needs a majority\n- Fixed: the scoreboard wrote the first player over its header\n- Fixed: High Priest's Monsoon cancelled its attacks; Berserker and Flesh Golem never berserked\n- Fixed: Pay the Toll failed silently without 50 gold; Void Restoration did nothing\n- Fixed: Ice Troll Priest could Frost Nova dead creeps\n- Fixed: Alliance of Blades enchantment checks and refunds\n- Fixed: desyncs when a race was picked`,
     },
     {
         title: `5.0.0 - 4`,

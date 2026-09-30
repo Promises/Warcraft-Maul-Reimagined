@@ -5,21 +5,25 @@ const INTERVAL = 2;
 const STATUS_FILE = 'WarcraftMaul\\observer-status.txt';
 
 /**
- * For the observers' own clients: a host bot sits in the observers, and so may any spectator.
- * Warcraft III tells an observer's menus nothing while a game runs, not even that its players have
- * left, and leaves it on a "Game over." dialog once they have. So on an observer's client the map
- * writes how the game stands to CustomMapData (STATUS_FILE: state, wave, lives, the players still
- * in), and once no defender is left it ends the game there, which goes straight to the score screen.
+ * For the clients of people in the game who defend no lane: a host bot (in the attackers' slot, or
+ * in the observers) and any spectator. Warcraft III tells their menus nothing while a game runs,
+ * not even that the players have left, and leaves an observer on a "Game over." dialog once they
+ * have. So on such a client the map writes how the game stands to CustomMapData (STATUS_FILE:
+ * state, wave, lives, the players still in), and once no defender is left it ends the game there,
+ * which goes straight to the score screen.
  *
  * Nothing here changes the game: the file is local, and the game ends on a client with no defender
- * left to play with. The timer runs on every client (it is a handle); only an observer's acts.
+ * left to play with. The timer runs on every client (it is a handle); only a watcher's acts.
  */
 export class ObserverSupport {
-    private readonly observing: boolean = IsPlayerObserver(GetLocalPlayer());
+    // Made after the defenders are set up: a player of the game who is none of them
+    private readonly observing: boolean;
     private ended: boolean = false;
     private last: string = '';
 
     constructor(private readonly game: WarcraftMaul) {
+        const local = GetLocalPlayer();
+        this.observing = !game.players.has(GetPlayerId(local)) && GetPlayerController(local) === MAP_CONTROL_USER;
         Timer.create().start(INTERVAL, true, () => this.update());
     }
 
