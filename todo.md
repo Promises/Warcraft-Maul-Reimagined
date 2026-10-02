@@ -81,7 +81,7 @@
     says "Nothing stirs", with a hint when a tower goes into an undiscovered Primal; the first of
     each Primal in a game is announced; Siphon's tooltip lists the Primal recipes the player knows.
     Debug command -forget empties the book. test_recipe_discovery (wc3-slop-lan measure.py).
-  - [x] Saves, as in the "Warcraft Maul Save Format" design doc: src/lib/Save (bit-packed sections,
+  - [x] Saves (docs/save-format.md): src/lib/Save (bit-packed sections,
     signed and scrambled with a key tied to the battletag), src/World/Game/Saves.ts (read by the
     owner's client a second in, synced through PlayerSync, written on change; unknown sections
     kept). The recipe book is section 1. Codec unit tests: `npm run test:lua`, on a 32-bit Lua 5.3

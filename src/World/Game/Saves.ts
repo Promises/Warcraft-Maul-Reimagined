@@ -35,8 +35,8 @@ const UNSET = '-';
 
 /**
  * Each player's save: a file on their own machine, read at the start of the game, sent to every
- * client and handed to the parts, and rewritten whenever a part's data changes. See the "Warcraft
- * Maul Save Format" design doc.
+ * client and handed to the parts, and rewritten whenever a part's data changes. See
+ * docs/save-format.md.
  *
  * The file is read and written only by its owner's client; everything the game acts on arrives
  * through PlayerSync, so every client applies the same saves in the same order.

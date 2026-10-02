@@ -1,7 +1,6 @@
 /**
  * The save format: a player's sections, packed, signed and scrambled with a key tied to their
- * name, as text that is safe in a preload file and a sync message. See the "Warcraft Maul Save
- * Format" design doc.
+ * name, as text that is safe in a preload file and a sync message. See docs/save-format.md.
  *
  *   payload  = smart(FORMAT) smart(count) { smart(id) smart(bit length) bits }  (padded to bytes)
  *   file     = text(scramble(payload + signature))
