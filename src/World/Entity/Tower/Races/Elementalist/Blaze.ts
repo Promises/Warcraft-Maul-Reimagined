@@ -5,7 +5,8 @@ export class Blaze extends Tower implements EndOfRoundTower {
 
 
     public EndOfRoundAction(): void {
-        this.Upgrade(FourCC('n027'));
+        // Burnt out: back to an Uncharged Rune, not rock
+        this.Upgrade(FourCC('n00A'));
     }
 
 }

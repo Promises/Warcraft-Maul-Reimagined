@@ -19,6 +19,7 @@ import { EndlessStorm, Haboob } from './Haboob';
 import { Firelord, Inferno } from './Inferno';
 import { AvatarOfLife } from './AvatarOfLife';
 import { Nordrassil } from './Nordrassil';
+import { Mist } from './Mist';
 import {
     AVATAR_OF_LIFE, ENDLESS_STORM, EYE_OF_THE_STORM, FIRELORD, HABOOB, HEART_OF_LIFE, INFERNO, LICH, LICH_KING, NORDRASSIL,
     THUNDERHEAD, WORLD_TREE,
@@ -51,6 +52,7 @@ export class ElementalistTowers extends RaceTowers {
         list.add(FourCC('u026'), Bubbles);
         list.add(FourCC('u027'), Blaze);
         list.add(FourCC('u020'), Plague);
+        list.add(FourCC('u028'), Mist);
         list.add(FourCC(LICH), Lich);
         list.add(FourCC(THUNDERHEAD), Thunderhead);
         list.add(FourCC(LICH_KING), LichKing);

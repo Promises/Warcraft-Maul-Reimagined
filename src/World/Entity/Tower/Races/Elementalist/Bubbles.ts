@@ -5,7 +5,8 @@ export class Bubbles extends Tower implements EndOfRoundTower {
 
     public EndOfRoundAction(): void {
         if (this.unit.getBaseDamage(0) <= 4) {
-            this.Upgrade(FourCC('n027'));
+            // Popped: back to an Uncharged Rune, not rock
+            this.Upgrade(FourCC('n00A'));
         } else {
             this.unit.setBaseDamage(this.unit.getBaseDamage(0) - 5, 0);
         }

@@ -3,6 +3,9 @@ import {Unit} from "war3-objectdata-th";
 // The Primals' own abilities (scripts/primal-abilities.js adds them to the built map)
 export const ASCEND = 'AP01';
 export const SURGE = 'AP02';
+// The Depleted Rock's: 8 gold turns it back into an Uncharged Rune (in place of Pay the Toll)
+export const RECHARGE = 'AP03';
+export const RECHARGE_PRICE = 8;
 
 /**
  * The Elementalist's Primal fusions and their Ascended forms (the Elementalist redesign), made at
@@ -28,7 +31,19 @@ export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LIC
                 + 'The growth after Ascension only comes from waves survived.',
             icon: 'ReplaceableTextures\\CommandButtons\\BTNBloodLust.blp', hotkey: 'G', x: 2, y: 2,
         },
+        {
+            id: 'AP03', order: 'rejuvination', name: '[Elementalists] Recharge', tooltip: 'Recharge [|cffffcc00R|r]',
+            extended: 'Recharges the rock into an Uncharged Rune for 8 gold, which can take an element again.',
+            icon: 'ReplaceableTextures\\CommandButtons\\BTNManaRecharge.blp', hotkey: 'R', x: 0, y: 2,
+        },
     ]);
+
+    // The midgame: Tornado's first aura is Updraft (an Endurance Aura, +20% attack speed for your towers
+    // within 500) where Tailwind sped enemies up; the Depleted Rock is recharged, not paid to go away
+    const tornado = objectData.units.get('u022')!;
+    tornado.normal = String(tornado.normal ?? '').split(',').map(id => id === 'A0E0' ? 'A03Q' : id).join(',');
+    const rock = objectData.units.get('n027')!;
+    rock.normal = String(rock.normal ?? '').split(',').filter(id => id !== 'A0BF').concat('AP03').join(',');
 
     // Undead L2 and Death Rune L3: the Lich; Air Rune L3 and Water Rune L3: Thunderhead; Sandstorm L2
     // and Air Rune L3: Haboob; two Life Rune L3: Heart of Life; Tree and Nature Rune L3: World Tree;
@@ -101,14 +116,16 @@ export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LIC
     // Heart of Life: two Life Rune L3, the race's boss killer: melee, one target, a heavy hit
     const heart = primal('u02D', 'uP04', 'Heart of Life', 'A Primal fusion of two Life Rune Level 3 '
         + '(Siphon Energy, 500 gold).|n|nA boss killer: melee, one target, 4,300 normal damage a second. ' + attunement);
-    heart.scalingValueundefined = 0.8;
+    heart.scalingValueundefined = 0.6;
     heart.attack1DamageBase = 4299;
 
     // World Tree: Nature Rune L3's siege attack with splash
     const worldTree = primal('u02F', 'uP05', 'World Tree', 'A Primal fusion of a Tree and a Nature Rune Level 3 '
         + '(Siphon Energy, 400 gold).|n|nGround splash: 1,400 siege damage a second, range 800, 250 splash. ' + attunement);
+    // The Tree of Ages: the Tree of Life model with its first upgrade's animations
     worldTree.modelFile = 'buildings\\nightelf\\TreeofLife\\TreeofLife';
-    worldTree.scalingValueundefined = 0.45;
+    worldTree.requiredAnimationNames = 'Upgrade,First';
+    worldTree.scalingValueundefined = 0.8;
     worldTree.iconGameInterface = 'ReplaceableTextures\\CommandButtons\\BTNTreeOfLife.blp';
     worldTree.attack1WeaponType = 'msplash';
     worldTree.attack1DamageBase = 1399;
@@ -124,7 +141,7 @@ export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LIC
         + '(Siphon Energy, 350 gold).|n|nImmolation: 400 damage a second to every enemy within 400. For clumped '
         + 'ground waves; weak on bosses. ' + attunement);
     inferno.modelFile = 'units\\demon\\Infernal\\Infernal';
-    inferno.scalingValueundefined = 1.1;
+    inferno.scalingValueundefined = 0.85;
     inferno.iconGameInterface = 'ReplaceableTextures\\CommandButtons\\BTNInfernal.blp';
     inferno.normal = String(inferno.normal ?? '').split(',').filter(id => id !== 'A0E7').join(',');
 
@@ -147,7 +164,9 @@ export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LIC
     const eye = objectData.units.copy(thunderhead, 'uA02')!;
     eye.name = 'Eye of the Storm';
     eye.normal = withoutPrimalAbilities(eye.normal);
-    eye.attack1DamageBase = 2050;
+    // The Ascended keep their Attunement (15, +30%), so their bases are the design's damage at
+    // ascension over 1.3: the Eye starts at Dalaran's 2,050 a hit, not 30% past it
+    eye.attack1DamageBase = 1576;
     eye.attack1Range = 1100;
     eye.acquisitionRange = 1100;
     eye.attack1AreaOfEffectFullDamage = 900;
@@ -166,18 +185,20 @@ export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LIC
     const uncapped = 'Gains 5% of its power every wave it stands, with no cap.';
     const endlessStorm = ascended(haboob, 'uA03', 'Endless Storm', 'The Haboob, ascended (500 gold). Hits up to 8 '
         + 'targets, air and ground: 2,000 chaos damage, range 500. ' + uncapped);
-    endlessStorm.attack1DamageBase = 1999;
+    endlessStorm.attack1DamageBase = 1537;
     endlessStorm.scalingValueundefined = 0.7;
     const avatar = ascended(heart, 'uA04', 'Avatar of Life', 'The Heart of Life, ascended (600 gold). Melee, one '
         + 'target, 9,000 normal damage a second, and half again against bosses. ' + uncapped);
-    avatar.attack1DamageBase = 8999;
+    avatar.attack1DamageBase = 6922;
     avatar.scalingValueundefined = 1.0;
     const nordrassil = ascended(worldTree, 'uA05', 'Nordrassil', 'The World Tree, ascended (450 gold). Ground splash: '
         + '3,000 siege damage a second, range 900, 300 splash; every fifth attack roots its target for a second '
         + '(not bosses). ' + uncapped);
-    nordrassil.modelFile = 'buildings\\nightelf\\TreeofEternity\\TreeofEternity';
+    // The Tree of Eternity: there is no model of its own, it is the Tree of Life's second upgrade
+    nordrassil.requiredAnimationNames = 'Upgrade,Second';
+    nordrassil.scalingValueundefined = 0.95;
     nordrassil.iconGameInterface = 'ReplaceableTextures\\CommandButtons\\BTNTreeOfEternity.blp';
-    nordrassil.attack1DamageBase = 2999;
+    nordrassil.attack1DamageBase = 2307;
     nordrassil.attack1Range = 900;
     nordrassil.acquisitionRange = 900;
     nordrassil.attack1AreaOfEffectFullDamage = 300;
@@ -185,7 +206,7 @@ export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LIC
     nordrassil.attack1AreaOfEffectSmallDamage = 300;
     const firelord = ascended(inferno, 'uA06', 'Firelord', 'The Inferno, ascended (400 gold). Immolation: 900 damage '
         + 'a second to every enemy within 450. ' + uncapped);
-    firelord.scalingValueundefined = 1.4;
+    firelord.scalingValueundefined = 1.0;
 
     return {LICH: lich.newId, THUNDERHEAD: thunderhead.newId, HABOOB: haboob.newId, HEART_OF_LIFE: heart.newId,
         WORLD_TREE: worldTree.newId, INFERNO: inferno.newId, LICH_KING: lichKing.newId, EYE_OF_THE_STORM: eye.newId,

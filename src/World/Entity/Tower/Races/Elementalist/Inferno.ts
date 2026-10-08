@@ -42,10 +42,10 @@ export class Inferno extends AttunedTower implements TickingTower {
     }
 }
 
-/** The Inferno, ascended: 900 a second within 450. */
+/** The Inferno, ascended: 900 a second within 450 at ascension, with its Attunement (692 x 1.3). */
 export class Firelord extends AscendedTower implements TickingTower {
     public Action(): void {
-        burn(this, Math.floor(900 * this.growthShare()), 450);
+        burn(this, Math.floor(692 * this.growthShare()), 450);
     }
 
     public GetTickModulo(): number {

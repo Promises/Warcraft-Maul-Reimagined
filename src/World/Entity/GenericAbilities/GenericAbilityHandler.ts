@@ -20,6 +20,7 @@ import { PayTheToll } from './Void/PayTheToll';
 import { VoidRestoration } from './Void/VoidRestoration';
 import { Ascend } from './Elementalist/Ascend';
 import { Surge } from './Elementalist/Surge';
+import { Recharge } from './Elementalist/Recharge';
 import { VoidLordAbility } from './Void/VoidLordAbility';
 import { PurchaseVoidBeast } from './Void/PurchaseVoidBeast';
 import { PurchaseVoidBeing } from './Void/PurchaseVoidBeing';
@@ -75,6 +76,7 @@ export class GenericAbilityHandler {
         this.abilities.push(VoidRestoration);
         this.abilities.push(Ascend);
         this.abilities.push(Surge);
+        this.abilities.push(Recharge);
         this.abilities.push(VoidLordAbility);
         this.abilities.push(PurchaseVoidBeing);
         this.abilities.push(PurchaseVoidBeast);
