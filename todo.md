@@ -217,8 +217,11 @@
   panel or in the vote. The tests need it: in Classic, removing a creep player's last unit (a
   test target) ends the "round" - wave +1, round gold, and the next wave 20 s later.
   (2026-09-26)
-  - [ ] Its scoreboard never fills the armour and creep-type cells (UpdateScoreboardForWave is
-    Classic's, private).
+  - [x] Its scoreboard never followed the wave (level, armour, creep type stayed wave 1's): the
+    update was Classic's, private, and Blitz had two more copies of it. One shared
+    ShowWaveOnScoreboard in AbstractGameRound now, which Sandbox calls with its clock (Classic's
+    copy also capitalised only the first letter). test_scoreboard_follows_the_wave: screenshots
+    show Hero (Boss) on wave 35 and Medium on wave 12 (2026-10-09).
   - [ ] Debug builds: the hidden Secondary tab keeps its slot, leaving a gap above Dev.
 - [x] Secondary race: Shrine of Buffs (I026) is a secondary race (tier from its tooltip,
   RaceItems 'Secondary'). The race picker shows a Secondary tab to a player who has a race and
@@ -253,16 +256,19 @@
     (u008) casts the monsoon on the attacked unit's spot whenever the tower's A03P is off cooldown
     (the tower's button shows the cooldown), and the tower attacks throughout. Race test passes:
     54 magic attacks and a monsoon every ~10.5 s in one round. (2026-09-26)
-  - [ ] Monsoon (A03P, from ANmo) strikes each unit through one monsoon only: a unit struck by
-    one is never struck by a later one, even after the first caster is gone (probed with three
-    targets and dummies living 13 s and 25 s). Its strikes also go on as long as the caster lives,
-    not the 12 s it lasts. Creeps walking through rarely meet two, but a boss would take one
-    monsoon and no more. Options: set A03P's duration fields and see, or strike from a trigger
-    instead of the ability.
-  - [ ] Corrupted Night Elves' Roots (n02H): its aura A08E (from AUau, targets enemies + ground,
-    area 128, buff B01T) never put its buff on a creep standing 96 away, in two runs
-    (2026-09-26/27). Not looked into yet: whether the aura fails for any enemy (AUau with enemy
-    targets, its data values) or only for the test's target.
+  - [x] Monsoon (A03P, from ANmo): measured again with hits traced (test_monsoon_strikes_every_cast,
+    wc3-slop-lan measure.py, 2026-10-09), the old notes were wrong: it strikes for its 12 s (6
+    strikes in 9 s with a caster living 25 s) and a later Monsoon strikes the same unit again (7).
+    What holds: two Monsoons at once do not stack (6 strikes and 0), so two High Priests on the
+    same creeps deal one Monsoon, and one Priest's casts overlap 2 s (cooldown 10, duration 12).
+    That is the game's Monsoon; stacking would mean striking from a trigger, and more damage for
+    several Priests. Decided (2026-10-09): left as the game has it - one Priest loses only the 2 s
+    overlap, and stacking would mean re-tuning every multi-Priest build. The test logs the
+    overlap; revisit only if players ask for several Priests to stack.
+  - [x] Corrupted Night Elves' Roots (n02H): its aura A08E never put its buff on a creep. Not a
+    bug: Thorns needs the Den's research R000 ("Research Thorns"; Roots' tooltip says "requires
+    research!"), which the test never did. race-data.js now gives each aura its requirements and
+    the race test researches them first; the race test passes (2026-10-09).
   - [x] Berserker (o00E, A03K) and Flesh Golem (o00G, A03R): their berserk (from Absk) kept Absk's
     requirement (the Berserker Upgrade research), so it never cast. Fixed: areq cleared on both
     in war3map.w3a.
@@ -296,11 +302,14 @@
   random). Now it attacks a random enemy in range, a new one each attack
   (Specs/RandomTargeting.ts); the race test gives it 8 targets and checks the spread. Human race
   test passes: 77 attacks over all 8 targets, at most 16 on one. (2026-09-27)
-  - [ ] It rolls every second attack, not every attack: the order onto the rolled creep does not
-    cancel the swing already started, so the old target takes that one and the rolled one takes
-    two in a row. Rolling on every swing would fix it for Venom, but a tower whose swing the order
-    does cancel would then never finish an attack - test on a second tower first.
-  - [ ] Not tried: a creep that walks out of range while the tower is ordered onto it.
+  - [x] It rolled every second attack, not every attack: each rolled creep took two in a row. Now
+    every attack rolls the next (Venom is the only RandomTargeting tower, and the order does not
+    stop its swing). The race test's spread check also counts attacks that follow onto the same
+    target (at most 35%; ~1 in 8 at random, 50% before); the Human race test passes (2026-10-09).
+  - [x] A creep that walks out of range while the tower is ordered onto it: not a bug. The game
+    drops the order and the tower attacks another at once (test_venom_target_leaves_range,
+    wc3-slop-lan measure.py: the creep of its latest order moved away, three times). Its first
+    runs seemed to show the tower idle; that was the test reading the trace before it was written.
 - [x] IceTrollPriest leaked: a boolexpr (Condition) every tick, and a `targets` list that was
   never emptied, so it grew with every creep ever seen, dead ones included. Now one group for all,
   no filter, and this tick's live creeps only. test_ice_troll_priest_frost_nova (wc3-slop-lan
@@ -328,8 +337,11 @@
     tiers 6-9, past any roll). Now `-`: Rocks 80/70/60% for tiers 4-6, and tiers 7-9 give no
     Rocks at all, only their Stick/Coin/Lootbag/MaulKoinz tables. The test checks every roll
     against the exact table. (2026-09-28)
-  - [ ] Not tried in a game: Rocks to a Lootbag (a stack of 9 used), and Stick/Coin/MaulKoinz
-    restoring a box's mana (only when the box itself uses them) - the harness cannot use items.
+  - [x] Tried in a game with `.lua UnitUseItem` (test_loot_boxer_items, wc3-slop-lan measure.py,
+    2026-10-09): Wooden Sticks, Gold Coin and Platinum Token give an opened-tier box 1, 2 and 6
+    mana, nothing when the builder uses them. Rocks were broken: the game takes the used charge
+    before the map sees it, so a stack of 9 read 8 and only got its charge back - no Lootbag ever
+    came from 9. Now 9 make a Lootbag, a bigger stack keeps the rest, a smaller one stays.
 - [x] Loot Boxer (I02D) showed in the Advanced tab (its tooltip says Advanced) and could be picked
   there. Now random-only (Race.randomOnly): rolled by the random picks, shown only in the Dev tab.
   (2026-09-27)
