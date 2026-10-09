@@ -5,9 +5,15 @@ import {CreepAbility} from './CreepAbilities/specs/CreepAbility';
 import {WarcraftMaul} from '../WarcraftMaul';
 import {Effect, Unit} from "w3ts";
 
+// Counts checkpoints reached, by any creep: the order creeps reach them in
+let arrivals = 0;
+
 export class Creep {
     public unit: Unit;
-    public targetCheckpoint: CheckPoint | undefined;
+    private _targetCheckpoint: CheckPoint | undefined;
+    // When it reached the checkpoint it walks on from, in arrivals: of two creeps on the same leg,
+    // the one that reached its start first is ahead, however the maze winds
+    public reachedAt: number = 0;
     public gameRound: AbstractGameRound;
     public abilities: CreepAbility[];
     private readonly game: WarcraftMaul;
@@ -20,6 +26,21 @@ export class Creep {
         this.AddHPBonusByDifficulty();
         this.abilities = abilities;
 
+    }
+
+    get targetCheckpoint(): CheckPoint | undefined {
+        return this._targetCheckpoint;
+    }
+
+    set targetCheckpoint(value: CheckPoint | undefined) {
+        this._targetCheckpoint = value;
+        arrivals++;
+        this.reachedAt = arrivals;
+    }
+
+    /** How many checkpoints it still has to reach, the one it walks to included; 0 when it has none. */
+    public checkpointsLeft(): number {
+        return this._targetCheckpoint?.checkpointsToEnd() ?? 0;
     }
 
     public ReapplyMovement(): void {

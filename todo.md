@@ -310,6 +310,14 @@
     drops the order and the tower attacks another at once (test_venom_target_leaves_range,
     wc3-slop-lan measure.py: the creep of its latest order moved away, three times). Its first
     runs seemed to show the tower idle; that was the test reading the trace before it was written.
+- [x] Cold Tower (h04B, Human, 300 gold) always attacks the creep in range furthest along the path
+  (FrontmostTargeting.ts): the fewest checkpoints left (the lanes' paths join into one, so the
+  count compares any two creeps), and of those the one that reached its last checkpoint first
+  (a maze winds, so distance would not tell). The order goes at the start of a swing and costs
+  that swing's windup, ~0.1-0.2 s, only when the front changes hands. test_cold_tower_targets_the_frontmost
+  (wc3-slop-lan measure.py): a wave on red's straight leg, every pick the westmost creep, each
+  followed by an attack on it (2026-10-09). Its tooltip said range 650 and splash 150; the data
+  has 900 and 200, now in the tooltip (its "air only" splash note is unchecked).
 - [x] IceTrollPriest leaked: a boolexpr (Condition) every tick, and a `targets` list that was
   never emptied, so it grew with every creep ever seen, dead ones included. Now one group for all,
   no filter, and this tick's live creeps only. test_ice_troll_priest_frost_nova (wc3-slop-lan

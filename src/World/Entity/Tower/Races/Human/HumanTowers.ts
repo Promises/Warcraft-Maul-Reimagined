@@ -1,6 +1,7 @@
 import { TowerMap } from '../../Specs/TowerMap';
 import { RaceTowers } from '../RaceTowers';
 import { VenomTower } from './VenomTower';
+import { ColdTower } from './ColdTower';
 import { SirGalahad } from './SirGalahad';
 
 
@@ -10,6 +11,7 @@ export class HumanTowers extends RaceTowers {
 
         // Human
         list.add(FourCC('h045'), VenomTower);
+        list.add(FourCC('h04B'), ColdTower);
         list.add(FourCC('n05C'), SirGalahad);
 
     }

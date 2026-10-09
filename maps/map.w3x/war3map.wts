@@ -7616,7 +7616,7 @@ Build Cold Tower
 STRING 1256
 // Units: h04B ([Humans] - Cold Tower), Ubertip (Tooltip - Extended)
 {
-The Cold Tower cools down water until it forms a large ice shard which it then uses as ammunition to shoot down it's enemies|n|cffffcc00Attack:|r Magic|n|cffffcc00Cooldown:|r 0.75|n|cffffcc00Damage:|r 440 - 440|n|cffffcc00Range:|r 650|n|cffffcc00Ability:|r Splash; the area of effect is 150 (air only)
+The Cold Tower cools down water until it forms a large ice shard which it then uses as ammunition to shoot down it's enemies|n|cffffcc00Attack:|r Magic|n|cffffcc00Cooldown:|r 0.75|n|cffffcc00Damage:|r 440 - 440|n|cffffcc00Range:|r 900|n|cffffcc00Ability:|r Splash; the area of effect is 200 (air only)|n|cffffcc00Ability:|r Frontline; always attacks the creep furthest along the path
 }
 
 STRING 1257
