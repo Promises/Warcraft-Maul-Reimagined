@@ -318,17 +318,17 @@
   (wc3-slop-lan measure.py): a wave on red's straight leg, every pick the westmost creep, each
   followed by an attack on it (2026-10-09). Its tooltip said range 650 and splash 150; the data
   has 900 and 200, now in the tooltip (its "air only" splash note is unchecked).
-- [ ] Cold Tower's slow (asked 2026-10-09: give it the stronger of the two frost attacks, without
-  many of them stopping creeps). Measured (test_cold_tower_slow_probe, wc3-slop-lan measure.py,
-  walkers with endless life past 1 and 6 towers): A08X (the Frost Tower's, a dummy's Slow A02U,
-  25% for 10 s, buff B017) only ever slows ground units; A0EU (Workers Union's frost attack, from
-  Afr2) only air units, as its targets say "air,enemies". Neither stacks into a stop: one buff
-  each, refreshed, and six towers' walkers all kept moving. So A0EU as it is would slow none of a
-  ground wave. Options: a copy of Afr2 targeting ground and air for the Cold Tower (added to the
-  built map the way scripts/primal-abilities.js adds the Primals' abilities), or A08X's code slow
-  with a stronger Slow; either is one buff, so many towers cannot freeze a creep. Undecided.
-  The Cold Tower's frontmost targeting is checked in a maze (test_cold_tower_frontmost_in_a_maze:
-  four passes, 9 of 9 picks the creep with the least ground left).
+- [x] Cold Tower's slow (asked 2026-10-09: the stronger of the two frost attacks, without many of
+  them stopping creeps). The two: A08X (the Frost Tower's, a dummy's Slow A02U, buff B017) slows
+  ground units only; A0EU (Workers Union's frost attack, from Afr2) air only, its targets being
+  "air,enemies". The Cold Tower got A0EU copied as AC01 with ground added (scripts/copy-abilities.js,
+  at build time; A0EU stays as it is). test_cold_tower_frost: a footman 275 -> 200, a gryphon
+  320 -> 237 past one Cold Tower, and the same past six (one buff, refreshed: no stacking, no
+  stop). Whether it reaches the splash is not settled (two side-by-side footmen: frosted once, not
+  once). The frost broke the first frontmost ranking (who reached their checkpoint first): it
+  slows the leader and the creep behind walks past. Now the ground left to the next checkpoint
+  decides, from a distance field over the lane's antiblock maze (PathField.ts, cached per
+  checkpoint until a cell changes; unit-tested in tests/lua/pathfield.test.ts).
 - [ ] Workers Union's Undead Acolyte (h03I) attacks ground only, but its frost attack A0EU targets
   "air,enemies": it can never slow anything. Not yet seen in a game with a wave.
 - [x] IceTrollPriest leaked: a boolexpr (Condition) every tick, and a `targets` list that was
