@@ -15650,7 +15650,7 @@ Upgrade to Sandstorm Level 2
 STRING 2631
 // Units: u03D (Sandstorm - Level 2), Ubertip (Tooltip - Extended)
 {
-|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.7|n|cffffcc00Damage:|r 926 - 926|n|cffffcc00Range:|r 300|n|cffffcc00Ability:|r Multishot; attacks up to 5 targets
+|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.7|n|cffffcc00Damage:|r 926 - 926|n|cffffcc00Range:|r 300|n|cffffcc00Ability:|r Multishot; attacks up to 7 targets
 }
 
 STRING 2632

@@ -29,7 +29,7 @@ export class Plague extends Tower implements PassiveCreepDiesInAreaEffectTower {
         if (infected.length === 0) {
             return;
         }
-        SyncTrace.note('plague', `p${this.owner.id} infected ${infected.length}`);
+        SyncTrace.note('plague', `p${this.owner.id} creep=${SyncTrace.unit(dyingCreep.unit)} infected ${infected.length}`);
         let seconds = 0;
         const timer = CreateTimer()!;
         TimerStart(timer, 1, true, () => {
