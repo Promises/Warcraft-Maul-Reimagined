@@ -2,7 +2,7 @@ import {AbstractGameRound} from '../BaseMaul/AbstractGameRound';
 import * as settings from '../../GlobalSettings';
 import {WarcraftMaul} from '../../WarcraftMaul';
 import {Ship} from '../../Entity/Ship';
-import {COLOUR, CREEP_TYPE, SendMessage, Util} from "../../../lib/translators";
+import {COLOUR, SendMessage, Util} from "../../../lib/translators";
 import {Effect, Trigger} from "w3ts";
 
 export class ClassicGameRound extends AbstractGameRound {
@@ -106,31 +106,7 @@ export class ClassicGameRound extends AbstractGameRound {
     private UpdateScoreboardForWave(): void {
         if (this.game.scoreBoard) {
             MultiboardSetItemValueBJ(this.game.scoreBoard.board, 1, 1, 'Starting in');
-            let armourType: string = settings.ARMOUR_TYPE_NAMES[this.game.worldMap.waveCreeps[this.currentWave - 1].getArmourType()];
-            armourType = armourType.toLowerCase().charAt(0).toUpperCase() + armourType.slice(1);
-            MultiboardSetItemValueBJ(
-                this.game.scoreBoard.board,
-                2, 5,
-                Util.ColourString(
-                    settings.ARMOUR_TYPE_COLOURS[this.game.worldMap.waveCreeps[this.currentWave - 1].getArmourType()], armourType,
-                ),
-            );
-            const creepType: CREEP_TYPE = this.game.worldMap.waveCreeps[this.currentWave - 1].getCreepType();
-            if (creepType !== CREEP_TYPE.NORMAL) {
-                let creepTypeName: string = settings.CREEP_TYPE_NAMES[this.game.worldMap.waveCreeps[this.currentWave - 1].getCreepType()];
-                creepTypeName = creepTypeName.charAt(0).toUpperCase() + creepTypeName.toLowerCase().slice(1);
-                MultiboardSetItemValueBJ(
-                    this.game.scoreBoard.board,
-                    2, 6,
-                    Util.ColourString(
-                        settings.CREEP_TYPE_COLOURS[this.game.worldMap.waveCreeps[this.currentWave - 1].getCreepType()],
-                        `(${creepTypeName})`));
-            } else {
-                MultiboardSetItemValueBJ(
-                    this.game.scoreBoard.board,
-                    2, 6,
-                    '');
-            }
+            this.ShowWaveOnScoreboard();
         }
     }
 

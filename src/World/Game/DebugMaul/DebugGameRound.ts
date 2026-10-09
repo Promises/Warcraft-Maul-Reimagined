@@ -55,11 +55,13 @@ export class DebugGameRound extends ClassicGameRound {
         }
     }
 
+    /** The clock, and the current wave's armour, creep type and level (-wave may change it at any time). */
     private ShowClock(): void {
         const board = this.game.scoreBoard;
         if (!board) {
             return;
         }
+        this.ShowWaveOnScoreboard();
         if (this.isWaveInProgress) {
             MultiboardSetItemValueBJ(board.board, 1, 1, 'Game Time');
             MultiboardSetItemValueBJ(board.board, 2, 1, this.game.PrettifyGameTime(this.game.gameTime));

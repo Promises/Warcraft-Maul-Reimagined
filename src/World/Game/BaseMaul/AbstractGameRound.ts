@@ -5,7 +5,8 @@ import { PlayerSpawns } from '../../Entity/PlayerSpawns';
 import { CreepAbility } from '../../Entity/CreepAbilities/specs/CreepAbility';
 import { SpawnedCreeps } from '../../Entity/SpawnedCreeps';
 import {Trigger} from "w3ts";
-import {CREEP_TYPE, SendMessage} from "../../../lib/translators";
+import {CREEP_TYPE, SendMessage, Util} from "../../../lib/translators";
+import * as settings from '../../GlobalSettings';
 import {SyncTrace} from '../../../lib/SyncTrace';
 
 export abstract class AbstractGameRound {
@@ -24,6 +25,27 @@ export abstract class AbstractGameRound {
         this.creepMovementTimeout.addAction(() => {
             this.VerifyCreepMovement();
         });
+    }
+
+    /** The current wave's armour, creep type and level on the scoreboard (every mode, Sandbox too). */
+    protected ShowWaveOnScoreboard(): void {
+        const board = this.game.scoreBoard;
+        if (!board) {
+            return;
+        }
+        const wave = this.game.worldMap.waveCreeps[this.currentWave - 1];
+        const armour = settings.ARMOUR_TYPE_NAMES[wave.getArmourType()];
+        MultiboardSetItemValueBJ(board.board, 2, 5, Util.ColourString(settings.ARMOUR_TYPE_COLOURS[wave.getArmourType()],
+            armour.charAt(0).toUpperCase() + armour.toLowerCase().slice(1)));
+        const creepType: CREEP_TYPE = wave.getCreepType();
+        if (creepType !== CREEP_TYPE.NORMAL) {
+            const name = settings.CREEP_TYPE_NAMES[creepType];
+            MultiboardSetItemValueBJ(board.board, 2, 6, Util.ColourString(settings.CREEP_TYPE_COLOURS[creepType],
+                `(${name.charAt(0).toUpperCase() + name.toLowerCase().slice(1)})`));
+        } else {
+            MultiboardSetItemValueBJ(board.board, 2, 6, '');
+        }
+        MultiboardSetItemValueBJ(board.board, 2, 2, `${this.currentWave}`);
     }
 
     get currentWave(): number {
