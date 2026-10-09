@@ -36,6 +36,59 @@ Frame "BACKDROP" "BoxedTextBackgroundTemplate" {
         BackdropEdgeFile  "ToolTipBorder", //the border File
         BackdropBlendAll,
 }
+// The recipe book's panel: the ESC menu's backdrop (escmenumainpanel.fdf) with a smaller corner
+Frame "BACKDROP" "RecipeBookBackdrop" {
+    DecorateFileNames,
+    BackdropTileBackground,
+    BackdropBackground  "EscMenuBackground",
+    BackdropCornerFlags "UL|UR|BL|BR|T|L|B|R",
+    BackdropCornerSize  0.040,
+    BackdropBackgroundSize  0.256,
+    BackdropBackgroundInsets 0.01 0.01 0.01 0.01,
+    BackdropEdgeFile  "EscMenuBorder",
+    BackdropBlendAll,
+}
+// The recipe book's texts, one template per size (a TEXT made without a font ignores BlzFrameSetFont)
+Frame "TEXT" "RecipeBookText0150" {
+    DecorateFileNames,
+    FrameFont "MasterFont", 0.015, "",
+    FontColor 1.0 1.0 1.0 1.0,
+}
+Frame "TEXT" "RecipeBookText0140" {
+    DecorateFileNames,
+    FrameFont "MasterFont", 0.014, "",
+    FontColor 1.0 1.0 1.0 1.0,
+}
+Frame "TEXT" "RecipeBookText0115" {
+    DecorateFileNames,
+    FrameFont "MasterFont", 0.0115, "",
+    FontColor 1.0 1.0 1.0 1.0,
+}
+Frame "TEXT" "RecipeBookText0110" {
+    DecorateFileNames,
+    FrameFont "MasterFont", 0.011, "",
+    FontColor 1.0 1.0 1.0 1.0,
+}
+Frame "TEXT" "RecipeBookText0098" {
+    DecorateFileNames,
+    FrameFont "MasterFont", 0.0098, "",
+    FontColor 1.0 1.0 1.0 1.0,
+}
+Frame "TEXT" "RecipeBookText0092" {
+    DecorateFileNames,
+    FrameFont "MasterFont", 0.0092, "",
+    FontColor 1.0 1.0 1.0 1.0,
+}
+Frame "TEXT" "RecipeBookText0088" {
+    DecorateFileNames,
+    FrameFont "MasterFont", 0.0088, "",
+    FontColor 1.0 1.0 1.0 1.0,
+}
+Frame "TEXT" "RecipeBookText0085" {
+    DecorateFileNames,
+    FrameFont "MasterFont", 0.0085, "",
+    FontColor 1.0 1.0 1.0 1.0,
+}
 // An icon button: a plain BUTTON with the standard mouse-over glow; the script lays it over an
 // icon backdrop as that backdrop's child, so the glow draws over the icon. Hover feedback
 // (glow, tooltip) is left to the engine: registering mouse enter/leave events on a frame

@@ -206,16 +206,34 @@ export function onLocalClick(button: Frame, handler: (this: void) => void): void
  * A boxed tooltip the engine shows while its owner is hovered. The box wraps one text frame
  * whose height follows its content, so the box always fits whatever text is set.
  */
+/**
+ * Where a tooltip opens from its anchor: above it (the default), or from one of its corners, to
+ * keep a tooltip of a panel's top row on the screen. The box stays clear of the anchor by the gap.
+ */
+export type TooltipPlacement = 'above' | 'belowRight' | 'belowLeft' | 'aboveRight' | 'aboveLeft';
+
 export class Tooltip {
     private readonly box: Frame;
     private readonly text: Frame;
 
-    constructor(name: string, owner: Frame, width: number, anchor: Frame = owner) {
+    constructor(name: string, owner: Frame, width: number, anchor: Frame = owner, placement: TooltipPlacement = 'above') {
         this.box = Frame.createType(`${name}Tooltip`, owner, 0, 'BACKDROP', 'BoxedTextBackgroundTemplate')!;
         this.text = createText(`${name}TooltipText`, this.box, '', TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_LEFT);
         // Height 0: the text grows with its content and the box follows it
         this.text.setSize(width - 2 * TOOLTIP_PADDING, 0);
-        this.text.setPoint(FRAMEPOINT_BOTTOM, anchor, FRAMEPOINT_TOP, 0, TOOLTIP_GAP);
+        // From a corner the box keeps the same distance from the anchor as above it
+        const corner = TOOLTIP_GAP;
+        if (placement === 'belowRight') {
+            this.text.setPoint(FRAMEPOINT_TOPLEFT, anchor, FRAMEPOINT_BOTTOMRIGHT, corner, -corner);
+        } else if (placement === 'belowLeft') {
+            this.text.setPoint(FRAMEPOINT_TOPRIGHT, anchor, FRAMEPOINT_BOTTOMLEFT, -corner, -corner);
+        } else if (placement === 'aboveRight') {
+            this.text.setPoint(FRAMEPOINT_BOTTOMLEFT, anchor, FRAMEPOINT_TOPRIGHT, corner, corner);
+        } else if (placement === 'aboveLeft') {
+            this.text.setPoint(FRAMEPOINT_BOTTOMRIGHT, anchor, FRAMEPOINT_TOPLEFT, -corner, corner);
+        } else {
+            this.text.setPoint(FRAMEPOINT_BOTTOM, anchor, FRAMEPOINT_TOP, 0, TOOLTIP_GAP);
+        }
         this.box.setPoint(FRAMEPOINT_BOTTOMLEFT, this.text, FRAMEPOINT_BOTTOMLEFT, -TOOLTIP_PADDING, -TOOLTIP_PADDING);
         this.box.setPoint(FRAMEPOINT_TOPRIGHT, this.text, FRAMEPOINT_TOPRIGHT, TOOLTIP_PADDING, TOOLTIP_PADDING);
         this.box.setLevel(TOOLTIP_LEVEL);

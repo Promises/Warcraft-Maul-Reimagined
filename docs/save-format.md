@@ -34,8 +34,12 @@ A part owns one section and only ever adds to the end of it, so any map version 
 | Bit set | a small number for its length, then one bit each |
 | Text | a small number for its length, then 8 bits a letter |
 
-- **Section ids are never reused.** 1 is the Elementalist recipe book: a bit set over the fixed,
-  append-only list of fusion results in `RecipeBook.ts` (`RESULTS`).
+- **Section ids are never reused.** 1 is the Elementalist recipe book (`RecipeRules.ts`, `writeBook`):
+  three bit sets, in this order. What is in the book, over the fixed, append-only list of fusion
+  results in `RecipeBook.ts` (`RESULTS`); which of those were given (a free reveal, the free Primal)
+  rather than found, over the same list; and which Ascended the player has made, over the six
+  Primals in `RESULTS` order. The last two came later: a save without them reads them as empty, so
+  an old book counts every entry as found.
 - **Reading stops at the section's length.** A field an older save lacks takes its default.
 - **Unknown sections are kept.** An older map version keeps a newer section's bits as they are and
   writes them back, so playing an old version never loses progress.

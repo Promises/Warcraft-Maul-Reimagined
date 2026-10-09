@@ -230,6 +230,10 @@ export class Commands {
                 this.game.recipeBook.forget(player);
                 player.sendMessage('Your recipe book is empty');
                 break;
+            case 'learn':
+                // Puts fusion results in the player's recipe book as found (an Ascended's id: as ascended)
+                player.sendMessage(`Learnt ${this.game.recipeBook.learn(player, command2.slice(1))} of ${command2.length - 1}`);
+                break;
             case 'diff':
                 amount = Util.ParsePositiveInt(command[1]);
                 if (!amount) {

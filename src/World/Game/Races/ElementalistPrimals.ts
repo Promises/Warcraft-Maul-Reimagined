@@ -14,7 +14,7 @@ export const RECHARGE_PRICE = 8;
  * Ascend and Surge to the Primals.
  */
 export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LICH_KING, EYE_OF_THE_STORM, ENDLESS_STORM,
-    AVATAR_OF_LIFE, NORDRASSIL, FIRELORD, PRIMAL_INGREDIENTS} = compiletime(({objectData}) => {
+    AVATAR_OF_LIFE, NORDRASSIL, FIRELORD, PRIMAL_INGREDIENTS, BOOK_ICONS} = compiletime(({objectData}) => {
     // Ascend and Surge: the ids are the ASCEND and SURGE above (compiletime code cannot see them)
     require(require('path').resolve('scripts/primal-abilities.js')).addPrimalAbilities([
         {
@@ -229,10 +229,26 @@ export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LIC
     firelord.iconGameInterface = 'ReplaceableTextures\\CommandButtons\\BTNHeroAvatarOfFlame.blp';
     firelord.scalingValueundefined = 1.0;
 
+    // The icon of every tower the recipe book shows: the Runes, the first fusions, the Primals and
+    // the Ascended (the game has no native that gives a unit type's icon)
+    const bookIcons: {[id: string]: string} = {};
+    const runesAndFirstFusions = ['n025', 'n024', 'n01S', 'n01R', 'n022', 'n023', 'n026', 'u01D', 'n028', 'n030', 'u01E',
+        'u01F', 'u020', 'u021', 'u022', 'u023', 'u024', 'u025', 'u026', 'u028', 'u027', 'u02A', 'u02C', 'u02E', 'u030',
+        'u032', 'u034'];
+    for (const id of runesAndFirstFusions) {
+        const unit = objectData.units.get(id);
+        // An icon left as the base unit's (Purgatory's, the Tidal Guardian's) is read from the base
+        bookIcons[id] = String(unit?.iconGameInterface || (unit ? objectData.units.get(unit.oldId)?.iconGameInterface : '') || '');
+    }
+    for (const unit of [lich, thunderhead, haboob, heart, worldTree, inferno, lichKing, eye, endlessStorm, avatar,
+        nordrassil, firelord]) {
+        bookIcons[unit.newId] = String(unit.iconGameInterface ?? '');
+    }
+
     return {LICH: lich.newId, THUNDERHEAD: thunderhead.newId, HABOOB: haboob.newId, HEART_OF_LIFE: heart.newId,
         WORLD_TREE: worldTree.newId, INFERNO: inferno.newId, LICH_KING: lichKing.newId, EYE_OF_THE_STORM: eye.newId,
         ENDLESS_STORM: endlessStorm.newId, AVATAR_OF_LIFE: avatar.newId, NORDRASSIL: nordrassil.newId,
-        FIRELORD: firelord.newId, PRIMAL_INGREDIENTS: ingredients};
+        FIRELORD: firelord.newId, PRIMAL_INGREDIENTS: ingredients, BOOK_ICONS: bookIcons};
 }) as {LICH: string, THUNDERHEAD: string, HABOOB: string, HEART_OF_LIFE: string, WORLD_TREE: string, INFERNO: string,
     LICH_KING: string, EYE_OF_THE_STORM: string, ENDLESS_STORM: string, AVATAR_OF_LIFE: string, NORDRASSIL: string,
-    FIRELORD: string, PRIMAL_INGREDIENTS: string[]};
+    FIRELORD: string, PRIMAL_INGREDIENTS: string[], BOOK_ICONS: {[id: string]: string}};

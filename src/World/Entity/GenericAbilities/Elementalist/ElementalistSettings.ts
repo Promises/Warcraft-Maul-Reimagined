@@ -4,14 +4,28 @@ import {
     THUNDERHEAD, WORLD_TREE,
 } from '../../../Game/Races/ElementalistPrimals';
 
-/** A Primal fusion: two grown towers, a fee, and a line on what the Primal does. */
+/** A Primal fusion: two grown towers, a fee, and a line on what the Primal does, in full and short. */
 export interface PrimalRecipe {
     a: string;
     b: string;
     result: string;
     fee: number;
     role: string;
+    // For the recipe book's ledger, which holds about 32 letters a line
+    short: string;
+    // The first fusions a and b grow from (Undead L2 from Undead, Death Rune L3 from Death Rune L2)
+    from: [string, string];
 }
+
+/** What a Primal ascends to: the Ascended, its fee, and a line on what it does. */
+export interface Ascension {
+    ascended: string;
+    fee: number;
+    role: string;
+}
+
+// The six Runes, in the recipe book's order (its fusion table's rows and columns)
+const RUNES = ['n025', 'n024', 'n01S', 'n01R', 'n022', 'n023']; // Life, Death, Fire, Water, Nature, Air
 
 /** Any fusion: two towers (the same one twice for a doubled rune) and what they make. */
 export interface Recipe {
@@ -29,8 +43,8 @@ export class ElementalistSettings {
     private fees: Map<string, number> = new Map<string, number>();
     // How many of a tower (a fusion's or an ascension's result) a player may have; any number when not listed
     private limits: Map<string, number> = new Map<string, number>();
-    // A Primal's Ascended form and its fee
-    private ascensions: Map<string, {ascended: string, fee: number}> = new Map<string, {ascended: string, fee: number}>();
+    // A Primal's Ascended form, its fee and its role
+    private ascensions: Map<string, Ascension> = new Map<string, Ascension>();
 
     constructor() {
         this.SetupCombinations();
@@ -61,20 +75,29 @@ export class ElementalistSettings {
         this.AddDoubling('n01R', 'u034'); // Water*2 = Water Rune [Level 2]
 
         // Primal fusions of mature pieces, for a fee
-        this.AddPrimal('u038', 'u02B', LICH, 250, 'keeps all the Undead\'s damage and grows 100 a wave'); // Undead L2 + Death Rune L3
-        this.AddPrimal('u033', 'u035', THUNDERHEAD, 600, 'strikes air units with chaos splash'); // Air Rune L3 + Water Rune L3
-        this.AddPrimal('u03D', 'u033', HABOOB, 400, 'hits up to 8 targets, air and ground'); // Sandstorm L2 + Air Rune L3
-        this.AddPrimal('u02D', 'u02D', HEART_OF_LIFE, 500, 'kills bosses: melee, one target, a heavy hit'); // two Life Rune L3
-        this.AddPrimal('u036', 'u02F', WORLD_TREE, 400, 'splashes ground waves with siege damage'); // Tree + Nature Rune L3
-        this.AddPrimal('u039', 'u031', INFERNO, 350, 'burns every enemy near it'); // Purgatory L2 + Fire Rune L3
+        this.AddPrimal('u038', 'u02B', LICH, 250, 'keeps all the Undead\'s damage and grows 100 a wave',
+            'Grows 100 damage a wave', ['n026', 'u02A']); // Undead L2 + Death Rune L3
+        this.AddPrimal('u033', 'u035', THUNDERHEAD, 600, 'strikes air units with chaos splash',
+            'Chaos splash against air', ['u032', 'u034']); // Air Rune L3 + Water Rune L3
+        this.AddPrimal('u03D', 'u033', HABOOB, 400, 'hits up to 8 targets, air and ground',
+            'Up to 8 targets, air and ground', ['u024', 'u032']); // Sandstorm L2 + Air Rune L3
+        this.AddPrimal('u02D', 'u02D', HEART_OF_LIFE, 500, 'kills bosses: melee, one target, a heavy hit',
+            'Boss killer: one heavy hit', ['u02C', 'u02C']); // two Life Rune L3
+        this.AddPrimal('u036', 'u02F', WORLD_TREE, 400, 'splashes ground waves with siege damage',
+            'Siege splash on ground waves', ['u021', 'u02E']); // Tree (from Sapling) + Nature Rune L3
+        this.AddPrimal('u039', 'u031', INFERNO, 350, 'burns every enemy near it',
+            'Burns every enemy near it', ['n028', 'u030']); // Purgatory L2 + Fire Rune L3
 
         // What each Primal ascends to, and for how much; one of each Ascended per player
-        this.ascensions.set(LICH, {ascended: LICH_KING, fee: 400});
-        this.ascensions.set(THUNDERHEAD, {ascended: EYE_OF_THE_STORM, fee: 500});
-        this.ascensions.set(HABOOB, {ascended: ENDLESS_STORM, fee: 500});
-        this.ascensions.set(HEART_OF_LIFE, {ascended: AVATAR_OF_LIFE, fee: 600});
-        this.ascensions.set(WORLD_TREE, {ascended: NORDRASSIL, fee: 450});
-        this.ascensions.set(INFERNO, {ascended: FIRELORD, fee: 400});
+        this.ascensions.set(LICH, {ascended: LICH_KING, fee: 400, role: 'Range 700, +160 damage a wave.'});
+        this.ascensions.set(THUNDERHEAD, {ascended: EYE_OF_THE_STORM, fee: 500,
+            role: 'About 2,100 chaos damage against air, 900 splash.'});
+        this.ascensions.set(HABOOB, {ascended: ENDLESS_STORM, fee: 500, role: '8 targets, 2,000 chaos damage.'});
+        this.ascensions.set(HEART_OF_LIFE, {ascended: AVATAR_OF_LIFE, fee: 600,
+            role: '9,000 damage a second, half again against bosses.'});
+        this.ascensions.set(WORLD_TREE, {ascended: NORDRASSIL, fee: 450,
+            role: '3,000 siege damage a second; every fifth attack roots.'});
+        this.ascensions.set(INFERNO, {ascended: FIRELORD, fee: 400, role: 'Burns 900 a second to every enemy within 450.'});
         for (const ascended of [LICH_KING, EYE_OF_THE_STORM, ENDLESS_STORM, AVATAR_OF_LIFE, NORDRASSIL, FIRELORD]) {
             this.limits.set(ascended, 1);
         }
@@ -82,9 +105,15 @@ export class ElementalistSettings {
     }
 
 
-    private AddPrimal(a: string, b: string, result: string, fee: number, role: string): void {
+    private AddPrimal(a: string, b: string, result: string, fee: number, role: string, short: string,
+                      from: [string, string]): void {
         this.AddCombination(a, b, result, fee);
-        this.primals.push({a, b, result, fee, role});
+        this.primals.push({a, b, result, fee, role, short, from});
+    }
+
+    /** The six Runes, in the recipe book's order. */
+    public GetRunes(): string[] {
+        return RUNES;
     }
 
     /** The Primal fusions, in the order they were added. */
@@ -113,7 +142,7 @@ export class ElementalistSettings {
     }
 
     /** What a Primal ascends to, and for how much; undefined for a tower that does not ascend. */
-    public GetAscension(primal: string): {ascended: string, fee: number} | undefined {
+    public GetAscension(primal: string): Ascension | undefined {
         return this.ascensions.get(primal);
     }
 

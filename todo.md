@@ -108,6 +108,16 @@
     It was never drawn: its backdrop was anchored to its own Close button, and a frame anchored to
     its own child is not drawn, though BlzFrameIsVisible says it is (so the test passed). Now the
     box is the texts' sibling under an undrawn frame; looked at on the M1 (test_primal_looks).
+  - [x] The book redesigned as the Fusion Table (Claude Design handoff, `../Wc3 buttons/recipe-book/SPEC.md`,
+    direction B): the Rune table with the 21 first fusions, the Primal ledger with the Ascended,
+    tier frames and sealed plates (uiImport\RecipeBook\*.dds), free reveals (every second find,
+    spent by clicking a sealed cell; a full table gives one Primal free; RecipeRules.ts), what was
+    given and the Ascended made kept in the save (section 1 grows by two bit sets). Debug command
+    -learn sets a book up. test_recipe_book (wc3-slop-lan measure.py): the four states as
+    screenshots, clicks by both players, in step, the save round trip; `npm run test:lua` covers the
+    reveal arithmetic and old saves.
+  - [ ] Look at the book's tooltips in game (hover cannot be scripted; placement is from a corner so
+    the top rows' stay on screen).
 
 - [x] The mode and difficulty votes end as soon as every player has voted, instead of always
   waiting their 10 s (the timer still ends them for players who do not vote). The results go to

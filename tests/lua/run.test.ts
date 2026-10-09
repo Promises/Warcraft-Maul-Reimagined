@@ -3,6 +3,7 @@
  * Each file registers its checks with `check`; a failure exits with status 1.
  */
 import {saveTests} from './save.test';
+import {recipeTests} from './recipe.test';
 
 let failures = 0;
 let passed = 0;
@@ -17,6 +18,7 @@ export function check(this: void, what: string, ok: boolean, detail: string = ''
 }
 
 saveTests(check);
+recipeTests(check);
 print(`${passed} passed, ${failures} failed`);
 if (failures > 0) {
     os.exit(1);
