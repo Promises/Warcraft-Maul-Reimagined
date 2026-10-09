@@ -85,12 +85,6 @@ export interface BookView {
     rows: LedgerRow[];
 }
 
-/** What a click on a table cell or a Primal asks for; run on every client with the clicker. */
-export interface BookClicks {
-    cell(this: void, player: Defender, index: number): void;
-    primal(this: void, player: Defender, index: number): void;
-}
-
 /** A frame's top left corner at an offset from the panel's, and its size. */
 function place(frame: Frame, panel: Frame, x: number, y: number, width: number, height: number = width): void {
     frame.setPoint(FRAMEPOINT_TOPLEFT, panel, FRAMEPOINT_TOPLEFT, x, y);
@@ -184,8 +178,8 @@ class BookSlot {
  * The Elementalist's recipe book: the six Runes against each other, a cell for each of the 21
  * first fusions, and a ledger of the six Primals with the Ascended each becomes. A view of the
  * local player's own book: RecipeBook fills it (show) for that player only, and whether it is
- * open is local. The frames exist on every client alike; a click on a cell or a Primal is a
- * synced event, and RecipeBook decides what it does.
+ * open is local. The frames exist on every client alike; a click on a Primal is a synced event,
+ * and RecipeBook decides what it does (onPrimal, run on every client with the clicker).
  */
 export class RecipeBookPanel {
     private readonly panel: Frame;
@@ -202,7 +196,7 @@ export class RecipeBookPanel {
     private readonly rows: {primal: BookSlot, name: Frame, fee: Frame, line2: Frame, line3: Frame, arrow: Frame,
         ascended: BookSlot}[] = [];
 
-    constructor(game: WarcraftMaul, clicks: BookClicks) {
+    constructor(game: WarcraftMaul, onPrimal: (this: void, player: Defender, row: number) => void) {
         this.panel = Frame.createType('recipeBookPanel', uiRoot(), 0, 'BACKDROP', 'RecipeBookBackdrop')!;
         this.panel.setAbsPoint(FRAMEPOINT_TOPLEFT, PANEL_X, PANEL_Y);
         this.panel.setSize(PANEL_WIDTH, PANEL_HEIGHT);
@@ -228,8 +222,7 @@ export class RecipeBookPanel {
             for (let j = i; j < 6; j++) {
                 const index = this.cells.length;
                 this.cells.push(new BookSlot(game, `recipeBookCell${index}`, this.panel, CELL_X + TABLE_PITCH * j,
-                    CELL_Y - TABLE_PITCH * i, CELL_SIZE, 'first', i < 3 ? 'belowRight' : 'aboveRight',
-                    player => clicks.cell(player, index)));
+                    CELL_Y - TABLE_PITCH * i, CELL_SIZE, 'first', i < 3 ? 'belowRight' : 'aboveRight'));
             }
         }
         const caption = label('recipeBookCaption', this.panel, 0.058, -0.191, 0.100, 0.016, 0.0115);
@@ -257,7 +250,7 @@ export class RecipeBookPanel {
             arrow.setTexture(ARROW, 0, true);
             this.rows.push({
                 primal: new BookSlot(game, `recipeBookPrimal${r}`, this.panel, 0.296, y, PRIMAL_SIZE, 'primal', placement,
-                    player => clicks.primal(player, row)),
+                    player => onPrimal(player, row)),
                 name: label(`recipeBookName${r}`, this.panel, 0.336, y + 0.001, 0.100, 0.014, 0.011),
                 fee: label(`recipeBookFee${r}`, this.panel, 0.406, y + 0.001, 0.072, 0.014, 0.0088,
                     TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_RIGHT),

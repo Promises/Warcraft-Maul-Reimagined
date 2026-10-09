@@ -7,7 +7,7 @@ import {
     BOOK_ICONS, HABOOB, HEART_OF_LIFE, INFERNO, LICH, THUNDERHEAD, WORLD_TREE,
 } from '../../../Game/Races/ElementalistPrimals';
 import {BookView, LedgerRow, RecipeBookPanel, SLOT_TEXTURES, SlotContent} from '../../../Game/Ui/RecipeBookPanel';
-import {findsToNextReveal, primalOffer, readBook, revealsLeft, writeBook} from './RecipeRules';
+import {primalOffer, readBook, writeBook} from './RecipeRules';
 import {PrimalRecipe} from './ElementalistSettings';
 
 const SIPHON = FourCC('A0CT');
@@ -83,27 +83,27 @@ const ARROW_UNKNOWN_ALPHA = 89;
 /** A player's book. */
 interface Book {
     known: Set<string>;
-    // In the book because it was given (a free reveal, the free Primal), not found
+    // In the book because it was given (the free Primal), not found
     given: Set<string>;
     // Primals whose Ascended this player has made, in any game
     ascended: Set<string>;
 }
 
-/** Where a player's book stands, for the free reveals (RecipeRules). */
+/** Where a player's book stands: the table's sealed cells, and the free Primal (RecipeRules). */
 interface Standing {
-    found: number;
-    revealsLeft: number;
     sealedCells: number;
+    primalGiven: boolean;
+    unknownPrimals: number;
     primalOffer: boolean;
 }
 
 /**
  * Which fusions each player has discovered: the Elementalist's recipe book, kept in their save
  * (section 1). A Primal recipe is discovered by revealing it with Siphon, any other by making it.
- * Every second find earns a free reveal of a first fusion, and a full fusion table one Primal free
- * (RecipeRules); what was given is kept apart from what was found. Each player sees their own book
- * in its panel (the action bar's recipe book, -book) and the Primal recipes they know in Siphon's
- * tooltip.
+ * A player who has found every first fusion may take one Primal recipe free, once (RecipeRules), a
+ * hand for a player stuck on the Primals; what was given is kept apart from what was found. Each
+ * player sees their own book in its panel (the action bar's recipe book, -book) and the Primal
+ * recipes they know in Siphon's tooltip.
  */
 export class RecipeBook implements SavePart {
     public readonly section = 1;
@@ -121,10 +121,7 @@ export class RecipeBook implements SavePart {
                 this.cells.push(this.settings().GetCombination(runes[i], runes[j]));
             }
         }
-        this.panel = new RecipeBookPanel(game, {
-            cell: (player, index) => this.revealCell(player, this.cells[index]),
-            primal: (player, index) => this.takeFreePrimal(player, PRIMALS[index]),
-        });
+        this.panel = new RecipeBookPanel(game, (player, index) => this.takeFreePrimal(player, PRIMALS[index]));
         game.saves.register(this);
     }
 
@@ -163,25 +160,10 @@ export class RecipeBook implements SavePart {
     }
 
     /**
-     * A click on a sealed cell of the fusion table: with a free reveal left, its first fusion goes
-     * in the book as given. Runs on every client with the clicker, so the rule is checked here
-     * against the synced book, not against what the clicker's panel showed.
+     * A click on a sealed Primal while the full table offers one free: it goes in the book as given.
+     * Runs on every client with the clicker, so the rule is checked here against the synced book,
+     * not against what the clicker's panel showed.
      */
-    public revealCell(player: Defender, result: string): void {
-        const book = this.bookOf(player);
-        if (book.known.has(result) || this.standing(player).revealsLeft === 0) {
-            return;
-        }
-        book.known.add(result);
-        book.given.add(result);
-        const recipe = this.settings().GetRecipes().find(r => r.result === result)!;
-        player.sendMessage(`${colour(HIGHLIGHT, 'Free reveal:')} ${displayName(result)}, ${element(recipe.a)} + `
-            + `${element(recipe.b)}. Siphon them to make one.`);
-        SyncTrace.note('book', `p${player.id} revealed ${result}`);
-        this.changed(player);
-    }
-
-    /** A click on a sealed Primal while the full table offers one free: it goes in the book as given. */
     public takeFreePrimal(player: Defender, result: string): void {
         const book = this.bookOf(player);
         if (book.known.has(result) || !this.standing(player).primalOffer) {
@@ -269,17 +251,10 @@ export class RecipeBook implements SavePart {
 
     private standing(player: Defender): Standing {
         const book = this.bookOf(player);
-        const found = RESULTS.filter(result => book.known.has(result) && !book.given.has(result)).length;
-        const givenCells = this.cells.filter(cell => book.given.has(cell)).length;
         const sealedCells = this.cells.filter(cell => !book.known.has(cell)).length;
         const primalGiven = PRIMALS.some(primal => book.given.has(primal));
         const unknownPrimals = PRIMALS.filter(primal => !book.known.has(primal)).length;
-        return {
-            found,
-            revealsLeft: revealsLeft(found, givenCells, sealedCells),
-            sealedCells,
-            primalOffer: primalOffer(sealedCells, primalGiven, unknownPrimals),
-        };
+        return {sealedCells, primalGiven, unknownPrimals, primalOffer: primalOffer(sealedCells, primalGiven, unknownPrimals)};
     }
 
     /** The player's book in the panel and Siphon's tooltip, on their own screen. */
@@ -300,18 +275,15 @@ export class RecipeBook implements SavePart {
         const knownCells = this.cells.length - standing.sealedCells;
         const complete = known === RESULTS.length;
 
+        // Under the table: what filling it earns, while it can still earn it
         let revealLine1 = '';
         let revealLine2 = '';
         if (!complete) {
             if (standing.sealedCells === 0) {
                 revealLine1 = colour(DIM, 'Table full');
-            } else if (standing.revealsLeft > 0) {
-                revealLine1 = colour(HEADING, standing.revealsLeft === 1 ? '1 free reveal' : `${standing.revealsLeft} free reveals`);
-                revealLine2 = colour(DIM, 'click a glowing cell');
-            } else {
-                const next = findsToNextReveal(standing.found);
-                revealLine1 = colour(DIM, 'Next free reveal');
-                revealLine2 = colour(DIM, next === 1 ? 'after 1 more find' : `after ${next} more finds`);
+            } else if (!standing.primalGiven && standing.unknownPrimals > 0) {
+                revealLine1 = colour(DIM, 'Fill the table');
+                revealLine2 = colour(DIM, 'for one Primal, free');
             }
         }
 
@@ -319,7 +291,7 @@ export class RecipeBook implements SavePart {
         let index = 0;
         for (let i = 0; i < runes.length; i++) {
             for (let j = i; j < runes.length; j++) {
-                cellViews.push(this.cellView(book, standing, this.cells[index], runes[i], runes[j], i === j));
+                cellViews.push(this.cellView(book, this.cells[index], runes[i], runes[j], i === j));
                 index++;
             }
         }
@@ -346,18 +318,13 @@ export class RecipeBook implements SavePart {
         };
     }
 
-    private cellView(book: Book, standing: Standing, result: string, a: string, b: string, twin: boolean): SlotContent {
+    private cellView(book: Book, result: string, a: string, b: string, twin: boolean): SlotContent {
         const pair = `${displayName(a)} + ${displayName(b)}`;
         if (!book.known.has(result)) {
-            let body = `${colour(DIM, `${pair}, free.`)}|nSiphon them together to make it.`;
-            if (standing.revealsLeft > 0) {
-                body += `|n${colour(GOLD, `Or click to reveal it: ${standing.revealsLeft} free `
-                    + `${standing.revealsLeft === 1 ? 'reveal' : 'reveals'} left.`)}`;
-            }
             return {
-                icon: standing.revealsLeft > 0 ? SLOT_TEXTURES.sealedReady : SLOT_TEXTURES.sealed,
+                icon: SLOT_TEXTURES.sealed,
                 title: colour(UNKNOWN, 'Undiscovered first fusion'),
-                body,
+                body: `${colour(DIM, `${pair}, free.`)}|nSiphon them together to make it.`,
             };
         }
         const lines = [colour(DIM, 'First fusion'), `${pair}, ${colour(GOLD, 'free')}`];
@@ -367,9 +334,6 @@ export class RecipeBook implements SavePart {
                     ? `Grown, it goes into the ${displayName(recipe.result)}.`
                     : colour(DIM, 'Grown, it goes into a Primal you have not found.'));
             }
-        }
-        if (book.given.has(result)) {
-            lines.push(colour(DIM, 'Revealed for free: Siphon the pair to make one.'));
         }
         return {icon: BOOK_ICONS[result], twin, title: displayName(result), body: lines.join('|n')};
     }
@@ -403,8 +367,8 @@ export class RecipeBook implements SavePart {
             ];
             if (standing.primalOffer) {
                 lines.push('', colour(GOLD, 'Click to take it as your free Primal.'));
-            } else if (standing.sealedCells > 0) {
-                lines.push('', 'Fill the fusion table to choose one Primal free.');
+            } else if (!standing.primalGiven) {
+                lines.push('', 'Find every first fusion to choose one Primal free.');
             }
             primal = {
                 icon: standing.primalOffer ? SLOT_TEXTURES.sealedReady : SLOT_TEXTURES.sealed,

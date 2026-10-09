@@ -14,7 +14,7 @@ export const Quests: Quest[] = [
         title: `5.0.0 - 8`,
         icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
         stype: 0,
-        body: `Updates:\n- The recipe book is a Fusion Table: the six Runes against each other, a cell for each first fusion, and the Primals beside it with the Ascended each becomes\n- Free reveals: every second recipe you find lets you reveal a first fusion of your choice, by clicking its cell. Fill the table and you may take one Primal recipe free\n- The book remembers which Ascended you have made, across games`,
+        body: `Updates:\n- The recipe book is a Fusion Table: the six Runes against each other, a cell for each first fusion, and the Primals beside it with the Ascended each becomes\n- Stuck on the Primals? Find every first fusion and you may take one Primal recipe free, by clicking it in the book\n- The book remembers which Ascended you have made, across games`,
     },
     {
         title: `5.0.0 - 7`,
