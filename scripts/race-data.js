@@ -8,7 +8,8 @@
  *
  * Races come from WorldMap.setupRaces (builder, name, item, enabled); a race's tier from the
  * first line of its item's tooltip, as RaceItems reads it; its towers are everything its builder
- * builds, and everything those upgrade to. A tower's auras come with their buff, area and targets.
+ * builds, and everything those upgrade to. A tower's auras come with their buff, area, targets and
+ * the researches they need.
  */
 const fs = require('fs');
 const path = require('path');
@@ -100,6 +101,8 @@ function aura(abilityId) {
         buff: fields.abuf || defaults.buff,
         area: fields.aare ?? defaults.area,
         targets: list(fields.atar || defaults.targets),
+        // Researches the aura needs before it works (Roots' Thorns: the Den's R000)
+        requires: list(fields.areq),
     };
 }
 
