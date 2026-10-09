@@ -121,7 +121,7 @@ export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LIC
     // Model: Heart Crystal by Tranquil (hiveworkshop.com/threads/generators.277141); its crystal takes the
     // player's colour
     heart.modelFile = 'war3mapImported\\HeartCrystal.mdx';
-    heart.scalingValueundefined = 0.6;
+    heart.scalingValueundefined = 0.45;
     heart.attack1DamageBase = 4299;
 
     // World Tree: Nature Rune L3's siege attack with splash

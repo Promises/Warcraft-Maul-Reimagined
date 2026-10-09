@@ -79,7 +79,7 @@
     asset-credits.md and the changelog. All six Elementalist tests pass with them (M1, 2026-10-09).
   - [x] Looked at in game (test_primal_looks, M1 screenshots, 2026-10-09): the Lich and the Lich
     King were invisible (units\Undead\Lich\Lich does not exist); now the Lich hero and Kel'Thuzad.
-    The Heart Crystal overflowed its tile at 0.9; now 0.6. The rest fit their tiles.
+    The Heart Crystal overflowed its tile at 0.9 and filled it at 0.6; now 0.45. The rest fit.
   - [x] Midgame bridge (branch): Purgatory and Decay burn in code, Mist (+10% to a magic tower's
     target), Tornado's Updraft (+20% attack speed nearby), Blaze and Bubbles back to Uncharged
     Runes, Recharge (Depleted Rock to Uncharged Rune, 8 gold), Plague (a creep dying in the lane
