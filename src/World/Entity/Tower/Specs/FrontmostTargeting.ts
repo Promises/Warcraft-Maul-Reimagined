@@ -10,8 +10,12 @@ const TRACED = 8;
 
 /**
  * Makes a tower attack the creep in its range that is furthest along the path, the one closest to
- * leaking: the fewest checkpoints left, and of those the one that reached its last checkpoint
- * first (a maze winds, so distance would not tell). A unit that is not a wave creep comes last.
+ * leaking: the fewest checkpoints left, and of those the one with the least ground left to walk
+ * to its next one - along the ground around the towers (the lane's antiblock maze), as a maze
+ * winds back past itself. Where that cannot be measured (the checkpoint is outside the lane), the
+ * straight distance. Last, who reached their checkpoint first. A unit that is not a wave creep
+ * comes last. (Who reached their checkpoint first alone failed in a maze: the Cold Tower's frost
+ * slows the leader, and the creep behind walks past it.)
  *
  * Call attackStarted when the tower starts an attack (EVENT_PLAYER_UNIT_ATTACKED). As with
  * RandomTargeting, the order does not stop the swing already started: it picks the next one, so
@@ -46,9 +50,32 @@ export class FrontmostTargeting {
         if (creepA === undefined || creepB === undefined) {
             return (creepA === undefined ? 1 : 0) - (creepB === undefined ? 1 : 0);
         }
-        // Not `||`: in Lua 0 is true, so a tie would never reach the second test
+        // Not `||`: in Lua 0 is true, so a tie would never reach the next test
         const left = creepA.checkpointsLeft() - creepB.checkpointsLeft();
-        return left !== 0 ? left : creepA.reachedAt - creepB.reachedAt;
+        if (left !== 0) {
+            return left;
+        }
+        const ground = this.groundLeft(creepA) - this.groundLeft(creepB);
+        return ground !== 0 ? ground : creepA.reachedAt - creepB.reachedAt;
+    }
+
+    /** How far the creep has still to walk to its next checkpoint. */
+    private groundLeft(creep: Creep): number {
+        const checkpoint = creep.targetCheckpoint;
+        if (checkpoint === undefined) {
+            return 0;
+        }
+        const x = GetUnitX(creep.unit.handle);
+        const y = GetUnitY(creep.unit.handle);
+        const toX = GetRectCenterX(checkpoint.rectangle);
+        const toY = GetRectCenterY(checkpoint.rectangle);
+        for (const maze of this.game.worldMap.playerMazes) {
+            const d = maze.pathDistance(x, y, toX, toY);
+            if (d !== undefined) {
+                return d;
+            }
+        }
+        return math.sqrt((toX - x) * (toX - x) + (toY - y) * (toY - y));
     }
 
     private creep(u: unit): Creep | undefined {

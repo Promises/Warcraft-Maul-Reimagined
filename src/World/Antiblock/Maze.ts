@@ -4,6 +4,7 @@ import {Log} from '../../lib/Serilog/Serilog';
 import {AntiJuggleTower} from '../Entity/AntiJuggle/AntiJuggleTower';
 import {Image, IMAGE_TEXTURES, ImageColour} from "../../JassOverrides/Image";
 import {Defender} from "../Entity/Players/Defender";
+import {distanceField} from './PathField';
 
 export enum Walkable {
     Walkable,
@@ -24,6 +25,10 @@ export class Maze {
     public readonly height: number;
     public readonly maze: Walkable[][];
     private antiJugglers: AntiJuggleTower[] = [];
+    // Bumped by every change to a cell, so a distance field knows it is out of date
+    private version: number = 0;
+    // Distance fields to target cells (x + y * width), made when first asked for and again after a change
+    private readonly fields: Map<number, {version: number, distance: number[]}> = new Map();
     /** One hidden image per cell, created on every client at init so handle ids stay in sync. */
     public readonly gridPoints: Image[][];
 
@@ -101,6 +106,7 @@ export class Maze {
 
     public setWalkable(x: number, y: number, isWalkable: Walkable): void {
         this.maze[x][y] = isWalkable;
+        this.version++;
         const point = this.gridPoints[x][y];
         point.visible = this.cellVisible(x, y);
         if (isWalkable === Walkable.Walkable) {
@@ -108,6 +114,49 @@ export class Maze {
         } else {
             point.colour = {red: 255, green: 0, blue: 0, alpha: 153}; // Red
         }
+    }
+
+    /**
+     * The distance along the ground, around the towers, from one point to another in this lane;
+     * undefined when either is outside it or the ground does not join them. A point on a blocked
+     * cell (a creep brushing a tower) counts from its nearest open neighbour.
+     */
+    public pathDistance(fromX: number, fromY: number, toX: number, toY: number): number | undefined {
+        // The grid's own size: width and height are the lane's size over 64, which need not be
+        // whole (setupMazes makes a column or row for the part)
+        const columns = math.ceil(this.width);
+        const rows = math.ceil(this.height);
+        const inside = (x: number, y: number) => x >= 0 && x < columns && y >= 0 && y < rows;
+        const tx = math.floor((toX - this.minX) / 64);
+        const ty = math.floor((toY - this.minY) / 64);
+        const fx = math.floor((fromX - this.minX) / 64);
+        const fy = math.floor((fromY - this.minY) / 64);
+        if (!inside(tx, ty) || !inside(fx, fy)) {
+            return undefined;
+        }
+        const key = tx + ty * columns;
+        let field = this.fields.get(key);
+        if (field === undefined || field.version !== this.version) {
+            field = {version: this.version, distance: distanceField(columns, rows,
+                (x, y) => this.maze[x][y] === Walkable.Walkable, tx, ty)};
+            this.fields.set(key, field);
+        }
+        const own = field.distance[fx + fy * columns];
+        if (own >= 0) {
+            return own;
+        }
+        let best: number | undefined;
+        for (let dx = -1; dx <= 1; dx++) {
+            for (let dy = -1; dy <= 1; dy++) {
+                const x = fx + dx;
+                const y = fy + dy;
+                const d = inside(x, y) ? field.distance[x + y * columns] : -1;
+                if (d >= 0 && (best === undefined || d + 64 < best)) {
+                    best = d + 64;
+                }
+            }
+        }
+        return best;
     }
 
     public getWalkable(x: number, y: number): Walkable {
