@@ -318,6 +318,19 @@
   (wc3-slop-lan measure.py): a wave on red's straight leg, every pick the westmost creep, each
   followed by an attack on it (2026-10-09). Its tooltip said range 650 and splash 150; the data
   has 900 and 200, now in the tooltip (its "air only" splash note is unchecked).
+- [ ] Cold Tower's slow (asked 2026-10-09: give it the stronger of the two frost attacks, without
+  many of them stopping creeps). Measured (test_cold_tower_slow_probe, wc3-slop-lan measure.py,
+  walkers with endless life past 1 and 6 towers): A08X (the Frost Tower's, a dummy's Slow A02U,
+  25% for 10 s, buff B017) only ever slows ground units; A0EU (Workers Union's frost attack, from
+  Afr2) only air units, as its targets say "air,enemies". Neither stacks into a stop: one buff
+  each, refreshed, and six towers' walkers all kept moving. So A0EU as it is would slow none of a
+  ground wave. Options: a copy of Afr2 targeting ground and air for the Cold Tower (added to the
+  built map the way scripts/primal-abilities.js adds the Primals' abilities), or A08X's code slow
+  with a stronger Slow; either is one buff, so many towers cannot freeze a creep. Undecided.
+  The Cold Tower's frontmost targeting is checked in a maze (test_cold_tower_frontmost_in_a_maze:
+  four passes, 9 of 9 picks the creep with the least ground left).
+- [ ] Workers Union's Undead Acolyte (h03I) attacks ground only, but its frost attack A0EU targets
+  "air,enemies": it can never slow anything. Not yet seen in a game with a wave.
 - [x] IceTrollPriest leaked: a boolexpr (Condition) every tick, and a `targets` list that was
   never emptied, so it grew with every creep ever seen, dead ones included. Now one group for all,
   no filter, and this tick's live creeps only. test_ice_troll_priest_frost_nova (wc3-slop-lan
