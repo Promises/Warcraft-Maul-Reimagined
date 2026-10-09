@@ -60,8 +60,8 @@ export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LIC
     // A fixed id of its own (Primals are uP..), so it stays the same from build to build
     const lich = objectData.units.copy(objectData.units.get('u038')!, 'uP01')!;
     lich.name = 'Lich';
-    lich.modelFile = 'units\\undead\\Lich\\Lich';
-    lich.iconGameInterface = 'ReplaceableTextures\\CommandButtons\\BTNLichVersion2.blp';
+    lich.modelFile = 'Units\\Undead\\HeroLich\\HeroLich';
+    lich.iconGameInterface = 'ReplaceableTextures\\CommandButtons\\BTNHeroLich.blp';
     lich.attack1Range = 600;
     lich.acquisitionRange = 600;
     lich.attack1WeaponType = 'missile';
@@ -121,7 +121,7 @@ export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LIC
     // Model: Heart Crystal by Tranquil (hiveworkshop.com/threads/generators.277141); its crystal takes the
     // player's colour
     heart.modelFile = 'war3mapImported\\HeartCrystal.mdx';
-    heart.scalingValueundefined = 0.9;
+    heart.scalingValueundefined = 0.6;
     heart.attack1DamageBase = 4299;
 
     // World Tree: Nature Rune L3's siege attack with splash
@@ -160,6 +160,9 @@ export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LIC
         String(normal ?? '').split(',').filter(id => id !== 'AP01' && id !== 'AP02').join(',');
     const lichKing = objectData.units.copy(lich, 'uA01')!;
     lichKing.name = 'Lich King';
+    // Kel'Thuzad as a lich, with the icon the game gives him
+    lichKing.modelFile = 'Units\\Undead\\KelThuzad\\KelThuzad';
+    lichKing.iconGameInterface = 'ReplaceableTextures\\CommandButtons\\BTNLichVersion2.blp';
     lichKing.normal = withoutPrimalAbilities(lichKing.normal);
     lichKing.attack1Range = 700;
     lichKing.acquisitionRange = 700;

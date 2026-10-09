@@ -1,5 +1,5 @@
 import {Frame} from 'w3ts';
-import {createPanel, createText, createTextButton, onLocalClick} from './Frames';
+import {createText, createTextButton, onLocalClick, uiRoot} from './Frames';
 
 // Centred over the play area, below the top bar; the panel grows down with its contents
 const TOP_Y = 0.54;
@@ -14,8 +14,10 @@ const BUTTON_HEIGHT = 0.026;
  * as "???". A view of the local player's own book only: its text and whether it is open are local
  * (RecipeBook fills it), so nothing here is synced. The frames exist on every client alike.
  *
- * The texts have height 0, so each grows with its lines, and the panel's bottom follows the close
- * button under them: the panel fits whatever the book holds.
+ * The texts have height 0, so each grows with its lines, and the box's bottom follows the close
+ * button under them: the box fits whatever the book holds. The box is the texts' sibling, not their
+ * parent: a frame anchored to its own child is not drawn. All of it hangs from an undrawn frame,
+ * which is what opens and closes.
  */
 export class RecipeBookPanel {
     private readonly panel: Frame;
@@ -26,8 +28,12 @@ export class RecipeBookPanel {
 
     constructor() {
         const inner = PANEL_WIDTH - 2 * PADDING;
-        this.panel = createPanel('recipeBookPanel', PANEL_WIDTH, 0);
+        this.panel = Frame.createType('recipeBookPanel', uiRoot(), 0, 'FRAME', '')!;
+        this.panel.setSize(PANEL_WIDTH, TITLE_HEIGHT);
         this.panel.setAbsPoint(FRAMEPOINT_TOP, 0.4, TOP_Y);
+        this.panel.setVisible(false);
+        // Made first, so it is drawn under the texts and the button
+        const box = Frame.createType('recipeBookBox', this.panel, 0, 'BACKDROP', 'BoxedTextBackgroundTemplate')!;
 
         this.title = createText('recipeBookTitle', this.panel, '', TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
         this.title.setSize(inner, TITLE_HEIGHT);
@@ -47,7 +53,9 @@ export class RecipeBookPanel {
 
         const close = createTextButton(this.panel, 'Close', BUTTON_WIDTH, BUTTON_HEIGHT);
         close.setPoint(FRAMEPOINT_TOP, this.firstLeft, FRAMEPOINT_BOTTOM, inner / 4, -PADDING);
-        this.panel.setPoint(FRAMEPOINT_BOTTOM, close, FRAMEPOINT_BOTTOM, 0, -PADDING);
+        box.setPoint(FRAMEPOINT_TOPLEFT, this.panel, FRAMEPOINT_TOPLEFT, 0, 0);
+        box.setPoint(FRAMEPOINT_TOPRIGHT, this.panel, FRAMEPOINT_TOPRIGHT, 0, 0);
+        box.setPoint(FRAMEPOINT_BOTTOM, close, FRAMEPOINT_BOTTOM, 0, -PADDING);
         onLocalClick(close, () => this.panel.setVisible(false));
     }
 

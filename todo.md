@@ -77,7 +77,9 @@
     Life Demigod Cenarius (FerSZ), all from Hive; World Tree, Nordrassil, Inferno and Firelord on
     the game's Ancient Protector, Tree of Life, Lava Spawn and Avatar of Flame. Credits in
     asset-credits.md and the changelog. All six Elementalist tests pass with them (M1, 2026-10-09).
-  - [ ] Look at the new models in game (scale, team colour, how they read in a maze).
+  - [x] Looked at in game (test_primal_looks, M1 screenshots, 2026-10-09): the Lich and the Lich
+    King were invisible (units\Undead\Lich\Lich does not exist); now the Lich hero and Kel'Thuzad.
+    The Heart Crystal overflowed its tile at 0.9; now 0.6. The rest fit their tiles.
   - [x] Midgame bridge (branch): Purgatory and Decay burn in code, Mist (+10% to a magic tower's
     target), Tornado's Updraft (+20% attack speed nearby), Blaze and Bubbles back to Uncharged
     Runes, Recharge (Depleted Rock to Uncharged Rune, 8 gold), Plague (a creep dying in the lane
@@ -103,8 +105,9 @@
   - [x] The recipe book panel: an action bar button (Elementalists only) or -book opens the
     player's book, Primals with recipe, fee and role, first fusions in two columns, the rest as
     "???". A local view; test_recipe_discovery checks the button and -book on both clients.
-    Its layout has not been looked at: the harness cannot capture the game windows ("could not
-    create image from window"), though screencapture by window id works for other apps.
+    It was never drawn: its backdrop was anchored to its own Close button, and a frame anchored to
+    its own child is not drawn, though BlzFrameIsVisible says it is (so the test passed). Now the
+    box is the texts' sibling under an undrawn frame; looked at on the M1 (test_primal_looks).
 
 - [x] The mode and difficulty votes end as soon as every player has voted, instead of always
   waiting their 10 s (the timer still ends them for players who do not vote). The results go to
