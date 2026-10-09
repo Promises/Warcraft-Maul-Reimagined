@@ -107,7 +107,9 @@ export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LIC
     // tower, Haboob.ts), harder and further
     const haboob = primal('u03D', 'uP03', 'Haboob', 'A Primal fusion of Sandstorm Level 2 and an Air Rune Level 3 '
         + '(Siphon Energy, 400 gold).|n|nHits up to 8 targets, air and ground: 1,300 chaos damage, range 500. ' + attunement);
-    haboob.scalingValueundefined = 0.55;
+    // Model: Sand Elemental by MiniMage and icewolf055 (hiveworkshop.com/threads/sandelemental.244919)
+    haboob.modelFile = 'war3mapImported\\SandElemental.mdx';
+    haboob.scalingValueundefined = 0.8;
     haboob.iconGameInterface = 'ReplaceableTextures\\CommandButtons\\BTNTornado.blp';
     haboob.attack1DamageBase = 1299;
     haboob.attack1Range = 500;
@@ -116,15 +118,17 @@ export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LIC
     // Heart of Life: two Life Rune L3, the race's boss killer: melee, one target, a heavy hit
     const heart = primal('u02D', 'uP04', 'Heart of Life', 'A Primal fusion of two Life Rune Level 3 '
         + '(Siphon Energy, 500 gold).|n|nA boss killer: melee, one target, 4,300 normal damage a second. ' + attunement);
-    heart.scalingValueundefined = 0.6;
+    // Model: Heart Crystal by Tranquil (hiveworkshop.com/threads/generators.277141); its crystal takes the
+    // player's colour
+    heart.modelFile = 'war3mapImported\\HeartCrystal.mdx';
+    heart.scalingValueundefined = 0.9;
     heart.attack1DamageBase = 4299;
 
     // World Tree: Nature Rune L3's siege attack with splash
     const worldTree = primal('u02F', 'uP05', 'World Tree', 'A Primal fusion of a Tree and a Nature Rune Level 3 '
         + '(Siphon Energy, 400 gold).|n|nGround splash: 1,400 siege damage a second, range 800, 250 splash. ' + attunement);
-    // The Tree of Ages: the Tree of Life model with its first upgrade's animations
-    worldTree.modelFile = 'buildings\\nightelf\\TreeofLife\\TreeofLife';
-    worldTree.requiredAnimationNames = 'Upgrade,First';
+    // The game's Ancient Protector: a tree that hurls boulders, which is what a siege splash looks like
+    worldTree.modelFile = 'buildings\\nightelf\\AncientProtector\\AncientProtector';
     worldTree.scalingValueundefined = 0.8;
     worldTree.iconGameInterface = 'ReplaceableTextures\\CommandButtons\\BTNTreeOfLife.blp';
     worldTree.attack1WeaponType = 'msplash';
@@ -140,9 +144,10 @@ export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LIC
     const inferno = primal('u039', 'uP06', 'Inferno', 'A Primal fusion of Purgatory Level 2 and a Fire Rune Level 3 '
         + '(Siphon Energy, 350 gold).|n|nImmolation: 400 damage a second to every enemy within 400. For clumped '
         + 'ground waves; weak on bosses. ' + attunement);
-    inferno.modelFile = 'units\\demon\\Infernal\\Infernal';
-    inferno.scalingValueundefined = 0.85;
-    inferno.iconGameInterface = 'ReplaceableTextures\\CommandButtons\\BTNInfernal.blp';
+    // The Lava Spawn: red fire (the Infernal burns fel green, which reads as demon)
+    inferno.modelFile = 'Units\\Creeps\\LavaSpawn\\LavaSpawn';
+    inferno.scalingValueundefined = 1.2;
+    inferno.iconGameInterface = 'ReplaceableTextures\\CommandButtons\\BTNLavaSpawn.blp';
     inferno.normal = String(inferno.normal ?? '').split(',').filter(id => id !== 'A0E7').join(',');
 
     // The Primals can Ascend and Surge
@@ -186,15 +191,22 @@ export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LIC
     const endlessStorm = ascended(haboob, 'uA03', 'Endless Storm', 'The Haboob, ascended (500 gold). Hits up to 8 '
         + 'targets, air and ground: 2,000 chaos damage, range 500. ' + uncapped);
     endlessStorm.attack1DamageBase = 1537;
-    endlessStorm.scalingValueundefined = 0.7;
+    // Model and icon: Al'Akir by Explobomb (hiveworkshop.com/threads/elemental-lords-pack.360451)
+    endlessStorm.modelFile = 'war3mapImported\\AlAkir.mdx';
+    endlessStorm.iconGameInterface = 'ReplaceableTextures\\CommandButtons\\BTNIconAlAkir.blp';
+    endlessStorm.scalingValueundefined = 0.95;
     const avatar = ascended(heart, 'uA04', 'Avatar of Life', 'The Heart of Life, ascended (600 gold). Melee, one '
         + 'target, 9,000 normal damage a second, and half again against bosses. ' + uncapped);
     avatar.attack1DamageBase = 6922;
-    avatar.scalingValueundefined = 1.0;
+    // Model: Demigod Cenarius by FerSZ (hiveworkshop.com/threads/demigod-cenarius-keeper-of-the-groove.309948)
+    avatar.modelFile = 'war3mapImported\\CenariusTeamColor.mdx';
+    avatar.iconGameInterface = 'ReplaceableTextures\\CommandButtons\\BTNKeeperOfTheGrove.blp';
+    avatar.scalingValueundefined = 1.1;
     const nordrassil = ascended(worldTree, 'uA05', 'Nordrassil', 'The World Tree, ascended (450 gold). Ground splash: '
         + '3,000 siege damage a second, range 900, 300 splash; every fifth attack roots its target for a second '
         + '(not bosses). ' + uncapped);
     // The Tree of Eternity: there is no model of its own, it is the Tree of Life's second upgrade
+    nordrassil.modelFile = 'buildings\\nightelf\\TreeofLife\\TreeofLife';
     nordrassil.requiredAnimationNames = 'Upgrade,Second';
     nordrassil.scalingValueundefined = 0.95;
     nordrassil.iconGameInterface = 'ReplaceableTextures\\CommandButtons\\BTNTreeOfEternity.blp';
@@ -206,6 +218,9 @@ export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LIC
     nordrassil.attack1AreaOfEffectSmallDamage = 300;
     const firelord = ascended(inferno, 'uA06', 'Firelord', 'The Inferno, ascended (400 gold). Immolation: 900 damage '
         + 'a second to every enemy within 450. ' + uncapped);
+    // The game's own Firelord
+    firelord.modelFile = 'Units\\Creeps\\HeroFlameLord\\HeroFlameLord';
+    firelord.iconGameInterface = 'ReplaceableTextures\\CommandButtons\\BTNHeroAvatarOfFlame.blp';
     firelord.scalingValueundefined = 1.0;
 
     return {LICH: lich.newId, THUNDERHEAD: thunderhead.newId, HABOOB: haboob.newId, HEART_OF_LIFE: heart.newId,
