@@ -1,5 +1,6 @@
 import {Unit} from 'w3ts';
 import {WarcraftMaul} from '../WarcraftMaul';
+import {Walkable} from '../Antiblock/Maze';
 import {DecodeFourCC} from '../../lib/translators';
 import {DebugGameRound} from './DebugMaul/DebugGameRound';
 import {BlitzGameRound} from './BlitzMaul/BlitzGameRound';
@@ -15,8 +16,10 @@ import {BlitzGameRound} from './BlitzMaul/BlitzGameRound';
  *    would have sent, so a test can pick, build or vote without a click;
  *  - `.towers` lists the player's towers with the class that gives each its behaviour;
  *  - `.tower <type> <x> <y>` puts a tower of that type down for the player, set up as a built one
- *    (its class, its place in the game's lists), so a test can start from any tower - a Primal's
- *    ingredients, say - without the builds and random rolls that lead to it;
+ *    (its class, its place in the game's lists, its cells blocked in the lane's maze, as a
+ *    finished build blocks them), so a test can start from any tower - a Primal's ingredients, a
+ *    maze - without the builds and random rolls that lead to it. Unlike a build it is not refused
+ *    on ground that cannot be built on;
  *  - the heartbeat gets lives, wave, the wave timer and creeps, the game mode and whether this is a
  *    dev build (its debug commands: -wave, -lives, ...), and kills and towers per player;
  *  - the events that decide a game are written to the trace at once, not on the next flush.
@@ -51,6 +54,13 @@ export function installSlopHooks(game: WarcraftMaul): void {
                 return true;
             }
             const tower = game.worldMap.towerConstruction.SetupTower(unit, player);
+            // Its cells in the lane's maze, as a finished build blocks them: the creeps' path
+            // and the Cold Tower's ground left to walk go round it
+            const lane = game.mapSettings.PLAYER_AREAS.findIndex(area => area.ContainsUnit(unit));
+            if (lane !== -1) {
+                const onGrid = (value: number) => math.floor(value / 64 + 0.5) * 64;
+                game.worldMap.playerMazes[lane].setFootprint(onGrid(unit.x), onGrid(unit.y), Walkable.Blocked);
+            }
             Slop.note('tower', `p${player.id} made id=${Slop.ref(unit.handle)} type=${type}`
                 + ` class=${(tower as unknown as {constructor: {name: string}}).constructor.name}`);
             return true;
