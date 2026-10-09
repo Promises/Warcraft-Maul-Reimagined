@@ -282,7 +282,10 @@ export class DamageEngine {
 
             if (this.recursion > -1 && !this.holdClear && !this.purge) {
                 this.purge = true;
-                for (; i >= this.recursion;) {
+                // As Bribe's Damage Engine has it: replay the damage held back from slot 0 to the
+                // last, then enable the triggers again from the last back to 0 (both loops ran the
+                // wrong way: the first never ran, the second never ended)
+                while (i < this.recursion) {
                     i = i + 1;
 
                     this.damageEngineGlobals.udg_NextDamageType = this.lastType[i];
@@ -294,10 +297,11 @@ export class DamageEngine {
                                      true, false, this.lastAttackT[i], this.lastDamageT[i], this.lastWeaponT[i]);
                     this.Finish();
                 }
-                for (; i <= -1; i--) {
+                while (i > -1) {
                     if (this.lastTrig[i] !== undefined) {
                         EnableTrigger(this.lastTrig[i]);
                     }
+                    i = i - 1;
                 }
 
                 this.recursion = -1;
