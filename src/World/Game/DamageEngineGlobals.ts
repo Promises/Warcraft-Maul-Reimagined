@@ -1,4 +1,6 @@
 /* tslint:disable:variable-name */ // TODO: Fix the variable names
+import { DamageEngine as Engine } from '../../lib/DamageEngine/DamageEngine';
+
 export class DamageEngineGlobals {
     /**
      * DAMAGE ENGINE GLOBALS
@@ -7,7 +9,15 @@ export class DamageEngineGlobals {
     public udg_DamageEventTrigger: trigger | undefined = undefined;
 
     public udg_DamageEventOverride: boolean = false;
-    public udg_NextDamageType: number = 0;
+    /** The type a script marks its next damage with (5.A's DamageEngine.nextType). */
+    public get udg_NextDamageType(): number {
+        return Engine.nextType;
+    }
+
+    public set udg_NextDamageType(value: number) {
+        Engine.nextType = value;
+    }
+
     public udg_DamageEventType: number = 0;
     public udg_DamageTypeCode: number = 0;
     public udg_IsDamageCode: boolean = false;

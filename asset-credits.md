@@ -15,6 +15,12 @@ import something, add it here in the same commit, and credit the author in the c
 | Demigod Cenarius | Avatar of Life | `war3mapImported/CenariusTeamColor.mdx` (`Cenarius TeamColor.mdx`) | FerSZ | [Hive](https://www.hiveworkshop.com/threads/demigod-cenarius-keeper-of-the-groove.309948/) | credit the author | 2026-10-09 |
 | BTNBubbles | Bubbles (Elementalist) | `ReplaceableTextures/CommandButtons/BTNBubbles.blp`, `ReplaceableTextures/CommandButtonsDisabled/DISBTNBubbles.blp` | Golden-Drake | [Hive](https://www.hiveworkshop.com/threads/btnbubbles.173114/) | none stated; credit the author. Re-encoded by us: the original's mip table points its small levels at one 32x32 image (reported to crash the Mac client) | 2026-10-09 |
 
+## Code from other authors
+
+| Code | Used for | Files | Author | Source | Terms | Added |
+|---|---|---|---|---|---|---|
+| Damage Engine 5.A.0.0, TypeScript port | every damage hook in the map (src/World/Game/DamageEngine.ts runs on it) | `src/lib/DamageEngine/` | Bribe (Damage Engine); runi95 (TypeScript port) | [scourge-survival](https://github.com/runi95/scourge-survival), [Hive](https://www.hiveworkshop.com/threads/201016/) | MIT (scourge-survival); credit Bribe | 2026-10-09 |
+
 ## Made for this map
 
 | Asset | Files | Made by |

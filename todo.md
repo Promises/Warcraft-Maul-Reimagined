@@ -300,6 +300,16 @@
     replay of held-back damage never ran, and the loop that enables the triggers again never
     ended - a hang the first time a damage handler dealt damage. Now as the original has it.
     Still dormant (no damage handler deals damage), so not seen in a game (2026-10-09).
+  - [x] Moved to Damage Engine 5.A.0.0 (runi95's TypeScript port, from scourge-survival, MIT):
+    src/lib/DamageEngine; src/World/Game/DamageEngine.ts keeps the old API on top of it. The old
+    engine is kept (git tag damage-engine-5.3.0.1, ../from-backup/damage-engine-5.3.0.1). Changes
+    seen by the map: the area counter starts at 1 (the old one started at 0 until the first
+    multi-unit hit, so the Acolyte, Wisp, Turtle and Revenant skipped their on-hit effects);
+    on-hit actions no longer run for DAMAGE_TYPE_UNKNOWN damage (none is dealt). Damage dealt from
+    a damage event is held back and dealt after it; as 5.A has it, the handler runs once more on
+    its own damage, then is frozen: an on-hit that deals damage gets two hits per attack, not one
+    (test_damage_from_inside_a_damage_event, measure.py, with the .dmgecho hook). No handler deals
+    damage yet; one that does should know this (2026-10-09).
   - [x] Creep ability level is `currentWave + 1` (CreepAbility.ts:54, Cripple Aura): not shown to be
     off by one. The abilities have 40 levels, rising one step a level (Evasion N%, Slow Aura N%),
     so wave 37 gets level 38, inside them; the old TypeScript (Warcraft-Maul-Buildtools) had the

@@ -20,6 +20,9 @@ import {BlitzGameRound} from './BlitzMaul/BlitzGameRound';
  *    finished build blocks them), so a test can start from any tower - a Primal's ingredients, a
  *    maze - without the builds and random rolls that lead to it. Unlike a build it is not refused
  *    on ground that cannot be built on;
+ *  - `.dmgecho <tower ref> <amount>` makes the player's tower deal that much more damage to whatever
+ *    it damages, from inside the damage event (damage dealt during damage, which the damage
+ *    engine must hold back and deal once the event is over, without echoing itself for ever);
  *  - the heartbeat gets lives, wave, the wave timer and creeps, the game mode and whether this is a
  *    dev build (its debug commands: -wave, -lives, ...), and kills and towers per player;
  *  - the events that decide a game are written to the trace at once, not on the next flush.
@@ -63,6 +66,26 @@ export function installSlopHooks(game: WarcraftMaul): void {
             }
             Slop.note('tower', `p${player.id} made id=${Slop.ref(unit.handle)} type=${type}`
                 + ` class=${(tower as unknown as {constructor: {name: string}}).constructor.name}`);
+            return true;
+        }
+        if (line.startsWith('.dmgecho ')) {
+            const [, ref, amount] = line.split(' ');
+            const tower = player.towersArray.find(t => Slop.ref(t.unit.handle) === Number(ref));
+            if (tower === undefined) {
+                Slop.note('echo', `p${player.id} no tower ${ref}`);
+                return true;
+            }
+            const source = tower.unit.handle;
+            const extra = Number(amount);
+            const globals = game.gameDamageEngineGlobals;
+            game.gameDamageEngine.AddInitialDamageEvent(() => {
+                const target = globals.udg_DamageEventTarget;
+                if (globals.udg_DamageEventSource === source && target !== undefined) {
+                    UnitDamageTarget(source, target, extra, false, false, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_NORMAL,
+                        WEAPON_TYPE_WHOKNOWS);
+                }
+            });
+            Slop.note('echo', `p${player.id} on ${ref} amount=${extra}`);
             return true;
         }
         if (line.startsWith('@')) {
