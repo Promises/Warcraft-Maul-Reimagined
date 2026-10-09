@@ -222,7 +222,9 @@
     ShowWaveOnScoreboard in AbstractGameRound now, which Sandbox calls with its clock (Classic's
     copy also capitalised only the first letter). test_scoreboard_follows_the_wave: screenshots
     show Hero (Boss) on wave 35 and Medium on wave 12 (2026-10-09).
-  - [ ] Debug builds: the hidden Secondary tab keeps its slot, leaving a gap above Dev.
+  - [x] Debug builds: the hidden Secondary tab kept its slot, leaving a gap above Dev. The tabs
+    are laid out in the order shown (RaceSelectPanel.layOutTabs): Dev moves up while Secondary
+    is hidden. test_race_picker_tabs (screenshots, 2026-10-09).
 - [x] Secondary race: Shrine of Buffs (I026) is a secondary race (tier from its tooltip,
   RaceItems 'Secondary'). The race picker shows a Secondary tab to a player who has a race and
   opens on it then; a secondary pick costs a pick's lumber like any other and is refused before a
@@ -272,7 +274,7 @@
   - [x] Berserker (o00E, A03K) and Flesh Golem (o00G, A03R): their berserk (from Absk) kept Absk's
     requirement (the Berserker Upgrade research), so it never cast. Fixed: areq cleared on both
     in war3map.w3a.
-- [ ] Off-by-one audit (2026-09-26), checked in the code:
+- [x] Off-by-one audit (2026-09-26), checked in the code:
   - [x] CreepAbilityHandler.ts dropped the last creep ability (MorningPerson) and handed out one
     ability too few (none at 200%, one at 300%). Fixed; test_creep_abilities_by_difficulty
     (wc3-slop-lan tests.py) sees 0/1/2/3 at 100-400% and all 10 on a boss wave. (2026-09-28)
@@ -294,10 +296,16 @@
     creep players struck on wave 1, none on wave 35. (2026-09-29)
   - [x] LootBoxerHandler.ts looked the tier up after ReplaceUnit, got -1 and always gave the
     tier-1 item. Fixed (see Loot Boxer loot below).
-  - DamageEngine.ts:285/297 purge loops are inverted (dormant: nothing deals damage from a damage
-    handler today).
-  - Open: creep ability level is `currentWave + 1` (CreepAbility.ts:54 and others), while
-    Creep.MorningPerson uses `currentWave` - one of the two is off by one.
+  - [x] DamageEngine.ts's purge loops ran the wrong way round from Bribe's Damage Engine: the
+    replay of held-back damage never ran, and the loop that enables the triggers again never
+    ended - a hang the first time a damage handler dealt damage. Now as the original has it.
+    Still dormant (no damage handler deals damage), so not seen in a game (2026-10-09).
+  - [x] Creep ability level is `currentWave + 1` (CreepAbility.ts:54, Cripple Aura): not shown to be
+    off by one. The abilities have 40 levels, rising one step a level (Evasion N%, Slow Aura N%),
+    so wave 37 gets level 38, inside them; the old TypeScript (Warcraft-Maul-Buildtools) had the
+    same +1, and no tooltip says which level a wave should get. MorningPerson's `currentWave` is
+    a heal formula, not a level. Left as it is: lowering it would weaken every creep ability by a
+    level, a balance call, not a fix (2026-10-09).
 - [x] VenomTower (h045) ordered itself to 'stop' after each attack (an old try at attacking at
   random). Now it attacks a random enemy in range, a new one each attack
   (Specs/RandomTargeting.ts); the race test gives it 8 targets and checks the spread. Human race
@@ -329,8 +337,10 @@
   slows the leader and the creep behind walks past. Now the ground left to the next checkpoint
   decides, from a distance field over the lane's antiblock maze (PathField.ts, cached per
   checkpoint until a cell changes; unit-tested in tests/lua/pathfield.test.ts).
-- [ ] Workers Union's Undead Acolyte (h03I) attacks ground only, but its frost attack A0EU targets
-  "air,enemies": it can never slow anything. Not yet seen in a game with a wave.
+- [x] Workers Union's Undead Acolyte (h03I) attacks ground only, but its frost attack A0EU targets
+  "air,enemies": it could never slow anything. It has AC01 now, the copy that reaches ground too
+  (src/World/Entity/Tower/GroundFrost.ts, shared with the Cold Tower); test_undead_acolyte_frost
+  (wc3-slop-lan measure.py): a footman walking past it is frosted and slower (2026-10-09).
 - [x] IceTrollPriest leaked: a boolexpr (Condition) every tick, and a `targets` list that was
   never emptied, so it grew with every creep ever seen, dead ones included. Now one group for all,
   no filter, and this tick's live creeps only. test_ice_troll_priest_frost_nova (wc3-slop-lan

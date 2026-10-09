@@ -11,10 +11,16 @@ interface Quest {
 
 export const Quests: Quest[] = [
     {
+        title: `5.0.0 - 9`,
+        icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
+        stype: 0,
+        body: `Updates:\n- Fixed: 9 Rocks used now turn into a Loot Bag (a stack of 9 never did)\n- Fixed: the Venom Tower picks a new random target for every attack (it hit each one twice in a row)\n- Fixed: the Undead Acolyte's frost attack now slows the ground units it hits (it only ever reached air units, which it cannot attack)\n- Cold Tower: always attacks the creep in range furthest along the path (by the ground it has left to walk, mazes included), the one closest to leaking, and its frost attack slows it, air or ground, by about a quarter. Many Cold Towers slow a creep no more than one does. Its tooltip now gives its real range (900) and splash (200)`,
+    },
+    {
         title: `5.0.0 - 8`,
         icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
         stype: 0,
-        body: `Updates:\n- The recipe book is a Fusion Table: the six Runes against each other, a cell for each first fusion, and the Primals beside it with the Ascended each becomes\n- Stuck on the Primals? Find every first fusion and you may take one Primal recipe free, by clicking it in the book\n- The book remembers which Ascended you have made, across games\nUpdates:\n- Fixed: 9 Rocks used now turn into a Loot Bag (a stack of 9 never did)\n- Fixed: the Venom Tower picks a new random target for every attack (it hit each one twice in a row)\n- Cold Tower: always attacks the creep in range furthest along the path (by the ground it has left to walk, mazes included), the one closest to leaking, and its frost attack slows it, air or ground, by about a quarter. Many Cold Towers slow a creep no more than one does. Its tooltip now gives its real range (900) and splash (200)`,
+        body: `Updates:\n- The recipe book is a Fusion Table: the six Runes against each other, a cell for each first fusion, and the Primals beside it with the Ascended each becomes\n- Stuck on the Primals? Find every first fusion and you may take one Primal recipe free, by clicking it in the book\n- The book remembers which Ascended you have made, across games`,
     },
     {
         title: `5.0.0 - 7`,
