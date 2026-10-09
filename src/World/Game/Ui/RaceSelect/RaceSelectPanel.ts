@@ -49,6 +49,8 @@ const PANEL_WIDTH = PADDING + CATEGORY_WIDTH + PADDING + LIST_WIDTH + SCROLLBAR_
 export class RaceSelectPanel {
     private readonly panel: Frame;
     private readonly categoryButtons: Map<RaceTier, Frame> = new Map<RaceTier, Frame>();
+    // The tabs, in the order they stand
+    private readonly tiers: RaceTier[];
     private readonly rows: RaceListRow[] = [];
     private readonly scrollbar: Frame | undefined;
     private readonly infoIcon: Frame;
@@ -75,15 +77,14 @@ export class RaceSelectPanel {
         // Categories: the normal tiers, the Secondary tab (shown to a player once they have a race),
         // and a Dev tab in debug builds for the races you cannot normally select (disabled races
         // and the random-only Loot Boxer)
-        const tiers: RaceTier[] = [...RACE_TIERS, 'Secondary', ...(game.debugMode ? ['Dev' as RaceTier] : [])];
-        tiers.forEach((tier, index) => {
+        this.tiers = [...RACE_TIERS, 'Secondary', ...(game.debugMode ? ['Dev' as RaceTier] : [])];
+        for (const tier of this.tiers) {
             const button = createTextButton(this.panel, tier, CATEGORY_WIDTH, CATEGORY_HEIGHT);
-            button.setPoint(FRAMEPOINT_TOPLEFT, this.panel, FRAMEPOINT_TOPLEFT, PADDING, -PADDING - index * CATEGORY_SPACING);
             onLocalClick(button, () => this.showTier(tier));
             trackUiPress(game, button);
             this.categoryButtons.set(tier, button);
-        });
-        this.categoryButtons.get('Secondary')?.setVisible(false);
+        }
+        this.layOutTabs(false);
 
         // Scrolling race list, offsets from the panel's top-left
         const listLeft = PADDING + CATEGORY_WIDTH + PADDING;
@@ -190,7 +191,7 @@ export class RaceSelectPanel {
     public open(player: Defender): void {
         if (player.isLocal()) {
             const secondary = player.hasPrimaryRace();
-            this.categoryButtons.get('Secondary')?.setVisible(secondary);
+            this.layOutTabs(secondary);
             // Opens on the Secondary tab while there is a secondary race still to pick
             if (secondary && !player.races.some(race => race.secondary)) {
                 this.showTier('Secondary');
@@ -199,6 +200,24 @@ export class RaceSelectPanel {
             }
         }
         this.setVisible(player, true);
+    }
+
+    /**
+     * The tabs one under another, the Secondary tab only while it is shown: a tab after it (Dev, in
+     * debug builds) moves up into its place rather than leaving a gap. Local.
+     */
+    private layOutTabs(showSecondary: boolean): void {
+        let slot = 0;
+        for (const tier of this.tiers) {
+            const button = this.categoryButtons.get(tier)!;
+            const shown = tier !== 'Secondary' || showSecondary;
+            button.setVisible(shown);
+            if (shown) {
+                button.clearPoints();
+                button.setPoint(FRAMEPOINT_TOPLEFT, this.panel, FRAMEPOINT_TOPLEFT, PADDING, -PADDING - slot * CATEGORY_SPACING);
+                slot++;
+            }
+        }
     }
 
     public close(player: Defender): void {
