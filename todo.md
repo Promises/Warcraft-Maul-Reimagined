@@ -310,6 +310,9 @@
     its own damage, then is frozen: an on-hit that deals damage gets two hits per attack, not one
     (test_damage_from_inside_a_damage_event, measure.py, with the .dmgecho hook). No handler deals
     damage yet; one that does should know this (2026-10-09).
+    Tested on the M1 with the 5.A build: the measure suite 22/22 and the race suite 30/30
+    (tests.py, races.py, builds.py; its one failure was test_pay_the_toll_on_a_depleted_rock,
+    stale since Recharge replaced Pay the Toll, now test_recharge_a_depleted_rock) (2026-10-10).
   - [x] Creep ability level is `currentWave + 1` (CreepAbility.ts:54, Cripple Aura): not shown to be
     off by one. The abilities have 40 levels, rising one step a level (Evasion N%, Slow Aura N%),
     so wave 37 gets level 38, inside them; the old TypeScript (Warcraft-Maul-Buildtools) had the
