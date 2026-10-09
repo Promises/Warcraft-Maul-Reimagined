@@ -13,6 +13,7 @@ import something, add it here in the same commit, and credit the author in the c
 | Al'Akir (Elemental Lords Pack) | Endless Storm | `war3mapImported/AlAkir.mdx`, `ReplaceableTextures/CommandButtons/BTNIconAlAkir.blp`, `ReplaceableTextures/CommandButtonsDisabled/DISBTNIconAlAkir.blp` | Explobomb | [Hive](https://www.hiveworkshop.com/threads/elemental-lords-pack.360451/) | credit the author; the pack was "awaiting update" (not yet approved) on 2026-10-09 | 2026-10-09 |
 | Heart Crystal (Generators) | Heart of Life | `war3mapImported/HeartCrystal.mdx` (`Heart Crystal Team Color.mdx`) | Tranquil | [Hive](https://www.hiveworkshop.com/threads/generators.277141/) | credit the author | 2026-10-09 |
 | Demigod Cenarius | Avatar of Life | `war3mapImported/CenariusTeamColor.mdx` (`Cenarius TeamColor.mdx`) | FerSZ | [Hive](https://www.hiveworkshop.com/threads/demigod-cenarius-keeper-of-the-groove.309948/) | credit the author | 2026-10-09 |
+| BTNBubbles | Bubbles (Elementalist) | `ReplaceableTextures/CommandButtons/BTNBubbles.blp`, `ReplaceableTextures/CommandButtonsDisabled/DISBTNBubbles.blp` | Golden-Drake | [Hive](https://www.hiveworkshop.com/threads/btnbubbles.173114/) | none stated; credit the author. Re-encoded by us: the original's mip table points its small levels at one 32x32 image (reported to crash the Mac client) | 2026-10-09 |
 
 ## Made for this map
 

@@ -44,6 +44,9 @@ export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LIC
     tornado.normal = String(tornado.normal ?? '').split(',').map(id => id === 'A0E0' ? 'A03Q' : id).join(',');
     const rock = objectData.units.get('n027')!;
     rock.normal = String(rock.normal ?? '').split(',').filter(id => id !== 'A0BF').concat('AP03').join(',');
+    // Bubbles' icon: BTNBubbles by Golden-Drake (hiveworkshop.com/threads/btnbubbles.173114), re-encoded
+    // because the original's mip table points its small levels at one 32x32 image
+    objectData.units.get('u026')!.iconGameInterface = 'ReplaceableTextures\\CommandButtons\\BTNBubbles.blp';
 
     // Undead L2 and Death Rune L3: the Lich; Air Rune L3 and Water Rune L3: Thunderhead; Sandstorm L2
     // and Air Rune L3: Haboob; two Life Rune L3: Heart of Life; Tree and Nature Rune L3: World Tree;
