@@ -1,6 +1,4 @@
-import { Tower } from '../../Specs/Tower';
-import { GenericAutoAttackTower } from '../../Specs/GenericAutoAttackTower';
-import { FrontmostTargeting } from '../../Specs/FrontmostTargeting';
+import { FrontmostTower } from '../../Specs/FrontmostTower';
 
 /**
  * Its frost attack: Workers Union's (A0EU, from the game's Frost Attack, Afr2), copied as AC01 to
@@ -16,11 +14,6 @@ export const COLD_FROST = compiletime(({objectData}) => {
     return 'AC01';
 }) as string;
 
-/** Always attacks the creep in range that is furthest along the path, the one closest to leaking. */
-export class ColdTower extends Tower implements GenericAutoAttackTower {
-    private readonly targeting: FrontmostTargeting = new FrontmostTargeting(this.game, this.unit);
-
-    public GenericAttack(): void {
-        this.targeting.attackStarted(GetTriggerUnit()!);
-    }
+/** Always attacks the creep in range furthest along the path (FrontmostTower), and slows it with its frost. */
+export class ColdTower extends FrontmostTower {
 }

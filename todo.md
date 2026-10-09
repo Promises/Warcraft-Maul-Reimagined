@@ -249,7 +249,7 @@
   Mazing Tower), the chance-based Thrall/Magtheridon casts beyond a sanity check, the size of an
   aura's effect (only that its buff lands), and the race picker's UI itself. Run:
   `../wc3-slop-lan/slop test warcraft-maul` or `--only <name>` for one.
-- [ ] Found by the race tests (2026-09-26), each seen in a real two-client game:
+- [x] Found by the race tests (2026-09-26), each seen in a real two-client game:
   - [x] Forest Troll High Priest (n03I): ForestTrollHighPriest ordered a monsoon on every attack,
     which cancelled the attack - only monsoons, its own magic attack never landed (confirmed in
     play). Casting only when ready did not help (channel 12 s, cooldown 10 s). Fixed: a dummy
@@ -341,7 +341,7 @@
   no race, so a repick opens it whatever was picked before; there is still no repick from it.
   repickCounter stays: it shrinks the normal random's gold and bars Hardcore after a normal
   random. test_repick_starts_over (wc3-slop-lan tests.py) passes. (2026-09-29)
-- [ ] Loot Boxer loot, found while writing its test (fixed; items not tried, below):
+- [x] Loot Boxer loot, found while writing its test (all fixed; the items tried in game too):
   - [x] Boxes of tier 4-9 gave tier-1 loot, in practice always I02F: UpgradeToTower read the
     tier from the unit after replacing the box with its tower (indexOf gave -1, and tier -1
     gives I02F for every roll). The tier is now read from the box.
