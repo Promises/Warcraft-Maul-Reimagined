@@ -119,4 +119,4 @@ function addPrimalAbilities(abilities) {
     append(path.join(map, 'war3mapSkin.w3a'), template => abilities.map(a => object(template, a.id, skin(a))));
 }
 
-module.exports = {addPrimalAbilities};
+module.exports = {addPrimalAbilities, append, idInt, objectBytes};
