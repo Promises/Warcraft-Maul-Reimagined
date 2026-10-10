@@ -82,7 +82,7 @@ export const RACE_GUIDES: Record<string, string> = {
     'I000': 'The French Soldier (7 gold) is the cheapest tower; creeps near it lose 1 armor.\n\n'
         + 'The Knights Who Say Ni! slow ground creeps within 500 by 25% and hit for anything from 2 to 150, '
         + 'five times a second. Brother Maynard hits for 1,500 every 3 seconds. The Black Beast of Arrrghhh '
-        + 'takes 15 armor off every creep within 1,000.\n\n'
+        + 'takes 15 armor off every creep within 1,000, but makes them 15% faster.\n\n'
         + `${GOLD}Mind the air waves:${END} the Cow Catapult and the Witch Hunter hit ground only.`,
 
     // Critters UNITE
