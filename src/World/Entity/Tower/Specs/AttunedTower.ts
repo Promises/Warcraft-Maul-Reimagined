@@ -2,7 +2,7 @@ import {Carried, Tower} from './Tower';
 import {EndOfRoundTower} from './EndOfRoundTower';
 import {SyncTrace} from '../../../../lib/SyncTrace';
 import {DecodeFourCC} from '../../../../lib/translators';
-import {BOOK_ICONS, POWER_TEXTS} from '../../../Game/Races/ElementalistPrimals';
+import {POWER_TEXTS} from '../../../Game/Races/ElementalistPrimals';
 
 // Attunement: +2% of the tower's base damage per level, a level at the end of every wave it stands
 export const ATTUNEMENT_PER_LEVEL = 0.02;
@@ -106,9 +106,6 @@ export class AttunedTower extends Tower implements EndOfRoundTower {
             `${this.unit.name}: Attunement ${this.attunement} / ${this.cap}`);
         BlzSetAbilityStringLevelField(power, ABILITY_SLF_TOOLTIP_NORMAL_EXTENDED, 0,
             `${POWER_TEXTS[type] ?? ''}|n|n${lines.join('|n')}`);
-        if (BOOK_ICONS[type]) {
-            BlzSetAbilityStringLevelField(power, ABILITY_SLF_ICON_NORMAL, 0, BOOK_ICONS[type]);
-        }
     }
 
     /** What Attunement and Ascended growth make of the tower's power: 1 plus their share of it. */
