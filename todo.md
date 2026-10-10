@@ -17,6 +17,10 @@
 - [x] The Black Beast of Arrrghhh (Caerbannog, n05E): its second aura, A081, makes creeps within
   1,000 15% faster (Uau1 +0.15), where the race's other Unholy Auras slow. Intended: its tooltip
   calls it "Run Away". The guide says so (2026-10-10).
+- [ ] Hybrid build menu Keep open (R): built and tested, off for now - HybridBuildPanel.KEEP_OPEN_BUTTON
+  (static readonly) turns it on. With it on, picking a tower and placing it leave the menu open
+  for the next pick; test_hybrid_build_menu (wc3-slop-lan measure.py) checks either setting. Its
+  changelog line goes in once it is turned on (2026-10-10).
 - [ ] Randomised waypoints on extreme difficulty. Each lane's two in-area checkpoints move by a random offset, so the maze cannot be copied from memory. Inspected in game with the debug commands `-wptest [n]` (marker tiles at random spots in the red lane) and `-hidewp` (hide and restore the real two); the tile is Cityscape white marble `Ywmb` on Icecrown rough dirt `Idtr`, one 128 tile per waypoint, 26 in the map.
 
   What it includes:

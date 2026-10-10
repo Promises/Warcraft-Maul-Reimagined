@@ -42,10 +42,16 @@ function slotOfTier(tier: number): number {
  * Placing a tower stays synced by Defender.
  */
 export class HybridBuildPanel {
+    /**
+     * Whether the menu has its Keep open button (R): with it on, the menu stays open while the
+     * player builds. Off, the slot is empty and the menu closes on a pick, as it always did.
+     */
+    public static readonly KEEP_OPEN_BUTTON: boolean = false;
+
     private readonly panel: Frame;
     private readonly tierButtons: IconButton[] = [];
     private readonly cancelButton: IconButton;
-    private readonly keepOpenButton: IconButton;
+    private readonly keepOpenButton: IconButton | undefined;
     // Per player, updated on every client so toggle decisions agree everywhere
     private readonly openFor: boolean[] = [];
     // Per player as well: the menu stays open while they build, until they close it
@@ -77,10 +83,12 @@ export class HybridBuildPanel {
             player => this.close(player));
         place(this.cancelButton, CANCEL_SLOT);
         this.cancelButton.setHotkey(HOTKEY_LABELS[CANCEL_SLOT]);
-        this.keepOpenButton = new IconButton(game, 'hybridBuildKeepOpen', this.panel, BUTTON_SIZE,
-            player => this.toggleKeepOpen(player));
-        place(this.keepOpenButton, KEEP_OPEN_SLOT);
-        this.keepOpenButton.setHotkey(HOTKEY_LABELS[KEEP_OPEN_SLOT]);
+        if (HybridBuildPanel.KEEP_OPEN_BUTTON) {
+            this.keepOpenButton = new IconButton(game, 'hybridBuildKeepOpen', this.panel, BUTTON_SIZE,
+                player => this.toggleKeepOpen(player));
+            place(this.keepOpenButton, KEEP_OPEN_SLOT);
+            this.keepOpenButton.setHotkey(HOTKEY_LABELS[KEEP_OPEN_SLOT]);
+        }
 
         // Gold changes all the time (kills, wave rewards); keep the dimming current while open.
         // Runs on every client and only touches the local player's view.
@@ -121,6 +129,9 @@ export class HybridBuildPanel {
 
     /** Local view: the keep-open button is lit while it is on. */
     private refreshKeepOpen(player: Defender): void {
+        if (this.keepOpenButton === undefined) {
+            return;
+        }
         const on = this.keepOpen[player.id] === true;
         this.keepOpenButton.setContent(player, {
             icon: 'ReplaceableTextures\\CommandButtons\\BTNHoldPosition.blp',
@@ -133,6 +144,9 @@ export class HybridBuildPanel {
 
     /** Turns keep-open on or off for the acting player; runs on every client (click or hotkey). */
     private toggleKeepOpen(player: Defender): void {
+        if (this.keepOpenButton === undefined) {
+            return;
+        }
         this.keepOpen[player.id] = this.keepOpen[player.id] !== true;
         this.refreshKeepOpen(player);
     }

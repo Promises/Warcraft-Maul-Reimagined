@@ -11,6 +11,12 @@ interface Quest {
 
 export const Quests: Quest[] = [
     {
+        title: `5.0.0 - 10`,
+        icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
+        stype: 0,
+        body: `Updates:\n- Damage Engine 5.A by Bribe, in runi95's TypeScript port, now runs the map's damage (it ran 5.3)\n- Fixed: the Undead Acolyte, Night Elf Wisp, Cavern Turtle and Cavern Revenant skipped their on-hit effects early in a game, until some tower first hit several units with one attack\n- The race picker explains the random picks (Hybrid Random's +50 gold too) and has a guide for every Beginner race and the Elementalists\n- The scoreboard folds away while the race picker is open, so it no longer covers the race's description\n- Hybrid Random: the build menu sits on the right, above the command card`,
+    },
+    {
         title: `5.0.0 - 9`,
         icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
         stype: 0,
