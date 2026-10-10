@@ -11,6 +11,7 @@ import {RaceTowers} from './Races/RaceTowers';
 import {InitialiseAllRaceTowers} from './Races/RaceInitialiser';
 import {Trigger, Unit} from "w3ts";
 import {COLOUR, DecodeFourCC, ReplaceUnit} from "../../../lib/translators";
+import {switchOnAutocast} from "./Autocast";
 import {DummyTowersMap} from "../../Game/Races/HybridRandom";
 import {Walkable} from "../../Antiblock/Maze";
 import {SyncTrace} from '../../../lib/SyncTrace';
@@ -238,6 +239,8 @@ export class TowerConstruction {
         } else {
             ObjectExtendsTower = new Tower(tower, owner, this.game);
         }
+
+        switchOnAutocast(tower);
 
         if (ObjectExtendsTower.IsEndOfRoundTower() && this.game.worldMap.gameRoundHandler) {
             this.game.worldMap.gameTurn.AddEndOfRoundTower(ObjectExtendsTower.UniqueID, ObjectExtendsTower);
