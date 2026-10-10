@@ -50,18 +50,31 @@ function main() {
 const DEV_MAP_NAME = 'Warcraft Maul: DEV build';
 const RELEASE_MAP_NAME = /^Warcraft Maul: Reimagined v[\d.]+$/m;
 
-/** The string table with the map name swapped for the dev one; other files unchanged. */
-function devNamed(archivePath: string, contents: Buffer): Buffer {
-  if (process.env.WCM_DEV !== '1' || archivePath.toLowerCase() !== 'war3map.wts') {
+/**
+ * The name the built map carries in place of the string table's release name: the dev one for a
+ * dev build, else WCM_MAP_NAME when set (a beta: WCM_MAP_NAME="Warcraft Maul: Reimagined Beta
+ * 5.0.0" npm run build), else none.
+ */
+function builtMapName(): string | undefined {
+  if (process.env.WCM_DEV === '1') {
+    return DEV_MAP_NAME;
+  }
+  return process.env.WCM_MAP_NAME || undefined;
+}
+
+/** The string table with the map name swapped for the built one; other files unchanged. */
+function named(archivePath: string, contents: Buffer): Buffer {
+  const name = builtMapName();
+  if (name === undefined || archivePath.toLowerCase() !== 'war3map.wts') {
     return contents;
   }
   const text = contents.toString('latin1');
   if (!RELEASE_MAP_NAME.test(text)) {
-    logger.warn('Dev build: the map name was not found in war3map.wts, leaving it as is');
+    logger.warn(`The map name was not found in war3map.wts, leaving it as is (not "${name}")`);
     return contents;
   }
-  logger.info(`Dev build: map named "${DEV_MAP_NAME}"`);
-  return Buffer.from(text.replace(RELEASE_MAP_NAME, DEV_MAP_NAME), 'latin1');
+  logger.info(`Map named "${name}"`);
+  return Buffer.from(text.replace(RELEASE_MAP_NAME, name), 'latin1');
 }
 
 /** The editor's own map files; everything else in the folder is an import. */
@@ -103,7 +116,7 @@ export function createMapFromDir(output: string, dir: string) {
     // The game looks map files up by the exact path string (no separator normalisation), so
     // the archive, TOC entries and every path in code use backslashes like Blizzard's tools.
     const archivePath = path.relative(dir, fileName).split(path.sep).join('\\');
-    const contents = toArrayBuffer(devNamed(archivePath, fs.readFileSync(fileName)));
+    const contents = toArrayBuffer(named(archivePath, fs.readFileSync(fileName)));
     if (archivePath.toLowerCase() === 'war3map.imp') {
       // Regenerated below from what is actually in the archive
       continue;
