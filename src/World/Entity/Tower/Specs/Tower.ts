@@ -121,6 +121,10 @@ export class Tower {
         return newTower;
     }
 
+    /** Once it is set up and has taken what it was handed (SetupTower): nothing, but for grown towers. */
+    public Ready(): void {
+    }
+
     /** What this tower hands on to the tower it becomes: nothing, but for grown towers (AttunedTower). */
     public carry(): Carried {
         return {attunement: 0, bonusDamage: 0};

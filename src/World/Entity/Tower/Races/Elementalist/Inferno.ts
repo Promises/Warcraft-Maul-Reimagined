@@ -33,6 +33,10 @@ export class Inferno extends AttunedTower implements TickingTower {
         burn(this, Math.floor(400 * this.growthShare()), 400);
     }
 
+    protected powerNow(): string {
+        return `Burns now: |cffffcc00${Math.floor(400 * this.growthShare())}|r a second within 400`;
+    }
+
     public GetTickModulo(): number {
         return TICKS_A_SECOND;
     }
@@ -46,6 +50,10 @@ export class Inferno extends AttunedTower implements TickingTower {
 export class Firelord extends AscendedTower implements TickingTower {
     public Action(): void {
         burn(this, Math.floor(692 * this.growthShare()), 450);
+    }
+
+    protected powerNow(): string {
+        return `Burns now: |cffffcc00${Math.floor(692 * this.growthShare())}|r a second within 450`;
     }
 
     public GetTickModulo(): number {

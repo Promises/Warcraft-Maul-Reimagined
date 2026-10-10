@@ -306,6 +306,7 @@ export class TowerConstruction {
             }
         }
         // Log.Event(1, `{"tower":"${DecodeFourCC(ObjectExtendsTower.GetID())}", "owner": "${ObjectExtendsTower.owner.GetLogStr()}"}`);
+        ObjectExtendsTower.Ready();
         return ObjectExtendsTower;
     }
 

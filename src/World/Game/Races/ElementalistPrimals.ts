@@ -14,7 +14,7 @@ export const RECHARGE_PRICE = 8;
  * Ascend and Surge to the Primals.
  */
 export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LICH_KING, EYE_OF_THE_STORM, ENDLESS_STORM,
-    AVATAR_OF_LIFE, NORDRASSIL, FIRELORD, PRIMAL_INGREDIENTS, BOOK_ICONS, BOOK_TEXTS} = compiletime(({objectData}) => {
+    AVATAR_OF_LIFE, NORDRASSIL, FIRELORD, PRIMAL_INGREDIENTS, BOOK_ICONS, BOOK_TEXTS, POWER_TEXTS} = compiletime(({objectData}) => {
     // Ascend and Surge: the ids are the ASCEND and SURGE above (compiletime code cannot see them)
     require(require('path').resolve('scripts/primal-abilities.js')).addPrimalAbilities([
         {
@@ -35,6 +35,13 @@ export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LIC
             id: 'AP03', order: 'rejuvination', name: '[Elementalists] Recharge', tooltip: 'Recharge [|cffffcc00R|r]',
             extended: 'Recharges the rock into an Uncharged Rune for 8 gold, which can take an element again.',
             icon: 'ReplaceableTextures\\CommandButtons\\BTNManaRecharge.blp', hotkey: 'R', x: 0, y: 2,
+        },
+        {
+            // A Primal's and an Ascended's own account of itself: AttunedTower writes each tower's
+            // tooltip (what it does, and what it has gained) as it grows; clicking it does nothing
+            id: 'AP04', order: 'spiritlink', name: '[Elementalists] Power', tooltip: 'Power',
+            extended: 'What this tower does, and what it has gained.',
+            icon: 'ReplaceableTextures\\CommandButtons\\BTNSpellBookBLS.blp', hotkey: 'Q', x: 0, y: 0,
         },
     ]);
 
@@ -282,13 +289,16 @@ export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LIC
     firelord.iconGameInterface = 'ReplaceableTextures\\CommandButtons\\BTNHeroAvatarOfFlame.blp';
     firelord.scalingValueundefined = 1.0;
 
+    // What each Primal and Ascended says of itself, for its Power button (AttunedTower)
+    const powerTexts: {[id: string]: string} = {};
     // The Primals and the Ascended are copies of the towers they come from: each shows its own model
     // in the portrait (not its ingredient's: the Lich showed a ghoul), and none keeps Siphon Energy,
     // which they had from their ingredients but no fusion uses
     for (const unit of [lich, thunderhead, haboob, heart, worldTree, inferno, lichKing, eye, endlessStorm, avatar,
         nordrassil, firelord]) {
         unit.portraitModelFile = unit.modelFile;
-        unit.normal = String(unit.normal ?? '').split(',').filter(id => id !== 'A0CT').join(',');
+        unit.normal = String(unit.normal ?? '').split(',').filter(id => id !== 'A0CT' && id !== 'AP04').concat('AP04').join(',');
+        powerTexts[unit.newId] = String(unit.tooltipExtended ?? '');
     }
     // The Depleted Rock had its base unit's ghoul icon: the Uncharged Rune's, greyed out
     objectData.units.get('n027')!.iconGameInterface = 'ReplaceableTextures\\CommandButtonsDisabled\\DISBTNMoonStone.blp';
@@ -312,8 +322,9 @@ export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LIC
     return {LICH: lich.newId, THUNDERHEAD: thunderhead.newId, HABOOB: haboob.newId, HEART_OF_LIFE: heart.newId,
         WORLD_TREE: worldTree.newId, INFERNO: inferno.newId, LICH_KING: lichKing.newId, EYE_OF_THE_STORM: eye.newId,
         ENDLESS_STORM: endlessStorm.newId, AVATAR_OF_LIFE: avatar.newId, NORDRASSIL: nordrassil.newId,
-        FIRELORD: firelord.newId, PRIMAL_INGREDIENTS: ingredients, BOOK_ICONS: bookIcons, BOOK_TEXTS: bookTexts};
+        FIRELORD: firelord.newId, PRIMAL_INGREDIENTS: ingredients, BOOK_ICONS: bookIcons, BOOK_TEXTS: bookTexts,
+        POWER_TEXTS: powerTexts};
 }) as {LICH: string, THUNDERHEAD: string, HABOOB: string, HEART_OF_LIFE: string, WORLD_TREE: string, INFERNO: string,
     LICH_KING: string, EYE_OF_THE_STORM: string, ENDLESS_STORM: string, AVATAR_OF_LIFE: string, NORDRASSIL: string,
     FIRELORD: string, PRIMAL_INGREDIENTS: string[], BOOK_ICONS: {[id: string]: string},
-    BOOK_TEXTS: {[id: string]: string}};
+    BOOK_TEXTS: {[id: string]: string}, POWER_TEXTS: {[id: string]: string}};

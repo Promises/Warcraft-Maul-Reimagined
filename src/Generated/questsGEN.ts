@@ -14,7 +14,7 @@ export const Quests: Quest[] = [
         title: `5.0.0 - 12`,
         icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
         stype: 0,
-        body: `Updates:\n- Dormant Phoenix Egg: Awaken is free once the egg has 5 mana (it gains 1 a wave); before that, 250 gold skips the wait. Its button shows the price`,
+        body: `Updates:\n- Dormant Phoenix Egg: Awaken is free once the egg has 5 mana (it gains 1 a wave); before that, 250 gold skips the wait. Its button shows the price\n- Primals and Ascended have a Power button (Q): what the tower does, its Attunement, what it has gained from the waves, Surges and Ascension, and its damage or burn now`,
     },
     {
         title: `5.0.0 - 11`,

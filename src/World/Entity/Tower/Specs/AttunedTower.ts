@@ -2,6 +2,7 @@ import {Carried, Tower} from './Tower';
 import {EndOfRoundTower} from './EndOfRoundTower';
 import {SyncTrace} from '../../../../lib/SyncTrace';
 import {DecodeFourCC} from '../../../../lib/translators';
+import {BOOK_ICONS, POWER_TEXTS} from '../../../Game/Races/ElementalistPrimals';
 
 // Attunement: +2% of the tower's base damage per level, a level at the end of every wave it stands
 export const ATTUNEMENT_PER_LEVEL = 0.02;
@@ -9,6 +10,8 @@ export const ATTUNEMENT_CAP = 15;
 // Surge: a Primal buys a level of Attunement, up to this many over its life
 export const SURGE_PRICE = 60;
 export const SURGE_LIMIT = 10;
+// The Primals' and Ascended's Power button, whose tooltip each keeps up to date (refreshPower)
+const POWER = FourCC('AP04');
 
 /**
  * A tower that grows with the waves it stands (the Elementalist redesign). At the end of each wave
@@ -38,6 +41,7 @@ export class AttunedTower extends Tower implements EndOfRoundTower {
         this.bonusDamage += this.flatPerWave;
         this.waves++;
         this.applyDamage();
+        this.refreshPower();
         SyncTrace.note('attune', `p${this.owner.id} type=${DecodeFourCC(this.GetTypeID())} attunement=${this.attunement}`
             + ` damage=${this.unit.getBaseDamage(0)}`);
     }
@@ -56,12 +60,55 @@ export class AttunedTower extends Tower implements EndOfRoundTower {
         this.attunement++;
         this.surged++;
         this.applyDamage();
+        this.refreshPower();
     }
 
     public receive(carried: Carried): void {
         this.attunement = Math.min(Math.max(this.attunement, carried.attunement), Math.max(this.cap, this.attunement));
         this.bonusDamage += carried.bonusDamage;
         this.applyDamage();
+        this.refreshPower();
+    }
+
+    public Ready(): void {
+        this.refreshPower();
+    }
+
+    /** What its growth has made of it now: its damage (the Inferno says its burn). */
+    protected powerNow(): string {
+        return `Damage now: |cffffcc00${this.unit.getBaseDamage(0)}|r (base ${this.baseDamage})`;
+    }
+
+    /**
+     * The Power button's tooltip (Primals and Ascended have one): what the tower does, and what it
+     * has gained - Attunement, Ascended growth, flat damage, Surges - and its power now. Set on this
+     * tower's own ability, so each tower shows its own.
+     */
+    protected refreshPower(): void {
+        const power = BlzGetUnitAbility(this.unit.handle, POWER);
+        if (!power) {
+            return;
+        }
+        const percent = (share: number) => `${Math.floor(share * 100 + 0.5)}%`;
+        const lines = [`Attunement: |cffffcc00${this.attunement}|r / ${this.cap}, +${percent(ATTUNEMENT_PER_LEVEL * this.attunement)} of its base`];
+        if (this.growthPerWave > 0) {
+            lines.push(`Ascended for ${this.waves} wave${this.waves === 1 ? '' : 's'}: +${percent(this.growthPerWave * this.waves)} more`);
+        }
+        if (this.bonusDamage > 0) {
+            lines.push(`Damage gained by the waves: +${this.bonusDamage}`);
+        }
+        if (this.surged > 0) {
+            lines.push(`Surged: ${this.surged} / ${SURGE_LIMIT}`);
+        }
+        lines.push(this.powerNow());
+        const type = DecodeFourCC(this.GetTypeID());
+        BlzSetAbilityStringLevelField(power, ABILITY_SLF_TOOLTIP_NORMAL, 0,
+            `${this.unit.name}: Attunement ${this.attunement} / ${this.cap}`);
+        BlzSetAbilityStringLevelField(power, ABILITY_SLF_TOOLTIP_NORMAL_EXTENDED, 0,
+            `${POWER_TEXTS[type] ?? ''}|n|n${lines.join('|n')}`);
+        if (BOOK_ICONS[type]) {
+            BlzSetAbilityStringLevelField(power, ABILITY_SLF_ICON_NORMAL, 0, BOOK_ICONS[type]);
+        }
     }
 
     /** What Attunement and Ascended growth make of the tower's power: 1 plus their share of it. */
