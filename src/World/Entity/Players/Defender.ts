@@ -260,7 +260,7 @@ export class Defender extends AbstractPlayer {
         }
         // Explicit compare: 0 is truthy in the generated Lua, so !keepBuilding would never fire
         if (keepBuilding !== 1) {
-            this.game.hybridBuildPanel.close(this);
+            this.game.hybridBuildPanel.built(this);
         }
     }
 

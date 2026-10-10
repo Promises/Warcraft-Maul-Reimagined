@@ -5,18 +5,21 @@ import {IconButton} from '../IconButton';
 import {Timer} from 'w3ts';
 import {createPanel} from '../Frames';
 
-// Layout: a 4x3 grid like the command card, sitting above the action bar. The console
-// area itself never passes mouse input to custom frames, so the panel cannot overlay it.
+// Layout: a 4x3 grid like the command card, on the right just above it, where a builder's build
+// menu would be. The console area itself never passes mouse input to custom frames, so the panel
+// cannot overlay it.
 const COLUMNS = 4;
 const ROWS = 3;
 const BUTTON_SIZE = 0.032;
 const BUTTON_SPACING = 0.036;
 const PANEL_PADDING = 0.008;
-const PANEL_CENTER_X = 0.4;
-// Above the action bar rail (its top is at 0.221)
+// The right edge of the 4:3 screen, where the command card ends
+const PANEL_RIGHT_X = 0.8;
 const PANEL_BOTTOM_Y = 0.19;
 const TIERS = 9;
 const CANCEL_SLOT = COLUMNS * ROWS - 1;
+// Top of the right column: keeps the menu open while building
+const KEEP_OPEN_SLOT = COLUMNS - 1;
 // One hotkey per tower slot, the command card's layout: QWER / ASDF / ZXC; the last slot is
 // Close, which is Escape rather than V
 export const HYBRID_BUILD_HOTKEYS: oskeytype[] = [
@@ -26,7 +29,7 @@ export const HYBRID_BUILD_HOTKEYS: oskeytype[] = [
 ];
 const HOTKEY_LABELS = ['Q', 'W', 'E', 'R', 'A', 'S', 'D', 'F', 'Z', 'X', 'C', 'Esc'];
 
-/** The grid slot of a tier: three towers per row, the right column is kept for cancel. */
+/** The grid slot of a tier: three towers per row, the right column is kept for keep-open and close. */
 function slotOfTier(tier: number): number {
     return Math.floor(tier / (COLUMNS - 1)) * COLUMNS + tier % (COLUMNS - 1);
 }
@@ -42,15 +45,18 @@ export class HybridBuildPanel {
     private readonly panel: Frame;
     private readonly tierButtons: IconButton[] = [];
     private readonly cancelButton: IconButton;
+    private readonly keepOpenButton: IconButton;
     // Per player, updated on every client so toggle decisions agree everywhere
     private readonly openFor: boolean[] = [];
+    // Per player as well: the menu stays open while they build, until they close it
+    private readonly keepOpen: boolean[] = [];
 
     constructor(private readonly game: WarcraftMaul) {
         const width = COLUMNS * BUTTON_SPACING + PANEL_PADDING;
         const height = ROWS * BUTTON_SPACING + PANEL_PADDING;
 
         this.panel = createPanel('hybridBuildPanel', width, height);
-        this.panel.setAbsPoint(FRAMEPOINT_BOTTOM, PANEL_CENTER_X, PANEL_BOTTOM_Y);
+        this.panel.setAbsPoint(FRAMEPOINT_BOTTOMRIGHT, PANEL_RIGHT_X, PANEL_BOTTOM_Y);
 
         // Grid slots centred on a BUTTON_SPACING pitch, from the panel's top-left
         const place = (button: IconButton, slot: number): void => {
@@ -71,6 +77,10 @@ export class HybridBuildPanel {
             player => this.close(player));
         place(this.cancelButton, CANCEL_SLOT);
         this.cancelButton.setHotkey(HOTKEY_LABELS[CANCEL_SLOT]);
+        this.keepOpenButton = new IconButton(game, 'hybridBuildKeepOpen', this.panel, BUTTON_SIZE,
+            player => this.toggleKeepOpen(player));
+        place(this.keepOpenButton, KEEP_OPEN_SLOT);
+        this.keepOpenButton.setHotkey(HOTKEY_LABELS[KEEP_OPEN_SLOT]);
 
         // Gold changes all the time (kills, wave rewards); keep the dimming current while open.
         // Runs on every client and only touches the local player's view.
@@ -106,6 +116,25 @@ export class HybridBuildPanel {
             title: `|cffffcc00${HOTKEY_LABELS[CANCEL_SLOT]}|r  Close`,
             description: 'Close the build menu and stop building',
         });
+        this.refreshKeepOpen(player);
+    }
+
+    /** Local view: the keep-open button is lit while it is on. */
+    private refreshKeepOpen(player: Defender): void {
+        const on = this.keepOpen[player.id] === true;
+        this.keepOpenButton.setContent(player, {
+            icon: 'ReplaceableTextures\\CommandButtons\\BTNHoldPosition.blp',
+            title: `|cffffcc00${HOTKEY_LABELS[KEEP_OPEN_SLOT]}|r  Keep open: ${on ? '|cff00ff00on|r' : 'off'}`,
+            description: 'Keeps the build menu open while you build, so you can pick tower after tower. '
+                + 'Close it with Escape or Close.',
+        });
+        this.keepOpenButton.setDimmed(player, !on);
+    }
+
+    /** Turns keep-open on or off for the acting player; runs on every client (click or hotkey). */
+    private toggleKeepOpen(player: Defender): void {
+        this.keepOpen[player.id] = this.keepOpen[player.id] !== true;
+        this.refreshKeepOpen(player);
     }
 
     /**
@@ -121,6 +150,8 @@ export class HybridBuildPanel {
         const column = slot % COLUMNS;
         if (column < COLUMNS - 1) {
             this.pick(player, row * (COLUMNS - 1) + column);
+        } else if (slot === KEEP_OPEN_SLOT) {
+            this.toggleKeepOpen(player);
         }
     }
 
@@ -143,7 +174,7 @@ export class HybridBuildPanel {
         this.setVisible(player, true);
     }
 
-    /** Closes the panel and leaves build mode; used by the cancel button, escape and after a build. */
+    /** Closes the panel and leaves build mode; used by the cancel button, escape and after a build (built). */
     public close(player: Defender): void {
         this.openFor[player.id] = false;
         player.stopBuilding();
@@ -151,14 +182,29 @@ export class HybridBuildPanel {
     }
 
     /**
-     * Enters build mode for a tier and closes the menu; build mode carries on until the tower
-     * is placed (shift keeps placing) or Escape ends it. B reopens the menu to switch tower.
+     * A tower was placed without shift (Defender keeps build mode for a shift-placement): build
+     * mode ends, and the menu closes unless it is kept open.
+     */
+    public built(player: Defender): void {
+        if (this.keepOpen[player.id] === true) {
+            player.stopBuilding();
+        } else {
+            this.close(player);
+        }
+    }
+
+    /**
+     * Enters build mode for a tier and closes the menu, unless it is kept open; build mode
+     * carries on until the tower is placed (shift keeps placing) or Escape ends it. B reopens
+     * the menu to switch tower, or with the menu kept open, another tower's button or key.
      */
     private pick(player: Defender, tier: number): void {
         if (this.openFor[player.id] && player.hybridTowers[tier]) {
             player.startBuilding(tier);
-            this.openFor[player.id] = false;
-            this.setVisible(player, false);
+            if (this.keepOpen[player.id] !== true) {
+                this.openFor[player.id] = false;
+                this.setVisible(player, false);
+            }
         }
     }
 
