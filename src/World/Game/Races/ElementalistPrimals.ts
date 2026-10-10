@@ -70,8 +70,8 @@ export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LIC
     const roles: {[id: string]: string} = {
         'n026': 'Gains 5 damage every wave. Its upgrade (60 gold) makes it Undead Level 2, which keeps what '
             + 'it gained, gains 15 a wave and Attunement, and fused with a Death Rune Level 3 (250 gold) becomes the Lich.',
-        'u01D': 'Gains 1 mana every wave; at 5 mana it can Awaken (250 gold) into a Phoenix Egg, the '
-            + 'Humans\' tower that burns enemies near it and upgrades into a Juvenile Phoenix.',
+        'u01D': 'Gains 1 mana every wave. Awaken turns it into a Phoenix Egg, the Humans\' tower that burns '
+            + 'enemies near it and upgrades into a Juvenile Phoenix: free at 5 mana, or 250 gold to skip the wait.',
         'u01F': 'Its mana counts the waves: after three it rises into High Tide for one wave, '
             + 'then ebbs back to Low Tide.',
         'u029': 'Low Tide risen, for one wave: it ebbs back to Low Tide when the wave ends.',

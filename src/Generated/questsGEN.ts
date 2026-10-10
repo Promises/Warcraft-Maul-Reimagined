@@ -11,6 +11,12 @@ interface Quest {
 
 export const Quests: Quest[] = [
     {
+        title: `5.0.0 - 12`,
+        icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
+        stype: 0,
+        body: `Updates:\n- Dormant Phoenix Egg: Awaken is free once the egg has 5 mana (it gains 1 a wave); before that, 250 gold skips the wait. Its button shows the price`,
+    },
+    {
         title: `5.0.0 - 11`,
         icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
         stype: 0,
