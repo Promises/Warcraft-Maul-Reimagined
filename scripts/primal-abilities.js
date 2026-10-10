@@ -11,8 +11,10 @@
  * reads the flag first.
  *
  * Each is a Channel (ANcl) with no target and an order of its own - two abilities of one base
- * order on a unit could not both be cast - modelled on Open Lootbox (A0EX). Called from a
- * compiletime block (ElementalistPrimals.ts), after the build has copied the map to dist.
+ * order on a unit could not both be cast - modelled on Open Lootbox (A0EX); or, marked passive, an
+ * Evasion (AEev) with no chance to evade, as the map's own info passives (Homesick, Spiked Trap)
+ * are: shown in the command card as a passive, nothing to click. Called from a compiletime block
+ * (ElementalistPrimals.ts), after the build has copied the map to dist.
  */
 const fs = require('fs');
 const path = require('path');
@@ -21,6 +23,8 @@ const Modification = require('mdx-m3-viewer-th/dist/cjs/parsers/w3x/w3u/modifica
 const BinaryStream = require('mdx-m3-viewer-th/dist/cjs/common/binarystream').default;
 
 const TEMPLATE = 'A0EX';
+// An info passive's base: Evasion, its chance set to nothing
+const PASSIVE_BASE = 'AEev';
 const INT = 0, UNREAL = 2, STRING = 3;
 
 function idInt(id) {
@@ -38,8 +42,8 @@ function modification(id, variableType, level, dataPointer, value, owner) {
     return m;
 }
 
-function object(template, newId, modifications) {
-    return {oldId: template.oldId, newId, modifications};
+function object(template, ability, modifications) {
+    return {oldId: ability.passive ? PASSIVE_BASE : template.oldId, newId: ability.id, modifications};
 }
 
 /** An object as the game reads it (version 3: one set, flag 0): ids, set count, flag, field count, fields. */
@@ -58,9 +62,16 @@ function objectBytes(o) {
     return Buffer.concat([header].concat(fields));
 }
 
-/** The game data: order, cooldown and the rest, level 1 only. */
+/** The game data: order, cooldown and the rest, level 1 only; for a passive, no chance to evade. */
 function data(ability) {
     const id = ability.id;
+    if (ability.passive) {
+        return [
+            modification('aher', INT, 0, 0, 0, id),
+            modification('alev', INT, 0, 0, 1, id),
+            modification('Eev1', UNREAL, 1, 1, 0, id),
+        ];
+    }
     return [
         modification('aher', INT, 0, 0, 0, id),
         modification('alev', INT, 0, 0, 1, id),
@@ -75,7 +86,7 @@ function data(ability) {
     ];
 }
 
-/** The skin: name, tooltips, icon, hotkey, button. */
+/** The skin: name, tooltips, icon, hotkey (none for a passive), button. */
 function skin(ability) {
     const id = ability.id;
     return [
@@ -83,10 +94,10 @@ function skin(ability) {
         modification('atp1', STRING, 1, 0, ability.tooltip, id),
         modification('aub1', STRING, 1, 0, ability.extended, id),
         modification('aart', STRING, 0, 0, ability.icon, id),
-        modification('ahky', STRING, 0, 0, ability.hotkey, id),
+    ].concat(ability.passive ? [] : [modification('ahky', STRING, 0, 0, ability.hotkey, id)]).concat([
         modification('abpx', INT, 0, 0, ability.x, id),
         modification('abpy', INT, 0, 0, ability.y, id),
-    ];
+    ]);
 }
 
 /** Appends the abilities' entries to one built ability file, leaving the rest of it as it was. */
@@ -111,12 +122,13 @@ function append(file, build) {
     fs.writeFileSync(file, out);
 }
 
-/** Adds the abilities to the built map in dist. abilities: [{id, order, name, tooltip, extended, icon, hotkey, x, y}] */
+/** Adds the abilities to the built map in dist. abilities: [{id, order, name, tooltip, extended, icon, hotkey, x, y}],
+ * or [{id, passive: true, name, tooltip, extended, icon, x, y}] */
 function addPrimalAbilities(abilities) {
     const config = JSON.parse(fs.readFileSync(path.resolve('config.json'), 'utf8'));
     const map = path.resolve('dist', config.mapFolder);
-    append(path.join(map, 'war3map.w3a'), template => abilities.map(a => object(template, a.id, data(a))));
-    append(path.join(map, 'war3mapSkin.w3a'), template => abilities.map(a => object(template, a.id, skin(a))));
+    append(path.join(map, 'war3map.w3a'), template => abilities.map(a => object(template, a, data(a))));
+    append(path.join(map, 'war3mapSkin.w3a'), template => abilities.map(a => object(template, a, skin(a))));
 }
 
 module.exports = {addPrimalAbilities, append, idInt, objectBytes};

@@ -38,11 +38,11 @@ export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LIC
         },
         {
             // A Primal's and an Ascended's own account of itself: AttunedTower writes each tower's
-            // tooltip (what it does, and what it has gained) as it grows; clicking it does nothing.
-            // The spell book on every tower, so it never looks like Ascend (the Firelord's own icon did)
-            id: 'AP04', order: 'spiritlink', name: '[Elementalists] Power', tooltip: 'Power',
+            // tooltip (what it does, and what it has gained) as it grows. A passive, so it reads as
+            // information and is never taken for Ascend (as the Firelord's own icon on a button was)
+            id: 'AP04', passive: true, name: '[Elementalists] Power', tooltip: 'Power',
             extended: 'What this tower does, and what it has gained.',
-            icon: 'ReplaceableTextures\\CommandButtons\\BTNSpellBookBLS.blp', hotkey: 'Q', x: 0, y: 0,
+            icon: 'ReplaceableTextures\\PassiveButtons\\PASBTNCommand.blp', x: 0, y: 0,
         },
     ]);
 
