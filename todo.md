@@ -8,11 +8,16 @@
 
 ## Features
 - [ ] Race guides in the picker's information pane (src/World/Game/Races/RaceGuides.ts, by item id):
-  written for the three random picks, Human Town Hall and the Elementalists; every other race
-  still shows only its tier. About 19 lines of 40 characters fit; test_race_guides (wc3-slop-lan
+  written for the three random picks, every Beginner race and the Elementalists, from the
+  object data and the tower classes only (never a tooltip, no play advice: the how-to-play part is
+  left to people who play the race); Intermediate and Advanced races still show only their tier. About 19 lines of 40 characters fit; test_race_guides (wc3-slop-lan
   measure.py) takes a screenshot of each guide. A race guide (how to play each race) is planned
   after. Open question: a second Hybrid Random pays +50 gold again (RacePicking.ts gives it on
   every hybrid pick, for a lumber) - intended? (2026-10-10)
+- [ ] The Black Beast of Arrrghhh (Caerbannog, n05E): its second aura, A081 (an Unholy Aura on
+  enemies within 1,000), has Uau1 +0.15 - it makes creeps 15% faster, where the race's other
+  Unholy Auras slow (Knights Who Say Ni! -0.25, Roots -0.20). A typo for -0.15? Its tooltip may
+  say; left out of the guide until settled (2026-10-10).
 - [ ] Randomised waypoints on extreme difficulty. Each lane's two in-area checkpoints move by a random offset, so the maze cannot be copied from memory. Inspected in game with the debug commands `-wptest [n]` (marker tiles at random spots in the red lane) and `-hidewp` (hide and restore the real two); the tile is Cityscape white marble `Ywmb` on Icecrown rough dirt `Idtr`, one 128 tile per waypoint, 26 in the map.
 
   What it includes:
