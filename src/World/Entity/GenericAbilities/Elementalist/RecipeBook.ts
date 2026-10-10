@@ -4,7 +4,7 @@ import {SavePart} from '../../../Game/Saves';
 import {BitReader, BitWriter} from '../../../../lib/Save/Bits';
 import {SyncTrace} from '../../../../lib/SyncTrace';
 import {
-    BOOK_ICONS, HABOOB, HEART_OF_LIFE, INFERNO, LICH, THUNDERHEAD, WORLD_TREE,
+    BOOK_ICONS, BOOK_TEXTS, HABOOB, HEART_OF_LIFE, INFERNO, LICH, THUNDERHEAD, WORLD_TREE,
 } from '../../../Game/Races/ElementalistPrimals';
 import {BookView, LedgerRow, RecipeBookPanel, SLOT_TEXTURES, SlotContent} from '../../../Game/Ui/RecipeBookPanel';
 import {primalOffer, readBook, writeBook} from './RecipeRules';
@@ -328,6 +328,9 @@ export class RecipeBook implements SavePart {
             };
         }
         const lines = [colour(DIM, 'First fusion'), `${pair}, ${colour(GOLD, 'free')}`];
+        if (BOOK_TEXTS[result] !== undefined) {
+            lines.push(BOOK_TEXTS[result]);
+        }
         for (const recipe of this.settings().GetPrimalRecipes()) {
             if (recipe.from.indexOf(result) !== -1) {
                 lines.push(book.known.has(recipe.result)

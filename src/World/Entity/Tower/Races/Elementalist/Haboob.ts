@@ -15,6 +15,9 @@ function tuneMultishot(unit: Unit): void {
     if (ability) {
         BlzSetAbilityIntegerLevelField(ability, ABILITY_ILF_MAXIMUM_NUMBER_OF_TARGETS_EFK3, 0, EXTRA_TARGETS);
         BlzSetAbilityRealLevelField(ability, ABILITY_RLF_AREA_OF_EFFECT, 0, AREA);
+        // Its tooltip is the Sandstorm's (7, in the string table) but for this tower
+        BlzSetAbilityStringLevelField(ability, ABILITY_SLF_TOOLTIP_NORMAL_EXTENDED, 0,
+            `This tower can hit ${EXTRA_TARGETS + 2} enemies in one attack`);
     }
 }
 

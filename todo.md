@@ -21,6 +21,35 @@
   (static readonly) turns it on. With it on, picking a tower and placing it leave the menu open
   for the next pick; test_hybrid_build_menu (wc3-slop-lan measure.py) checks either setting. Its
   changelog line goes in once it is turned on (2026-10-10).
+- Player feedback on the Elementalists, Beta 5.0.0 (2026-10-10):
+  - [x] Towers sold for more than they cost (an Undead from two 8-gold runes sold for 29 and 39):
+    Tower.Upgrade added the new type's gold cost on free changes. Now what was paid
+    (test_elementalist_fusion_sells_for_what_it_cost, races.py).
+  - [x] Plague, Low/High Tide, the Dormant Phoenix Egg, Sapling, Tree, Moss, Fully Grown Moss, the
+    Undead, the Corrupted Tree and the Depleted Rock had the editor's placeholder tooltip or none:
+    now what each does (from its class and abilities) and its attack line from its data, also in
+    the recipe book's cell (a standing tower's tooltip is never shown).
+  - [x] The Corrupted Tree's selection circle (3.25, the base unit's): 2.5.
+  - [x] Primals and Ascended showed their ingredient's portrait (the Lich a ghoul, the Endless Storm a
+    Storm Altar) and kept Siphon Energy; the rock had a ghoul icon. Fixed.
+  - [x] Multishot (A0E4) said 5 targets: 7 in the string table (Sandstorm), 8 per tower for the
+    Haboob and Endless Storm (Haboob.ts).
+  - [x] "My Primal did nothing": every Primal attacks a ground wave but the Thunderhead, which attacks
+    air only (its tooltip says so) - test_primals_attack_a_wave. Most likely what was seen.
+  - [ ] Moss, the Sapling, Decay Level 2 and the Depleted Rock cannot be sold (no A02D). Intended
+    for the rock, Moss and Sapling? Decay Level 2 looks like an oversight.
+  - [ ] "A free Surge sometimes": no path in the code gives one (Surge always takes 60); Attunement
+    also rises 1 a wave by itself, but is shown nowhere. Ask what was seen; maybe show Attunement.
+  - [ ] Plague's portrait keeps changing: its Rat model in the portrait. Cosmetic, left as it is.
+  - [ ] Placeholder tooltips still on Purgatory, Decay, Tornado, Sandstorm, Wildfire, Bubbles, Mist,
+    Blaze and the Level 2 Life, Air Runes (Nature, Fire, Water L2 and the Life Rune have none).
+  - Wildfire: 16 gold for 42 dps, 50 more for Level 2 at 88 dps (a balance note, not a bug).
+- [x] Autocast abilities on as a tower is set up (Autocast.ts, scripts/autocast.js, from the map's
+  data): Parasitic Bite, Bloodlust, Inner Fire, Raise Dead, Cold Arrows (test_autocast_on_from_the_start).
+- [ ] The Bronze Dragon Whelp, Drake and Dragon never cast their Slow (A0DA): their class orders
+  'slow' on each attack, and in a test the Whelp attacked 28 times in 20 s with 0 casts, while a
+  Slow ordered from Lua cast at once. Its autocast cannot be switched on (the game refuses slowon
+  for ACsw). Cause not found yet (2026-10-10).
 - [ ] Randomised waypoints on extreme difficulty. Each lane's two in-area checkpoints move by a random offset, so the maze cannot be copied from memory. Inspected in game with the debug commands `-wptest [n]` (marker tiles at random spots in the red lane) and `-hidewp` (hide and restore the real two); the tile is Cityscape white marble `Ywmb` on Icecrown rough dirt `Idtr`, one 128 tile per waypoint, 26 in the map.
 
   What it includes:

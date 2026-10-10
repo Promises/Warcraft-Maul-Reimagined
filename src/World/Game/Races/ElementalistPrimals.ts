@@ -14,7 +14,7 @@ export const RECHARGE_PRICE = 8;
  * Ascend and Surge to the Primals.
  */
 export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LICH_KING, EYE_OF_THE_STORM, ENDLESS_STORM,
-    AVATAR_OF_LIFE, NORDRASSIL, FIRELORD, PRIMAL_INGREDIENTS, BOOK_ICONS} = compiletime(({objectData}) => {
+    AVATAR_OF_LIFE, NORDRASSIL, FIRELORD, PRIMAL_INGREDIENTS, BOOK_ICONS, BOOK_TEXTS} = compiletime(({objectData}) => {
     // Ascend and Surge: the ids are the ASCEND and SURGE above (compiletime code cannot see them)
     require(require('path').resolve('scripts/primal-abilities.js')).addPrimalAbilities([
         {
@@ -47,6 +47,59 @@ export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LIC
     // Bubbles' icon: BTNBubbles by Golden-Drake (hiveworkshop.com/threads/btnbubbles.173114), re-encoded
     // because the original's mip table points its small levels at one 32x32 image
     objectData.units.get('u026')!.iconGameInterface = 'ReplaceableTextures\\CommandButtons\\BTNBubbles.blp';
+
+    // Tooltips for the towers that had the World Editor's placeholder ("Primary defensive structure")
+    // or none: what each does, from its tower class and abilities, and its attack line from its own
+    // object data, so the numbers cannot drift from what the game uses
+    const attackLine = (unit: Unit): string => {
+        if (!unit.attacksEnabled) {
+            return 'No attack.';
+        }
+        const kind = String(unit.attack1AttackType ?? 'normal');
+        const base = Number(unit.attack1DamageBase ?? 0) + Number(unit.attack1DamageNumberOfDice ?? 1);
+        const top = Number(unit.attack1DamageBase ?? 0) + Number(unit.attack1DamageNumberOfDice ?? 1) * Number(unit.attack1DamageSidesPerDie ?? 1);
+        const targets = String(unit.attack1TargetsAllowed ?? '').split(',');
+        const reach = targets.indexOf('air') !== -1 && targets.indexOf('ground') !== -1 ? 'air and ground'
+            : targets.indexOf('air') !== -1 ? 'air only' : 'ground only';
+        const range = Number(unit.attack1Range ?? 0) <= 128 ? 'melee' : `range ${unit.attack1Range}`;
+        const splash = Number(unit.attack1AreaOfEffectFullDamage ?? 0) > 0 && String(unit.attack1WeaponType) === 'msplash'
+            ? `, splash ${unit.attack1AreaOfEffectFullDamage}` : '';
+        return `Attack: ${kind.charAt(0).toUpperCase()}${kind.slice(1)}, ${base === top ? base : `${base}-${top}`} damage `
+            + `every ${Number(unit.attack1CooldownTime).toFixed(2)} s, ${range}, ${reach}${splash}.`;
+    };
+    const roles: {[id: string]: string} = {
+        'n026': 'Gains 5 damage every wave. Its upgrade (60 gold) makes it Undead Level 2, which keeps what '
+            + 'it gained, gains 15 a wave and Attunement, and fused with a Death Rune Level 3 (250 gold) becomes the Lich.',
+        'u01D': 'Gains 1 mana every wave; at 5 mana it can Awaken (250 gold) into a Phoenix Egg, the '
+            + 'Humans\' tower that burns enemies near it and upgrades into a Juvenile Phoenix.',
+        'u01F': 'Its mana counts the waves: after three it rises into High Tide for one wave, '
+            + 'then ebbs back to Low Tide.',
+        'u029': 'Low Tide risen, for one wave: it ebbs back to Low Tide when the wave ends.',
+        'u020': 'When a creep dies in its lane, the creeps within 300 of it catch the plague: 50 '
+            + 'damage a second for 5 seconds.',
+        'u021': 'Gains 1 mana every wave and grows into a Tree after its sixth. Cannot be sold.',
+        'u036': 'A grown Sapling. Fused with a Nature Rune Level 3 (400 gold) it becomes the World Tree, a Primal.',
+        'u023': 'Drinks a Water Rune (Level 1), which turns to rock, and gains 1 mana: the tenth '
+            + 'it drinks makes it Fully Grown Moss. Cannot be sold.',
+        'u037': 'Moss that has drunk ten Water Runes.',
+        'n030': 'Its hits poison: 6 damage a second for 2 seconds.',
+        'n027': 'What is left of a siphoned rune. Recharge (8 gold) makes it an Uncharged Rune again. Cannot be sold.',
+    };
+    // The two Runes a first fusion is made of, for its own tooltip (the book's cell shows them already)
+    const recipes: {[id: string]: string} = {
+        'n026': 'Life + Death', 'u01D': 'Life + Fire', 'u01F': 'Life + Water', 'u020': 'Death + Air',
+        'u021': 'Life + Nature', 'u023': 'Nature + Water', 'n030': 'Water + Death',
+    };
+    // A tower's own tooltip is not shown once it stands (only in a build menu), so the recipe book
+    // shows the same text in its cell
+    const bookTexts: {[id: string]: string} = {};
+    for (const id of Object.keys(roles)) {
+        const unit = objectData.units.get(id)!;
+        bookTexts[id] = `${roles[id]}|n${attackLine(unit)}`;
+        unit.tooltipExtended = `${recipes[id] ? `${recipes[id]}. ` : ''}${roles[id]}|n|n${attackLine(unit)}`;
+    }
+    // The Corrupted Tree's selection circle was the base unit's 3.25, far wider than the others'
+    objectData.units.get('n030')!.selectionScale = 2.5;
 
     // Undead L2 and Death Rune L3: the Lich; Air Rune L3 and Water Rune L3: Thunderhead; Sandstorm L2
     // and Air Rune L3: Haboob; two Life Rune L3: Heart of Life; Tree and Nature Rune L3: World Tree;
@@ -229,6 +282,17 @@ export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LIC
     firelord.iconGameInterface = 'ReplaceableTextures\\CommandButtons\\BTNHeroAvatarOfFlame.blp';
     firelord.scalingValueundefined = 1.0;
 
+    // The Primals and the Ascended are copies of the towers they come from: each shows its own model
+    // in the portrait (not its ingredient's: the Lich showed a ghoul), and none keeps Siphon Energy,
+    // which they had from their ingredients but no fusion uses
+    for (const unit of [lich, thunderhead, haboob, heart, worldTree, inferno, lichKing, eye, endlessStorm, avatar,
+        nordrassil, firelord]) {
+        unit.portraitModelFile = unit.modelFile;
+        unit.normal = String(unit.normal ?? '').split(',').filter(id => id !== 'A0CT').join(',');
+    }
+    // The Depleted Rock had its base unit's ghoul icon: the Uncharged Rune's, greyed out
+    objectData.units.get('n027')!.iconGameInterface = 'ReplaceableTextures\\CommandButtonsDisabled\\DISBTNMoonStone.blp';
+
     // The icon of every tower the recipe book shows: the Runes, the first fusions, the Primals and
     // the Ascended (the game has no native that gives a unit type's icon)
     const bookIcons: {[id: string]: string} = {};
@@ -248,7 +312,8 @@ export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LIC
     return {LICH: lich.newId, THUNDERHEAD: thunderhead.newId, HABOOB: haboob.newId, HEART_OF_LIFE: heart.newId,
         WORLD_TREE: worldTree.newId, INFERNO: inferno.newId, LICH_KING: lichKing.newId, EYE_OF_THE_STORM: eye.newId,
         ENDLESS_STORM: endlessStorm.newId, AVATAR_OF_LIFE: avatar.newId, NORDRASSIL: nordrassil.newId,
-        FIRELORD: firelord.newId, PRIMAL_INGREDIENTS: ingredients, BOOK_ICONS: bookIcons};
+        FIRELORD: firelord.newId, PRIMAL_INGREDIENTS: ingredients, BOOK_ICONS: bookIcons, BOOK_TEXTS: bookTexts};
 }) as {LICH: string, THUNDERHEAD: string, HABOOB: string, HEART_OF_LIFE: string, WORLD_TREE: string, INFERNO: string,
     LICH_KING: string, EYE_OF_THE_STORM: string, ENDLESS_STORM: string, AVATAR_OF_LIFE: string, NORDRASSIL: string,
-    FIRELORD: string, PRIMAL_INGREDIENTS: string[], BOOK_ICONS: {[id: string]: string}};
+    FIRELORD: string, PRIMAL_INGREDIENTS: string[], BOOK_ICONS: {[id: string]: string},
+    BOOK_TEXTS: {[id: string]: string}};

@@ -163,7 +163,7 @@ Multi-Attack
 STRING 27
 // Abilities: A0E4 (Multi-Attack), Ubertip (Tooltip - Normal - Extended)
 {
-This tower can hit 5 enemies in one attack
+This tower can hit 7 enemies in one attack
 }
 
 STRING 28

@@ -11,10 +11,16 @@ interface Quest {
 
 export const Quests: Quest[] = [
     {
+        title: `5.0.0 - 11`,
+        icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
+        stype: 0,
+        body: `Updates:\n- Fixed: Elementalist towers sold for more than they cost (taking an element or fusing added gold that was never paid); Surge's gold now counts when a Primal is sold\n- Elementalist: Plague, Low and High Tide, the Dormant Phoenix Egg, the Sapling and Tree, Moss, the Undead, the Corrupted Tree and the Depleted Rock say what they do (their mana counts waves or drinks), in their tooltips and in the recipe book\n- The Corrupted Tree's selection circle is the size of the other towers'\n- The Primals and Ascended show their own portrait (the Lich showed a ghoul), and no longer have a Siphon Energy button that did nothing; the Depleted Rock has a rock icon\n- Fixed: Sandstorm's, the Haboob's and the Endless Storm's multishot said 5 targets; it hits 7 (Sandstorm) and 8\n- Autocast abilities are on as a tower is built (Parasitic Bite, Bloodlust, Inner Fire, Raise Dead, Cold Arrows)`,
+    },
+    {
         title: `5.0.0 - 10`,
         icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
         stype: 0,
-        body: `Updates:\n- Damage Engine 5.A by Bribe, in runi95's TypeScript port, now runs the map's damage (it ran 5.3)\n- Fixed: the Undead Acolyte, Night Elf Wisp, Cavern Turtle and Cavern Revenant skipped their on-hit effects early in a game, until some tower first hit several units with one attack\n- The race picker explains the random picks (Hybrid Random's +50 gold too) and has a guide for every Beginner race and the Elementalists\n- The scoreboard folds away while the race picker is open, so it no longer covers the race's description\n- Hybrid Random: the build menu sits on the right, above the command card\n- Fixed: Elementalist towers sold for more than they cost (taking an element or fusing added gold that was never paid); Surge's gold now counts when a Primal is sold`,
+        body: `Updates:\n- Damage Engine 5.A by Bribe, in runi95's TypeScript port, now runs the map's damage (it ran 5.3)\n- Fixed: the Undead Acolyte, Night Elf Wisp, Cavern Turtle and Cavern Revenant skipped their on-hit effects early in a game, until some tower first hit several units with one attack\n- The race picker explains the random picks (Hybrid Random's +50 gold too) and has a guide for every Beginner race and the Elementalists\n- The scoreboard folds away while the race picker is open, so it no longer covers the race's description\n- Hybrid Random: the build menu sits on the right, above the command card`,
     },
     {
         title: `5.0.0 - 9`,
