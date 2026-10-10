@@ -14,6 +14,8 @@ export interface IProjectConfig {
   launchArgs: string[];
   winePath?: string;
   winePrefix?: string;
+  /** Launch the archive `npm run build` wrote (outputFolder/mapFolder) instead of compiling first */
+  launchBuiltMap?: boolean;
 }
 
 /**

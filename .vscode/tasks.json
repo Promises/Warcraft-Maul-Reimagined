@@ -8,8 +8,7 @@
             "type": "shell",
             "command": "npm",
             "args": [
-                "run",
-                "test"
+                "start"
             ],
             "options": {
                 "cwd": "${workspaceRoot}"
