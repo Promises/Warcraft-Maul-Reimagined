@@ -5,7 +5,7 @@ export class Sapling extends Tower implements EndOfRoundTower {
 
     public EndOfRoundAction(): void {
         if (this.unit.mana === 5) {
-            this.Upgrade(FourCC('u036'));
+            this.Upgrade(FourCC('u036'), 0);
         } else {
             this.unit.mana += 1.00;
         }

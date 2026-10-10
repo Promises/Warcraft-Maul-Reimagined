@@ -22,7 +22,7 @@ export class AwakenDormantPheonixEgg extends GenericAbility implements AbilityOn
         if (owner) {
             const tower: Tower | undefined = owner.GetTower(triggerUnit.id);
             if (tower) {
-                tower.Upgrade(FourCC('h006'));
+                tower.Upgrade(FourCC('h006'), this.goldCost(triggerUnit.handle));
             }
         }
     }

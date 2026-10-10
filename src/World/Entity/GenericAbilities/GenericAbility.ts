@@ -18,6 +18,14 @@ export class GenericAbility {
     }
 
 
+    /**
+     * The gold the game takes for casting this ability (a Reveal-based ability's own gold cost,
+     * paid as the cast starts): what a tower it changes was paid.
+     */
+    protected goldCost(caster: unit): number {
+        return BlzGetAbilityIntegerLevelField(BlzGetUnitAbility(caster, this.abilityId)!, ABILITY_ILF_GOLD_COST_NDT1, 0);
+    }
+
     public Condition(): boolean{
         return GetSpellAbilityId() === this.abilityId;
     }

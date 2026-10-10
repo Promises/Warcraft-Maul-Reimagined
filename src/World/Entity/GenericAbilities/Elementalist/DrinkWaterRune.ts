@@ -28,14 +28,14 @@ export class DrinkWaterRune extends GenericAbility implements AbilityOnEffectTar
                 const mana: number = tower.unit.mana;
 
                 if (target.GetTypeID() === FourCC('n01R')) {
-                    target.Upgrade(FourCC('n027'));
+                    target.Upgrade(FourCC('n027'), 0);
 
                     if (mana > 8) {
                         let newId: number = FourCC('u037');
                         if (Util.RandomInt(1000, 2000) === 1337) {
                             newId = FourCC('h03G');
                         }
-                        tower.Upgrade(newId);
+                        tower.Upgrade(newId, 0);
                     } else {
                         tower.unit.mana += 1.00;
                     }

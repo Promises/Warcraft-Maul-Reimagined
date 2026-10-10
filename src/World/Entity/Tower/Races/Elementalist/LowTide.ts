@@ -5,7 +5,7 @@ export class LowTide extends Tower implements EndOfRoundTower {
 
     public EndOfRoundAction(): void {
         if (this.unit.mana === 2) {
-            this.Upgrade(FourCC('u029'));
+            this.Upgrade(FourCC('u029'), 0);
         } else {
             this.unit.mana += 1.00;
         }

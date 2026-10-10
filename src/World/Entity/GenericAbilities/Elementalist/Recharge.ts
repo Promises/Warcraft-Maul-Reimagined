@@ -35,7 +35,7 @@ export class Recharge extends GenericAbility implements AbilityOnCastTargetsUnit
             return;
         }
         owner.giveGold(-RECHARGE_PRICE);
-        const rune = tower.Upgrade(UNCHARGED_RUNE);
+        const rune = tower.Upgrade(UNCHARGED_RUNE, RECHARGE_PRICE);
         SyncTrace.note('recharge', `p${owner.id} recharged id=${SyncTrace.unit(rune.unit)}`);
     }
 

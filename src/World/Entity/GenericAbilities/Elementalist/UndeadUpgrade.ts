@@ -21,7 +21,7 @@ export class UndeadUpgrade extends GenericAbility implements AbilityOnEffectTarg
         if (owner) {
             const tower: Tower | undefined = owner.GetTower(triggerUnit.id);
             if (tower) {
-                tower.Upgrade(FourCC('u038'));
+                tower.Upgrade(FourCC('u038'), this.goldCost(triggerUnit.handle));
             }
         }
     }

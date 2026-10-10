@@ -34,7 +34,7 @@ export class Ascend extends GenericAbility implements AbilityOnCastTargetsUnit, 
         }
         owner.giveGold(-fee);
         const primal = DecodeFourCC(tower.GetTypeID());
-        const made = tower.Upgrade(FourCC(ascended));
+        const made = tower.Upgrade(FourCC(ascended), fee);
         SyncTrace.note('ascend', `p${owner.id} made ${ascended} fee=${fee} damage=${made.unit.getBaseDamage(0)}`);
         // Lit in the player's recipe book from now on, in this game and the next
         this.game.recipeBook.markAscended(owner, primal);

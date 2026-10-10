@@ -87,9 +87,9 @@ export class SiphonEnergy extends GenericAbility implements AbilityOnEffectTarge
         // The fusion takes what both ingredients grew: the caster's through Upgrade, the target's here,
         // before the target turns to rock
         const targetCarried = target.carry();
-        const fused = source.Upgrade(FourCC(combination));
+        const fused = source.Upgrade(FourCC(combination), fee);
         fused.receive(targetCarried);
-        target.Upgrade(FourCC('n027'));
+        target.Upgrade(FourCC('n027'), 0);
         SyncTrace.note('siphon', `p${owner.id} made ${combination} fee=${fee} damage=${fused.unit.getBaseDamage(0)}`);
         this.game.recipeBook.discover(owner, combination);
         if (fee > 0 && !this.announced.has(combination)) {

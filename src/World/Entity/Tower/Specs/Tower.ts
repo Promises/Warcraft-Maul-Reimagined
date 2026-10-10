@@ -99,12 +99,22 @@ export class Tower {
         this._leaverOwned = value;
     }
 
-    public Upgrade(newTypeId: number): Tower {
+    /**
+     * Becomes another tower type, keeping what this one was worth. The new type's gold cost is
+     * added to that, as for an upgrade bought in the command card; a change that costs something
+     * else - nothing (an Elementalist fusion, a tower that grows) or a fee - gives what was paid,
+     * or a free change would sell for gold that was never spent.
+     */
+    public Upgrade(newTypeId: number, paid?: number): Tower {
         // Taken before the unit is replaced: ReplaceUnit resets the unit's damage to its new type's
         const carried = this.carry();
         this.Sell();
         const u = ReplaceUnit(this.unit, newTypeId)!;
         const newTower: Tower = this.game.worldMap.towerConstruction.SetupTower(u, this.owner);
+        if (paid !== undefined) {
+            newTower._towerValue = paid;
+            newTower._fullRefundValue = paid;
+        }
         newTower._towerValue += this._towerValue;
         newTower._fullRefundValue += this.refundableValue;
         newTower.receive(carried);
@@ -270,6 +280,12 @@ export class Tower {
     /** Gold spent on this tower in the build phase that is still running; 0 once a wave has started. */
     public get refundableValue(): number {
         return this._fullRefundPhase === this._game.buildPhase ? this._fullRefundValue : 0;
+    }
+
+    /** Gold paid into this tower without it changing type (Surge): part of what it sells for. */
+    public AddPaidValue(gold: number): void {
+        this._towerValue += gold;
+        this._fullRefundValue += gold;
     }
 
     /** Carries still-refundable gold onto this tower: an upgrade keeps what its predecessor cost. */

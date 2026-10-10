@@ -33,6 +33,7 @@ export class Surge extends GenericAbility implements AbilityOnCastTargetsUnit, A
             return;
         }
         owner.giveGold(-SURGE_PRICE);
+        tower.AddPaidValue(SURGE_PRICE);
         tower.surge();
         SyncTrace.note('surge', `p${owner.id} attunement=${tower.attunement} surged=${tower.surged}`);
     }

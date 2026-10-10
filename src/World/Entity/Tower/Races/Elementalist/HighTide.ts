@@ -5,7 +5,7 @@ export class HighTide extends Tower implements EndOfRoundTower {
 
 
     public EndOfRoundAction(): void {
-        this.Upgrade(FourCC('u01F'));
+        this.Upgrade(FourCC('u01F'), 0);
     }
 
 }
