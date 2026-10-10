@@ -282,6 +282,12 @@ export class Tower {
         return this._fullRefundPhase === this._game.buildPhase ? this._fullRefundValue : 0;
     }
 
+    /** What this tower sells for from now on, whatever it was worth before (a recharged rock). */
+    public ResetValue(gold: number): void {
+        this._towerValue = gold;
+        this._fullRefundValue = gold;
+    }
+
     /** Gold paid into this tower without it changing type (Surge): part of what it sells for. */
     public AddPaidValue(gold: number): void {
         this._towerValue += gold;
