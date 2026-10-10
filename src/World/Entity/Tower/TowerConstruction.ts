@@ -11,7 +11,7 @@ import {RaceTowers} from './Races/RaceTowers';
 import {InitialiseAllRaceTowers} from './Races/RaceInitialiser';
 import {Trigger, Unit} from "w3ts";
 import {COLOUR, DecodeFourCC, ReplaceUnit} from "../../../lib/translators";
-import {switchOnAutocast} from "./Autocast";
+import {switchOnAutocast, switchOnAutocastForSpawns} from "./Autocast";
 import {DummyTowersMap} from "../../Game/Races/HybridRandom";
 import {Walkable} from "../../Antiblock/Maze";
 import {SyncTrace} from '../../../lib/SyncTrace';
@@ -49,6 +49,7 @@ export class TowerConstruction {
         this.game = game;
         this._towerTypes = InitialiseAllRaceTowers();
         this.lootBoxerHander = new LootBoxerHandler(this, game);
+        switchOnAutocastForSpawns();
         this.towerStartConstructTrigger = Trigger.create();
         this.towerStartConstructTrigger.registerAnyUnitEvent(EVENT_PLAYER_UNIT_CONSTRUCT_START);
         this.towerStartConstructTrigger.addAction(() => this.ConstructionStarted());
