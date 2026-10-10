@@ -7,6 +7,12 @@
 - [x] Range check mode (`-range` / action bar button): a toggle (action bar button and/or chat command, per player, local) that draws the attack range around the currently selected tower while enabled. Selection events already exist per player (`Defender.SelectUnit`); range from `BlzGetUnitWeaponRealField(ATTACK_RANGE)`; render as a local-only image/effect ring like the maze grid.
 
 ## Features
+- [ ] Race guides in the picker's information pane (src/World/Game/Races/RaceGuides.ts, by item id):
+  written for the three random picks, Human Town Hall and the Elementalists; every other race
+  still shows only its tier. About 19 lines of 40 characters fit; test_race_guides (wc3-slop-lan
+  measure.py) takes a screenshot of each guide. A race guide (how to play each race) is planned
+  after. Open question: a second Hybrid Random pays +50 gold again (RacePicking.ts gives it on
+  every hybrid pick, for a lumber) - intended? (2026-10-10)
 - [ ] Randomised waypoints on extreme difficulty. Each lane's two in-area checkpoints move by a random offset, so the maze cannot be copied from memory. Inspected in game with the debug commands `-wptest [n]` (marker tiles at random spots in the red lane) and `-hidewp` (hide and restore the real two); the tile is Cityscape white marble `Ywmb` on Icecrown rough dirt `Idtr`, one 128 tile per waypoint, 26 in the map.
 
   What it includes:

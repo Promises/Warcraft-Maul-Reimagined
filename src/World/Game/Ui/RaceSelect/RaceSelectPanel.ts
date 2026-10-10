@@ -4,6 +4,7 @@ import {trackUiPress} from '../UiPress';
 import {Defender} from '../../../Entity/Players/Defender';
 import {Race} from '../../Races/Race';
 import {RACE_TIERS, RaceItemDef, RaceItems, RaceTier, RANDOM_PICK_ITEMS} from '../../Races/RaceItems';
+import {RACE_GUIDES} from '../../Races/RaceGuides';
 import {IconButton} from '../IconButton';
 import {RaceListRow} from './RaceListRow';
 import {createPanel, createText, createTextButton, onLocalClick} from '../Frames';
@@ -69,6 +70,8 @@ export class RaceSelectPanel {
     private scrollOffset: number = 0;
     private highlightedItem: string | undefined;
     private visibleLocally: boolean = false;
+    // Whether the player had the scoreboard folded when the picker opened
+    private scoreboardWasFolded: boolean = false;
 
     constructor(private readonly game: WarcraftMaul) {
         this.panel = createPanel('raceSelectPanel', PANEL_WIDTH, PANEL_HEIGHT);
@@ -354,7 +357,7 @@ export class RaceSelectPanel {
         this.infoIcon.setTexture(item?.icon ?? '', 0, true);
         this.infoIcon.setVisible(item !== undefined);
         this.infoName.setText(item ? (GetLocalizedString(item.name) ?? item.name) : '');
-        this.infoText.setText(item ? (GetLocalizedString(item.description) ?? item.description) : '');
+        this.infoText.setText(item ? (RACE_GUIDES[item.id] ?? GetLocalizedString(item.description) ?? item.description) : '');
         this.rows.forEach(row => row.setSelected(row.item === itemId));
         this.refreshPickButton();
     }
@@ -364,7 +367,27 @@ export class RaceSelectPanel {
         if (!player.isLocal()) {
             return;
         }
+        if (visible !== this.visibleLocally) {
+            this.foldScoreboard(visible);
+        }
         this.visibleLocally = visible;
         this.panel.setVisible(visible);
+    }
+
+    /**
+     * Local: the scoreboard (top right, taller with every player) covers the information pane, so
+     * it folds up while the picker is open and is left as the player had it when it closes.
+     */
+    private foldScoreboard(open: boolean): void {
+        const board = this.game.scoreBoard?.board;
+        if (board === undefined) {
+            return;
+        }
+        if (open) {
+            this.scoreboardWasFolded = IsMultiboardMinimized(board);
+            MultiboardMinimize(board, true);
+        } else if (!this.scoreboardWasFolded) {
+            MultiboardMinimize(board, false);
+        }
     }
 }
