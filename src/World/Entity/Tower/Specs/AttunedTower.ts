@@ -1,4 +1,5 @@
 import {Carried, Tower} from './Tower';
+import {TowerTooltip} from '../TowerTooltips';
 import {EndOfRoundTower} from './EndOfRoundTower';
 import {SyncTrace} from '../../../../lib/SyncTrace';
 import {DecodeFourCC} from '../../../../lib/translators';
@@ -31,6 +32,8 @@ export class AttunedTower extends Tower implements EndOfRoundTower {
     private waves: number = 0;
     // Levels of Attunement bought with Surge
     public surged: number = 0;
+    // Power's tooltip as it is now (Primals and Ascended)
+    private powerTooltip: TowerTooltip | undefined;
     // The type's own base damage, before any growth
     private baseDamage: number = this.unit.getBaseDamage(0);
 
@@ -80,9 +83,9 @@ export class AttunedTower extends Tower implements EndOfRoundTower {
     }
 
     /**
-     * The Power button's tooltip (Primals and Ascended have one): what the tower does, and what it
-     * has gained - Attunement, Ascended growth, flat damage, Surges - and its power now. Set on this
-     * tower's own ability, so each tower shows its own.
+     * Power's tooltip (Primals and Ascended have it): what the tower does, and what it has gained -
+     * Attunement, Ascended growth, flat damage, Surges - and its power now; shown while it is
+     * selected (TowerTooltips), so each tower shows its own.
      */
     protected refreshPower(): void {
         const power = BlzGetUnitAbility(this.unit.handle, POWER);
@@ -102,10 +105,16 @@ export class AttunedTower extends Tower implements EndOfRoundTower {
         }
         lines.push(this.powerNow());
         const type = DecodeFourCC(this.GetTypeID());
-        BlzSetAbilityStringLevelField(power, ABILITY_SLF_TOOLTIP_NORMAL, 0,
-            `${this.unit.name}: Attunement ${this.attunement} / ${this.cap}`);
-        BlzSetAbilityStringLevelField(power, ABILITY_SLF_TOOLTIP_NORMAL_EXTENDED, 0,
-            `${POWER_TEXTS[type] ?? ''}|n|n${lines.join('|n')}`);
+        this.powerTooltip = {
+            ability: POWER,
+            title: `${this.unit.name}: Attunement ${this.attunement} / ${this.cap}`,
+            text: `${POWER_TEXTS[type] ?? ''}|n|n${lines.join('|n')}`,
+        };
+        this.refreshTooltips();
+    }
+
+    public abilityTooltips(): TowerTooltip[] {
+        return this.powerTooltip ? [this.powerTooltip] : [];
     }
 
     /** What Attunement and Ascended growth make of the tower's power: 1 plus their share of it. */

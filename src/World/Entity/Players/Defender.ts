@@ -1,4 +1,5 @@
 import {AbstractPlayer} from './AbstractPlayer';
+import {showTowerTooltips} from '../Tower/TowerTooltips';
 import {Point} from '../../GlobalSettings';
 import {Race} from '../../Game/Races/Race';
 import {WarcraftMaul} from '../../WarcraftMaul';
@@ -997,6 +998,10 @@ export class Defender extends AbstractPlayer {
         }
         if (unit && this._rangeCheck && unit.isUnitType(UNIT_TYPE_STRUCTURE)) {
             this.rangeIndicator.show(unit);
+        }
+        // A selected tower's own tooltips (a Primal's Power), on the selecting player's screen only
+        if (unit && this.isLocal()) {
+            showTowerTooltips(this.game.players.get(unit.owner.id)?.GetTower(unit.id));
         }
     }
 

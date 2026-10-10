@@ -42,7 +42,8 @@ export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LIC
             // information and is never taken for Ascend (as the Firelord's own icon on a button was)
             id: 'AP04', passive: true, name: '[Elementalists] Power', tooltip: 'Power',
             extended: 'What this tower does, and what it has gained.',
-            icon: 'ReplaceableTextures\\PassiveButtons\\PASBTNCommand.blp', x: 0, y: 0,
+            // The command card's V slot, bottom right (Ascend and Surge are left of it)
+            icon: 'ReplaceableTextures\\PassiveButtons\\PASBTNCommand.blp', x: 3, y: 2,
         },
     ]);
 

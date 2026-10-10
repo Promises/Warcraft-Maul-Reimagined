@@ -1,4 +1,5 @@
 import { Defender } from '../../Players/Defender';
+import {showTowerTooltips, TowerTooltip} from '../TowerTooltips';
 import { WarcraftMaul } from '../../../WarcraftMaul';
 import { EndOfRoundTower } from './EndOfRoundTower';
 import { AttackActionTower } from './AttackActionTower';
@@ -119,6 +120,18 @@ export class Tower {
         newTower._fullRefundValue += this.refundableValue;
         newTower.receive(carried);
         return newTower;
+    }
+
+    /** Tooltips of its own for its abilities, shown while it is selected (TowerTooltips): none here. */
+    public abilityTooltips(): TowerTooltip[] {
+        return [];
+    }
+
+    /** Local: puts its tooltips up again if the local player has it selected (they changed). */
+    protected refreshTooltips(): void {
+        if (IsUnitSelected(this.unit.handle, GetLocalPlayer())) {
+            showTowerTooltips(this);
+        }
     }
 
     /** Once it is set up and has taken what it was handed (SetupTower): nothing, but for grown towers. */
