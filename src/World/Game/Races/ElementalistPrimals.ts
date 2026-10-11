@@ -291,6 +291,11 @@ export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LIC
     firelord.iconGameInterface = 'ReplaceableTextures\\CommandButtons\\BTNHeroAvatarOfFlame.blp';
     firelord.scalingValueundefined = 1.0;
 
+    // An Ascended's damage in its description is what it has as it ascends, at Attunement 15 (its base
+    // is that over 1.3); Power's line beside it shows the damage now, so say which is which
+    for (const unit of [eye, endlessStorm, avatar, nordrassil, firelord]) {
+        unit.tooltipExtended = `${unit.tooltipExtended} The numbers are at Attunement 15, which it ascends with.`;
+    }
     // What each Primal and Ascended says of itself, for its Power button (AttunedTower)
     const powerTexts: {[id: string]: string} = {};
     // The Primals and the Ascended are copies of the towers they come from: each shows its own model
