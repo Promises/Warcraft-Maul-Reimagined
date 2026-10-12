@@ -7,7 +7,8 @@
  */
 export const GROUND_FROST = compiletime(({objectData}) => {
     require(require('path').resolve('scripts/copy-abilities.js')).copyAbilities([
-        {from: 'A0EU', id: 'AC01', data: {atar: 'air,enemies,ground'}, skin: {anam: 'Frost Attack'}},
+        {from: 'A0EU', id: 'AC01', data: {atar: 'air,enemies,ground'},
+            skin: {anam: 'Frost Attack', aub1: 'Slows the units it hits, air and ground, by 25% for 5 seconds.'}},
     ]);
     for (const id of ['h04B', 'h03I']) {
         const tower = objectData.units.get(id)!;
