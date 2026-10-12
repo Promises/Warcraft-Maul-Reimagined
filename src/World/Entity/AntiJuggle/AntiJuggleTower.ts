@@ -8,17 +8,9 @@ import {Destructable} from "w3ts";
 /** Pathing blocker used for anti-juggle; a stock invisible blocker unless given a model. */
 const ANTI_JUGGLE_BLOCKER = 'YTpc';
 
-// The blocker is shown as a circle of power on a red 2x2 pathing footprint. This lived in the
-// map's object data before and was lost on a World Editor save, so it is applied at build time.
-compiletime(({objectData}) => {
-    // Evaluated in isolation at build time: module constants are not in scope here
-    const blocker = objectData.destructables.get('YTpc');
-    if (!blocker) {
-        throw new Error('Anti-juggle blocker YTpc not found in object data');
-    }
-    blocker.modelFile = 'buildings\\other\\CircleOfPower\\CircleOfPower.mdl';
-    blocker.pathingTexture = 'PathTextures\\4x4red.tga';
-});
+// The blocker is shown as a circle of power on a red 2x2 pathing footprint, set in the map's data
+// (scripts/bake-object-edits.js). It was once lost on a World Editor save; an editor save is now
+// taken for its world files only, the map's object data kept (docs, lane exit terrain).
 
 export class AntiJuggleTower {
 

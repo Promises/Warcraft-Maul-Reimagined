@@ -122,11 +122,12 @@ function append(file, build) {
     fs.writeFileSync(file, out);
 }
 
-/** Adds the abilities to the built map in dist. abilities: [{id, order, name, tooltip, extended, icon, hotkey, x, y}],
+/** Adds the abilities to the built map in dist, or mapDir. abilities: [{id, order, name, tooltip, extended, icon, hotkey, x, y}],
  * or [{id, passive: true, name, tooltip, extended, icon, x, y}] */
-function addPrimalAbilities(abilities) {
+function addPrimalAbilities(abilities, mapDir) {
     const config = JSON.parse(fs.readFileSync(path.resolve('config.json'), 'utf8'));
-    const map = path.resolve('dist', config.mapFolder);
+    // The built map in dist, unless another map folder is given (scripts/bake-object-edits.js: the map's own)
+    const map = mapDir || path.resolve('dist', config.mapFolder);
     append(path.join(map, 'war3map.w3a'), template => abilities.map(a => object(template, a, data(a))));
     append(path.join(map, 'war3mapSkin.w3a'), template => abilities.map(a => object(template, a, skin(a))));
 }

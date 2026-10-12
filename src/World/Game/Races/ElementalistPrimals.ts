@@ -1,6 +1,6 @@
 import {Unit} from "war3-objectdata-th";
 
-// The Primals' own abilities (scripts/primal-abilities.js adds them to the built map)
+// The Primals' own abilities, in the map's data (scripts/bake-object-edits.js put them there)
 export const ASCEND = 'AP01';
 export const SURGE = 'AP02';
 // The Depleted Rock's: 8 gold turns it back into an Uncharged Rune (in place of Pay the Toll)
@@ -9,54 +9,13 @@ export const RECHARGE_PRICE = 8;
 
 /**
  * The Elementalist's Primal fusions and their Ascended forms (the Elementalist redesign), made at
- * build time from the towers they come from: new unit types, so they need no World Editor save.
- * Siphon Energy (A0CT) is added to the mature pieces a Primal is made of, so they can fuse, and
- * Ascend and Surge to the Primals.
+ * build time from the towers they come from: new unit types, so they need no World Editor save,
+ * and they follow their ingredients. Ascend and Surge go to the Primals. What is set once and for
+ * all (Siphon Energy on the ingredients, the midgame's Updraft and Recharge, icons, the Corrupted
+ * Tree's circle, the Primal abilities themselves) is in the map's data: scripts/bake-object-edits.js.
  */
 export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LICH_KING, EYE_OF_THE_STORM, ENDLESS_STORM,
     AVATAR_OF_LIFE, NORDRASSIL, FIRELORD, PRIMAL_INGREDIENTS, BOOK_ICONS, BOOK_TEXTS, POWER_TEXTS} = compiletime(({objectData}) => {
-    // Ascend and Surge: the ids are the ASCEND and SURGE above (compiletime code cannot see them)
-    require(require('path').resolve('scripts/primal-abilities.js')).addPrimalAbilities([
-        {
-            id: 'AP01', order: 'avatar', name: '[Elementalists] Ascend', tooltip: 'Ascend [|cffffcc00V|r]',
-            extended: 'At Attunement 15, this Primal ascends: the Lich into the Lich King (400 gold), the Thunderhead '
-                + 'into the Eye of the Storm (500), the Haboob into the Endless Storm (500), the Heart of Life into the '
-                + 'Avatar of Life (600), the World Tree into Nordrassil (450), the Inferno into the Firelord (400). An '
-                + 'Ascended tower gains 5% of its power every wave it stands, with no cap. One of each Ascended per player.',
-            icon: 'ReplaceableTextures\\CommandButtons\\BTNAvatar.blp', hotkey: 'V', x: 1, y: 2,
-        },
-        {
-            id: 'AP02', order: 'berserk', name: '[Elementalists] Surge', tooltip: 'Surge [|cffffcc00G|r]',
-            extended: 'Buys one level of Attunement for 60 gold: up to 10 levels over this Primal\'s life, never past 15. '
-                + 'The growth after Ascension only comes from waves survived.',
-            icon: 'ReplaceableTextures\\CommandButtons\\BTNBloodLust.blp', hotkey: 'G', x: 2, y: 2,
-        },
-        {
-            id: 'AP03', order: 'rejuvination', name: '[Elementalists] Recharge', tooltip: 'Recharge [|cffffcc00R|r]',
-            extended: 'Recharges the rock into an Uncharged Rune for 8 gold, which can take an element again.',
-            icon: 'ReplaceableTextures\\CommandButtons\\BTNManaRecharge.blp', hotkey: 'R', x: 0, y: 2,
-        },
-        {
-            // A Primal's and an Ascended's own account of itself: AttunedTower writes each tower's
-            // tooltip (what it does, and what it has gained) as it grows. A passive, so it reads as
-            // information and is never taken for Ascend (as the Firelord's own icon on a button was)
-            id: 'AP04', passive: true, name: '[Elementalists] Power', tooltip: 'Power',
-            extended: 'What this tower does, and what it has gained.',
-            // The command card's V slot, bottom right (Ascend and Surge are left of it)
-            icon: 'ReplaceableTextures\\PassiveButtons\\PASBTNCommand.blp', x: 3, y: 2,
-        },
-    ]);
-
-    // The midgame: Tornado's first aura is Updraft (an Endurance Aura, +20% attack speed for your towers
-    // within 500) where Tailwind sped enemies up; the Depleted Rock is recharged, not paid to go away
-    const tornado = objectData.units.get('u022')!;
-    tornado.normal = String(tornado.normal ?? '').split(',').map(id => id === 'A0E0' ? 'A03Q' : id).join(',');
-    const rock = objectData.units.get('n027')!;
-    rock.normal = String(rock.normal ?? '').split(',').filter(id => id !== 'A0BF').concat('AP03').join(',');
-    // Bubbles' icon: BTNBubbles by Golden-Drake (hiveworkshop.com/threads/btnbubbles.173114), re-encoded
-    // because the original's mip table points its small levels at one 32x32 image
-    objectData.units.get('u026')!.iconGameInterface = 'ReplaceableTextures\\CommandButtons\\BTNBubbles.blp';
-
     // Tooltips for the towers that had the World Editor's placeholder ("Primary defensive structure")
     // or none: what each does, from its tower class and abilities, and its attack line from its own
     // object data, so the numbers cannot drift from what the game uses
@@ -107,19 +66,11 @@ export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LIC
         bookTexts[id] = `${roles[id]}|n${attackLine(unit)}`;
         unit.tooltipExtended = `${recipes[id] ? `${recipes[id]}. ` : ''}${roles[id]}|n|n${attackLine(unit)}`;
     }
-    // The Corrupted Tree's selection circle was the base unit's 3.25, far wider than the others'
-    objectData.units.get('n030')!.selectionScale = 2.5;
-
     // Undead L2 and Death Rune L3: the Lich; Air Rune L3 and Water Rune L3: Thunderhead; Sandstorm L2
     // and Air Rune L3: Haboob; two Life Rune L3: Heart of Life; Tree and Nature Rune L3: World Tree;
     // Purgatory L2 and Fire Rune L3: Inferno
+    // (They have Siphon Energy, A0CT, in the map's data: scripts/bake-object-edits.js)
     const ingredients = ['u038', 'u02B', 'u033', 'u035', 'u03D', 'u02D', 'u036', 'u02F', 'u039', 'u031'];
-    for (const id of ingredients) {
-        const unit: Unit | undefined = objectData.units.get(id);
-        if (unit && String(unit.normal ?? '').split(',').indexOf('A0CT') === -1) {
-            unit.normal = String(unit.normal ?? '').split(',').concat('A0CT').join(',');
-        }
-    }
 
     // Copied as an object, not by id: a copy by id of a custom unit would name that unit as its base.
     // A fixed id of its own (Primals are uP..), so it stays the same from build to build
@@ -307,8 +258,6 @@ export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LIC
         unit.normal = String(unit.normal ?? '').split(',').filter(id => id !== 'A0CT' && id !== 'AP04').concat('AP04').join(',');
         powerTexts[unit.newId] = String(unit.tooltipExtended ?? '');
     }
-    // The Depleted Rock had its base unit's ghoul icon: the Uncharged Rune's, greyed out
-    objectData.units.get('n027')!.iconGameInterface = 'ReplaceableTextures\\CommandButtonsDisabled\\DISBTNMoonStone.blp';
 
     // The icon of every tower the recipe book shows: the Runes, the first fusions, the Primals and
     // the Ascended (the game has no native that gives a unit type's icon)

@@ -9,34 +9,9 @@ import {WarcraftMaul} from "./World/WarcraftMaul";
 import {writeLobbyStamp} from "./World/Game/LobbyStamp";
 import {installGameMessages} from "./World/Game/Ui/GameMessages";
 import {installAsyncClicks} from "./World/Game/Ui/Frames";
-import {AbilityTypes} from "war3-objectdata-th";
-import BuildTinyScoutTower = AbilityTypes.BuildTinyScoutTower;
 
 
 
-// Replace ground texture of undead acolite
-const testData = compiletime(({objectData}) => {
-    const units = objectData.units
-/*    const builders = Object.values(units.map)
-        // .filter(x => !x.isABuilding)
-    builders.forEach(x => {
-        x.portraitModelFile = x.modelFile;
-
-    })*/
-
-    // const builder = objectData.units.get('oC22')
-    // builder!.groundTexture = '';
-    // objectData.save()
-    // const tower = objectData.abilities.copy('AIbt') as AbilityTypes.BuildTinyScoutTower | undefined;
-    // const tower = objectData.abilities.get('AIbt') as BuildTinyScoutTower | undefined;
-    // const booktest = objectData.abilities.copy('Aspb') as AbilityTypes.SpellBook | undefined;
-    // console.log((booktest))
-    // if(tower && booktest) {
-    //     booktest.spellList = tower.newId
-    //     tower.unitCreatedPerPlayerRace = 'h00Z'
-    // }
-    // return tower?.unitCreatedPerPlayerRace
-})
 function tsMain() {
     PatchNatives();
     BlzLoadTOCFile('uiImport\\Templates.toc');
