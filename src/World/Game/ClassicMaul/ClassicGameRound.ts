@@ -110,7 +110,17 @@ export class ClassicGameRound extends AbstractGameRound {
         }
     }
 
+    public retire(): void {
+        super.retire();
+        this.roundEndTrigger.enabled = false;
+    }
+
     private CreepFoodConditions(): boolean {
+        // The creep players' food also runs out with no wave on (the last creep removed by
+        // -resetgame, say): only a wave's end ends the round
+        if (!this.isWaveInProgress) {
+            return false;
+        }
         for (const enemy of this.game.enemies) {
             if (!(enemy.getState(PLAYER_STATE_RESOURCE_FOOD_USED) === 0)) {
                 return false;

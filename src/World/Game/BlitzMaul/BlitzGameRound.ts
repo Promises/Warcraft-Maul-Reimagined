@@ -49,6 +49,11 @@ export class BlitzGameRound extends AbstractGameRound {
     }
 
 
+    public retire(): void {
+        super.retire();
+        this.roundEndTrigger.enabled = false;
+    }
+
     private SpawnNextWave(): boolean {
 
         const nextWave: number = this.currentWave + 1;

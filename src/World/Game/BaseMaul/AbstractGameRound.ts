@@ -17,6 +17,8 @@ export abstract class AbstractGameRound {
     private _currentWave: number = 1;
     public antiJuggleEnabled: boolean = true;
     private creepMovementTimeout: Trigger;
+    // Replaced by a fresh round (-resetgame): its triggers are off and a wave it is spawning stops
+    protected retired: boolean = false;
 
     constructor(game: WarcraftMaul) {
         this.game = game;
@@ -46,6 +48,12 @@ export abstract class AbstractGameRound {
             MultiboardSetItemValueBJ(board.board, 2, 6, '');
         }
         MultiboardSetItemValueBJ(board.board, 2, 2, `${this.currentWave}`);
+    }
+
+    /** Hands over to a fresh round (ResetGame): no more triggers, and the spawning in progress stops. */
+    public retire(): void {
+        this.retired = true;
+        this.creepMovementTimeout.enabled = false;
     }
 
     get currentWave(): number {
@@ -122,6 +130,9 @@ export abstract class AbstractGameRound {
             }
             creepOwner += 1;
             TriggerSleepAction(0.50);
+            if (this.retired) {
+                return;
+            }
         }
         this.FinishedSpawning();
     }

@@ -26,6 +26,9 @@ export const HYBRID_BUILD_ABILITY: number = FourCC('AUbu');
 const QUEUED_TILE_TEXTURE = 'ReplaceableTextures\\Splats\\SuggestedPlacementSplat.blp';
 const QUEUED_TILE_SIZE = 192;
 
+// A player's units that a repick or reset leaves standing (as -repick always has)
+const KEPT_UNITS: number[] = [FourCC('h03S'), FourCC('e00C')];
+
 export class Defender extends AbstractPlayer {
 
     public metadata: Record<string, any> = {};
@@ -562,6 +565,63 @@ export class Defender extends AbstractPlayer {
      * normal random's gold back, nor Hardcore Random after a normal random; Hybrid Random is open
      * again (it asks only that the player has no race).
      */
+    /**
+     * Removes the player's towers and units, the towers through their sell bookkeeping (their
+     * triggers and lists) without paying for them, but for the units a player keeps (the allow
+     * tower and the like). Their maze cells are left for the caller: -repick frees each one,
+     * -resetgame empties the mazes.
+     */
+    public removeOwnUnits(freeCells: boolean): void {
+        this.stopBuilding();
+        this.clearPendingBuilds();
+        for (const tower of [...this._towersArray]) {
+            const x = tower.unit.x;
+            const y = tower.unit.y;
+            tower.Sell();
+            if (freeCells) {
+                for (const maze of this.game.worldMap.playerMazes) {
+                    if (x >= maze.minX && x < maze.maxX && y >= maze.minY && y < maze.maxY) {
+                        maze.setFootprint(x, y, Walkable.Walkable);
+                    }
+                }
+            }
+        }
+        const group = GetUnitsOfPlayerAll(this.handle)!;
+        ForGroup(group, () => {
+            const unit = GetEnumUnit()!;
+            if (KEPT_UNITS.indexOf(GetUnitTypeId(unit)) === -1) {
+                RemoveUnit(unit);
+            }
+        });
+        DestroyGroup(group);
+        this._builders = [];
+        this._hybridBuilder = undefined;
+        this._voidBuilder = undefined;
+        this._lootBoxer = undefined;
+    }
+
+    /** As at the start of a game, after the settings (-resetgame): units gone, starting gold, no race. */
+    public resetForNewGame(): void {
+        this.removeOwnUnits(false);
+        this.game.hybridBuildPanel.close(this);
+        this.setGold(this._lane === COLOUR.GRAY ? 150 : 100);
+        this.setLumber(1);
+        this.forgetRacePicks();
+        this._hasHybridRandomed = false;
+        this._hasHardcoreRandomed = false;
+        this._repickCounter = 0;
+        this._hybridTowers = [];
+        this._voidFragments = 0;
+        this.chimeraCount = 0;
+        this._towerForces.clear();
+        this.towersEnabled = true;
+        this._totalMazeLength = 0;
+        this._kills = 0;
+        if (this.game.scoreBoard && this._scoreSlot > -1) {
+            MultiboardSetItemValueBJ(this.game.scoreBoard.board, 2, this.game.scoreBoard.playerRow(this._scoreSlot), '0');
+        }
+    }
+
     public forgetRacePicks(): void {
         this._races = [];
         this._hasNormalPicked = false;

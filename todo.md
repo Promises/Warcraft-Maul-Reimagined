@@ -50,6 +50,13 @@
   'slow' on each attack, and in a test the Whelp attacked 28 times in 20 s with 0 casts, while a
   Slow ordered from Lua cast at once. Its autocast cannot be switched on (the game refuses slowon
   for ACsw). Cause not found yet (2026-10-10).
+- [x] -resetgame (debug only): the game as just after the settings, same mode and difficulty - creeps
+  gone, wave 1 with its timer, starting lives, every player's towers and units gone (their sell
+  bookkeeping run), mazes open, starting gold and lumber, no race, race picker open (ResetGame.ts).
+  A fresh round of the same mode replaces the old, whose triggers stop and whose spawning loop
+  ends. Classic ends a round only while a wave is on (the creep players' food also hits 0 when the
+  reset removes them). -repick removes towers the same way: it destroyed the units only, leaving
+  them in the player's tower list. test_resetgame, test_repick_takes_the_towers_too (2026-10-13).
 - [ ] Randomised waypoints on extreme difficulty. Each lane's two in-area checkpoints move by a random offset, so the maze cannot be copied from memory. Inspected in game with the debug commands `-wptest [n]` (marker tiles at random spots in the red lane) and `-hidewp` (hide and restore the real two); the tile is Cityscape white marble `Ywmb` on Icecrown rough dirt `Idtr`, one 128 tile per waypoint, 26 in the map.
 
   What it includes:

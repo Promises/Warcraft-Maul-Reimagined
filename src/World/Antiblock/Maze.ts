@@ -227,6 +227,18 @@ export class Maze {
         }
     }
 
+    /** Every cell open again, as at the start of a game (-resetgame, once the lane's towers are gone). */
+    public Reset(): void {
+        this.CleanAll();
+        for (let x: number = 0; x < this.width; x++) {
+            for (let y: number = 0; y < this.height; y++) {
+                if (this.maze[x][y] !== Walkable.Walkable) {
+                    this.setWalkable(x, y, Walkable.Walkable);
+                }
+            }
+        }
+    }
+
     public CleanAll(): void {
         for (const antijuggle of this.antiJugglers) {
             antijuggle.EndOfRoundAction();

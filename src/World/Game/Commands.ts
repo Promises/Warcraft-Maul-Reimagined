@@ -1,4 +1,5 @@
 import {WarcraftMaul} from '../WarcraftMaul';
+import {resetGame} from './ResetGame';
 import {COLOUR_CODES, DIFFICULTIES, GAME_MODES, NO_LIVES_LOST} from '../GlobalSettings';
 import {Defender} from '../Entity/Players/Defender';
 import {Log} from '../../lib/Serilog/Serilog';
@@ -244,6 +245,9 @@ export class Commands {
                 player.sendMessage(`Difficulty was set to ${amount}%`);
                 // Applies to creeps spawned from now on; Creep scales each unit itself
                 this.game.diffVote.difficulty = amount;
+                break;
+            case 'resetgame':
+                resetGame(this.game, player);
                 break;
             case 'wave':
                 amount = Util.ParsePositiveInt(command[1]);
@@ -783,14 +787,14 @@ export class Commands {
     }
 
     public RepickActions(player: Defender): void {
-        const grp: group = GetUnitsInRectAll(GetPlayableMapRect()!)!;
         const maxGold: number = player.lane === COLOUR.GRAY ? 150 : 100;
         if (player.getGold() > maxGold) {
             player.setGold(maxGold);
         }
         player.setLumber(1);
-        ForGroupBJ(grp, () => this.RemovePlayerUnits(player));
-        DestroyGroup(grp);
+        // Its towers through their sell bookkeeping, their maze cells freed (destroying the units
+        // left them in the player's tower list and the maze's cells blocked)
+        player.removeOwnUnits(true);
         // A fresh pick: the same race again, or Hybrid Random after a chosen race
         player.forgetRacePicks();
         this.game.raceSelectPanel.open(player);
@@ -809,27 +813,6 @@ export class Commands {
         if (player.hasHybridRandomed) {
             return false;
         }
-        return true;
-    }
-
-    public RemovePlayerUnits(player: Defender): void {
-        const unit = Unit.fromEnum();
-        if (unit?.owner.id === player.id) {
-            if (this.RepickRemoveConditions(unit)) {
-                unit.destroy();
-            }
-        }
-    }
-
-    private RepickRemoveConditions(unit: Unit): boolean {
-        if (unit.typeId === FourCC('h03S')) {
-            return false;
-        }
-
-        if (unit.typeId === FourCC('e00C')) {
-            return false;
-        }
-
         return true;
     }
 
