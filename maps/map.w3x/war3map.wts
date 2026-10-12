@@ -24630,7 +24630,7 @@ Can attack 5 enemys at once.
 STRING 8043
 // Abilities: A09Z ([Workers Union] Angry, Angry Workers), Ubertip (Tooltip - Normal - Extended)
 {
-Increases a friendly unit's attack rate by 75%. |nLasts 15 seconds.
+Increases this worker's own attack rate by 75% for 10 seconds. |nCooldown: 15 seconds.
 }
 
 STRING 8047
