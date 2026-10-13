@@ -8,7 +8,7 @@
  * Units go through object-data.js (war3-objectdata, as the build itself loads and saves them every
  * time); the new abilities are appended to war3map.w3a and war3mapSkin.w3a by primal-abilities.js,
  * which leaves the existing entries byte for byte. Running it again changes nothing. (The anti-juggle
- * blocker's model and pathing, also set at build time before, were in the map's data already.)
+ * blocker's model and pathing stay build-time: see AntiJuggleTower.ts.)
  *
  *   node scripts/bake-object-edits.js
  */
