@@ -24,7 +24,6 @@ export class TowerConstruction {
     }
 
     private towerConstructTrigger: Trigger;
-    private towerStartConstructTrigger: Trigger;
     private towerUpgradeTrigger: Trigger;
     private readonly _towerTypes: TowerMap<number, object>;
     public genericAttacks: Map<number, GenericAutoAttackTower> = new Map<number, GenericAutoAttackTower>();
@@ -50,10 +49,6 @@ export class TowerConstruction {
         this._towerTypes = InitialiseAllRaceTowers();
         this.lootBoxerHander = new LootBoxerHandler(this, game);
         switchOnAutocastForSpawns();
-        this.towerStartConstructTrigger = Trigger.create();
-        this.towerStartConstructTrigger.registerAnyUnitEvent(EVENT_PLAYER_UNIT_CONSTRUCT_START);
-        this.towerStartConstructTrigger.addAction(() => this.ConstructionStarted());
-
         this.towerConstructTrigger = Trigger.create();
         this.towerConstructTrigger.registerAnyUnitEvent(EVENT_PLAYER_UNIT_CONSTRUCT_FINISH);
         this.towerConstructTrigger.registerAnyUnitEvent(EVENT_PLAYER_UNIT_UPGRADE_FINISH);
@@ -101,64 +96,32 @@ export class TowerConstruction {
     }
 
     /**
-     * This method is triggered when construction of a building starts. For hybrid builder.
-     * It checks the constructing unit against the `DummyTowersMap` map, which contains predefined 'dummy' buildings.
-     * If the building is a 'dummy' Tower, it will be replaced with the player's hybrid Tower of the corresponding tier by using the `ReplaceUnit` function.
-     * After replacing the 'dummy' Tower, `SetupTower` method is called to finalize setting up the Tower.
-     * If the constructing unit is not a 'dummy' Tower or if replacing the tower failed, no further action will be taken.
+     * A hybrid builder's 'dummy' building (DummyTowersMap) is replaced by the owner's hybrid tower
+     * of its tier, paid for here; without the gold, the dummy goes and its cells open again. Called
+     * by AntiBlock once its checks have let the construction stand; anything else is left as it is.
      */
-    private ConstructionStarted() {
-        // Output debug log
-        Log.Debug('Start construction');
-
-        // Get the unit from the triggered event
-        const unit = Unit.fromEvent();
-
-        // Check if unit exists and if its type ID is in the DummyTowersMap
-        if (unit && DummyTowersMap[DecodeFourCC(unit.typeId)]) {
-            Log.Debug('Found unit');
-
-            // Get the dummy tower info based on unit type ID
-            const dummyTower = DummyTowersMap[DecodeFourCC(unit.typeId)];
-
-            // Get owner ID of the unit
-            const ownerId = unit.owner.id;
-
-            // Output debug log with owner ID and expected player ID of the tower
-            Log.Debug(`owner id: ${ownerId}, tower expects: ${dummyTower.playerId}`);
-
-            // If the unit's owner's ID matches the one expected by the tower
-            if (ownerId === dummyTower.playerId) {
-                Log.Debug('Found owner');
-
-                // Get the owner player data
-                const owner = this.game.players.get(ownerId);
-                if(!owner) {
-                    Log.Error('Could not find owner');
-                    return;
-                }
-                const tierTower = owner.hybridTowers[dummyTower.tier];
-                if(owner.getGold() < tierTower.goldCost) {
-                    unit.destroy();
-                    return;
-                }
-                owner.giveGold(tierTower.goldCost * -1);
-
-
-                // Replace the unit with a new tower, based on the owner's tower tier
-                const newUnit = ReplaceUnit(unit, FourCC(tierTower.id), bj_UNIT_STATE_METHOD_DEFAULTS)
-
-                // If the unit failed to get replaced, terminate the function
-                if(!newUnit) {
-                    return;
-                }
-
-                Log.Debug('Setup');
-
-                // Call the method to setup the new tower
-                this.SetupTower(newUnit, owner!);
-            }
+    public ReplaceHybridDummy(unit: Unit): void {
+        const dummyTower = DummyTowersMap[DecodeFourCC(unit.typeId)];
+        if (!dummyTower || unit.owner.id !== dummyTower.playerId) {
+            return;
         }
+        const owner = this.game.players.get(unit.owner.id);
+        if (!owner) {
+            Log.Error('Could not find owner');
+            return;
+        }
+        const tierTower = owner.hybridTowers[dummyTower.tier];
+        if (owner.getGold() < tierTower.goldCost) {
+            this.game.worldMap.antiBlock?.CleanUpRemovedConstruction(unit);
+            unit.destroy();
+            return;
+        }
+        owner.giveGold(tierTower.goldCost * -1);
+        const newUnit = ReplaceUnit(unit, FourCC(tierTower.id), bj_UNIT_STATE_METHOD_DEFAULTS);
+        if (!newUnit) {
+            return;
+        }
+        this.SetupTower(newUnit, owner);
     }
 
     private ConstructionFinished(): void {

@@ -35,10 +35,23 @@ export class AntiBlock {
 
     private Action(): void {
         const consUnit: Unit | undefined = Unit.fromHandle(GetConstructingStructure());
-        const player: Defender | undefined = this._worldMap.game.players.get(consUnit?.getOwner()?.id!);
-        if (player === undefined || consUnit === undefined) {
+        if (consUnit === undefined) {
             return;
         }
+        const player: Defender | undefined = this._worldMap.game.players.get(consUnit.getOwner()?.id!);
+        if (player !== undefined && !this.admits(consUnit, player)) {
+            return;
+        }
+        // A hybrid builder's dummy becomes the player's hybrid tower only now, once the checks have
+        // let it stand: replaced first, it was gone before they ran, so hybrid towers could block
+        this._worldMap.towerConstruction.ReplaceHybridDummy(consUnit);
+    }
+
+    /**
+     * The anti-juggle, homesick and anti-block checks on a construction just started: false when
+     * one cancelled it. A construction the checks let stand is blocked in its lane's maze.
+     */
+    private admits(consUnit: Unit, player: Defender): boolean {
         const x: number = consUnit?.x;
         const y: number = consUnit?.y;
 
@@ -90,18 +103,20 @@ export class AntiBlock {
             grp.destroy();
 
             if (isJuggling) {
-                return this.juggling(consUnit, player, antiJuggleCreeps);
+                this.juggling(consUnit, player, antiJuggleCreeps);
+                return false;
             }
         }
 
         if (consUnit.getAbilityLevel(FourCC('A0CR')) > 0) {
             if (!player.getRectangle().ContainsUnit(consUnit)) {
-                return this.homesick(consUnit, player);
+                this.homesick(consUnit, player);
+                return false;
             }
         }
 
         if (playerSpawnId === undefined) {
-            return;
+            return true;
         }
 
         const maze: Maze = this._worldMap.playerMazes[playerSpawnId];
@@ -117,7 +132,8 @@ export class AntiBlock {
         const firstCheckpointY: number = Math.floor((GetRectCenterY(firstCheckpoint.rectangle) - maze.minY) / 64);
         const firstCheckpointBFS: number = maze.breathFirstSearch(spawnX, spawnY, firstCheckpointX, firstCheckpointY);
         if (firstCheckpointBFS === -1) {
-            return this.blocking(consUnit, player);
+            this.blocking(consUnit, player);
+            return false;
         }
 
         const secondCheckpoint: CheckPoint = <CheckPoint>firstCheckpoint.next;
@@ -126,7 +142,8 @@ export class AntiBlock {
         const secondCheckpointBFS: number =
             maze.breathFirstSearch(firstCheckpointX, firstCheckpointY, secondCheckpointX, secondCheckpointY);
         if (secondCheckpointBFS === -1) {
-            return this.blocking(consUnit, player);
+            this.blocking(consUnit, player);
+            return false;
         }
 
         const end: CheckPoint = <CheckPoint>secondCheckpoint.next;
@@ -134,7 +151,8 @@ export class AntiBlock {
         const endY: number = Math.max(Math.min(Math.floor((GetRectCenterY(end.rectangle) - maze.minY) / 64), maze.height - 1), 0);
         const exitPointBFS: number = maze.breathFirstSearch(secondCheckpointX, secondCheckpointY, endX, endY);
         if (exitPointBFS === -1) {
-            return this.blocking(consUnit, player);
+            this.blocking(consUnit, player);
+            return false;
         }
 
         player.totalMazeLength = firstCheckpointBFS + secondCheckpointBFS + exitPointBFS;
@@ -145,6 +163,7 @@ export class AntiBlock {
         if (isWaveInProgress) {
             this.repathLane(playerSpawnId);
         }
+        return true;
     }
 
     /** Every wave creep in the lane is sent on to its checkpoint again, along a fresh way. */

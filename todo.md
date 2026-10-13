@@ -8,6 +8,13 @@
   creep standing still before or after. Still, every build during a wave now sends the lane's
   creeps on along a fresh way (AntiBlock.repathLane), so a way the new tower spoils is planned
   again at once (2026-10-13).
+- [x] A hybrid builder could block a lane completely (Beta 3, operator's screenshot): TowerConstruction
+  replaced the builder's dummy with the real tower on construction start, before AntiBlock's
+  handler for the same event ran, which then found the dummy gone - no anti-block, anti-juggle or
+  homesick check, and the tower never entered the maze (so the lane's maze knew none of a hybrid
+  player's towers). AntiBlock now checks first and replaces the dummy only when the build stands
+  (TowerConstruction.ReplaceHybridDummy). test_hybrid_tower_cannot_block (wc3-slop-lan
+  measure.py) failed on the old build, passes now (2026-10-13).
 - [x] Anti-juggle blockers lifted as soon as they guard nothing, not only at the end of the round
   (continuous spawning): AntiJuggleRelease looks every second during a wave, and a blocker goes
   once opening it would change the way of no creep now walking, towards the checkpoint each is
