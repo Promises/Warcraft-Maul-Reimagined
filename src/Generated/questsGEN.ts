@@ -11,6 +11,12 @@ interface Quest {
 
 export const Quests: Quest[] = [
     {
+        title: `5.0.0 - 13`,
+        icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
+        stype: 0,
+        body: `Updates:\n- Anti-juggle blockers (left where a tower is sold during a wave) go as soon as they guard nothing, not only at the end of the round: once opening one would change no creep's way to its checkpoint. A blocker in the second checkpoint's maze goes while the wave is still on its way to the first\n- When a tower is built during a wave, the creeps in that lane plan their way again around it`,
+    },
+    {
         title: `5.0.0 - 12`,
         icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
         stype: 0,
