@@ -1,4 +1,5 @@
 import * as settings from '../GlobalSettings';
+import {SyncTrace} from '../../lib/SyncTrace';
 import { WorldMap } from '../WorldMap';
 import { Defender } from '../Entity/Players/Defender';
 import { Creep } from '../Entity/Creep';
@@ -137,6 +138,26 @@ export class AntiBlock {
         }
 
         player.totalMazeLength = firstCheckpointBFS + secondCheckpointBFS + exitPointBFS;
+
+        // The creeps in the lane plan their way again, round the new tower: one built just ahead of
+        // them, or one that changed their way, could leave them walking a way that no longer fits
+        // (seen in games: creeps that stopped going on properly)
+        if (isWaveInProgress) {
+            this.repathLane(playerSpawnId);
+        }
+    }
+
+    /** Every wave creep in the lane is sent on to its checkpoint again, along a fresh way. */
+    private repathLane(lane: number): void {
+        const area = this._worldMap.game.mapSettings.PLAYER_AREAS[lane];
+        let count = 0;
+        for (const creep of this._worldMap.spawnedCreeps.unitMap.values()) {
+            if (creep.targetCheckpoint && area.ContainsCreep(creep)) {
+                creep.ReapplyMovement();
+                count++;
+            }
+        }
+        SyncTrace.note('repath', `lane=${lane} creeps=${count}`);
     }
 
     private blocking(consUnit: Unit, player: Defender): void {
