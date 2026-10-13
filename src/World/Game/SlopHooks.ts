@@ -33,7 +33,7 @@ export function installSlopHooks(game: WarcraftMaul): void {
     if (Slop === undefined) {
         return;
     }
-    Slop.urgent('sync', 'pick', 'rolled', 'hybrid', 'wave', 'build', 'race', 'select', 'range');
+    Slop.urgent('sync', 'pick', 'rolled', 'hybrid', 'wave', 'build', 'race', 'select', 'range', 'antijuggle', 'repath');
     Slop.onCommand((slot, line) => {
         const player = game.players.get(slot);
         if (player === undefined) {
