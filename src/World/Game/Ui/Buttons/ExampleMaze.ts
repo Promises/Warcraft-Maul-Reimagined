@@ -1,8 +1,9 @@
 import {AbstractActionButton} from './AbstractActionButton';
 import {WarcraftMaul} from '../../../WarcraftMaul';
 import {Defender} from '../../../Entity/Players/Defender';
-import {AdvancedHoloMaze} from '../../../Holograms/AdvancedHoloMaze';
-import {CheckPoint} from '../../../Entity/CheckPoint';
+import {createSampleMaze, SAMPLE_MAZES, sampleMazeIndex} from '../../../Holograms/SampleMazes';
+import {AbstractHologramMaze} from '../../../Holograms/AbstractHologramMaze';
+import {SyncTrace} from '../../../../lib/SyncTrace';
 import {AbstractPlayer} from '../../../Entity/Players/AbstractPlayer';
 import {MapPlayer,Frame} from "w3ts";
 
@@ -19,7 +20,8 @@ export class ExampleMaze extends AbstractActionButton {
         super(game, `mazeButton${idx}`, ExampleMaze.disabledIcon, rail, offsetX, size);
         this.defaultSize = size;
         this.currentSize = (size * 2);
-        this.setTooltip('Sample maze', 'Shows or hides the advanced sample maze in your lane.');
+        this.setTooltip('Sample maze', 'Shows a sample maze in your lane: a simple circle, then a basic maze, then a more '
+            + 'advanced one, one more each click, and then hides it again.');
 
         for (const player of this.game.players.values()) {
             this.players.set(player.id, player);
@@ -36,33 +38,16 @@ export class ExampleMaze extends AbstractActionButton {
         }
         this.players.delete(player.id);
         this.backdropHandle.setAlpha(255);
-        const firstSpawn: CheckPoint | undefined = this.game.worldMap.playerSpawns[player.lane].spawnOne;
-        if (firstSpawn === undefined) {
-            return;
-        }
-
-        const firstCheckpoint: CheckPoint | undefined = firstSpawn.next;
-        if (firstCheckpoint === undefined) {
-            return;
-        }
-
-        const secondCheckpoint: CheckPoint | undefined = firstCheckpoint.next;
-        if (secondCheckpoint === undefined) {
-            return;
-        }
-
-        if (player.holoMaze === undefined) {
-            player.setHoloMaze(
-                new AdvancedHoloMaze(
-                    'ReplaceableTextures\\Splats\\SuggestedPlacementSplat.blp',
-                    GetRectCenterX(firstCheckpoint.rectangle),
-                    GetRectCenterY(firstCheckpoint.rectangle),
-                    GetRectCenterX(secondCheckpoint.rectangle),
-                    GetRectCenterY(secondCheckpoint.rectangle)));
-            this.setIcon(true);
-        } else {
-            player.setHoloMaze(undefined);
-            this.setIcon(false);
+        // Each click shows the next sample maze, simplest first; after the last, none
+        const next: number = sampleMazeIndex(player.holoMaze) + 1;
+        const maze: AbstractHologramMaze | undefined = next < SAMPLE_MAZES.length
+            ? createSampleMaze(this.game, player.lane, next)
+            : undefined;
+        player.setHoloMaze(maze);
+        this.setIcon(maze !== undefined);
+        SyncTrace.note('maze', `p${player.id} shows=${maze !== undefined ? next + 1 : 0}`);
+        if (maze !== undefined) {
+            player.sendMessage(`Sample maze ${next + 1} of ${SAMPLE_MAZES.length}: ${SAMPLE_MAZES[next].name}`);
         }
     }
 

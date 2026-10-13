@@ -4,9 +4,7 @@ import {COLOUR_CODES, DIFFICULTIES, GAME_MODES, NO_LIVES_LOST} from '../GlobalSe
 import {Defender} from '../Entity/Players/Defender';
 import {Log} from '../../lib/Serilog/Serilog';
 import {CheckPoint} from '../Entity/CheckPoint';
-import {AdvancedHoloMaze} from '../Holograms/AdvancedHoloMaze';
-import {SimpleHoloMaze} from '../Holograms/SimpleHoloMaze';
-import {CircleHoloMaze} from '../Holograms/CircleHoloMaze';
+import {createSampleMaze, SAMPLE_MAZES} from '../Holograms/SampleMazes';
 import {AbstractHologramMaze} from '../Holograms/AbstractHologramMaze';
 import {Rectangle} from '../../JassOverrides/Rectangle';
 import {SpawnedCreeps} from '../Entity/SpawnedCreeps';
@@ -419,26 +417,8 @@ export class Commands {
 
     /** The sample maze 1/2/3 drawn in the player's lane, or undefined for any other choice. */
     private holoMazeFor(player: Defender, choice: string): AbstractHologramMaze | undefined {
-        const firstCheckpoint: CheckPoint | undefined = this.game.worldMap.playerSpawns[player.lane].spawnOne?.next;
-        const secondCheckpoint: CheckPoint | undefined = firstCheckpoint?.next;
-        if (!firstCheckpoint || !secondCheckpoint) {
-            return undefined;
-        }
-        const imagePath: string = 'ReplaceableTextures\\Splats\\SuggestedPlacementSplat.blp';
-        const x1: number = GetRectCenterX(firstCheckpoint.rectangle);
-        const y1: number = GetRectCenterY(firstCheckpoint.rectangle);
-        const x2: number = GetRectCenterX(secondCheckpoint.rectangle);
-        const y2: number = GetRectCenterY(secondCheckpoint.rectangle);
-        switch (choice) {
-            case '1':
-                return new CircleHoloMaze(imagePath, x1, y1, x2, y2);
-            case '2':
-                return new SimpleHoloMaze(imagePath, x1, y1, x2, y2);
-            case '3':
-                return new AdvancedHoloMaze(imagePath, x1, y1, x2, y2);
-            default:
-                return undefined;
-        }
+        const index: number = SAMPLE_MAZES.findIndex((_, i) => `${i + 1}` === choice);
+        return index === -1 ? undefined : createSampleMaze(this.game, player.lane, index);
     }
 
     /** Debug: builds real towers on every point of a sample maze in the player's lane. */

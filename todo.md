@@ -14,6 +14,11 @@
   paid one level (17 gold); now the round-end condition refuses once the game is over (Classic and
   Blitz) and RoundEnd runs only while a wave is on. test_game_over_pays_no_level (wc3-slop-lan
   measure.py): a normal wave still pays, the lost one pays nothing (2026-10-13).
+- [ ] Siphon Energy refused for the fee still fuses if the gold arrives before its cast point
+  (0.5 s): A0CT is a Channel with Disable Other Abilities, so the caster is uninterruptable and
+  TargetOnCastAction's stop is refused; TargetOnEffectAction re-checks the gold and fuses, right
+  after "This fusion costs 250 gold". A refused set, like revealing, would close it. Low: the
+  player wanted the fusion and pays for it. Found by warcraft-sim in wc3-sim (2026-10-13).
 - [ ] Creeps spawned before the difficulty is set get 0 life (Creep.ts scales life by the
   difficulty, 0 until the vote): only reachable with the dev -start before the vote ends, so low;
   found by wc3-sim-runner (2026-10-13).
