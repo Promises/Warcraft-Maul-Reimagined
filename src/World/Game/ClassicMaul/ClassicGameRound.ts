@@ -58,7 +58,11 @@ export class ClassicGameRound extends AbstractGameRound {
     }
 
     protected RoundEnd(): void {
-
+        // Each creep player's food reaching 0 is an event, and they can come in one go: the
+        // first ends the round, the rest find no wave on
+        if (!this.isWaveInProgress) {
+            return;
+        }
         if (this.currentWave === this.game.worldMap.waveCreeps.length) {
             this.BonusRoundsOver();
         } else {
@@ -117,8 +121,9 @@ export class ClassicGameRound extends AbstractGameRound {
 
     private CreepFoodConditions(): boolean {
         // The creep players' food also runs out with no wave on (the last creep removed by
-        // -resetgame, say): only a wave's end ends the round
-        if (!this.isWaveInProgress) {
+        // -resetgame, say), and when a lost game removes every creep (GameOver): only a wave's
+        // end ends the round, and pays for it
+        if (!this.isWaveInProgress || this.game.gameEnded) {
             return false;
         }
         for (const enemy of this.game.enemies) {

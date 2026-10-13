@@ -163,6 +163,10 @@ export class BlitzGameRound extends AbstractGameRound {
     }
 
     private CreepFoodConditions(): boolean {
+        // A lost game removes every creep (GameOver), which is no wave's end
+        if (this.game.gameEnded) {
+            return false;
+        }
         for (const enemy of this.game.enemies) {
             if (!(enemy.getState(PLAYER_STATE_RESOURCE_FOOD_USED) === 0)) {
                 return false;

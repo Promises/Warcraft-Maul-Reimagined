@@ -8,6 +8,15 @@
   creep standing still before or after. Still, every build during a wave now sends the lane's
   creeps on along a fresh way (AntiBlock.repathLane), so a way the new tower spoils is planned
   again at once (2026-10-13).
+- [x] Losing the game paid the level's gold (found by the simulator, wc3-sim: there levels 2-5
+  all paid at once). GameOver removes every creep, and each creep player's food reaching 0 is a
+  round-end event; ClassicGameRound.RoundEnd paid before it marked the wave over. The real game
+  paid one level (17 gold); now the round-end condition refuses once the game is over (Classic and
+  Blitz) and RoundEnd runs only while a wave is on. test_game_over_pays_no_level (wc3-slop-lan
+  measure.py): a normal wave still pays, the lost one pays nothing (2026-10-13).
+- [ ] Creeps spawned before the difficulty is set get 0 life (Creep.ts scales life by the
+  difficulty, 0 until the vote): only reachable with the dev -start before the vote ends, so low;
+  found by wc3-sim-runner (2026-10-13).
 - [x] A hybrid builder could block a lane completely (Beta 3, operator's screenshot): TowerConstruction
   replaced the builder's dummy with the real tower on construction start, before AntiBlock's
   handler for the same event ran, which then found the dummy gone - no anti-block, anti-juggle or
