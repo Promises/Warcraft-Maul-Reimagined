@@ -290,6 +290,71 @@ export class Maze {
         return this.antiJugglers;
     }
 
+    /**
+     * Lifts the blockers whose opening would change the way of no creep now walking: for each leg
+     * that creeps are on (its target, and where they stand), the ground left to the target from
+     * every one of them, with the blocker and without it. A shorter way, or one that only now
+     * exists, is a change. The ways as they stand are worked out once, and again after each lift.
+     * Pure over the grid, so every client lifts the same ones. Returns the lifted blockers.
+     */
+    public liftIdleAntiJugglers(legs: {toX: number, toY: number, creeps: {x: number, y: number}[]}[]): AntiJuggleTower[] {
+        const columns = math.ceil(this.width);
+        const rows = math.ceil(this.height);
+        const clamp = (value: number, top: number) => math.max(0, math.min(top - 1, value));
+        const cell = (x: number, y: number): [number, number] =>
+            [clamp(math.floor((x - this.minX) / 64), columns), clamp(math.floor((y - this.minY) / 64), rows)];
+        // A creep standing on a closed cell (brushing a tower) counts from its nearest open neighbour
+        const at = (field: number[], x: number, y: number): number => {
+            let best = field[x + y * columns];
+            for (let dx = -1; dx <= 1; dx++) {
+                for (let dy = -1; dy <= 1; dy++) {
+                    const nx = x + dx;
+                    const ny = y + dy;
+                    const d = nx >= 0 && nx < columns && ny >= 0 && ny < rows ? field[nx + ny * columns] : -1;
+                    if (d >= 0 && (best < 0 || d + 64 < best)) {
+                        best = d + 64;
+                    }
+                }
+            }
+            return best;
+        };
+        const targets = legs.map(leg => cell(leg.toX, leg.toY));
+        const open = (x: number, y: number) => this.maze[x][y] === Walkable.Walkable;
+        let now = targets.map(([tx, ty]) => distanceField(columns, rows, open, tx, ty));
+        const lifted: AntiJuggleTower[] = [];
+        for (const juggler of [...this.antiJugglers]) {
+            const opened: {[index: number]: boolean} = {};
+            for (const [x, y] of juggler.cells()) {
+                opened[x + y * columns] = true;
+            }
+            const openWithout = (x: number, y: number) => opened[x + y * columns] === true || this.maze[x][y] === Walkable.Walkable;
+            const changes = legs.some((leg, i) => {
+                const without = distanceField(columns, rows, openWithout, targets[i][0], targets[i][1]);
+                return leg.creeps.some(creep => {
+                    const [x, y] = cell(creep.x, creep.y);
+                    return at(without, x, y) !== at(now[i], x, y);
+                });
+            });
+            if (!changes) {
+                this.removeAntiJuggler(juggler);
+                lifted.push(juggler);
+                now = targets.map(([tx, ty]) => distanceField(columns, rows, open, tx, ty));
+            }
+        }
+        return lifted;
+    }
+
+    /** Takes a blocker away: its destructable goes and its cells are open again (unless built on since). */
+    public removeAntiJuggler(juggler: AntiJuggleTower): void {
+        juggler.EndOfRoundAction();
+        for (const [x, y] of juggler.cells()) {
+            if (this.maze[x][y] === Walkable.Protected) {
+                this.setWalkable(x, y, Walkable.Walkable);
+            }
+        }
+        this.antiJugglers = this.antiJugglers.filter(other => other !== juggler);
+    }
+
     /** The anti-juggle blocker whose footprint is exactly the tower footprint centred on (x, y). */
     public antiJugglerAt(x: number, y: number): AntiJuggleTower | undefined {
         return this.antiJugglers.find(juggler => juggler.isAt(x, y));

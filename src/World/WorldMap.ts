@@ -1,4 +1,5 @@
 import { WarcraftMaul } from './WarcraftMaul';
+import {AntiJuggleRelease} from './Antiblock/AntiJuggleRelease';
 import { Ship } from './Entity/Ship';
 import { WaveCreep } from './Entity/WaveCreep';
 import { Race } from './Game/Races/Race';
@@ -35,6 +36,7 @@ export class WorldMap {
     public disabledRaces: number = 0;
     public towerConstruction: TowerConstruction;
     public antiBlock?: AntiBlock;
+    public antiJuggleRelease?: AntiJuggleRelease;
     private gameTimeTrigger: Trigger;
     public gameRoundHandler?: AbstractGameRound;
     public gameTurn: GameTurn;
@@ -49,6 +51,7 @@ export class WorldMap {
         this.gameTimeTrigger.addAction(() => this.UpdateGameTime());
         this.gameTurn = new GameTurn();
         this.antiBlock = new AntiBlock(this);
+        this.antiJuggleRelease = new AntiJuggleRelease(this);
 
 
         // this.gameRoundHandler = new ClassicGameRound(this.game);

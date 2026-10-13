@@ -2,6 +2,19 @@
 
 ## Bugs
 - [x] Void fragment-based buildings: when a build is cancelled by anti-juggle / anti-block, the fragment (mana) cost is not refunded. Gold is refunded by the cancel; the mana path needs the same. (f2de51b)
+- [x] Creeps that stopped going on properly after a tower was built just ahead of them or changed
+  their way (seen in an online game, not a block). Not reproduced: test_creeps_go_on_when_built_ahead
+  (wc3-slop-lan measure.py: a builder builds ahead of a wave's lead creep every 1.2 s) found no
+  creep standing still before or after. Still, every build during a wave now sends the lane's
+  creeps on along a fresh way (AntiBlock.repathLane), so a way the new tower spoils is planned
+  again at once (2026-10-13).
+- [x] Anti-juggle blockers lifted as soon as they guard nothing, not only at the end of the round
+  (continuous spawning): AntiJuggleRelease looks every second during a wave, and a blocker goes
+  once opening it would change the way of no creep now walking, towards the checkpoint each is
+  on its way to (Maze.liftIdleAntiJugglers). test_anti_juggle_lifts_when_safe: one in the second
+  leg's maze goes within a second while the wave is on the first leg; one in a wall on the first
+  leg stays while its opening would shorten a creep's way (judged by the test on its own) and
+  goes after (2026-10-13).
 
 ## Features
 - [x] Range check mode (`-range` / action bar button): a toggle (action bar button and/or chat command, per player, local) that draws the attack range around the currently selected tower while enabled. Selection events already exist per player (`Defender.SelectUnit`); range from `BlzGetUnitWeaponRealField(ATTACK_RANGE)`; render as a local-only image/effect ring like the maze grid.

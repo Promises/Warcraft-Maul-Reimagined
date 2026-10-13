@@ -90,6 +90,12 @@ export class AntiJuggleTower {
         }
     }
 
+    /** The four grid cells its footprint covers in its lane's maze. */
+    public cells(): [number, number][] {
+        return [[this.leftSide, this.bottomSide], [this.rightSide, this.bottomSide],
+            [this.leftSide, this.topSide], [this.rightSide, this.topSide]];
+    }
+
     /** Whether this blocker sits exactly on a tower footprint centred on (x, y). */
     public isAt(x: number, y: number): boolean {
         return this.x === x && this.y === y;
