@@ -36,13 +36,17 @@
     Haboob and Endless Storm (Haboob.ts).
   - [x] "My Primal did nothing": every Primal attacks a ground wave but the Thunderhead, which attacks
     air only (its tooltip says so) - test_primals_attack_a_wave. Most likely what was seen.
-  - [ ] Moss, the Sapling, Decay Level 2 and the Depleted Rock cannot be sold (no A02D). Intended
-    for the rock, Moss and Sapling? Decay Level 2 looks like an oversight.
+  - [x] Moss, the Sapling and Decay Level 2 can be sold now (they had no A02D); the Depleted Rock stays
+    unsellable, as decided (test_elementalist_towers_sell, 2026-10-13).
   - [ ] "A free Surge sometimes": no path in the code gives one (Surge always takes 60); Attunement
     also rises 1 a wave by itself, but is shown nowhere. Ask what was seen; maybe show Attunement.
   - [ ] Plague's portrait keeps changing: its Rat model in the portrait. Cosmetic, left as it is.
-  - [ ] Placeholder tooltips still on Purgatory, Decay, Tornado, Sandstorm, Wildfire, Bubbles, Mist,
-    Blaze and the Level 2 Life, Air Runes (Nature, Fire, Water L2 and the Life Rune have none).
+  - [x] Purgatory, Decay, Tornado, Sandstorm, Wildfire, Bubbles, Mist, Blaze and the Level 2 Life and
+    Air Runes have real tooltips (ElementalistPrimals.ts roles, from their fields and classes; their
+    own abilities' tooltips are stale in places: Purgatory's says 6 a second, Decay's 3, Mist's a
+    slow it does not have) (2026-10-13).
+  - [ ] Still no tooltip: the Life Rune and the Level 2 Nature, Fire and Water Runes. Wildfire's attack
+    lists no targets in its data, so its tooltip says none.
   - Wildfire: 16 gold for 42 dps, 50 more for Level 2 at 88 dps (a balance note, not a bug).
 - [x] Autocast abilities on as a tower is set up (Autocast.ts, scripts/autocast.js, from the map's
   data): Parasitic Bite, Bloodlust, Inner Fire, Raise Dead, Cold Arrows (test_autocast_on_from_the_start).
@@ -166,8 +170,7 @@
     kept in the save (section 1 grows by two bit sets). Debug command -learn sets a book up.
     test_recipe_book (wc3-slop-lan measure.py): the four states as screenshots, clicks by both
     players, in step, the save round trip; `npm run test:lua` covers the offer and old saves.
-  - [ ] Look at the book's tooltips in game (hover cannot be scripted; placement is from a corner so
-    the top rows' stay on screen).
+  - [x] The book's tooltips, looked at in game: they work (2026-10-13).
 
 - [x] The mode and difficulty votes end as soon as every player has voted, instead of always
   waiting their 10 s (the timer still ends them for players who do not vote). The results go to

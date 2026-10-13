@@ -27,13 +27,14 @@ export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LIC
         const base = Number(unit.attack1DamageBase ?? 0) + Number(unit.attack1DamageNumberOfDice ?? 1);
         const top = Number(unit.attack1DamageBase ?? 0) + Number(unit.attack1DamageNumberOfDice ?? 1) * Number(unit.attack1DamageSidesPerDie ?? 1);
         const targets = String(unit.attack1TargetsAllowed ?? '').split(',');
-        const reach = targets.indexOf('air') !== -1 && targets.indexOf('ground') !== -1 ? 'air and ground'
-            : targets.indexOf('air') !== -1 ? 'air only' : 'ground only';
+        // Nothing said where its data lists no targets (Wildfire's)
+        const reach = targets.indexOf('air') !== -1 && targets.indexOf('ground') !== -1 ? ', air and ground'
+            : targets.indexOf('air') !== -1 ? ', air only' : targets.indexOf('ground') !== -1 ? ', ground only' : '';
         const range = Number(unit.attack1Range ?? 0) <= 128 ? 'melee' : `range ${unit.attack1Range}`;
         const splash = Number(unit.attack1AreaOfEffectFullDamage ?? 0) > 0 && String(unit.attack1WeaponType) === 'msplash'
             ? `, splash ${unit.attack1AreaOfEffectFullDamage}` : '';
         return `Attack: ${kind.charAt(0).toUpperCase()}${kind.slice(1)}, ${base === top ? base : `${base}-${top}`} damage `
-            + `every ${Number(unit.attack1CooldownTime).toFixed(2)} s, ${range}, ${reach}${splash}.`;
+            + `every ${Number(unit.attack1CooldownTime).toFixed(2)} s, ${range}${reach}${splash}.`;
     };
     const roles: {[id: string]: string} = {
         'n026': 'Gains 5 damage every wave. Its upgrade (60 gold) makes it Undead Level 2, which keeps what '
@@ -45,18 +46,37 @@ export const {LICH, THUNDERHEAD, HABOOB, HEART_OF_LIFE, WORLD_TREE, INFERNO, LIC
         'u029': 'Low Tide risen, for one wave: it ebbs back to Low Tide when the wave ends.',
         'u020': 'When a creep dies in its lane, the creeps within 300 of it catch the plague: 50 '
             + 'damage a second for 5 seconds.',
-        'u021': 'Gains 1 mana every wave and grows into a Tree after its sixth. Cannot be sold.',
+        'u021': 'Gains 1 mana every wave and grows into a Tree after its sixth.',
         'u036': 'A grown Sapling. Fused with a Nature Rune Level 3 (400 gold) it becomes the World Tree, a Primal.',
         'u023': 'Drinks a Water Rune (Level 1), which turns to rock, and gains 1 mana: the tenth '
-            + 'it drinks makes it Fully Grown Moss. Cannot be sold.',
+            + 'it drinks makes it Fully Grown Moss.',
         'u037': 'Moss that has drunk ten Water Runes.',
         'n030': 'Its hits poison: 6 damage a second for 2 seconds.',
+        'n028': 'Burns every enemy within 300 for 20 damage a second, air and ground. Upgrades into Purgatory Level 2 '
+            + '(116 gold), which burns for 150 and, fused with a Fire Rune Level 3 (350 gold), becomes the Inferno.',
+        'u01E': 'Diseases the enemies that come near it: 15 damage a second. Upgrades into Decay Level 2 (200 gold), '
+            + 'whose disease deals 100 a second.',
+        'u022': 'Changes every wave: one wave Updraft, +20% attack speed for your towers within 500; the next a calm '
+            + 'that slows enemies within 800 by 20%.',
+        'u024': 'Hits up to 7 enemies in one attack. Upgrades into Sandstorm Level 2 (320 gold), which fused with '
+            + 'an Air Rune Level 3 (400 gold) becomes the Haboob.',
+        'u025': 'Its attacks set the ground on fire, which burns ground enemies standing in it. Upgrades into '
+            + 'Wildfire Level 2 (50 gold), and that into Wildfire Level 3 (434 gold).',
+        'u026': 'Loses 5 damage at the end of every wave; once it is down to 4 it pops and is an Uncharged Rune again.',
+        'u028': 'What it hits takes 10% more magic damage, from every tower, for 10 seconds.',
+        'u027': 'Burns out at the end of the wave: it is an Uncharged Rune again.',
+        'u02C': 'Upgrades into the Life Rune Level 3 (128 gold); two of those fused (500 gold) become the Heart of Life.',
+        'u032': 'Upgrades into the Air Rune Level 3 (80 gold), which fused with a Water Rune Level 3 (600 gold) becomes '
+            + 'the Thunderhead, and with Sandstorm Level 2 (400 gold) the Haboob.',
         'n027': 'What is left of a siphoned rune. Recharge (8 gold) makes it an Uncharged Rune again. Cannot be sold.',
     };
     // The two Runes a first fusion is made of, for its own tooltip (the book's cell shows them already)
     const recipes: {[id: string]: string} = {
         'n026': 'Life + Death', 'u01D': 'Life + Fire', 'u01F': 'Life + Water', 'u020': 'Death + Air',
         'u021': 'Life + Nature', 'u023': 'Nature + Water', 'n030': 'Water + Death',
+        'n028': 'Fire + Death', 'u01E': 'Nature + Death', 'u022': 'Life + Air', 'u024': 'Nature + Air',
+        'u025': 'Nature + Fire', 'u026': 'Water + Air', 'u028': 'Water + Fire', 'u027': 'Fire + Air',
+        'u02C': 'Life + Life', 'u032': 'Air + Air',
     };
     // A tower's own tooltip is not shown once it stands (only in a build menu), so the recipe book
     // shows the same text in its cell
