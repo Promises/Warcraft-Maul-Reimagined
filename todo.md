@@ -84,10 +84,12 @@
   - Wildfire: 16 gold for 42 dps, 50 more for Level 2 at 88 dps (a balance note, not a bug).
 - [x] Autocast abilities on as a tower is set up (Autocast.ts, scripts/autocast.js, from the map's
   data): Parasitic Bite, Bloodlust, Inner Fire, Raise Dead, Cold Arrows (test_autocast_on_from_the_start).
-- [ ] The Bronze Dragon Whelp, Drake and Dragon never cast their Slow (A0DA): their class orders
-  'slow' on each attack, and in a test the Whelp attacked 28 times in 20 s with 0 casts, while a
-  Slow ordered from Lua cast at once. Its autocast cannot be switched on (the game refuses slowon
-  for ACsw). Cause not found yet (2026-10-10).
+- [x] The Bronze Dragon Whelp, Drake and Dragon never cast their Slow (A0DA): DragonTowers was never
+  registered in RaceInitialiser (since the w3ts rewrite), so every Bronze tower was a plain Tower
+  and its GenericAttack, which orders 'slow' on each attack, never ran. Registered now;
+  test_bronze_towers_cast_slow (wc3-slop-lan measure.py). Found with a sim probe: the same order
+  from our own trigger in the attacked event cast fine, and the map gave the tower no order at all
+  (2026-10-14).
 - [x] -resetgame (debug only): the game as just after the settings, same mode and difficulty - creeps
   gone, wave 1 with its timer, starting lives, every player's towers and units gone (their sell
   bookkeeping run), mazes open, starting gold and lumber, no race, race picker open (ResetGame.ts).

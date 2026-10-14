@@ -6,6 +6,7 @@ import { CavernousCreaturesTowers } from './CavernousCreatures/CavernousCreature
 import { CorruptedNightElfTowers } from './CorruptedNightElves/CorruptedNightElfTowers';
 import { DemonTowers } from './Demon/DemonTowers';
 import { DraeneiTowers } from './Draenei/DraeneiTowers';
+import { DragonTowers } from './Dragons/DragonTowers';
 import { DwarfTowers } from './Dwaven/DwarfTowers';
 import { ElementalistTowers } from './Elementalist/ElementalistTowers';
 import { ForestTrollTowers } from './ForestTrolls/ForestTrollTowers';
@@ -41,6 +42,7 @@ export function InitialiseAllRaceTowers(): TowerMap<number, object> {
     races.push(new CorruptedNightElfTowers());
     races.push(new DemonTowers());
     races.push(new DraeneiTowers());
+    races.push(new DragonTowers());
     races.push(new DwarfTowers());
     races.push(new ElementalistTowers());
     races.push(new ForestTrollTowers());
