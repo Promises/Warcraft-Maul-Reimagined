@@ -82,6 +82,8 @@ export class TowerConstruction {
             Log.Error("Could not get affected tower for upgrade")
             return;
         }
+        // The harness waits for this: a structure reads as its new type from the upgrade's start
+        SyncTrace.note('upgraded', `${SyncTrace.unit(tower)} type=${DecodeFourCC(tower.typeId)}`);
         const owner: Defender | undefined = this.game.players.get(tower.owner.id);
         if (!owner) {
             return;
