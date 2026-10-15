@@ -1,10 +1,12 @@
-import {Trigger} from 'w3ts';
+import {MapPlayer, Trigger} from 'w3ts';
 import {WarcraftMaul} from '../WarcraftMaul';
 import {Defender} from '../Entity/Players/Defender';
 import {Log} from '../../lib/Serilog/Serilog';
 import {SyncTrace} from '../../lib/SyncTrace';
 
 export type SyncHandler = (player: Defender, data: string) => void;
+/** A handler for a message any player of the game may send, not only a defender. */
+export type AnyPlayerHandler = (player: MapPlayer, data: string) => void;
 
 /**
  * Runs player actions on every client.
@@ -27,11 +29,17 @@ export type SyncHandler = (player: Defender, data: string) => void;
 export class PlayerSync {
     private static readonly PREFIX = 'wm';
     private readonly handlers: Map<string, SyncHandler> = new Map<string, SyncHandler>();
+    private readonly anyPlayerHandlers: Map<string, AnyPlayerHandler> = new Map<string, AnyPlayerHandler>();
 
     constructor(private readonly game: WarcraftMaul) {
         const trigger = Trigger.create();
-        for (const player of game.players.values()) {
-            trigger.registerPlayerSyncEvent(player, PlayerSync.PREFIX, false);
+        // Every player of the game, defender or not: a host bot (or an observer) is a player who
+        // defends no lane, and some messages are theirs too (onAnyPlayer)
+        for (let i = 0; i < bj_MAX_PLAYER_SLOTS; i++) {
+            const player = MapPlayer.fromIndex(i);
+            if (player && player.controller === MAP_CONTROL_USER && player.slotState === PLAYER_SLOT_STATE_PLAYING) {
+                trigger.registerPlayerSyncEvent(player, PlayerSync.PREFIX, false);
+            }
         }
         trigger.addAction(() => this.dispatch(BlzGetTriggerSyncData() ?? ''));
     }
@@ -49,6 +57,20 @@ export class PlayerSync {
         const command = separator === -1 ? rest : rest.substring(0, separator);
         const data = separator === -1 ? '' : rest.substring(separator + 1);
         SyncTrace.note('sync', message);
+        const anyPlayer = this.anyPlayerHandlers.get(command);
+        if (anyPlayer) {
+            const sender = MapPlayer.fromIndex(senderId);
+            if (!sender) {
+                Log.Warning(`Unhandled sync message '${message}'`);
+                return;
+            }
+            try {
+                anyPlayer(sender, data);
+            } catch (error) {
+                Log.Error(`sync '${message}' failed: ${error}`);
+            }
+            return;
+        }
         const player = this.game.players.get(senderId);
         const handler = this.handlers.get(command);
         if (!player || !handler) {
@@ -65,6 +87,11 @@ export class PlayerSync {
 
     public on(command: string, handler: SyncHandler): void {
         this.handlers.set(command, handler);
+    }
+
+    /** A command any player of the game may send, a defender or not (host detection). */
+    public onAnyPlayer(command: string, handler: AnyPlayerHandler): void {
+        this.anyPlayerHandlers.set(command, handler);
     }
 
     public send(command: string, data: string = ''): void {

@@ -14,7 +14,7 @@ export const Quests: Quest[] = [
         title: `5.0.0 - 14`,
         icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
         stype: 0,
-        body: `Updates:\n- Observers watch without a lane, and their game ends by itself once every player has left`,
+        body: `Updates:\n- Observers watch without a lane, and their game ends by itself once every player has left\n- A game whose host doesn't play (a host bot, or a host who only observes) goes straight to the players' vote on mode and difficulty; no player is handed the host's choice`,
     },
     {
         title: `5.0.0 - 13`,

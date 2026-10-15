@@ -31,9 +31,14 @@ export class HostDetection {
     private longestLobbyWait: number = -1;
 
     constructor(private readonly game: WarcraftMaul) {
-        game.playerSync.on('host', player => this.setHost(player, 'disk'));
-        game.playerSync.on('host-race', player => this.setHost(player, 'race'));
-        game.playerSync.on('host-lobby', (player, wait) => this.recordLobbyWait(player, Number(wait)));
+        // Any player of the game may be its host, a defender or not: a host bot in the attackers'
+        // slot, or a host who only observes. Such a host chooses nothing, so the players vote
+        // (Vote.begin). The wc3-slop-lan harness's own seat is left out: its tests keep red as
+        // the host, for its settings command
+        const fromHost = (player: MapPlayer) => Slop === undefined || player.id !== Slop.seat;
+        game.playerSync.onAnyPlayer('host', player => fromHost(player) && this.setHost(player, 'disk'));
+        game.playerSync.onAnyPlayer('host-race', player => fromHost(player) && this.setHost(player, 'race'));
+        game.playerSync.onAnyPlayer('host-lobby', (player, wait) => fromHost(player) && this.recordLobbyWait(player, Number(wait)));
 
         Timer.create().start(ANNOUNCE_DELAY, false, () => this.announce());
         Timer.create().start(FALLBACK_DELAY, false, () => {
