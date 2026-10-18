@@ -5,6 +5,7 @@
 import {saveTests} from './save.test';
 import {recipeTests} from './recipe.test';
 import {pathFieldTests} from './pathfield.test';
+import {difficultyTests} from './difficulty.test';
 
 let failures = 0;
 let passed = 0;
@@ -21,6 +22,7 @@ export function check(this: void, what: string, ok: boolean, detail: string = ''
 saveTests(check);
 recipeTests(check);
 pathFieldTests(check);
+difficultyTests(check);
 print(`${passed} passed, ${failures} failed`);
 if (failures > 0) {
     os.exit(1);

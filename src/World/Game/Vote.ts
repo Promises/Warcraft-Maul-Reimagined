@@ -11,6 +11,7 @@ import {VotePanel} from './Ui/VotePanel';
 import {HostSettingsPanel} from './Ui/HostSettingsPanel';
 import {Defender} from '../Entity/Players/Defender';
 import {SyncTrace} from '../../lib/SyncTrace';
+import {votedDifficulty} from './DifficultyVote';
 
 // Host detection answers within a second or two; after this the players vote instead
 const HOST_WAIT = 3.00;
@@ -37,7 +38,6 @@ export class Vote {
     private votedMode: number[] = [];
     private hasVotedMode: boolean[] = [];
     private votedDiff: number[] = [];
-    private totalVotedDiff: number = 0;
     // A vote ends when everyone has voted or its time is up, whichever comes first - once
     private modeVoteOpen: boolean = false;
     private diffVoteOpen: boolean = false;
@@ -229,26 +229,25 @@ export class Vote {
             return;
         }
         this.diffVoteOpen = false;
-        let voteCount: number = 0;
+        const votes: number[] = [];
         for (const player of this.game.players.values()) {
             if (!this.votedDiff[player.id]) {
                 this.panel.hide(player);
                 SendMessage(`${player.getNameWithColour()} did not vote, their vote will not be counted`);
             } else {
-                voteCount++;
-                this.totalVotedDiff += this.votedDiff[player.id];
+                votes.push(this.votedDiff[player.id]);
             }
         }
-        if (voteCount === 0) {
+        if (votes.length === 0) {
             SendMessage('Nobody voted, difficulty will automatically be set to Normal');
             this.applyDifficulty(settings.DIFFICULTIES[0]);
         } else {
-            this.applyDifficulty(this.totalVotedDiff / voteCount);
+            this.applyDifficulty(votedDifficulty(votes));
         }
-        SyncTrace.note('vote', `difficulty=${this.difficulty} votes=${voteCount}`);
+        SyncTrace.note('vote', `difficulty=${this.difficulty} votes=${votes.length}`);
     }
 
-    /** Sets the difficulty (a percentage, possibly a vote average) and everything that hangs off it. */
+    /** Sets the difficulty (a percentage, possibly a blend of the votes) and everything that hangs off it. */
     private applyDifficulty(difficulty: number): void {
         this.game.scoreBoard = new MultiBoard(this.game);
         const diffIndex: number = R2I((difficulty - 100.00) / 100.00 + ModuloReal((difficulty - 100.00) / 100.00, 1.00));
