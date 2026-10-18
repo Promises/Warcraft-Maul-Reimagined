@@ -2765,13 +2765,6 @@ STRING 448
 Construct Thaddius
 }
 
-STRING 449
-// Units: h011 ([Goblins] - Pocket Factory), Ubertip (Tooltip - Extended)
-{
-This sweatshop factory is packed with wage-slave Goblins who continuously churn out Mecha-Goblins. Has no attack of its own, but spawns Mecha-Goblins to bash on enemies.|n
-|cffffcc00Unit Attack:|r Normal|n|cffffcc00Cooldown:|r 0.40|n|cffffcc00Damage:|r 28 (Ground only)
-}
-
 STRING 450
 // Units: o00U ([Aviaries] - Phoenix), Hotkey (Hotkey)
 {
@@ -4635,12 +4628,6 @@ STRING 759
 Build Star Shooter
 }
 
-STRING 760
-// Units: e00J ([Galaxy] - Star Shooter), Ubertip (Tooltip - Extended)
-{
-The Starshooter is a member of the group called Star Shooters, they can't actually shoot stars, obviously.|n|n|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 1.1|n|cffffcc00Damage:|r 22 - 22|n|cffffcc00Range:|r 1000|n|cffffcc00Ability:|r Can hit two extra targets for half damage each.
-}
-
 STRING 761
 // Units: e00K ([Galaxy] - Moon Dancer), Name (Name)
 {
@@ -5089,12 +5076,6 @@ STRING 835
 // Units: h000 ([Undead] - Antonidas the Undead), Tip (Tooltip - Basic)
 {
 Build Antonidas the Undead
-}
-
-STRING 836
-// Units: h000 ([Undead] - Antonidas the Undead), Ubertip (Tooltip - Extended)
-{
-Once a great human mage has been turned into a ghost fighting for the undead hordes so he alone can avoid eternal torture and damnation|n|n|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.25|n|cffffcc00Damage:|r 800 - 800|n|cffffcc00Range:|r 800|n|cffffcc00Ability:|r Diamond Summoning; allows him to attack 8 enemies at once
 }
 
 STRING 837
@@ -5837,12 +5818,6 @@ STRING 959
 Hire Centaur Outrunner
 }
 
-STRING 960
-// Units: h01C ([Tavern] - Centaur Outrunner), Ubertip (Tooltip - Extended)
-{
-These centaurs are often hired as mercenaries to take out simple targets|n|n|cffffcc00Attack:|r Pierce|n|cffffcc00Cooldown:|r 1.25|n|cffffcc00Damage:|r 19 - 24|n|cffffcc00Range:|r 900
-}
-
 STRING 961
 // Units: h01D ([Tavern] - Forest Troll Shadow Priest), Name (Name)
 {
@@ -5901,12 +5876,6 @@ STRING 970
 // Units: h01F ([Tavern] - Earth Pandaren), Tip (Tooltip - Basic)
 {
 Hire Earth Pandaren
-}
-
-STRING 971
-// Units: h01F ([Tavern] - Earth Pandaren), Ubertip (Tooltip - Extended)
-{
-The first of the panda brothers is the Earth Pandaren, he spends most of his time in your tavern|n|n|cffffcc00Attack:|r Magic|n|cffffcc00Cooldown:|r 1.00|n|cffffcc00Damage:|r 2 - 2|n|cffffcc00Range:|r 900|n|cffffcc00Ability:|r Drunken Haze; increases damage taken by 25% for 25 seconds
 }
 
 STRING 972
@@ -6185,12 +6154,6 @@ STRING 1017
 Upgrade to Dire Spirit Wolf
 }
 
-STRING 1018
-// Units: h023 ([Summons] - Dire Spirit Wolf), Ubertip (Tooltip - Extended)
-{
-|cffffcc00Attack:|r Normal|n|cffffcc00Cooldown:|r 0.35|n|cffffcc00Damage:|r 55 - 68|n|cffffcc00Range:|r Melee|n|cffffcc00Ability:|r Can be upgraded to Great Spirit Wolf|n|cffffcc00Ability (2):|r Wolf Bash; 15% chance on attack to deal extra damage and stun
-}
-
 STRING 1019
 // Units: h024 ([Summons] - Great Spirit Wolf), Name (Name)
 {
@@ -6339,12 +6302,6 @@ STRING 1043
 // Units: h029 ([Summons] - Spirit Hawk), Tip (Tooltip - Basic)
 {
 Summon Spirit Hawk
-}
-
-STRING 1044
-// Units: h029 ([Summons] - Spirit Hawk), Ubertip (Tooltip - Extended)
-{
-|cffffcc00Attack:|r Magic|n|cffffcc00Cooldown:|r 0.25|n|cffffcc00Damage:|r 2000|n|cffffcc00Range:|r Melee (ground only)
 }
 
 STRING 1045
@@ -6881,12 +6838,6 @@ STRING 1133
 Build Naga Slave
 }
 
-STRING 1134
-// Units: h03G ([Workers Union] - Naga Slave), Ubertip (Tooltip - Extended)
-{
-|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 1.30|n|cffffcc00Damage:|r 20|n|cffffcc00Range:|r 650 (ground only)|n|cffffcc00Ability:|r Naga Magic; 25% chance to cast frost bolt, 25% chance to cast forked lightning, 50% chance to do nothing because clearly this slave hasnt been whipped enough today|n|cffffcc00Ability (2):|r Every time this tower attacks increase damage by 20, damage resets at the end of a wave, primary attack only.|n|cffffcc00Attack (2):|r Chaos|n|cffffcc00Cooldown (2):|r 0.2|n|cffffcc00Damage (2):|r 475|n|cffffcc00Range (2):|r 800 (air only)|n|cffffcc00Ability (3):|r Splash; the area of effect is 100
-}
-
 STRING 1135
 // Units: h03G ([Workers Union] - Naga Slave), EditorSuffix (Name - Editor Suffix)
 {
@@ -7295,12 +7246,6 @@ STRING 1202
 Build Succubus
 }
 
-STRING 1203
-// Units: h03X ([Demon] - Succubus), Ubertip (Tooltip - Extended)
-{
-|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.20|n|cffffcc00Damage:|r 150 - 200|n|cffffcc00Range:|r 700|n|cffffcc00Ability:|r Alluring Gaze; decreases the movement speed of enemy units within a 400 area of effect by 20%
-}
-
 STRING 1204
 // Units: h03F ([Workers Union] - Human Peasant), EditorSuffix (Name - Editor Suffix)
 {
@@ -7659,12 +7604,6 @@ STRING 1263
 // Units: h04D ([Humans] - Flame Tower), Tip (Tooltip - Basic)
 {
 Build Flame Tower
-}
-
-STRING 1264
-// Units: h04D ([Humans] - Flame Tower), Ubertip (Tooltip - Extended)
-{
-This tower takes a while to prepare it's concoction, but once it finally shoots it leaves a burning hell for enemies to walk into |n|n|cffffcc00Attack:|r Magic|n|cffffcc00Cooldown:|r 1.50|n|cffffcc00Damage:|r 50 - 50|n|cffffcc00Range:|r 800 (ground only)|n|cffffcc00Ability:|r Flames; leaves burning fire on the ground that deals 500 damage per second
 }
 
 STRING 1265
@@ -8343,12 +8282,6 @@ STRING 1377
 // Units: hC21 ([Undead] - Ghast), Tip (Tooltip - Basic)
 {
 Build Ghast
-}
-
-STRING 1378
-// Units: hC21 ([Undead] - Ghast), Ubertip (Tooltip - Extended)
-{
-The ghast is a fearsome creature that mostly dwells in the darkness underground, hiding it's ghastly body from anyone and everyone, but once in a while it surfaces, wreaking havoc wherever it goes|n|n|cffffcc00Attack:|r Magic|n|cffffcc00Cooldown:|r 0.10|n|cffffcc00Damage:|r 2 - 2|n|cffffcc00Range:|r 256|n|cffffcc00Ability:|r Poison; deals 6 damage per second for 2 seconds
 }
 
 STRING 1379
@@ -9797,12 +9730,6 @@ STRING 1619
 Ice Troll Joker
 }
 
-STRING 1620
-// Units: n01A ([Ice Trolls] - Ice Troll Joker), Ubertip (Tooltip - Extended)
-{
-An essential piece of art for the Ice Troll Tribe the first slow tower!|n|n|cffffcc00Attack:|r Magic|n|cffffcc00Cooldown:|r 0.10|n|cffffcc00Damage:|r 342 - 342|n|cffffcc00Range:|r 300|n|cffffcc00Ability:|r Frozen Destruction; slowed enemy units within range take 3x damage
-}
-
 STRING 1621
 // Units: n01B ([Ice Trolls] - Ice Troll King), Name (Name)
 {
@@ -9891,12 +9818,6 @@ STRING 1635
 // Units: n01E ([High Elven Farm] - Hungry Sheep), Tip (Tooltip - Basic)
 {
 Build Hungry Sheep
-}
-
-STRING 1636
-// Units: n01E ([High Elven Farm] - Hungry Sheep), Ubertip (Tooltip - Extended)
-{
-Nothing to worry about, definitely not a hungry sheep with a cannon|n|n|cffffcc00Attack:|r Normal|n|cffffcc00Cooldown:|r 2.00|n|cffffcc00Damage:|r 768 - 770|n|cffffcc00Range:|r 500|n|cffffcc00Ability:|r Splash; the area of effect is 120|n|cffffcc00Ability (2):|r Homesick; can't leave your spawn
 }
 
 STRING 1637
@@ -10037,12 +9958,6 @@ STRING 1659
 Upgrade to Albatross
 }
 
-STRING 1660
-// Units: n01L ([High Elven Farm] - Albatross), Ubertip (Tooltip - Extended)
-{
-Even when this guy is fed he's still just an albatross|n|n|cffffcc00Attack:|r Piercing|n|cffffcc00Cooldown:|r 0.50|n|cffffcc00Damage:|r 60 - 54|n|cffffcc00Range:|r 400|n|cffffcc00Ability:|r Homesick; can't leave your spawn
-}
-
 STRING 1661
 // Units: n01M ([High Elven Farm] - Well Fed Albatross), Name (Name)
 {
@@ -10091,12 +10006,6 @@ STRING 1668
 Immolation
 }
 
-STRING 1669
-// Units: n01N ([High Elven Farm] - Sheep), Ubertip (Tooltip - Extended)
-{
-The sheep is going crazy with the cannon!|n|n|cffffcc00Attack:|r Normal|n|cffffcc00Cooldown:|r 0.90|n|cffffcc00Damage:|r 768 - 770|n|cffffcc00Range:|r 700|n|cffffcc00Ability:|r Splash; the area of effect is 120|n|cffffcc00Ability (2):|r Homesick; can't leave your spawn
-}
-
 STRING 1670
 // Units: n01O ([High Elven Farm] - Well Fed Sheep), Name (Name)
 {
@@ -10107,12 +10016,6 @@ STRING 1671
 // Units: n01O ([High Elven Farm] - Well Fed Sheep), Tip (Tooltip - Basic)
 {
 Upgrade to Well Fed Sheep
-}
-
-STRING 1672
-// Units: n01O ([High Elven Farm] - Well Fed Sheep), Ubertip (Tooltip - Extended)
-{
-If you're looking for the crazy sheep with the cannon then I know an even crazier well fed sheep!|n|n|cffffcc00Attack:|r Normal|n|cffffcc00Cooldown:|r 0.90|n|cffffcc00Damage:|r 1536 - 1538|n|cffffcc00Range:|r 800|n|cffffcc00Ability:|r Splash; the area of effect is 120|n|cffffcc00Ability (2):|r Homesick; can't leave your spawn
 }
 
 STRING 1673
@@ -10203,12 +10106,6 @@ STRING 1687
 // Units: n01Q ([High Elven Farm] - Well Fed Crab), Tip (Tooltip - Basic)
 {
 Upgrade to Well Fed Crab
-}
-
-STRING 1688
-// Units: n01Q ([High Elven Farm] - Well Fed Crab), Ubertip (Tooltip - Extended)
-{
-Hungry hungry crab is coming to eat your Acolyte|n|n|cffffcc00Attack:|r Normal|n|cffffcc00Cooldown:|r 0.10|n|cffffcc00Damage:|r 544 - 556|n|cffffcc00Range:|r Melee|n|cffffcc00Ability:|r Homesick; can't leave your spawn
 }
 
 STRING 1689
@@ -10673,12 +10570,6 @@ STRING 1765
 Build Snow Owl
 }
 
-STRING 1766
-// Units: n020 ([Critters] - Snow Owl), Ubertip (Tooltip - Extended)
-{
-|cffffcc00Attack:|r Magic|n|cffffcc00Cooldown:|r 0.50|n|cffffcc00Damage:|r 800|n|cffffcc00Range:|r 750|n|cffffcc00Ability:|r Splash; the area of effect is 500 (ground only)|n|cffffcc00Attack (2):|r Magic|n|cffffcc00Cooldown (2):|r 0.25|n|cffffcc00Damage (2):|r 500|n|cffffcc00Range (2):|r 750|n|cffffcc00Ability (2):|r Splash; the area of effect is 600 (air only)
-}
-
 STRING 1767
 // Units: h04O ([Cavernous Creatures] - Cavern Revenant), EditorSuffix (Name - Editor Suffix)
 {
@@ -10956,7 +10847,7 @@ An assassin dedicated to killing the enemies one by one.|n|n|cffffcc00Attack:|r 
 }
 
 STRING 1813
-// Abilities: A0AZ ([Orc Stronghold] Summon Hawk), Researchhotkey (Hotkey - Learn)
+// Units: o001 ([Giants] - Giant King), Hotkey (Hotkey)
 {
 C
 }
@@ -11585,12 +11476,6 @@ STRING 1917
 Build Cow Catapult (Sheep)
 }
 
-STRING 1918
-// Units: n056 ([Caerbannog] - Cow Catapult (Sheep)), Ubertip (Tooltip - Extended)
-{
-The cow catapult was a great invention, the weight of a dead cow can crush even the strongest of foes! A shame this place only has sheep.|n|n|cffffcc00Attack:|r Magic|n|cffffcc00Cooldown:|r 1.0|n|cffffcc00Damage:|r 58 - 61|n|cffffcc00Range:|r 1000|n|cffffcc00Ability:|r Splash; the area of effect is 60
-}
-
 STRING 1919
 // Units: n057 ([Caerbannog] - Witch Hunter (Peasant)), Name (Name)
 {
@@ -11790,7 +11675,7 @@ STRING 1951
 }
 
 STRING 1952
-// Units: o001 ([Giants] - Giant King), Hotkey (Hotkey)
+// Units: o01G ([Dragons] - Green Drake), Hotkey (Hotkey)
 {
 C
 }
@@ -12123,12 +12008,6 @@ STRING 2007
 // Abilities: A00U (Overwhelming Power), Ubertip (Tooltip - Normal - Extended)
 {
 Giving Jake PHENOMENAL damage however, as a price, Jake has a long cool down and short range. ( 7.35 cooldown )
-}
-
-STRING 2008
-// Units: n05Q ([Dwarven Mine] - Dwarf King (Statue)), Ubertip (Tooltip - Extended)
-{
-A king amongst dwarfs (not in person, he's far too important to be here) is what this is a statue of|n|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.01|n|cffffcc00Damage:|r 2000 - 2000|n|cffffcc00Range:|r Melee|n|cffffcc00Ability:|r Kings Wrath; this tower has a 3% chance to cast shockwave whenever it damages a unit with its attack, shockwave deals 1000 damage
 }
 
 STRING 2009
@@ -12504,7 +12383,7 @@ STRING 2070
 }
 
 STRING 2071
-// Units: o01G ([Dragons] - Green Drake), Hotkey (Hotkey)
+// Units: o01L ([Dragons] - Green Dragon), Hotkey (Hotkey)
 {
 C
 }
@@ -12567,12 +12446,6 @@ STRING 2081
 // Units: o003 ([Outland] - Chaos Grunt), Tip (Tooltip - Basic)
 {
 Build Chaos Grunt
-}
-
-STRING 2082
-// Units: o003 ([Outland] - Chaos Grunt), Ubertip (Tooltip - Extended)
-{
-Legions of corrupted orcs server Magtheridon. Basic melee tower.|n|n|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.85|n|cffffcc00Damage:|r 45 - 50|n|cffffcc00Range:|r Melee|n|cffffcc00Ability:|r Critical Strike; gives a 50% chance that an attack will deal 2 times normal damage
 }
 
 STRING 2083
@@ -12642,7 +12515,7 @@ Build Chaos Kodo Beast
 }
 
 STRING 2094
-// Abilities: A0BK ([Void Cult] Summon Void Monstrosity), Hotkey (Hotkey - Normal)
+// Units: oC78 ([Naxx] - Sir Zeliek), Hotkey (Hotkey)
 {
 C
 }
@@ -13239,12 +13112,6 @@ STRING 2199
 // Units: o00V ([Outland] - Chaos Raider), Tip (Tooltip - Basic)
 {
 Build Chaos Raider
-}
-
-STRING 2200
-// Units: o00V ([Outland] - Chaos Raider), Ubertip (Tooltip - Extended)
-{
-|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 1.00|n|cffffcc00Damage:|r 200 - 200|n|cffffcc00Range:|r Melee|n|cffffcc00Ability:|r Splash; the area of effect is 192|n|cffffcc00Ability (2):|r Critical Strike; gives a 50% chance that an attack will deal 2 times normal damage
 }
 
 STRING 2201
@@ -14165,12 +14032,6 @@ STRING 2370
 Build Meat Wagon
 }
 
-STRING 2371
-// Units: oC56 ([Undead] - Meat Wagon), Ubertip (Tooltip - Extended)
-{
-Meat Wagons usually carry the dead which is why they are full of plagues and diseases and should not be approached by anyone other than the dead themselves|n|n|cffffcc00Attack:|r Siege|n|cffffcc00Cooldown:|r 4.00|n|cffffcc00Damage:|r 16 - 19|n|cffffcc00Range:|r 900 (ground only)|n|cffffcc00Ability:|r Splash; the area of effect is 150|n|cffffcc00Ability(2):|r Disease Cloud; deals 36 damage a second for 20 seconds
-}
-
 STRING 2372
 // Units: oC58 ([Orc Stronghold] - Barrelmaster), Name (Name)
 {
@@ -15021,12 +14882,6 @@ STRING 2526
 // Units: u00F ([Forsaken] - Gargoyle Spire), Tip (Tooltip - Basic)
 {
 Build Gargoyle Spire
-}
-
-STRING 2527
-// Units: u00F ([Forsaken] - Gargoyle Spire), Ubertip (Tooltip - Extended)
-{
-While normal at first glance, this structure is teaming with savage Gargoyles just waiting to swoop down on unsuspecting prey.|n|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 6.0|n|cffffcc00Damage:|r 2-2|n|cffffcc00Range:|r 900|n|cffffcc00Ability:|r Gargoyle Swarm: Unleashes a swarm of fifteen gargoyles to attack enemies within range. The Gargoyles hit for 250 damage.
 }
 
 STRING 2528
@@ -16517,6 +16372,12 @@ STRING 2775
 Corrupted Night Elves
 }
 
+STRING 2776
+// Units: e00J ([Galaxy] - Star Shooter), Ubertip (Tooltip - Extended)
+{
+The Starshooter is a member of the group called Star Shooters, they can't actually shoot stars, obviously.|n|n|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 1.00|n|cffffcc00Damage:|r 20 - 20|n|cffffcc00Range:|r 1000|n|cffffcc00Ability:|r Can hit two extra targets for half damage each.
+}
+
 STRING 2777
 // Items: I00J (Goblins), Hotkey (Hotkey)
 {
@@ -16565,6 +16426,12 @@ STRING 2784
 Forest Troll Hut
 }
 
+STRING 2785
+// Units: n056 ([Caerbannog] - Cow Catapult (Sheep)), Ubertip (Tooltip - Extended)
+{
+The cow catapult was a great invention, the weight of a dead cow can crush even the strongest of foes! A shame this place only has sheep.|n|n|cffffcc00Attack (1):|r Magic|n|cffffcc00Cooldown:|r 1.00|n|cffffcc00Damage:|r 69 - 72 (ground only)|n|cffffcc00Range:|r 1000|n|cffffcc00Ability:|r Splash; the area of effect is 60|n|n|cffffcc00Attack (2):|r Magic|n|cffffcc00Cooldown:|r 0.30|n|cffffcc00Damage:|r 83 - 86 (air only)|n|cffffcc00Range:|r 1000|n|cffffcc00Ability:|r Splash; the area of effect is 650
+}
+
 STRING 2786
 // Items: I00P (Alliance of Blades), Name (Name)
 {
@@ -16578,7 +16445,7 @@ F
 }
 
 STRING 2788
-// Units: o01L ([Dragons] - Green Dragon), Hotkey (Hotkey)
+// Items: I00R (Ice Troll Hut), Hotkey (Hotkey)
 {
 C
 }
@@ -16661,6 +16528,12 @@ STRING 2801
 High Elf Farm
 }
 
+STRING 2802
+// Abilities: AP01 ([Elementalists] Ascend), Name (Name)
+{
+[Elementalists] Ascend
+}
+
 STRING 2803
 // Units: u01B ([Builder] - Bringer of Buffs), EditorSuffix (Name - Editor Suffix)
 {
@@ -16671,6 +16544,12 @@ STRING 2804
 // Items: I027 (Uniques [Geno]), Hotkey (Hotkey)
 {
 A
+}
+
+STRING 2805
+// Abilities: AP01 ([Elementalists] Ascend), Tip (Tooltip - Normal)
+{
+Ascend [|cffffcc00V|r]
 }
 
 STRING 2806
@@ -16763,6 +16642,12 @@ STRING 2820
 Z
 }
 
+STRING 2821
+// Abilities: AP01 ([Elementalists] Ascend), Ubertip (Tooltip - Normal - Extended)
+{
+At Attunement 15, this Primal ascends: the Lich into the Lich King (400 gold), the Thunderhead into the Eye of the Storm (500), the Haboob into the Endless Storm (500), the Heart of Life into the Avatar of Life (600), the World Tree into Nordrassil (450), the Inferno into the Firelord (400). An Ascended tower gains 5% of its power every wave it stands, with no cap. One of each Ascended per player.
+}
+
 STRING 2822
 // Units: u039 (Purgatory - Level 2), Hotkey (Hotkey)
 {
@@ -16797,6 +16682,12 @@ STRING 2827
 // Abilities: A04W (Artifact Curse), EditorSuffix (Editor Suffix)
 {
  (Unholy Aura)
+}
+
+STRING 2828
+// Abilities: AP02 ([Elementalists] Surge), Name (Name)
+{
+[Elementalists] Surge
 }
 
 STRING 2829
@@ -16848,9 +16739,15 @@ D
 }
 
 STRING 2837
-// Units: oC78 ([Naxx] - Sir Zeliek), Hotkey (Hotkey)
+// Abilities: A07M ( Allow 11 - Dark Green), Hotkey (Hotkey - Normal)
 {
 C
+}
+
+STRING 2838
+// Abilities: AP02 ([Elementalists] Surge), Tip (Tooltip - Normal)
+{
+Surge [|cffffcc00G|r]
 }
 
 STRING 2839
@@ -16859,10 +16756,22 @@ STRING 2839
 X
 }
 
+STRING 2840
+// Abilities: AP02 ([Elementalists] Surge), Ubertip (Tooltip - Normal - Extended)
+{
+Buys one level of Attunement for 60 gold: up to 10 levels over this Primal's life, never past 15. The growth after Ascension only comes from waves survived.
+}
+
 STRING 2841
 // Abilities: A07R ( Deny 02 - Blue), Hotkey (Hotkey - Normal)
 {
 W
+}
+
+STRING 2842
+// Abilities: AP02 ([Elementalists] Surge), Hotkey (Hotkey - Normal)
+{
+G
 }
 
 STRING 2843
@@ -16914,7 +16823,7 @@ X
 }
 
 STRING 2851
-// Items: I00R (Ice Troll Hut), Hotkey (Hotkey)
+// Abilities: A080 ( Deny 11 - Dark Green), Hotkey (Hotkey - Normal)
 {
 C
 }
@@ -16943,6 +16852,18 @@ STRING 2855
 Z
 }
 
+STRING 2856
+// Abilities: AP03 ([Elementalists] Recharge), Name (Name)
+{
+[Elementalists] Recharge
+}
+
+STRING 2857
+// Abilities: AP03 ([Elementalists] Recharge), Tip (Tooltip - Normal)
+{
+Recharge [|cffffcc00R|r]
+}
+
 STRING 2858
 // Abilities: A0A7 (Infuse), Hotkey (Hotkey - Normal)
 {
@@ -16968,13 +16889,13 @@ X
 }
 
 STRING 2862
-// Abilities: A07M ( Allow 11 - Dark Green), Hotkey (Hotkey - Normal)
+// Abilities: A0AZ ([Orc Stronghold] Summon Hawk), Hotkey (Hotkey - Normal)
 {
 C
 }
 
 STRING 2863
-// Abilities: A080 ( Deny 11 - Dark Green), Hotkey (Hotkey - Normal)
+// Abilities: A0AZ ([Orc Stronghold] Summon Hawk), Researchhotkey (Hotkey - Learn)
 {
 C
 }
@@ -17010,7 +16931,7 @@ X
 }
 
 STRING 2869
-// Abilities: A0AZ ([Orc Stronghold] Summon Hawk), Hotkey (Hotkey - Normal)
+// Abilities: A0BK ([Void Cult] Summon Void Monstrosity), Hotkey (Hotkey - Normal)
 {
 C
 }
@@ -17249,10 +17170,22 @@ STRING 2908
 Kel'Thuzad
 }
 
+STRING 2909
+// Abilities: AP03 ([Elementalists] Recharge), Ubertip (Tooltip - Normal - Extended)
+{
+Recharges the rock into an Uncharged Rune for 8 gold, which can take an element again.
+}
+
 STRING 2910
 // Abilities: A01Q (Glacier Caster Shell), Ubertip (Tooltip - Normal - Extended)
 {
 Loads a Glacier Caster Shell into the cannon. slowing the enimies when it hits. .50% slow in a 300 AOE 7.00 cooldown
+}
+
+STRING 2911
+// Abilities: AP03 ([Elementalists] Recharge), Hotkey (Hotkey - Normal)
+{
+R
 }
 
 STRING 2912
@@ -17295,6 +17228,12 @@ STRING 2918
 // Abilities: A0FK (Build), EditorSuffix (Editor Suffix)
 {
 (Spell Book)
+}
+
+STRING 2919
+// Abilities: AP04 ([Elementalists] Power), Name (Name)
+{
+[Elementalists] Power
 }
 
 STRING 2920
@@ -17548,6 +17487,24 @@ STRING 2952
 [T8]
 }
 
+STRING 2953
+// Abilities: AP04 ([Elementalists] Power), Tip (Tooltip - Normal)
+{
+Power
+}
+
+STRING 2954
+// Abilities: AP04 ([Elementalists] Power), Ubertip (Tooltip - Normal - Extended)
+{
+What this tower does, and what it has gained.
+}
+
+STRING 2955
+// Upgrades: R002 (Cloud), Hotkey (Hotkey)
+{
+V
+}
+
 STRING 2956
 // Abilities: A07X ( Deny 08 - Pink), Hotkey (Hotkey - Normal)
 {
@@ -17618,6 +17575,18 @@ STRING 2967
 // Abilities: A0BV ([Night Elf] Chimaera Transform), Hotkey (Hotkey - Normal)
 {
 Z
+}
+
+STRING 2968
+// Units: n020 ([Critters] - Snow Owl), Ubertip (Tooltip - Extended)
+{
+|cffffcc00Attack:|r Magic|n|cffffcc00Cooldown:|r 0.50|n|cffffcc00Damage:|r 800|n|cffffcc00Range:|r 750|n|cffffcc00Ability:|r Splash; the area of effect is 500 (ground only)|n|n|cffffcc00Attack (2):|r Magic|n|cffffcc00Cooldown:|r 0.25|n|cffffcc00Damage:|r 500|n|cffffcc00Range:|r 700|n|cffffcc00Ability:|r Splash; the area of effect is 600 (air only)
+}
+
+STRING 2969
+// Units: h03X ([Demon] - Succubus), Ubertip (Tooltip - Extended)
+{
+|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.20|n|cffffcc00Damage:|r 100 - 150|n|cffffcc00Range:|r 700|n|cffffcc00Ability:|r Alluring Gaze; decreases the movement speed of enemy units within a 400 area of effect by 20%
 }
 
 STRING 2970
@@ -17735,6 +17704,12 @@ STRING 2987
 The best aerial unit. It combines the speed of the chimeara with splash. Though its damage is lower than the chimeara it makes up for it with its splash.|n|n|cffffcc00Attack:|r Normal|n|cffffcc00Cooldown:|r 0.00|n|cffffcc00Damage:|r 200 - 250|n|cffffcc00Range:|r 700|n|cffffcc00Ability:|r Splash; the area of effect is 150
 }
 
+STRING 2988
+// Units: n05Q ([Dwarven Mine] - Dwarf King (Statue)), Ubertip (Tooltip - Extended)
+{
+A king amongst dwarfs (not in person, he's far too important to be here) is what this is a statue of|n|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.01|n|cffffcc00Damage:|r 2500 - 2500|n|cffffcc00Range:|r Melee|n|cffffcc00Ability:|r Kings Wrath; this tower has a 3% chance to cast shockwave whenever it damages a unit with its attack, shockwave deals 1000 damage
+}
+
 STRING 2989
 // Units: oC76 ([Naxxramas] - Ghoul), Ubertip (Tooltip - Extended)
 {
@@ -17808,6 +17783,12 @@ STRING 3000
 |cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.30|n|cffffcc00Damage:|r 600|n|cffffcc00Range:|r 900|n|cffffcc00Ability:|r Multishot; attacks up to 3 enemy targets at once.|n|cffffcc00Ability (2):|r Sunder Armor; reduces the armor of enemies hit based on the movement speed they lost.|n
 }
 
+STRING 3001
+// Units: h04D ([Humans] - Flame Tower), Ubertip (Tooltip - Extended)
+{
+This tower takes a while to prepare it's concoction, but once it finally shoots it leaves a burning hell for enemies to walk into |n|n|cffffcc00Attack:|r Magic|n|cffffcc00Cooldown:|r 1.50|n|cffffcc00Damage:|r 50 - 50|n|cffffcc00Range:|r 900 (ground only)|n|cffffcc00Ability:|r Flames; leaves burning fire on the ground that deals 500 damage per second
+}
+
 STRING 3002
 // Abilities: A0CA ([Cavernous Creatures] Resurrect), Hotkey (Hotkey - Normal)
 {
@@ -17864,10 +17845,40 @@ STRING 3010
 A truly helpful Tower for any situation. It removes 15% of any non-boss opponents current health. |n|n|cffffcc00Attack:|r Magic|n|cffffcc00Cooldown:|r 2.50|n|cffffcc00Damage:|r 400|n|cffffcc00Range:|r Melee|n|cffffcc00Ability:|r Splash; the area of effect is 128|n|cffffcc00Ability(2):|r Deadly Venom; enemies hit by this tower has their current health reduced by 15%
 }
 
+STRING 3011
+// Units: n01A ([Ice Trolls] - Ice Troll Joker), Ubertip (Tooltip - Extended)
+{
+An essential piece of art for the Ice Troll Tribe the first slow tower!|n|n|cffffcc00Attack:|r Normal|n|cffffcc00Cooldown:|r 0.10|n|cffffcc00Damage:|r 342 - 342|n|cffffcc00Range:|r 300|n|cffffcc00Ability:|r Frozen Destruction; slowed enemy units within range take 3x damage
+}
+
 STRING 3012
 // Abilities: A0DA (Slow), Unhotkey (Hotkey - Turn Off)
 {
 E
+}
+
+STRING 3013
+// Units: n01E ([High Elven Farm] - Hungry Sheep), Ubertip (Tooltip - Extended)
+{
+Nothing to worry about, definitely not a hungry sheep with a cannon|n|n|cffffcc00Attack:|r Siege|n|cffffcc00Cooldown:|r 2.00|n|cffffcc00Damage:|r 768 - 770|n|cffffcc00Range:|r 500|n|cffffcc00Ability:|r Splash; the area of effect is 120|n|cffffcc00Ability (2):|r Homesick; can't leave your spawn
+}
+
+STRING 3014
+// Units: n01L ([High Elven Farm] - Albatross), Ubertip (Tooltip - Extended)
+{
+Even when this guy is fed he's still just an albatross|n|n|cffffcc00Attack:|r Piercing|n|cffffcc00Cooldown:|r 0.50|n|cffffcc00Damage:|r 60 - 64|n|cffffcc00Range:|r 400|n|cffffcc00Ability:|r Homesick; can't leave your spawn
+}
+
+STRING 3015
+// Units: n01N ([High Elven Farm] - Sheep), Ubertip (Tooltip - Extended)
+{
+The sheep is going crazy with the cannon!|n|n|cffffcc00Attack:|r Siege|n|cffffcc00Cooldown:|r 0.90|n|cffffcc00Damage:|r 768 - 770|n|cffffcc00Range:|r 700|n|cffffcc00Ability:|r Splash; the area of effect is 120|n|cffffcc00Ability (2):|r Homesick; can't leave your spawn
+}
+
+STRING 3016
+// Units: n01O ([High Elven Farm] - Well Fed Sheep), Ubertip (Tooltip - Extended)
+{
+If you're looking for the crazy sheep with the cannon then I know an even crazier well fed sheep!|n|n|cffffcc00Attack:|r Siege|n|cffffcc00Cooldown:|r 0.90|n|cffffcc00Damage:|r 1536 - 1538|n|cffffcc00Range:|r 800|n|cffffcc00Ability:|r Splash; the area of effect is 120|n|cffffcc00Ability (2):|r Homesick; can't leave your spawn
 }
 
 STRING 3017
@@ -17888,6 +17899,12 @@ STRING 3019
 Scurvy
 }
 
+STRING 3020
+// Units: n01Q ([High Elven Farm] - Well Fed Crab), Ubertip (Tooltip - Extended)
+{
+Hungry hungry crab is coming to eat your Acolyte|n|n|cffffcc00Attack:|r Normal|n|cffffcc00Cooldown:|r 0.10|n|cffffcc00Damage:|r 544 - 554|n|cffffcc00Range:|r Melee|n|cffffcc00Ability:|r Homesick; can't leave your spawn
+}
+
 STRING 3021
 // Buffs/Effects: B00J (Scurvy), EditorName (Name (Editor Only))
 {
@@ -17906,10 +17923,28 @@ STRING 3023
 Scurvy
 }
 
+STRING 3024
+// Units: h000 ([Undead] - Antonidas the Undead), Ubertip (Tooltip - Extended)
+{
+Once a great human mage has been turned into a ghost fighting for the undead hordes so he alone can avoid eternal torture and damnation|n|n|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.25|n|cffffcc00Damage:|r 800 - 800|n|cffffcc00Range:|r 900|n|cffffcc00Ability:|r Diamond Summoning; allows him to attack 8 enemies at once
+}
+
+STRING 3025
+// Units: h01C ([Tavern] - Centaur Outrunner), Ubertip (Tooltip - Extended)
+{
+These centaurs are often hired as mercenaries to take out simple targets|n|n|cffffcc00Attack:|r Pierce|n|cffffcc00Cooldown:|r 1.25|n|cffffcc00Damage:|r 20 - 25|n|cffffcc00Range:|r 900
+}
+
 STRING 3026
 // Buffs/Effects: B00K (Scurvy), EditorName (Name (Editor Only))
 {
 Scurvy
+}
+
+STRING 3027
+// Units: h01F ([Tavern] - Earth Pandaren), Ubertip (Tooltip - Extended)
+{
+The first of the panda brothers is the Earth Pandaren, he spends most of his time in your tavern|n|n|cffffcc00Attack:|r Magic|n|cffffcc00Cooldown:|r 2.00|n|cffffcc00Damage:|r 2 - 2|n|cffffcc00Range:|r 900|n|cffffcc00Ability:|r Drunken Haze; increases damage taken by 25% for 25 seconds
 }
 
 STRING 3028
@@ -17928,6 +17963,61 @@ STRING 3030
 // Buffs/Effects: B00K (Scurvy), Buffubertip (Tooltip - Extended)
 {
 This unit has come down with a bad case of Scurvy and will take 100dmg a sec while in range of Proudmoore
+}
+
+STRING 3031
+// Units: h023 ([Summons] - Dire Spirit Wolf), Ubertip (Tooltip - Extended)
+{
+|cffffcc00Attack:|r Normal|n|cffffcc00Cooldown:|r 0.35|n|cffffcc00Damage:|r 55 - 67|n|cffffcc00Range:|r Melee|n|cffffcc00Ability:|r Can be upgraded to Great Spirit Wolf|n|cffffcc00Ability (2):|r Wolf Bash; 15% chance on attack to deal extra damage and stun
+}
+
+STRING 3032
+// Units: h029 ([Summons] - Spirit Hawk), Ubertip (Tooltip - Extended)
+{
+|cffffcc00Attack:|r Magic|n|cffffcc00Cooldown:|r 0.10|n|cffffcc00Damage:|r 2000|n|cffffcc00Range:|r Melee (ground only)
+}
+
+STRING 3033
+// Units: h03G ([Workers Union] - Naga Slave), Ubertip (Tooltip - Extended)
+{
+|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 1.30|n|cffffcc00Damage:|r 20|n|cffffcc00Range:|r 650 (ground only)|n|cffffcc00Ability:|r Naga Magic; 25% chance to cast frost bolt, 25% chance to cast forked lightning, 50% chance to do nothing because clearly this slave hasnt been whipped enough today|n|cffffcc00Ability (2):|r Every time this tower attacks increase damage by 20, damage resets at the end of a wave, primary attack only.|n|n|cffffcc00Attack (2):|r Magic|n|cffffcc00Cooldown:|r 0.2|n|cffffcc00Damage:|r 475|n|cffffcc00Range:|r 800 (air only)|n|cffffcc00Ability (3):|r Splash; the area of effect is 100
+}
+
+STRING 3034
+// Units: hC21 ([Undead] - Ghast), Ubertip (Tooltip - Extended)
+{
+The ghast is a fearsome creature that mostly dwells in the darkness underground, hiding it's ghastly body from anyone and everyone, but once in a while it surfaces, wreaking havoc wherever it goes|n|n|cffffcc00Attack:|r Magic|n|cffffcc00Cooldown:|r 0.20|n|cffffcc00Damage:|r 2 - 2|n|cffffcc00Range:|r 256|n|cffffcc00Ability:|r Poison; deals 6 damage per second for 2 seconds
+}
+
+STRING 3035
+// Units: o003 ([Outland] - Chaos Grunt), Ubertip (Tooltip - Extended)
+{
+Legions of corrupted orcs server Magtheridon. Basic melee tower.|n|n|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.80|n|cffffcc00Damage:|r 45 - 50|n|cffffcc00Range:|r Melee|n|cffffcc00Ability:|r Critical Strike; gives a 50% chance that an attack will deal 2 times normal damage
+}
+
+STRING 3036
+// Units: o00V ([Outland] - Chaos Raider), Ubertip (Tooltip - Extended)
+{
+|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 0.70|n|cffffcc00Damage:|r 200 - 200|n|cffffcc00Range:|r Melee|n|cffffcc00Ability:|r Splash; the area of effect is 192|n|cffffcc00Ability (2):|r Critical Strike; gives a 50% chance that an attack will deal 2 times normal damage
+}
+
+STRING 3037
+// Units: oC56 ([Undead] - Meat Wagon), Ubertip (Tooltip - Extended)
+{
+Meat Wagons usually carry the dead which is why they are full of plagues and diseases and should not be approached by anyone other than the dead themselves|n|n|cffffcc00Attack:|r Siege|n|cffffcc00Cooldown:|r 4.00|n|cffffcc00Damage:|r 17 - 19|n|cffffcc00Range:|r 900 (ground only)|n|cffffcc00Ability:|r Splash; the area of effect is 150|n|cffffcc00Ability(2):|r Disease Cloud; deals 36 damage a second for 20 seconds
+}
+
+STRING 3038
+// Units: u00F ([Forsaken] - Gargoyle Spire), Ubertip (Tooltip - Extended)
+{
+While normal at first glance, this structure is teaming with savage Gargoyles just waiting to swoop down on unsuspecting prey.|n|cffffcc00Attack:|r Chaos|n|cffffcc00Cooldown:|r 3.00|n|cffffcc00Damage:|r 2-2|n|cffffcc00Range:|r 900|n|cffffcc00Ability:|r Gargoyle Swarm: Unleashes a swarm of fifteen gargoyles to attack enemies within range. The Gargoyles hit for 250 damage.
+}
+
+STRING 3040
+// Units: h011 ([Goblins] - Pocket Factory), Ubertip (Tooltip - Extended)
+{
+This sweatshop factory is packed with wage-slave Goblins who continuously churn out Mecha-Goblins. Has no attack of its own, but spawns Mecha-Goblins to bash on enemies.|n
+|cffffcc00Attack:|r None|n|cffffcc00Ability:|r Summons a Mecha-Goblin every <A0D0,DataA1> seconds|n|cffffcc00Mecha-Goblin attack:|r Normal|n|cffffcc00Mecha-Goblin cooldown:|r 0.40|n|cffffcc00Mecha-Goblin damage:|r 28 - 28
 }
 
 STRING 3045
@@ -23486,7 +23576,7 @@ STRING 7406
 }
 
 STRING 7418
-// Upgrades: R002 (Cloud), Hotkey (Hotkey)
+// Abilities: AP01 ([Elementalists] Ascend), Hotkey (Hotkey - Normal)
 {
 V
 }
