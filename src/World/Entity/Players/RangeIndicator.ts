@@ -44,7 +44,7 @@ export class RangeIndicator {
         this.rings = [];
     }
 
-    // The reaches of the tower's enabled attacks, without repeats
+    // The reaches of the tower's enabled attacks, without repeats; none for a tower that has no attack
     private static attackRanges(tower: Unit): number[] {
         const ranges: number[] = [];
         for (const index of [0, 1]) {
@@ -55,10 +55,6 @@ export class RangeIndicator {
             if (range > 0 && !ranges.includes(range)) {
                 ranges.push(range);
             }
-        }
-        if (ranges.length === 0) {
-            // Nothing read as enabled: fall back to the first attack
-            ranges.push(BlzGetUnitWeaponRealField(tower.handle, UNIT_WEAPON_RF_ATTACK_RANGE, 0));
         }
         return ranges;
     }
