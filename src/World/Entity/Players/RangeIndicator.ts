@@ -20,18 +20,50 @@ const RADIUS_TRIM = 0.985;
 
 /**
  * Draws a ring showing a tower's attack range for one player while their range check mode
- * is on. The effect is created on every client (handles must stay in step) with the model
- * only on the owner's client, so only they see it.
+ * is on, one ring per enabled attack when a tower has two with different reaches. The effects
+ * are created on every client (handles must stay in step) with the model only on the owner's
+ * client, so only they see them.
  */
 export class RangeIndicator {
-    private ring: Effect | undefined;
+    private rings: Effect[] = [];
 
     constructor(private readonly player: Defender) {
     }
 
     public show(tower: Unit): void {
         this.hide();
-        const range = BlzGetUnitWeaponRealField(tower.handle, UNIT_WEAPON_RF_ATTACK_RANGE, 0);
+        for (const range of RangeIndicator.attackRanges(tower)) {
+            this.drawRing(tower, range);
+        }
+    }
+
+    public hide(): void {
+        for (const ring of this.rings) {
+            ring.destroy();
+        }
+        this.rings = [];
+    }
+
+    // The reaches of the tower's enabled attacks, without repeats
+    private static attackRanges(tower: Unit): number[] {
+        const ranges: number[] = [];
+        for (const index of [0, 1]) {
+            if (!BlzGetUnitWeaponBooleanField(tower.handle, UNIT_WEAPON_BF_ATTACKS_ENABLED, index)) {
+                continue;
+            }
+            const range = BlzGetUnitWeaponRealField(tower.handle, UNIT_WEAPON_RF_ATTACK_RANGE, index);
+            if (range > 0 && !ranges.includes(range)) {
+                ranges.push(range);
+            }
+        }
+        if (ranges.length === 0) {
+            // Nothing read as enabled: fall back to the first attack
+            ranges.push(BlzGetUnitWeaponRealField(tower.handle, UNIT_WEAPON_RF_ATTACK_RANGE, 0));
+        }
+        return ranges;
+    }
+
+    private drawRing(tower: Unit, range: number): void {
         SyncTrace.note('range', `p${this.player.id} ring for ${SyncTrace.unit(tower)} range=${range}`);
         if (range <= 0) {
             return;
@@ -39,18 +71,14 @@ export class RangeIndicator {
         const radius = range + TOWER_HALF_WIDTH;
         const scale = radius * RADIUS_TRIM / MODEL_RADIUS;
         const variant = RING_MODELS.find(candidate => scale <= candidate.maxScale) ?? RING_MODELS[RING_MODELS.length - 1];
-        this.ring = Effect.create(this.player.isLocal() ? variant.model : '', tower.x, tower.y);
+        const ring = Effect.create(this.player.isLocal() ? variant.model : '', tower.x, tower.y);
         SyncTrace.note('range', `p${this.player.id} ring scale=${string.format('%.2f', scale)}`
-            + ` model=${variant.model} made=${this.ring !== undefined}`);
-        if (!this.ring) {
+            + ` model=${variant.model} made=${ring !== undefined}`);
+        if (!ring) {
             return;
         }
-        this.ring.scale = scale;
-        this.ring.setColorByPlayer(MapPlayer.fromIndex(RING_COLOUR_PLAYER)!);
-    }
-
-    public hide(): void {
-        this.ring?.destroy();
-        this.ring = undefined;
+        ring.scale = scale;
+        ring.setColorByPlayer(MapPlayer.fromIndex(RING_COLOUR_PLAYER)!);
+        this.rings.push(ring);
     }
 }
