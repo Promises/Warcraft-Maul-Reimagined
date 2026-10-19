@@ -14,7 +14,7 @@ export const Quests: Quest[] = [
         title: `5.0.0 - 14`,
         icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
         stype: 0,
-        body: `Updates:\n- Observers watch without a lane, and their game ends by itself once every player has left\n- A game whose host doesn't play (a host bot, or a host who only observes) goes straight to the players' vote on mode and difficulty; no player is handed the host's choice`,
+        body: `Updates:\n- Observers watch without a lane, and their game ends by itself once every player has left\n- A game whose host doesn't play (a host bot, or a host who only observes) goes straight to the players' vote on mode and difficulty; no player is handed the host's choice\nUpdates:\n- Range check draws a separate ring for each of a tower's attacks, so a tower with two shows both (the Death Tower), and a tower that doesn't attack shows none\n- The difficulty vote blends the average with the median, so a few hard votes pull a lobby up less\n- A unit shows only the upgrades the map can research, so a tower no longer lists a defence upgrade it can't take\n- Several tower descriptions corrected`,
     },
     {
         title: `5.0.0 - 13`,
