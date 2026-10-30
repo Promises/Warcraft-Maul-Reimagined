@@ -30,6 +30,8 @@ export class PlayerSync {
     private static readonly PREFIX = 'wm';
     private readonly handlers: Map<string, SyncHandler> = new Map<string, SyncHandler>();
     private readonly anyPlayerHandlers: Map<string, AnyPlayerHandler> = new Map<string, AnyPlayerHandler>();
+    // Commands sent only for external readers (the host bot): no handler, no "unhandled" warning.
+    private readonly broadcasts: Set<string> = new Set<string>();
 
     constructor(private readonly game: WarcraftMaul) {
         const trigger = Trigger.create();
@@ -57,6 +59,11 @@ export class PlayerSync {
         const command = separator === -1 ? rest : rest.substring(0, separator);
         const data = separator === -1 ? '' : rest.substring(separator + 1);
         SyncTrace.note('sync', message);
+        // Broadcast-only messages (for external readers like the host bot) have no handler here;
+        // every client still traces them, nothing in the map acts on them.
+        if (this.broadcasts.has(command)) {
+            return;
+        }
         const anyPlayer = this.anyPlayerHandlers.get(command);
         if (anyPlayer) {
             const sender = MapPlayer.fromIndex(senderId);
@@ -99,5 +106,32 @@ export class PlayerSync {
         const senderId = GetPlayerId(GetLocalPlayer());
         const body = data === '' ? command : `${command}:${data}`;
         BlzSendSyncData(PlayerSync.PREFIX, `${senderId} ${body}`);
+    }
+
+    /**
+     * A map-global broadcast for external readers (the host bot): sent once, from the lowest
+     * playing slot only, so every client doesn't duplicate it. What's behind it (a vote result,
+     * a synced roll, the wave number) is already the same on every client, so which client sends
+     * it doesn't matter.
+     */
+    public sendGlobal(command: string, data: string = ''): void {
+        // The lowest slot still PLAYING sends - not merely the lowest in game.players. A player who
+        // leaves is removed from game.players only once their towers have distributed, but their slot
+        // state flips to LEFT at the same synced moment on every client; keying on that keeps exactly
+        // one live sender across a leave, with no window where the gone player is still "lowest".
+        let lowest: number = -1;
+        for (const id of this.game.players.keys()) {
+            if (GetPlayerSlotState(Player(id)!) === PLAYER_SLOT_STATE_PLAYING && (lowest === -1 || id < lowest)) {
+                lowest = id;
+            }
+        }
+        if (lowest !== -1 && GetLocalPlayer() === Player(lowest)) {
+            this.send(command, data);
+        }
+    }
+
+    /** Marks a command as broadcast-only: the map sends it for external readers; no handler, no warning. */
+    public registerBroadcast(command: string): void {
+        this.broadcasts.add(command);
     }
 }

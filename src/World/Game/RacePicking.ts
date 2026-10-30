@@ -94,6 +94,7 @@ export class RacePicking {
         const race = this.getRaceFromItem(soldItem);
         if (race) {
             player.races.push(race);
+            this.game.playerSync.sendGlobal('race', `${player.id}:${race.itemid}`);
             race.pickAction(player);
             SendMessage(player.getNameWithColour() + ' has chosen ' + race.name);
         }
@@ -136,6 +137,7 @@ export class RacePicking {
 
         player.races.push(randomedRace);
         SyncTrace.note('rolled', `p${player.id} race=${randomedRace.name}`);
+        this.game.playerSync.sendGlobal('race', `${player.id}:${randomedRace.itemid}`);
         this.GiveBuyingPlayerBuilder(player, randomedRace);
         return randomedRace;
     }
@@ -187,6 +189,9 @@ export class RacePicking {
         // The rolls every client has to agree on: a hybrid set that differs is a desync the
         // moment one of those towers is built
         SyncTrace.note('hybrid', `p${player.id} ${player.hybridTowers.map(tower => tower.name).join(',')}`);
+        // Hybrid random has no single race: report the hybrid item plus the 9 rolled tower ids, so a
+        // host bot can resolve this player's build:<tier> placements to the actual towers.
+        this.game.playerSync.sendGlobal('race', `${player.id}:I00X:${player.hybridTowers.map(tower => tower.id).join(',')}`);
 
         // print(player.hybridBuilder?.name)
 

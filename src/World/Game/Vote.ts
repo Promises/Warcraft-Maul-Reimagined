@@ -50,6 +50,8 @@ export class Vote {
     private modeVoteOpen: boolean = false;
     private diffVoteOpen: boolean = false;
     public difficulty: number = 0;
+    // The mode index actually applied (0 Classic, 1 Blitz, as vote-mode), for the settings-final broadcast.
+    private finalModeIndex: number = settings.GAME_MODES.CLASSIC;
     public forceBlitz: boolean = false;
 
     constructor(game: WarcraftMaul) {
@@ -273,6 +275,7 @@ export class Vote {
             mode = settings.GAME_MODES.BLITZ;
             SendMessage(`Developer forced gamemode to be: ${this.modeName(mode)}.`);
         }
+        this.finalModeIndex = mode;
         switch (mode) {
             case settings.GAME_MODES.CLASSIC:
                 this.game.worldMap.gameRoundHandler = new ClassicGameRound(this.game);
@@ -338,6 +341,10 @@ export class Vote {
         this.game.scoreBoard = new MultiBoard(this.game);
         const diffIndex: number = R2I((difficulty - 100.00) / 100.00 + ModuloReal((difficulty - 100.00) / 100.00, 1.00));
         this.difficulty = Math.floor(difficulty);
+        // Once, for a host bot's stats: the map build, then the actual mode + difficulty + the wave
+        // count to win (35 = Archimonde; waves 36-37 are post-win bonus). What people actually play.
+        this.game.playerSync.sendGlobal('version', settings.MAP_VERSION);
+        this.game.playerSync.sendGlobal('settings-final', `${this.finalModeIndex}:${diffIndex}:35`);
         const colouredDifficulty = Util.ColourString(settings.DIFFICULTY_COLOURS[diffIndex], settings.DIFFICULTY_STRINGS[diffIndex]);
         // No player handicap: creeps are scaled per unit in Creep (HP, armor, abilities)
         SendMessage(`Difficulty was set to ${this.difficulty}% (${colouredDifficulty})`);

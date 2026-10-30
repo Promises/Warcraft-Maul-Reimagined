@@ -93,6 +93,7 @@ export abstract class AbstractGameRound {
     public SpawnCreeps(): void {
         const wave: WaveCreep = this.game.worldMap.waveCreeps[this._currentWave - 1];
         SyncTrace.note('wave', `${this._currentWave} type=${wave.GetTypeID()}`);
+        this.game.playerSync.sendGlobal('wave', `${this._currentWave}`);
         SendMessage(`Level ${this._currentWave} - ${wave.GetName()}`);
 
         let spawnAmount: number = 10;

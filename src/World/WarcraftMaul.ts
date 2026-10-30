@@ -231,6 +231,10 @@ export class WarcraftMaul {
         this.laneTransfer = new LaneTransfer(this);
         this.grayVacancy = new GrayVacancy(this);
         this.playerSync.on('build', (player, data) => player.placeTower(data));
+        // Outbound-only messages for a host bot reading the game (research/stats). No map handler.
+        for (const broadcast of ['version', 'settings-final', 'race', 'wave', 'wave-end', 'game-end']) {
+            this.playerSync.registerBroadcast(broadcast);
+        }
         this.hybridBuildPanel = new HybridBuildPanel(this);
         this.raceSelectPanel = new RaceSelectPanel(this);
         this.diffVote = new Vote(this);
@@ -246,6 +250,7 @@ export class WarcraftMaul {
 
     public GameWin(): void {
         if (this.gameLives > 0) {
+            this.playerSync.sendGlobal('game-end', `win:${this.worldMap.gameRoundHandler ? this.worldMap.gameRoundHandler.currentWave : 0}`);
             settings.Sounds.victorySound.start()
             SendMessage('|cFFF48C42YOU HAVE WON!|r');
             SendMessage('You can either leave the game or stay for bonus rounds');
@@ -283,6 +288,7 @@ export class WarcraftMaul {
     public GameOver(): void {
         this.gameEndTimer = this.mapSettings.GAME_END_TIME;
         this.gameEnded = true;
+        this.playerSync.sendGlobal('game-end', `loss:${this.worldMap.gameRoundHandler ? this.worldMap.gameRoundHandler.currentWave : 0}`);
         settings.Sounds.defeatSound.start()
         SendMessage('|cFFFF0000GAME OVER|r');
         this.worldMap.RemoveEveryUnit();

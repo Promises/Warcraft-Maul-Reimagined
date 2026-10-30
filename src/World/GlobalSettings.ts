@@ -15,6 +15,37 @@ export interface Point {
 /** Selling gives this much of a tower's worth back, except for gold spent in the build phase still running. */
 export const SELL_REFUND_RATE: number = 0.75;
 
+/**
+ * The map's semantic version (latest Quests/X.Y.Z) plus the git commit, for a host bot's per-game
+ * stats: splitting by this keeps balance changes from blurring together (a change is a new commit).
+ * e.g. "5.0.0+961c0bc" (a trailing "+" on the commit marks an uncommitted working tree).
+ */
+export const MAP_VERSION: string = compiletime(() => {
+    const fs = require('fs');
+    const path = require('path');
+    const { execSync } = require('child_process');
+    const root = (process as any).cwd() as string;
+    const notes: string[] = fs.readdirSync(path.join(root, 'Quests'))
+        .filter((name: string) => /^\d+\.\d+\.\d+\.md$/.test(name))
+        .map((name: string) => name.replace(/\.md$/, ''))
+        .sort((a: string, b: string) => {
+            const pa = a.split('.').map(Number);
+            const pb = b.split('.').map(Number);
+            return (pa[0] - pb[0]) || (pa[1] - pb[1]) || (pa[2] - pb[2]);
+        });
+    const version: string = notes.length > 0 ? notes[notes.length - 1] : '?';
+    let commit = 'unknown';
+    try {
+        commit = execSync('git rev-parse --short HEAD', { cwd: root, stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
+        if (execSync('git status --porcelain', { cwd: root, stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim() !== '') {
+            commit += '+';
+        }
+    } catch (error) {
+        // not a git checkout; the version alone still identifies it
+    }
+    return `${version}+${commit}`;
+}) as string;
+
 // @ts-ignore
 
 export enum GAME_MODES {
