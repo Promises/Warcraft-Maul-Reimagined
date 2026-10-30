@@ -108,3 +108,7 @@ maps/map.w3x/war3mapSkin.w3d
 maps/map.w3x/.objdata-stamp.json
 # Built from the archive contents by scripts/build.ts
 maps/map.w3x/war3map.imp
+
+# Editor/OS and local tool state
+.DS_Store
+.claude/
