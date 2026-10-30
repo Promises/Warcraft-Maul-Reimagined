@@ -20,8 +20,8 @@ export class ExampleMaze extends AbstractActionButton {
         super(game, `mazeButton${idx}`, ExampleMaze.disabledIcon, rail, offsetX, size);
         this.defaultSize = size;
         this.currentSize = (size * 2);
-        this.setTooltip('Sample maze', 'Shows a sample maze in your lane: a simple circle, then a basic maze, then a more '
-            + 'advanced one, one more each click, and then hides it again.');
+        this.setTooltip('Sample maze', 'Shows a simple sample maze in your lane to get you started; '
+            + 'click again to hide it, then build your own.');
 
         for (const player of this.game.players.values()) {
             this.players.set(player.id, player);
@@ -47,7 +47,7 @@ export class ExampleMaze extends AbstractActionButton {
         this.setIcon(maze !== undefined);
         SyncTrace.note('maze', `p${player.id} shows=${maze !== undefined ? next + 1 : 0}`);
         if (maze !== undefined) {
-            player.sendMessage(`Sample maze ${next + 1} of ${SAMPLE_MAZES.length}: ${SAMPLE_MAZES[next].name}`);
+            player.sendMessage('A simple sample maze - a starting point, not the answer. Build your own from here; click again to hide it.');
         }
     }
 

@@ -425,7 +425,7 @@ export class Commands {
     private fillMaze(player: Defender, choice: string, typeId: number): void {
         const maze = this.holoMazeFor(player, choice);
         if (!maze) {
-            player.sendMessage('Usage: -fillmaze [1|2|3] [tower id], e.g. -fillmaze 3 hC66');
+            player.sendMessage('Usage: -fillmaze 1 [tower id], e.g. -fillmaze 1 hC66');
             return;
         }
         let built: number = 0;
@@ -694,11 +694,9 @@ export class Commands {
                     player.setHoloMaze(maze);
                 } else {
                     player.sendMessage(
-                        'Unknown maze selected, please try one of the mazes shown below\n' +
-                        '|cFFFFCC00-maze none|r: removes the current maze\n' +
-                        '|cFFFFCC00-maze 1|r: shows a very simple circled maze\n' +
-                        '|cFFFFCC00-maze 2|r: shows a basic maze\n' +
-                        '|cFFFFCC00-maze 3|r: shows a more advanced maze');
+                        'Maze options:\n' +
+                        '|cFFFFCC00-maze 1|r: shows a simple sample maze in your lane\n' +
+                        '|cFFFFCC00-maze none|r: hides it');
                 }
             }
         }

@@ -2,8 +2,6 @@ import {WarcraftMaul} from '../WarcraftMaul';
 import {CheckPoint} from '../Entity/CheckPoint';
 import {AbstractHologramMaze} from './AbstractHologramMaze';
 import {CircleHoloMaze} from './CircleHoloMaze';
-import {SimpleHoloMaze} from './SimpleHoloMaze';
-import {AdvancedHoloMaze} from './AdvancedHoloMaze';
 
 const IMAGE_PATH: string = 'ReplaceableTextures\\Splats\\SuggestedPlacementSplat.blp';
 
@@ -13,22 +11,13 @@ interface SampleMaze {
     shows(maze: AbstractHologramMaze): boolean;
 }
 
-/** The sample mazes, simplest first: -maze 1, 2 and 3, and the order the sample maze button shows them in. */
+/** The one simple sample maze the button and -maze show: a hint to get started, deliberately not a
+ * worked solution - the fun is building your own from there. */
 export const SAMPLE_MAZES: SampleMaze[] = [
     {
-        name: 'a very simple circled maze',
+        name: 'a simple maze',
         create: (x1, y1, x2, y2) => new CircleHoloMaze(IMAGE_PATH, x1, y1, x2, y2),
         shows: maze => maze instanceof CircleHoloMaze,
-    },
-    {
-        name: 'a basic maze',
-        create: (x1, y1, x2, y2) => new SimpleHoloMaze(IMAGE_PATH, x1, y1, x2, y2),
-        shows: maze => maze instanceof SimpleHoloMaze,
-    },
-    {
-        name: 'a more advanced maze',
-        create: (x1, y1, x2, y2) => new AdvancedHoloMaze(IMAGE_PATH, x1, y1, x2, y2),
-        shows: maze => maze instanceof AdvancedHoloMaze,
     },
 ];
 

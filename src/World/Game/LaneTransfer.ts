@@ -20,7 +20,7 @@ function snapToGrid(value: number): number {
 /**
  * A lane's coordinate frame: origin at its first checkpoint, `along` pointing at the second
  * checkpoint and `across` perpendicular to it. This is the frame the sample holomaze is drawn
- * in (AdvancedHoloMaze), so a layout carried between lanes lands where the sample maze would.
+ * in (CircleHoloMaze), so a layout carried between lanes lands where the sample maze would.
  * The lanes are congruent - checkpoints 1152 apart, the area +-768 across and -640..+1792
  * along - so carrying a position between two frames is rigid and keeps the 64 grid.
  */
