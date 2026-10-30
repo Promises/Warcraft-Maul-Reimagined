@@ -11,10 +11,16 @@ interface Quest {
 
 export const Quests: Quest[] = [
     {
+        title: `5.0.0 - 15`,
+        icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
+        stype: 0,
+        body: `Updates:\n- Range check draws a separate ring for each of a tower's attacks, so a tower with two shows both (the Death Tower), and a tower that doesn't attack shows none\n- The difficulty vote blends the average with the median, so a few hard votes pull a lobby up less\n- A unit shows only the upgrades the map can research, so a tower no longer lists a defence upgrade it can't take\n- Several tower descriptions corrected\nUpdates:\n- Creep gold now splits 60% to the defender whose lane a creep spawned in and 40% to whoever kills it; an unheld lane gives the killer the whole bounty. You earn from your own creeps even when they leak downstream.\n- The sample maze button and -maze now show one simple example maze instead of three - a starting hint, not the answer; the rest is yours to build.\n- A "Warcraftmaul.com" team now appears in the lobby's team list.`,
+    },
+    {
         title: `5.0.0 - 14`,
         icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
         stype: 0,
-        body: `Updates:\n- Observers watch without a lane, and their game ends by itself once every player has left\n- A game whose host doesn't play (a host bot, or a host who only observes) goes straight to the players' vote on mode and difficulty; no player is handed the host's choice\nUpdates:\n- Range check draws a separate ring for each of a tower's attacks, so a tower with two shows both (the Death Tower), and a tower that doesn't attack shows none\n- The difficulty vote blends the average with the median, so a few hard votes pull a lobby up less\n- A unit shows only the upgrades the map can research, so a tower no longer lists a defence upgrade it can't take\n- Several tower descriptions corrected`,
+        body: `Updates:\n- Observers watch without a lane, and their game ends by itself once every player has left\n- A game whose host doesn't play (a host bot, or a host who only observes) goes straight to the players' vote on mode and difficulty; no player is handed the host's choice`,
     },
     {
         title: `5.0.0 - 13`,
