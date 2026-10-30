@@ -17,11 +17,14 @@ export class Creep {
     public gameRound: AbstractGameRound;
     public abilities: CreepAbility[];
     private readonly game: WarcraftMaul;
+    /** The lane (colour id) this creep spawned in, for the spawn-side share of its gold bounty. */
+    public readonly spawnLane: number;
 
-    constructor(creep: Unit, gameRound: AbstractGameRound, abilities: CreepAbility[], game: WarcraftMaul) {
+    constructor(creep: Unit, gameRound: AbstractGameRound, abilities: CreepAbility[], game: WarcraftMaul, spawnLane: number) {
         this.unit = creep;
         this.gameRound = gameRound;
         this.game = game;
+        this.spawnLane = spawnLane;
         this.AddArmorBonusByDifficulty();
         this.AddHPBonusByDifficulty();
         this.abilities = abilities;

@@ -111,7 +111,7 @@ export class PlayerSpawns {
                 GetRectCenterY(this.spawnOne.rectangle),
                 this.getSpawnFace(this.colourId)
             )!;
-            spawned.set(creep.id, new Creep(creep, gameRound, abilities, this.worldMap.game));
+            spawned.set(creep.id, new Creep(creep, gameRound, abilities, this.worldMap.game, this.colourId));
             SyncTrace.note('spawn', `${SyncTrace.unit(creep)} type=${wave.GetTypeID()} lane=${this.colourId} owner=${creepOwner}`);
 
             if (wave.GetWaveNumber() !== 37 && this.spawnTwo) {
@@ -122,7 +122,7 @@ export class PlayerSpawns {
                     GetRectCenterY(this.spawnTwo.rectangle),
                     this.getSpawnFace(this.colourId)
                 )!;
-                spawned.set(creep.id, new Creep(creep, gameRound, abilities, this.worldMap.game));
+                spawned.set(creep.id, new Creep(creep, gameRound, abilities, this.worldMap.game, this.colourId));
                 SyncTrace.note('spawn', `${SyncTrace.unit(creep)} type=${wave.GetTypeID()} lane=${this.colourId} owner=${creepOwner}`);
             }
         }

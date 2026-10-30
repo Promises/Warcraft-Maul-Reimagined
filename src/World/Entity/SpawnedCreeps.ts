@@ -1,4 +1,5 @@
 import { Creep } from './Creep';
+import { rollBounty } from './CreepBounty';
 import * as settings from '../GlobalSettings';
 import { WorldMap } from '../WorldMap';
 import { Defender } from './Players/Defender';
@@ -90,6 +91,24 @@ export class SpawnedCreeps {
         const player: Defender | undefined = this.worldMap.game.players.get(killingUnit?.getOwner()?.id!);
         if (player) {
             player.GiveKillCount();
+        }
+
+        // Gold bounty (the engine's own bounty is off, see Attacker): roll it here with the synced
+        // RNG and split it 60% to the creep's spawn-lane holder, 40% to the killer. An unheld spawn
+        // lane gives the killer the whole bounty; a creep killed in its own lane sends both shares
+        // to the one player, i.e. 100%.
+        const bounty: number = rollBounty(creep.getTypeId());
+        if (bounty > 0) {
+            const spawnHolder: Defender | undefined = this.worldMap.game.laneHolders.get(creep.spawnLane);
+            if (spawnHolder && player) {
+                const spawnShare: number = Math.floor(bounty * 0.6);
+                spawnHolder.giveGold(spawnShare);
+                player.giveGold(bounty - spawnShare);
+            } else if (player) {
+                player.giveGold(bounty);
+            } else if (spawnHolder) {
+                spawnHolder.giveGold(bounty);
+            }
         }
 
         this.unitMap.delete(creep.getHandleId());
