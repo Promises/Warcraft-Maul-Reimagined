@@ -338,7 +338,7 @@ export class Vote {
 
     /** Sets the difficulty (a percentage, possibly a blend of the votes) and everything that hangs off it. */
     private applyDifficulty(difficulty: number): void {
-        this.game.scoreBoard = new MultiBoard(this.game);
+        this.game.scoreBoard = new MultiBoard(this.game, this.finalModeIndex);
         const diffIndex: number = R2I((difficulty - 100.00) / 100.00 + ModuloReal((difficulty - 100.00) / 100.00, 1.00));
         this.difficulty = Math.floor(difficulty);
         // Once, for a host bot's stats: the map build, then the actual mode + difficulty + the wave

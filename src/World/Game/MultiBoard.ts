@@ -1,5 +1,5 @@
 import { WarcraftMaul } from '../WarcraftMaul';
-import { ARMOUR_TYPE_COLOURS, ARMOUR_TYPE_NAMES } from '../GlobalSettings';
+import { ARMOUR_TYPE_COLOURS, ARMOUR_TYPE_NAMES, GAME_MODES } from '../GlobalSettings';
 import { Defender } from '../Entity/Players/Defender';
 import {Util} from "../../lib/translators";
 
@@ -10,12 +10,15 @@ export class MultiBoard {
     game: WarcraftMaul;
     scoreboardColumnWidth: number[] = [];
 
-    constructor(game: WarcraftMaul) {
+    constructor(game: WarcraftMaul, mode: number) {
         this.game = game;
 
         this.scoreboardColumnWidth[1] = 10.00;
         this.scoreboardColumnWidth[2] = 8.00;
-        this.board = CreateMultiboardBJ(2, MultiBoard.HEADER_ROW + this.game.players.size, this.game.mapSettings.GAME_NAME)!;
+        // Title coloured by game mode: green for Classic, red for Blitz.
+        const titleColour: string = mode === GAME_MODES.BLITZ ? '#ff4444' : '#44ff44';
+        const title: string = Util.ColourString(titleColour, this.game.mapSettings.GAME_NAME);
+        this.board = CreateMultiboardBJ(2, MultiBoard.HEADER_ROW + this.game.players.size, title)!;
         MultiboardSetItemValueBJ(this.board, 1, 1, 'Starting in');
         MultiboardSetItemValueBJ(this.board, 2, 1, `${this.game.waveTimer}`);
         MultiboardSetItemValueBJ(this.board, 1, 2, 'Level');
