@@ -102,16 +102,43 @@ export class SpawnedCreeps {
             const spawnHolder: Defender | undefined = this.worldMap.game.laneHolders.get(creep.spawnLane);
             if (spawnHolder && player) {
                 const spawnShare: number = Math.floor(bounty * 0.6);
+                const killShare: number = bounty - spawnShare;
                 spawnHolder.giveGold(spawnShare);
-                player.giveGold(bounty - spawnShare);
+                player.giveGold(killShare);
+                if (spawnHolder === player) {
+                    this.showGoldGain(creep, player, bounty);
+                } else {
+                    this.showGoldGain(creep, player, killShare);
+                    this.showGoldGain(creep, spawnHolder, spawnShare);
+                }
             } else if (player) {
                 player.giveGold(bounty);
+                this.showGoldGain(creep, player, bounty);
             } else if (spawnHolder) {
                 spawnHolder.giveGold(bounty);
+                this.showGoldGain(creep, spawnHolder, bounty);
             }
         }
 
         this.unitMap.delete(creep.getHandleId());
         creep.unit.destroy();
+    }
+
+    /**
+     * Floating gold text above a dying creep, shown only to the player who earned it. Replaces the
+     * engine's own bounty text, which went away when the engine's auto-bounty was turned off for the
+     * 60/40 split. Text tags are local, so this is visual only and can't desync.
+     */
+    private showGoldGain(creep: Creep, player: Defender, amount: number): void {
+        const tag: texttag | undefined = CreateTextTagUnitBJ(`+${amount}`, creep.unit.handle, 16, 10, 100, 85, 0, 0);
+        if (!tag) {
+            return;
+        }
+        SetTextTagPermanentBJ(tag, false);
+        SetTextTagLifespanBJ(tag, 1.50);
+        SetTextTagVelocityBJ(tag, 64, 90);
+        if (GetLocalPlayer() !== player.handle) {
+            SetTextTagVisibility(tag, false);
+        }
     }
 }
