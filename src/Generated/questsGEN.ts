@@ -11,10 +11,16 @@ interface Quest {
 
 export const Quests: Quest[] = [
     {
+        title: `5.0.0 - 17`,
+        icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
+        stype: 0,
+        body: `Updates:\n- Fixed: killing a creep shows your gold again - each player sees the share they earned float up from the creep.\n- The scoreboard title is green in Classic mode and red in Blitz.\nUpdates:\n- A new adaptive difficulty: instead of a fixed multiplier it starts gentle and adjusts to how the team is doing - leak and it eases, keep clearing and it climbs, so you settle near your own edge. Each player pulls only a little around the team's level (nobody stuck on trivial or impossible), and the creep abilities ramp on their own.\n- Blitz is now always adaptive: the mode vote offers Classic and Blitz (Adaptive), and the host settings add Adaptive as a Blitz difficulty. Classic keeps its fixed difficulties (Normal to Extreme).\n- Fixed: creeps could roll nearly every ability when a game started before a difficulty was set.`,
+    },
+    {
         title: `5.0.0 - 16`,
         icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
         stype: 0,
-        body: `Updates:\n- Creep gold now splits 60% to the defender whose lane a creep spawned in and 40% to whoever kills it; an unheld lane gives the killer the whole bounty. You earn from your own creeps even when they leak downstream.\n- The sample maze button and -maze now show one simple example maze instead of three - a starting hint, not the answer; the rest is yours to build.\n- A "Warcraftmaul.com" team now appears in the lobby's team list.\nUpdates:\n- Fixed: killing a creep shows your gold again - each player sees the share they earned float up from the creep.\n- The scoreboard title is green in Classic mode and red in Blitz.`,
+        body: `Updates:\n- Creep gold now splits 60% to the defender whose lane a creep spawned in and 40% to whoever kills it; an unheld lane gives the killer the whole bounty. You earn from your own creeps even when they leak downstream.\n- The sample maze button and -maze now show one simple example maze instead of three - a starting hint, not the answer; the rest is yours to build.\n- A "Warcraftmaul.com" team now appears in the lobby's team list.`,
     },
     {
         title: `5.0.0 - 15`,
