@@ -32,7 +32,11 @@ const RADIO_DOT = 'UI\\Widgets\\EscMenu\\Human\\radiobutton-button.blp';
  */
 class OptionColumn {
     private readonly dots: Frame[] = [];
+    private readonly rows: Frame[] = [];
     private selected: number = 0;
+    // Run after a selection changes (e.g. to show/hide another column's row); set after construction,
+    // so the constructor's initial select(0) does not fire it.
+    public onSelect: ((this: void, index: number) => void) | undefined;
 
     /** Placed with its top-left at (left, top) from the parent's top-left. */
     constructor(name: string, parent: Frame, left: number, top: number, header: string, labels: string[]) {
@@ -64,6 +68,7 @@ class OptionColumn {
             // The selection is the local view
             onLocalClick(button, () => this.select(index));
             this.dots.push(dot);
+            this.rows.push(row);
         });
         this.select(0);
     }
@@ -71,6 +76,16 @@ class OptionColumn {
     public select(index: number): void {
         this.selected = index;
         this.dots.forEach((dot, i) => dot.setVisible(i === index));
+        if (this.onSelect) {
+            this.onSelect(index);
+        }
+    }
+
+    /** Shows or hides one option's whole row (its radio and label), for an option offered conditionally. */
+    public setRowVisible(index: number, visible: boolean): void {
+        if (this.rows[index]) {
+            this.rows[index].setVisible(visible);
+        }
     }
 
     public get selection(): number {
@@ -87,11 +102,13 @@ export class HostSettingsPanel {
     private readonly panel: Frame;
     private readonly modes: OptionColumn;
     private readonly difficulties: OptionColumn;
+    // The difficulty column's last row is Adaptive, offered only with Blitz (see syncAdaptiveRow).
+    private readonly adaptiveRow: number = settings.DIFFICULTIES.length;
 
     constructor(game: WarcraftMaul,
                 onConfirm: (this: void, mode: number, difficulty: number) => void,
                 onVote: (this: void) => void) {
-        const rows = Math.max(settings.PLAYER_GAME_MODES.length, settings.DIFFICULTIES.length);
+        const rows = Math.max(settings.PLAYER_GAME_MODES.length, settings.DIFFICULTIES.length + 1);
         const width = PADDING + COLUMN_WIDTH + COLUMN_GAP + COLUMN_WIDTH + PADDING;
         const height = PADDING + TITLE_HEIGHT + PADDING + HEADER_HEIGHT + rows * ROW_SPACING + PADDING + BUTTON_HEIGHT + PADDING;
 
@@ -106,10 +123,16 @@ export class HostSettingsPanel {
         this.modes = new OptionColumn('hostSettingsMode', this.panel, PADDING, columnsTop, 'Game mode',
             settings.PLAYER_GAME_MODES.map(mode =>
                 Util.ColourString(settings.GAME_MODE_COLOURS[mode], settings.GAME_MODE_STRINGS[mode])));
+        const difficultyLabels = settings.DIFFICULTIES.map((difficulty, i) =>
+            Util.ColourString(settings.DIFFICULTY_COLOURS[i], `${difficulty}% ${settings.DIFFICULTY_STRINGS[i]}`));
+        difficultyLabels.push(Util.ColourString(settings.GAME_MODE_COLOURS[settings.GAME_MODES.BLITZ], 'Adaptive'));
         this.difficulties = new OptionColumn('hostSettingsDifficulty', this.panel,
-            PADDING + COLUMN_WIDTH + COLUMN_GAP, columnsTop, 'Difficulty',
-            settings.DIFFICULTIES.map((difficulty, i) =>
-                Util.ColourString(settings.DIFFICULTY_COLOURS[i], `${difficulty}% ${settings.DIFFICULTY_STRINGS[i]}`)));
+            PADDING + COLUMN_WIDTH + COLUMN_GAP, columnsTop, 'Difficulty', difficultyLabels);
+
+        // Adaptive (the last difficulty row) belongs to Blitz: show it only when Blitz is selected, and
+        // when switching back to Classic hide it and fall back to Normal, so Classic is never adaptive.
+        this.modes.onSelect = (index: number) => this.syncAdaptiveRow(index);
+        this.syncAdaptiveRow(this.modes.selection);
 
         // Both actions are sent from the clicker's client only; the vote logic checks it is the host
         const vote = createTextButton(this.panel, 'Let players vote', BUTTON_WIDTH, BUTTON_HEIGHT);
@@ -118,6 +141,15 @@ export class HostSettingsPanel {
         const confirm = createTextButton(this.panel, 'Confirm', BUTTON_WIDTH, BUTTON_HEIGHT);
         confirm.setPoint(FRAMEPOINT_BOTTOMRIGHT, this.panel, FRAMEPOINT_BOTTOMRIGHT, -PADDING, PADDING);
         onLocalClick(confirm, () => onConfirm(settings.PLAYER_GAME_MODES[this.modes.selection], this.difficulties.selection));
+    }
+
+    /** Shows the Adaptive difficulty row only for Blitz; a switch to Classic hides it and resets to Normal. */
+    private syncAdaptiveRow(modeIndex: number): void {
+        const blitz: boolean = settings.PLAYER_GAME_MODES[modeIndex] === settings.GAME_MODES.BLITZ;
+        this.difficulties.setRowVisible(this.adaptiveRow, blitz);
+        if (!blitz && this.difficulties.selection === this.adaptiveRow) {
+            this.difficulties.select(0);
+        }
     }
 
     /** Local UI: the panel appears on the given player's client only. */

@@ -487,6 +487,7 @@ export class Commands {
         let mode: number = GAME_MODES.CLASSIC;
         let difficulty: number = lowest;
         let letPlayersVote: boolean = false;
+        let adaptive: boolean = false;
         for (const word of words) {
             const percent: number = Number(word);
             if (word === 'n' || word === 'normal') {
@@ -497,16 +498,22 @@ export class Commands {
                 mode = GAME_MODES.DEBUG;
             } else if (word === 'v' || word === 'vote') {
                 letPlayersVote = true;
+            } else if (word === 'a' || word === 'adaptive') {
+                adaptive = true;
             } else if (word !== '' && percent === Math.floor(percent) && percent >= lowest && percent <= highest) {
                 difficulty = percent;
             } else if (word !== '') {
-                player.sendMessage(`|cFF999999Usage: -s [n|normal / b|blitz / d|debug] [vote | ${lowest}-${highest}]|r`);
+                player.sendMessage(`|cFF999999Usage: -s [n|normal / b|blitz / d|debug] [vote | ${lowest}-${highest} | adaptive]|r`);
                 return;
             }
         }
+        if (adaptive && mode !== GAME_MODES.BLITZ) {
+            player.sendMessage('|cFF999999Adaptive difficulty is only available with Blitz|r');
+            return;
+        }
         const taken: boolean = letPlayersVote
             ? this.game.diffVote.applyHostVote(player)
-            : this.game.diffVote.applyHostChoice(player, mode, difficulty);
+            : this.game.diffVote.applyHostChoice(player, mode, difficulty, adaptive);
         if (!taken) {
             player.sendMessage('|cFF999999Only the host sets the game, while it waits for their choice|r');
         }

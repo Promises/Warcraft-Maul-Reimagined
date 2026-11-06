@@ -147,7 +147,7 @@ export class Vote {
             this.startModeVote();
         } else {
             this.applyMode(mode);
-            this.applyDifficulty(difficulty, scaling);
+            this.applyDifficulty(difficulty, scaling, 'bot');
             this.openRaceSelection();
         }
         return true;
@@ -178,29 +178,40 @@ export class Vote {
     /** The host's choice from their panel, as "mode:difficulty index". */
     private applyHostSettings(player: Defender, data: string): void {
         const [mode, difficultyIndex] = data.split(':').map(value => Number(value));
-        if (difficultyIndex >= 0 && difficultyIndex < settings.DIFFICULTIES.length) {
+        // The difficulty column's last row (index == DIFFICULTIES.length) is Adaptive (Blitz only).
+        if (difficultyIndex === settings.DIFFICULTIES.length) {
+            this.applyHostChoice(player, mode, settings.DIFFICULTIES[0], true);
+        } else if (difficultyIndex >= 0 && difficultyIndex < settings.DIFFICULTIES.length) {
             this.applyHostChoice(player, mode, settings.DIFFICULTIES[difficultyIndex]);
         }
     }
 
     /**
-     * The host's choice of mode and difficulty (a whole percentage from the lowest difficulty to
-     * the highest - 250 is fine, as a vote can end up there too); ignored from anyone but the
-     * host the game waits for. Returns whether it was taken.
+     * The host's choice of mode and difficulty; ignored from anyone but the host the game waits for.
+     * A fixed difficulty is a whole percentage from the lowest to the highest (250 is fine, as a vote
+     * can end up there too). With `scaling` the game runs the adaptive difficulty instead, which is
+     * Blitz-only. Returns whether it was taken.
      */
-    public applyHostChoice(player: Defender, mode: number, difficulty: number): boolean {
+    public applyHostChoice(player: Defender, mode: number, difficulty: number, scaling: boolean = false): boolean {
         if (!this.awaitingHost || player.id !== this.awaitingHost.id) {
             return false;
         }
-        if (!(mode >= 0 && mode < settings.GAME_MODE_STRINGS.length) || difficulty !== Math.floor(difficulty)
+        if (!(mode >= 0 && mode < settings.GAME_MODE_STRINGS.length)) {
+            return false;
+        }
+        if (scaling) {
+            if (mode !== settings.GAME_MODES.BLITZ) {
+                return false;
+            }
+        } else if (difficulty !== Math.floor(difficulty)
             || !(difficulty >= settings.DIFFICULTIES[0] && difficulty <= settings.DIFFICULTIES[settings.DIFFICULTIES.length - 1])) {
             return false;
         }
         this.awaitingHost = undefined;
         this.hostPanel.hide(player);
-        SendMessage(`${player.getNameWithColour()} set the game mode to ${this.modeName(mode)}`);
+        SendMessage(`${player.getNameWithColour()} set the game mode to ${this.modeName(mode)}${scaling ? ' (Adaptive)' : ''}`);
         this.applyMode(mode);
-        this.applyDifficulty(difficulty);
+        this.applyDifficulty(difficulty, scaling, 'host');
         this.openRaceSelection();
         return true;
     }
@@ -228,11 +239,18 @@ export class Vote {
         this.startModeVote();
     }
 
+    /** The mode's name as the vote shows it: Blitz reads "Blitz (Adaptive)", since a Blitz vote is adaptive. */
+    private voteModeName(mode: number): string {
+        const name: string = settings.GAME_MODE_STRINGS[mode]
+            + (mode === settings.GAME_MODES.BLITZ ? ' (Adaptive)' : '');
+        return Util.ColourString(settings.GAME_MODE_COLOURS[mode], name);
+    }
+
     private startModeVote(): void {
         for (let i = 0; i < settings.PLAYER_GAME_MODES.length; i++) {
             this.votedMode[i] = 0;
         }
-        const labels = settings.PLAYER_GAME_MODES.map(mode => this.modeName(mode));
+        const labels = settings.PLAYER_GAME_MODES.map(mode => this.voteModeName(mode));
         this.panel.show('Game mode vote', labels, index => this.game.playerSync.send('vote-mode', `${index}`));
         this.modeVoteOpen = true;
         Timer.create().start(VOTE_LENGTH, false, () => this.resolveModeVote());
@@ -245,7 +263,7 @@ export class Vote {
         this.hasVotedMode[player.id] = true;
         this.votedMode[index]++;
         this.panel.hide(this.game.players.get(player.id)!);
-        SendMessage(`${this.playerName(player)} voted for: ${this.modeName(settings.PLAYER_GAME_MODES[index])}`);
+        SendMessage(`${this.playerName(player)} voted for: ${this.voteModeName(settings.PLAYER_GAME_MODES[index])}`);
         if (this.everyoneVoted(defender => this.hasVotedMode[defender.id])) {
             this.resolveModeVote();
         }
@@ -273,12 +291,18 @@ export class Vote {
             }
         }
         const mode = settings.PLAYER_GAME_MODES[winningMode];
-        SendMessage(`${this.modeName(mode)} won with ${this.votedMode[winningMode]} votes.`);
+        SendMessage(`${this.voteModeName(mode)} won with ${this.votedMode[winningMode]} votes.`);
         SyncTrace.note('vote', `mode=${mode} votes=${this.votedMode[winningMode]}`);
         this.applyMode(mode);
 
-        // Difficulty is voted on while the race selection is already open
-        this.startDiffVote();
+        if (this.finalModeIndex === settings.GAME_MODES.BLITZ) {
+            // A Blitz vote is always adaptive: there is no difficulty to vote on (it starts at 160 and
+            // adjusts to the team), so apply adaptive and go straight to race selection.
+            this.applyDifficulty(settings.DIFFICULTIES[0], true, 'vote');
+        } else {
+            // Difficulty is voted on while the race selection is already open
+            this.startDiffVote();
+        }
         this.openRaceSelection();
     }
 
@@ -354,16 +378,17 @@ export class Vote {
      * created and the stored percentage is only its starting global, for display and the lives rule.
      * Only the host-bot handicap path sets scaling, so vote/host-panel games stay flat.
      */
-    private applyDifficulty(difficulty: number, scaling: boolean = false): void {
+    private applyDifficulty(difficulty: number, scaling: boolean = false, source: string = 'host'): void {
         this.scaling = scaling;
         if (scaling) {
             // The engine owns the difficulty from here, per lane; the value stored/shown is its
             // starting global, so the lives rule and the host-stat broadcast have a number to use.
             this.game.adaptiveDifficulty = new AdaptiveDifficultyEngine();
             difficulty = this.game.adaptiveDifficulty.globalDifficulty();
-            // Tell a host bot this game is adaptive and where it started, so its stats don't mix
-            // adaptive games in with fixed ones (settings-final's difficulty is only this start).
-            this.game.playerSync.sendGlobal('difficulty-mode', `adaptive:${difficulty}`);
+            // Tell a host bot this game is adaptive, where it started, and how it was chosen (bot
+            // handicap / host panel / a Blitz vote), so its stats separate them (settings-final's
+            // difficulty is only this start).
+            this.game.playerSync.sendGlobal('difficulty-mode', `adaptive:${difficulty}:${source}`);
             // The tuning this game ran, so its telemetry records which constants produced the curve.
             this.game.playerSync.sendGlobal('adapt-tuning', this.game.adaptiveDifficulty.tuningSummary());
         }
