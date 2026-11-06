@@ -6,6 +6,7 @@ import {saveTests} from './save.test';
 import {recipeTests} from './recipe.test';
 import {pathFieldTests} from './pathfield.test';
 import {difficultyTests} from './difficulty.test';
+import {adaptiveTests} from './adaptive.test';
 
 let failures = 0;
 let passed = 0;
@@ -23,6 +24,7 @@ saveTests(check);
 recipeTests(check);
 pathFieldTests(check);
 difficultyTests(check);
+adaptiveTests(check);
 print(`${passed} passed, ${failures} failed`);
 if (failures > 0) {
     os.exit(1);
