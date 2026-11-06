@@ -7,6 +7,7 @@ import {AbstractGameRound} from './Game/BaseMaul/AbstractGameRound';
 import {Vote} from './Game/Vote';
 import {RacePicking} from './Game/RacePicking';
 import {MultiBoard} from './Game/MultiBoard';
+import {AdaptiveDifficultyEngine} from './Game/AdaptiveDifficultyEngine';
 // import {Quests} from '../Generated/questsGEN';
 import {Log, LogLevel} from '../lib/Serilog/Serilog';
 import {SellTower} from './Entity/Tower/SellTower';
@@ -93,6 +94,9 @@ export class WarcraftMaul {
     public readonly towerTicker: TowerTicker;
     public buffHandler: BuffHandler;
     public scoreBoard: MultiBoard | undefined;
+    // Set only when the scaling (adaptive) difficulty is chosen; drives per-lane creep HP and the
+    // team ability level. Undefined for flat difficulties (vote/host/normal), which read diffVote.
+    public adaptiveDifficulty: AdaptiveDifficultyEngine | undefined;
     private itemHandler: ItemHandler;
     public sellTower: SellTower;
     public abilityHandler: GenericAbilityHandler;
@@ -232,7 +236,9 @@ export class WarcraftMaul {
         this.grayVacancy = new GrayVacancy(this);
         this.playerSync.on('build', (player, data) => player.placeTower(data));
         // Outbound-only messages for a host bot reading the game (research/stats). No map handler.
-        for (const broadcast of ['version', 'settings-final', 'race', 'wave', 'wave-end', 'game-end']) {
+        for (const broadcast of
+            ['version', 'settings-final', 'race', 'wave', 'wave-end', 'game-end', 'difficulty-mode', 'difficulty',
+             'adapt-tuning', 'adapt-global', 'adapt-lane', 'adapt-econ']) {
             this.playerSync.registerBroadcast(broadcast);
         }
         this.hybridBuildPanel = new HybridBuildPanel(this);

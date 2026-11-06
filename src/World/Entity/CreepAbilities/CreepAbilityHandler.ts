@@ -79,28 +79,42 @@ export class CreepAbilityHandler {
         if (!this.game) {
             return this.activeAbilities;
         }
+        // Scaling (adaptive) difficulty: abilities are their own team-wide axis, so the count comes
+        // straight from the engine, decoupled from the HP percent.
+        const engine = this.game.adaptiveDifficulty;
+        if (engine) {
+            return this.pickAbilities(wave, engine.abilityLevelForWave());
+        }
+        // Flat difficulty: one ability per 100% above Normal, plus a fractional-% chance of one more.
+        // 100% (Normal) gives none, and so does anything below it: a game whose difficulty is never
+        // set sits at 0% (Vote.ts), and without this guard the maths goes negative and hands back
+        // nearly every ability. Nothing under Normal adds any.
         let currentDiff: number = this.game.diffVote.difficulty;
-        if (currentDiff === 100) {
+        if (currentDiff <= 100) {
             return [];
         }
         currentDiff -= 100;
-        // Every ability, MorningPerson (the last) included
-        const allAbilities: CreepAbility[] = this.activeAbilities.slice(0);
-        // allAbilities.sort(() => 0.5 - Math.random());
-        if (wave.getCreepType() === CREEP_TYPE.BOSS) {
-            return allAbilities;
-        }
-        this.ShuffleArray(allAbilities);
         let picks: number = Math.floor(currentDiff / 100);
         const rest: number = currentDiff % 100;
-
         if (Util.RandomInt(1, 100) <= rest) {
             picks++;
         }
-        if (picks === 0) {
+        return this.pickAbilities(wave, picks);
+    }
+
+    /**
+     * `picks` random abilities for a non-boss creep (a boss always gets every ability). The pool is
+     * shuffled with the synced RNG, so every client picks the same set.
+     */
+    private pickAbilities(wave: WaveCreep, picks: number): CreepAbility[] {
+        const allAbilities: CreepAbility[] = this.activeAbilities.slice(0);
+        if (wave.getCreepType() === CREEP_TYPE.BOSS) {
+            return allAbilities;
+        }
+        if (picks <= 0) {
             return [];
         }
-        // One ability per pick: 200% gives one, 300% two, 400% three
+        this.ShuffleArray(allAbilities);
         return allAbilities.slice(0, Math.min(picks, allAbilities.length));
     }
 

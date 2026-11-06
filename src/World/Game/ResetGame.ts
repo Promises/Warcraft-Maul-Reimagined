@@ -4,6 +4,7 @@ import {AbstractGameRound} from './BaseMaul/AbstractGameRound';
 import {ClassicGameRound} from './ClassicMaul/ClassicGameRound';
 import {BlitzGameRound} from './BlitzMaul/BlitzGameRound';
 import {DebugGameRound} from './DebugMaul/DebugGameRound';
+import {AdaptiveDifficultyEngine} from './AdaptiveDifficultyEngine';
 import {SendMessage} from '../../lib/translators';
 import {SyncTrace} from '../../lib/SyncTrace';
 
@@ -29,6 +30,11 @@ export function resetGame(game: WarcraftMaul, by: Defender): void {
     }
     for (const maze of worldMap.playerMazes) {
         maze.Reset();
+    }
+
+    // The adaptive difficulty starts over too, so the reset game plays from its opening level.
+    if (game.adaptiveDifficulty) {
+        game.adaptiveDifficulty = new AdaptiveDifficultyEngine();
     }
 
     // The lives a game starts with: one at Extreme, as the difficulty gave them (-lives changes the start too)

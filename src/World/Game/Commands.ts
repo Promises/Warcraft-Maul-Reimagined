@@ -1,6 +1,7 @@
 import {WarcraftMaul} from '../WarcraftMaul';
 import {resetGame} from './ResetGame';
 import {COLOUR_CODES, DIFFICULTIES, GAME_MODES, NO_LIVES_LOST} from '../GlobalSettings';
+import {AdaptiveDifficultyEngine} from './AdaptiveDifficultyEngine';
 import {Defender} from '../Entity/Players/Defender';
 import {Log} from '../../lib/Serilog/Serilog';
 import {CheckPoint} from '../Entity/CheckPoint';
@@ -234,12 +235,24 @@ export class Commands {
                 player.sendMessage(`Learnt ${this.game.recipeBook.learn(player, command2.slice(1))} of ${command2.length - 1}`);
                 break;
             case 'diff':
+                // -diff scaling (or -diff s): turn on the adaptive difficulty, so it can be tested
+                // without a host bot. Plain -diff <n> is a flat difficulty and turns adaptive off.
+                if (command[1] === 'scaling' || command[1] === 's') {
+                    this.game.adaptiveDifficulty = new AdaptiveDifficultyEngine();
+                    this.game.diffVote.scaling = true;
+                    player.sendMessage(
+                        `Difficulty set to adaptive, starting at ${this.game.adaptiveDifficulty.globalDifficulty()}%`);
+                    break;
+                }
                 amount = Util.ParsePositiveInt(command[1]);
                 if (!amount) {
                     player.sendMessage(Util.ColourString(COLOUR_CODES[COLOUR.RED], 'Invalid Amount'));
                     return;
 
                 }
+                // A plain -diff is flat: turn adaptive off so you can toggle back to a fixed multiplier
+                this.game.adaptiveDifficulty = undefined;
+                this.game.diffVote.scaling = false;
                 player.sendMessage(`Difficulty was set to ${amount}%`);
                 // Applies to creeps spawned from now on; Creep scales each unit itself
                 this.game.diffVote.difficulty = amount;

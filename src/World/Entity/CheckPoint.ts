@@ -46,6 +46,23 @@ export class CheckPoint {
         return true;
     }
 
+    /**
+     * Adaptive difficulty (when on): the first time a creep is found outside its owner's lane, it has
+     * leaked downstream for that player - count it once. Only runs while the adaptive engine exists
+     * and only until a creep has leaked, so the per-crossing cost is bounded.
+     */
+    private CountAdaptiveLeak(creep: Creep): void {
+        const engine = this.worldMap.game.adaptiveDifficulty;
+        if (!engine || creep.hasLeaked) {
+            return;
+        }
+        const ownArea = this.worldMap.game.mapSettings.PLAYER_AREAS[creep.spawnLane];
+        if (ownArea && !ownArea.ContainsCreep(creep)) {
+            creep.hasLeaked = true;
+            engine.registerLeak(creep.spawnLane);
+        }
+    }
+
     public CheckPointAction(): void {
         if (!this.next) {
             return;
@@ -59,7 +76,7 @@ export class CheckPoint {
                 if (UnitHasBuffBJ(GetEnteringUnit()!, FourCC('B028'))) {
                     creep.MorningPerson();
                 }
-
+                this.CountAdaptiveLeak(creep);
             }
         }
     }

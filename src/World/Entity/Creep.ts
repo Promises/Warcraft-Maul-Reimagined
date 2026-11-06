@@ -19,6 +19,8 @@ export class Creep {
     private readonly game: WarcraftMaul;
     /** The lane (colour id) this creep spawned in, for the spawn-side share of its gold bounty. */
     public readonly spawnLane: number;
+    /** Set once when this creep first leaves its owner's lane, so an adaptive-difficulty leak counts once. */
+    public hasLeaked: boolean = false;
 
     constructor(creep: Unit, gameRound: AbstractGameRound, abilities: CreepAbility[], game: WarcraftMaul, spawnLane: number) {
         this.unit = creep;
@@ -91,13 +93,22 @@ export class Creep {
     }
 
     public AddArmorBonusByDifficulty(): void {
-        this.unit.armor = Math.round(this.unit.armor * (this.game.diffVote.difficulty / 100));
+        this.unit.armor = Math.round(this.unit.armor * (this.difficultyPercent() / 100));
     }
 
     public AddHPBonusByDifficulty(): void {
-        const unitHPScaling: number = Math.round(this.unit.maxLife * (this.game.diffVote.difficulty / 100));
+        const unitHPScaling: number = Math.round(this.unit.maxLife * (this.difficultyPercent() / 100));
         this.unit.maxLife = unitHPScaling;
         this.unit.life = unitHPScaling;
+    }
+
+    /**
+     * The percent this creep's stats scale by: the adaptive difficulty of its own lane when the
+     * scaling difficulty is on, otherwise the flat voted/host difficulty.
+     */
+    private difficultyPercent(): number {
+        const engine = this.game.adaptiveDifficulty;
+        return engine ? engine.hpDifficultyForLane(this.spawnLane) : this.game.diffVote.difficulty;
     }
 
     public SetPostition(x: number, y: number): void {

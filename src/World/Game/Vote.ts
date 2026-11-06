@@ -12,6 +12,7 @@ import {HostSettingsPanel} from './Ui/HostSettingsPanel';
 import {Defender} from '../Entity/Players/Defender';
 import {SyncTrace} from '../../lib/SyncTrace';
 import {votedDifficulty} from './DifficultyVote';
+import {AdaptiveDifficultyEngine} from './AdaptiveDifficultyEngine';
 
 // The attacker's slot (the creep owner). A host bot sits here, and only here; no normal player can,
 // so settings that come from this slot can never be spoofed by a joiner.
@@ -50,6 +51,9 @@ export class Vote {
     private modeVoteOpen: boolean = false;
     private diffVoteOpen: boolean = false;
     public difficulty: number = 0;
+    // When set, the difficulty is the adaptive one (host-bot only): the game creates an
+    // AdaptiveDifficultyEngine and creeps scale per lane by how the team is doing, not by `difficulty`.
+    public scaling: boolean = false;
     // The mode index actually applied (0 Classic, 1 Blitz, as vote-mode), for the settings-final broadcast.
     private finalModeIndex: number = settings.GAME_MODES.CLASSIC;
     public forceBlitz: boolean = false;
@@ -97,6 +101,11 @@ export class Vote {
      * nothing set) returns false, so the normal flow runs. The handicap is reset to 100% first, so the
      * engine stops scaling the attacker's (NAVY's) creeps by the encoded value. A dev build records a
      * marker so the read can be confirmed off-game. Returns whether host settings were applied.
+     *
+     * Bit layout (7-bit field, MSB first): bit1 (64) players choose, bit2 (32) blitz (else classic),
+     * bit3 (16) difficulty +100, bit4 (8) difficulty +200, bit5 (4) adaptive difficulty (the game
+     * adjusts it per lane to how the team does, instead of a flat multiplier - see
+     * AdaptiveDifficultyEngine), bits 6-7 (2, 1) reserved.
      */
     private applyHandicapSettings(): boolean {
         const percent: number = R2I(GetPlayerHandicap(Player(ATTACKER_SLOT)!) * 100.00 + 0.50);
@@ -104,15 +113,16 @@ export class Vote {
         // creep HP by the encoded handicap (verified 2026-10-24: a slot-13 unit was 56% HP before
         // this reset, full after - matching an untouched attacker slot).
         SetPlayerHandicap(Player(ATTACKER_SLOT)!, 1.00);
-        // A 7-bit field, most significant bit first: bit1 (64) players choose, bit2 (32) blitz (else
-        // classic), bit3 (16) difficulty +100, bit4 (8) difficulty +200, bits 5-7 reserved. The
-        // no-host default is 100% = 1100100, which has BOTH choose and blitz set - a combination no
-        // real setting uses - so choose+blitz is the "nothing set" sentinel and the normal flow runs.
+        // See the bit layout above. The no-host default is 100% = 1100100, which has BOTH choose and
+        // blitz set - a combination no real setting uses - so choose+blitz is the "nothing set"
+        // sentinel and the normal flow runs. (That default also has bit5 set, but the sentinel is
+        // caught before bit5 is read, so the stray scaling bit never applies.)
         const choose: boolean = (percent & 64) !== 0;
         const blitz: boolean = (percent & 32) !== 0;
         let mode: number = settings.GAME_MODES.CLASSIC;
         let difficulty: number = 100;
         let vote: boolean = false;
+        let scaling: boolean = false;
         let applied: boolean = true;
         if (choose && blitz) {
             applied = false;
@@ -121,8 +131,10 @@ export class Vote {
         } else {
             mode = blitz ? settings.GAME_MODES.BLITZ : settings.GAME_MODES.CLASSIC;
             difficulty = 100 + ((percent & 16) !== 0 ? 100 : 0) + ((percent & 8) !== 0 ? 200 : 0);
+            scaling = (percent & 4) !== 0;
         }
-        const what: string = !applied ? 'default/none' : vote ? 'a players vote' : `mode=${mode} difficulty=${difficulty}`;
+        const what: string = !applied ? 'default/none' : vote ? 'a players vote'
+            : `mode=${mode} difficulty=${difficulty}${scaling ? ' (scaling)' : ''}`;
         Log.Info(`handicap: slot ${ATTACKER_SLOT} = ${percent}% -> ${what}`);
         Log.flush();
         if (this.game.debugMode) {
@@ -135,7 +147,7 @@ export class Vote {
             this.startModeVote();
         } else {
             this.applyMode(mode);
-            this.applyDifficulty(difficulty);
+            this.applyDifficulty(difficulty, scaling);
             this.openRaceSelection();
         }
         return true;
@@ -336,8 +348,25 @@ export class Vote {
         SyncTrace.note('vote', `difficulty=${this.difficulty} votes=${votes.length}`);
     }
 
-    /** Sets the difficulty (a percentage, possibly a blend of the votes) and everything that hangs off it. */
-    private applyDifficulty(difficulty: number): void {
+    /**
+     * Sets the difficulty (a percentage, possibly a blend of the votes) and everything that hangs
+     * off it. When `scaling` is set the game instead runs the adaptive difficulty: an engine is
+     * created and the stored percentage is only its starting global, for display and the lives rule.
+     * Only the host-bot handicap path sets scaling, so vote/host-panel games stay flat.
+     */
+    private applyDifficulty(difficulty: number, scaling: boolean = false): void {
+        this.scaling = scaling;
+        if (scaling) {
+            // The engine owns the difficulty from here, per lane; the value stored/shown is its
+            // starting global, so the lives rule and the host-stat broadcast have a number to use.
+            this.game.adaptiveDifficulty = new AdaptiveDifficultyEngine();
+            difficulty = this.game.adaptiveDifficulty.globalDifficulty();
+            // Tell a host bot this game is adaptive and where it started, so its stats don't mix
+            // adaptive games in with fixed ones (settings-final's difficulty is only this start).
+            this.game.playerSync.sendGlobal('difficulty-mode', `adaptive:${difficulty}`);
+            // The tuning this game ran, so its telemetry records which constants produced the curve.
+            this.game.playerSync.sendGlobal('adapt-tuning', this.game.adaptiveDifficulty.tuningSummary());
+        }
         this.game.scoreBoard = new MultiBoard(this.game, this.finalModeIndex);
         const diffIndex: number = R2I((difficulty - 100.00) / 100.00 + ModuloReal((difficulty - 100.00) / 100.00, 1.00));
         this.difficulty = Math.floor(difficulty);
@@ -347,7 +376,11 @@ export class Vote {
         this.game.playerSync.sendGlobal('settings-final', `${this.finalModeIndex}:${diffIndex}:35`);
         const colouredDifficulty = Util.ColourString(settings.DIFFICULTY_COLOURS[diffIndex], settings.DIFFICULTY_STRINGS[diffIndex]);
         // No player handicap: creeps are scaled per unit in Creep (HP, armor, abilities)
-        SendMessage(`Difficulty was set to ${this.difficulty}% (${colouredDifficulty})`);
+        if (this.scaling) {
+            SendMessage(`Difficulty: adaptive - starting at ${this.difficulty}% and adjusting to how the team does`);
+        } else {
+            SendMessage(`Difficulty was set to ${this.difficulty}% (${colouredDifficulty})`);
+        }
 
         for (const player of this.game.players.values()) {
             for (const ally of this.game.players.values()) {
@@ -365,7 +398,10 @@ export class Vote {
             this.game.worldMap.ReplaceRunedBricksWithLava();
         }
 
-        MultiboardSetItemValueBJ(this.game.scoreBoard.board, 2, 3, `${I2S(R2I(this.difficulty))}% (${colouredDifficulty})`);
+        const boardDifficulty: string = this.scaling
+            ? Util.ColourString(settings.DIFFICULTY_COLOURS[diffIndex], `Adaptive ${this.difficulty}%`)
+            : `${I2S(R2I(this.difficulty))}% (${colouredDifficulty})`;
+        MultiboardSetItemValueBJ(this.game.scoreBoard.board, 2, 3, boardDifficulty);
     }
 
     private openRaceSelection(): void {
