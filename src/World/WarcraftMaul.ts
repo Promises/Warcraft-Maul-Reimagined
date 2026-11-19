@@ -21,6 +21,7 @@ import {CreepAbilityHandler} from './Entity/CreepAbilities/CreepAbilityHandler';
 import {VoidTicker} from './Game/VoidTicker';
 import {ActionBar} from './Game/Ui/ActionBar';
 import {HybridBuildPanel} from './Game/Ui/HybridBuild/HybridBuildPanel';
+import {DraftPanel} from './Game/Ui/HybridDraft/DraftPanel';
 import {PlayerSync} from './Game/PlayerSync';
 import {Saves} from './Game/Saves';
 import {RecipeBook} from './Entity/GenericAbilities/Elementalist/RecipeBook';
@@ -30,6 +31,7 @@ import {LaneTransfer} from './Game/LaneTransfer';
 import {GrayVacancy} from './Game/GrayVacancy';
 import {Quests} from '../Generated/questsGEN';
 import {RaceSelectPanel} from './Game/Ui/RaceSelect/RaceSelectPanel';
+import {RatePanel} from './Game/Ui/RatePanel';
 import {WarcraftMaulSettings} from './WarcraftMaulSettings';
 import {IMapSettings} from './IMapSettings';
 import {EventQueue} from "../lib/WCEventQueue/EventQueue";
@@ -97,6 +99,13 @@ export class WarcraftMaul {
     // Set only when the scaling (adaptive) difficulty is chosen; drives per-lane creep HP and the
     // team ability level. Undefined for flat difficulties (vote/host/normal), which read diffVote.
     public adaptiveDifficulty: AdaptiveDifficultyEngine | undefined;
+    // An end-of-game rating survey a host bot turned on (a "rate" sync at game start): whether to
+    // show it and the category labels shown after the 1-5 stars. Set only from the attacker slot.
+    public rateEnabled: boolean = false;
+    public rateCategories: string[] = [];
+    // Optional "rate-at wave N" trigger: show the survey once wave N completes (-1 = none, game-end only).
+    public rateAtWave: number = -1;
+    private rateAtWaveShown: boolean = false;
     private itemHandler: ItemHandler;
     public sellTower: SellTower;
     public abilityHandler: GenericAbilityHandler;
@@ -106,6 +115,7 @@ export class WarcraftMaul {
     // Who defends each lane, by lane index: a player's own colour unless they took another lane over
     public laneHolders: Map<number, Defender> = new Map<number, Defender>();
     public hybridBuildPanel: HybridBuildPanel;
+    public draftPanel: DraftPanel;
     public playerSync: PlayerSync;
     public saves: Saves;
     public recipeBook: RecipeBook;
@@ -113,6 +123,7 @@ export class WarcraftMaul {
     public observerSupport: ObserverSupport;
     public laneTransfer: LaneTransfer;
     public raceSelectPanel: RaceSelectPanel;
+    public ratePanel: RatePanel;
     public actionBar: ActionBar;
     public grayVacancy: GrayVacancy;
     /**
@@ -205,6 +216,9 @@ export class WarcraftMaul {
         this.towerTicker = new TowerTicker();
         this.voidTicker = new VoidTicker(this);
         this.gameDamageEngine = new DamageEngine(this.gameDamageEngineGlobals);
+        // Adaptive difficulty telemetry (capture-only): record each lethal blow's overkill against the
+        // dying creep's lane, for the v2 kill-headroom signal. Only does work in an adaptive game.
+        this.gameDamageEngine.AddLethalDamageEvent(() => this.captureAdaptiveOverkill());
         this.buffHandler = new BuffHandler(this);
         this.abilityHandler = new GenericAbilityHandler(this);
         this.itemHandler = new ItemHandler(this);
@@ -235,14 +249,48 @@ export class WarcraftMaul {
         this.laneTransfer = new LaneTransfer(this);
         this.grayVacancy = new GrayVacancy(this);
         this.playerSync.on('build', (player, data) => player.placeTower(data));
+        // Inbound from a host bot (sent as a sync at game start): turn on the end-of-game rating
+        // survey and set its category labels. Trusted only from the attacker slot (13), where only a
+        // host bot can sit. Format: "stars|Cat1|Cat2|..." (the first token is the UI marker).
+        this.playerSync.onAnyPlayer('rate', (player, data) => {
+            if (player.id !== 13) {
+                return;
+            }
+            const parts: string[] = data.split('|');
+            this.rateEnabled = true;
+            this.rateCategories = parts.slice(1, 6);
+        });
+        // Optional triggers (host bot, slot 13). `rate-at` data "wave:<n>" shows the survey when wave n
+        // completes (the game-end show is the fallback if n is never reached); `rate-now` shows it now.
+        this.playerSync.onAnyPlayer('rate-at', (player, data) => {
+            if (player.id !== 13) {
+                return;
+            }
+            const parts: string[] = data.split(':');
+            const wave: number = Number(parts[1]);
+            if (parts[0] === 'wave' && wave > 0) {
+                this.rateAtWave = wave;
+            }
+        });
+        this.playerSync.onAnyPlayer('rate-now', (player) => {
+            if (player.id === 13) {
+                this.showRateSurveyMidGame();
+            }
+        });
         // Outbound-only messages for a host bot reading the game (research/stats). No map handler.
         for (const broadcast of
             ['version', 'settings-final', 'race', 'wave', 'wave-end', 'game-end', 'difficulty-mode', 'difficulty',
-             'adapt-tuning', 'adapt-global', 'adapt-lane', 'adapt-econ']) {
+             'adapt-tuning', 'adapt-global', 'adapt-lane', 'adapt-econ', 'adapt-leak', 'adapt-towers', 'adapt-rate',
+             'adapt-rate-preview']) {
             this.playerSync.registerBroadcast(broadcast);
         }
         this.hybridBuildPanel = new HybridBuildPanel(this);
+        // 9 tiers, 2 options each; the hybrid specifics live in RacePicking (built above).
+        this.draftPanel = new DraftPanel(this, 9, 2,
+            (player, row, option) => this.racePicking.onDraftSelect(player, row, option),
+            player => this.racePicking.onDraftConfirm(player));
         this.raceSelectPanel = new RaceSelectPanel(this);
+        this.ratePanel = new RatePanel(this);
         this.diffVote = new Vote(this);
         this.actionBar = new ActionBar(this);
         installSlopHooks(this);
@@ -254,6 +302,29 @@ export class WarcraftMaul {
         }
     }
 
+    /**
+     * On a lethal blow, records the overkill (killing-blow damage past the creep's remaining HP)
+     * against the dying creep's lane, for the adaptive difficulty telemetry. A no-op unless the
+     * adaptive difficulty is on and the dying unit is a tracked wave creep.
+     */
+    private captureAdaptiveOverkill(): void {
+        const engine = this.adaptiveDifficulty;
+        if (!engine) {
+            return;
+        }
+        const target: unit | undefined = this.gameDamageEngineGlobals.udg_DamageEventTarget;
+        if (!target) {
+            return;
+        }
+        const creep = this.worldMap.spawnedCreeps?.unitMap.get(GetHandleId(target));
+        if (!creep) {
+            return;
+        }
+        const overkill: number =
+            this.gameDamageEngineGlobals.udg_DamageEventAmount - this.gameDamageEngineGlobals.udg_LethalDamageHP;
+        engine.registerOverkill(creep.spawnLane, Math.max(0, overkill));
+    }
+
     public GameWin(): void {
         if (this.gameLives > 0) {
             this.playerSync.sendGlobal('game-end', `win:${this.worldMap.gameRoundHandler ? this.worldMap.gameRoundHandler.currentWave : 0}`);
@@ -261,6 +332,29 @@ export class WarcraftMaul {
             SendMessage('|cFFF48C42YOU HAVE WON!|r');
             SendMessage('You can either leave the game or stay for bonus rounds');
             this.GameWinEffects();
+            this.showRateSurvey();
+        }
+    }
+
+    /** Shows the end-of-game rating survey (centred panel) to each player, if a host bot enabled it. */
+    private showRateSurvey(): void {
+        for (const player of this.players.values()) {
+            this.ratePanel.show(player);
+        }
+    }
+
+    /** Shows the mid-game survey (compact left widget, so play stays visible) to each player. */
+    private showRateSurveyMidGame(): void {
+        for (const player of this.players.values()) {
+            this.ratePanel.showMidGame(player);
+        }
+    }
+
+    /** Shows the survey when the bot's `rate-at` wave has completed; fires once (SpawnCreeps calls it). */
+    public checkRateAtWave(completedWave: number): void {
+        if (this.rateEnabled && !this.rateAtWaveShown && this.rateAtWave > 0 && completedWave >= this.rateAtWave) {
+            this.rateAtWaveShown = true;
+            this.showRateSurveyMidGame();
         }
     }
 
@@ -298,6 +392,7 @@ export class WarcraftMaul {
         settings.Sounds.defeatSound.start()
         SendMessage('|cFFFF0000GAME OVER|r');
         this.worldMap.RemoveEveryUnit();
+        this.showRateSurvey();
     }
 
     get creepAbilityHandler(): CreepAbilityHandler {

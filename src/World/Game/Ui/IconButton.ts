@@ -2,7 +2,7 @@ import {Frame} from 'w3ts';
 import {WarcraftMaul} from '../../WarcraftMaul';
 import {Defender} from '../../Entity/Players/Defender';
 import {trackUiPress} from './UiPress';
-import {createText, onClick, Tooltip} from './Frames';
+import {createText, onClick, Tooltip, TooltipPlacement} from './Frames';
 
 const TOOLTIP_WIDTH = 0.29;
 
@@ -31,7 +31,8 @@ export class IconButton {
     private readonly hotkeyLabel: Frame;
 
     constructor(game: WarcraftMaul, name: string, parent: Frame, size: number,
-                handler: (this: void, player: Defender) => void, showTooltip: boolean = true) {
+                handler: (this: void, player: Defender) => void, showTooltip: boolean = true,
+                tooltipPlacement: TooltipPlacement = 'above') {
         this.frame = Frame.createType(`${name}Icon`, parent, 0, 'BACKDROP', '')!;
         this.frame.setSize(size, size);
 
@@ -44,7 +45,9 @@ export class IconButton {
         this.hotkeyLabel.setSize(size, size * 0.4);
 
         // A panel with its own details pane passes showTooltip=false to avoid a hover box over it
-        this.tooltip = showTooltip ? new Tooltip(name, this.button, TOOLTIP_WIDTH) : undefined;
+        this.tooltip = showTooltip
+            ? new Tooltip(name, this.button, TOOLTIP_WIDTH, this.button, tooltipPlacement)
+            : undefined;
 
         onClick(this.button, clicker => {
             const player = game.players.get(clicker.id);

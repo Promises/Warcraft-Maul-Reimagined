@@ -680,6 +680,63 @@ export class Commands {
             this.game.hybridBuildPanel.toggle(player);
         } else if (command[0] === 'race') {
             this.game.raceSelectPanel.toggle(player);
+        } else if (command[0] === 'rate') {
+            // Debug: preview the rating panels. a=pips, b=overall, c=bars, d=combo bars, e=combo stars
+            // (the end-game centre panel); mid=the compact mid-game left widget.
+            if (this.game.debugMode) {
+                const which: string = (command[1] ?? 'd').toLowerCase();
+                if (which === 'mid') {
+                    this.game.ratePanel.debugShowMid(player);
+                } else if (which === 'real' || which === 'realmid') {
+                    // Exercise the REAL (non-preview) survey path as the host bot would: enable it,
+                    // set the bot's categories (none = Overall only), then show the end-game or
+                    // mid-game prompt. Lets the real show()/done-flag path be tested without a bot.
+                    this.game.rateEnabled = true;
+                    this.game.rateCategories = command.slice(2, 7);
+                    if (which === 'realmid') {
+                        this.game.ratePanel.showMidGame(player);
+                    } else {
+                        this.game.ratePanel.show(player);
+                    }
+                } else {
+                    const index: number = which === 'e' || which === '5' ? 4
+                        : which === 'd' || which === '4' ? 3
+                        : which === 'c' || which === '3' ? 2
+                        : which === 'b' || which === '2' ? 1 : 0;
+                    this.game.ratePanel.debugShow(player, index);
+                }
+            }
+        } else if (command[0] === 'ratesubmit') {
+            // Debug: submit the shown rating headlessly, so the desync gate can exercise Submit.
+            if (this.game.debugMode) {
+                this.game.ratePanel.debugSubmit();
+            }
+        } else if (command[0] === 'draft') {
+            // Debug: drive the hybrid draft headlessly (the harness can't click the frame buttons).
+            // -draft starts a random roll, -draft fixed a deterministic one (same set every run, for
+            // UI-fidelity baselines), -draftpick <tier 1-9> <option 1-2> selects, -draftok confirms,
+            // -draftbuild <tier> <maze> <cornerX> <cornerY> places a drafted tower.
+            if (this.game.debugMode) {
+                if (command[1] === 'fixed') {
+                    this.game.racePicking.startFixedDraft(player);
+                } else {
+                    this.game.racePicking.PickRaceForPlayerByItem(player, FourCC('I00X'));
+                }
+            }
+        } else if (command[0] === 'draftpick') {
+            if (this.game.debugMode && command[1] !== undefined && command[2] !== undefined) {
+                this.game.racePicking.onDraftSelect(player, Number(command[1]) - 1, Number(command[2]) - 1);
+            }
+        } else if (command[0] === 'draftok') {
+            if (this.game.debugMode) {
+                this.game.racePicking.onDraftConfirm(player);
+            }
+        } else if (command[0] === 'draftbuild') {
+            if (this.game.debugMode && command[1] !== undefined && command[2] !== undefined
+                && command[3] !== undefined && command[4] !== undefined) {
+                // placeTower expects maze:cornerX:cornerY:tier(0-indexed):keep
+                player.placeTower(`${Number(command[2])}:${Number(command[3])}:${Number(command[4])}:${Number(command[1]) - 1}:0`);
+            }
         } else if (command[0] === 'host') {
             this.game.hostDetection.report(player);
         } else if (command[0] === 'log') {
@@ -802,6 +859,7 @@ export class Commands {
         player.removeOwnUnits(true);
         // A fresh pick: the same race again, or Hybrid Random after a chosen race
         player.forgetRacePicks();
+        this.game.racePicking.cancelDraft(player);
         this.game.raceSelectPanel.open(player);
     }
 

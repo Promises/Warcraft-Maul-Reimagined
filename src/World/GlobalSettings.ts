@@ -91,6 +91,12 @@ export const DIFFICULTY_COLOURS: string[] = [
     '#383838',
 ];
 
+// Races (by item id) that a random pick will not roll in Blitz - they fit Blitz poorly. Deliberately
+// picking them is still allowed; this only affects normal/hardcore random. Classic is unaffected.
+export const BLITZ_RANDOM_BLACKLIST: string[] = [
+    'I024', // Elementalists
+];
+
 
 export const COLOUR_CODES: string[] = [
     '#ff0303',

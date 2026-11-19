@@ -58,6 +58,11 @@ export class Vote {
     private finalModeIndex: number = settings.GAME_MODES.CLASSIC;
     public forceBlitz: boolean = false;
 
+    /** The applied game mode (Classic/Blitz/Debug); used e.g. to blacklist some random picks in Blitz. */
+    public get mode(): number {
+        return this.finalModeIndex;
+    }
+
     constructor(game: WarcraftMaul) {
         this.game = game;
         this.panel = new VotePanel(game);

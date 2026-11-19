@@ -21,14 +21,21 @@ export class Creep {
     public readonly spawnLane: number;
     /** Set once when this creep first leaves its owner's lane, so an adaptive-difficulty leak counts once. */
     public hasLeaked: boolean = false;
+    /** The wave this creep spawned in, so a leak scores against its own wave's type (Blitz overlaps waves). */
+    public readonly spawnWave: number;
 
     constructor(creep: Unit, gameRound: AbstractGameRound, abilities: CreepAbility[], game: WarcraftMaul, spawnLane: number) {
         this.unit = creep;
         this.gameRound = gameRound;
         this.game = game;
         this.spawnLane = spawnLane;
+        this.spawnWave = gameRound.currentWave;
         this.AddArmorBonusByDifficulty();
         this.AddHPBonusByDifficulty();
+        // Adaptive telemetry (capture-only): add this creep's scaled HP to its lane's pool.
+        if (this.game.adaptiveDifficulty) {
+            this.game.adaptiveDifficulty.registerSpawnHp(spawnLane, this.unit.maxLife);
+        }
         this.abilities = abilities;
 
     }

@@ -1,7 +1,7 @@
 import { WorldMap } from '../WorldMap';
 import { SpawnedCreeps } from './SpawnedCreeps';
 import { Creep } from './Creep';
-import {COLOUR} from "../../lib/translators";
+import {COLOUR, DecodeFourCC} from "../../lib/translators";
 import {Trigger} from "w3ts";
 
 // Far more checkpoints than any path has
@@ -60,6 +60,9 @@ export class CheckPoint {
         if (ownArea && !ownArea.ContainsCreep(creep)) {
             creep.hasLeaked = true;
             engine.registerLeak(creep.spawnLane);
+            // Telemetry for a host bot: the leak, with the wave it spawned in and the creep's rawcode.
+            this.worldMap.game.playerSync.sendGlobal(
+                'adapt-leak', `${creep.spawnWave}:${creep.spawnLane}:${DecodeFourCC(creep.getTypeId())}`);
         }
     }
 
@@ -75,6 +78,11 @@ export class CheckPoint {
                 creep.OrderMove(GetRectCenterX(this.next.rectangle), GetRectCenterY(this.next.rectangle));
                 if (UnitHasBuffBJ(GetEnteringUnit()!, FourCC('B028'))) {
                     creep.MorningPerson();
+                }
+                const engine = this.worldMap.game.adaptiveDifficulty;
+                if (engine) {
+                    // Adaptive telemetry: how far this creep got, for the per-lane margin signal.
+                    engine.registerProgress(creep.spawnLane, creep.checkpointsLeft());
                 }
                 this.CountAdaptiveLeak(creep);
             }

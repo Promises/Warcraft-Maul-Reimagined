@@ -15,7 +15,9 @@ export class StringSink implements ILogSink {
     constructor(private minLevel: LogLevel = LogLevel.Debug) {}
 
     public isEnabled(level: LogLevel): boolean {
-        return level >= this.minLevel;
+        // Event is the machine-structured channel (JSON for the log file, e.g. chat/command records);
+        // it must never reach the on-screen chat. The file sink still captures it.
+        return level >= this.minLevel && level !== LogLevel.Event;
     }
 
     public emit(event: LogEvent): void {

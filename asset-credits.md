@@ -30,6 +30,7 @@ import something, add it here in the same commit, and credit the author in the c
 | Loading screen | `LoadingScreen.mdx`, `LoadingScreen.dds` | MaulBot artwork with the 5.0 credits (2026-09-21, new artwork 2026-09-22) |
 | Recipe book tier frames, sealed plates, arrow | `uiImport/RecipeBook/*.dds` | the recipe book design handoff (2026-10-09), painted by `../Wc3 buttons/recipe-book/tools/make_textures.py` |
 | UI templates | `war3mapImported/ui/*.fdf`, `templates.toc`, `editbox-border-disabled.blp`, `uiImport/*.fdf`, `uiImport/*.toc` | this map's code |
+| Rating panel star | `uiImport/Rate/star.dds` | generated gold 5-point star for the star rating flavour (2026-11-08), drawn by `scripts/rate-star.py` |
 
 ## Author unknown (to fill in)
 

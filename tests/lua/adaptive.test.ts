@@ -1,54 +1,56 @@
-import {
-    AdaptiveTuning,
-    DEFAULT_TUNING,
-    LaneOutcome,
-    applyPoints,
-    effectivePlayerDifficulty,
-    scoreWave,
-    scoreWaveDetailed,
-} from '../../src/World/Game/AdaptiveDifficulty';
+import {AdaptiveTuning, DEFAULT_TUNING, clampDifficulty, riseIncrement} from '../../src/World/Game/AdaptiveDifficulty';
+import {AdaptiveDifficultyEngine} from '../../src/World/Game/AdaptiveDifficultyEngine';
 
 type Check = (this: void, what: string, ok: boolean, detail?: string) => void;
 
-// Tests are written against the tuning's own fields, not hard-coded numbers, so they assert the
-// invariants (a leak eases, a clean wave climbs, drops are slower than rises, offsets stay in the
-// window) and survive a tuning change as long as the invariant holds.
 const T: AdaptiveTuning = DEFAULT_TUNING;
 
-function outcome(leaks: number, deepestFraction: number): LaneOutcome {
-    return { leaks, deepestFraction };
+function near(a: number, b: number): boolean {
+    return Math.abs(a - b) < 0.001;
 }
 
 export function adaptiveTests(check: Check): void {
-    // scoreWave: leaks push easier, a clean wave climbs, walls and near-leaks hold.
-    check('a leak scores negative', scoreWave(outcome(1, 0.5), T, false) < 0);
-    check('a clean mid wave drifts up', scoreWave(outcome(0, 0.5), T, false) === T.drift);
-    check('dominating beats the drift', scoreWave(outcome(0, T.earlyFraction - 0.01), T, false) > T.drift);
-    check('a near-leak holds', scoreWave(outcome(0, T.lateFraction + 0.01), T, false) === 0);
-    check('surviving a hard wave holds', scoreWave(outcome(0, 0.5), T, true) === 0);
-    check('a hard wave softens a leak',
-        Math.abs(scoreWave(outcome(1, 0.5), T, true)) < Math.abs(scoreWave(outcome(1, 0.5), T, false)));
-    check('many leaks cap the penalty',
-        scoreWave(outcome(3, 0.5), T, false) === scoreWave(outcome(9, 0.5), T, false));
+    // Pure helpers: the exponential rise and the band clamp.
+    check('rise step 0 is the base', near(riseIncrement(T, 0), T.riseBase));
+    check('rise grows exponentially', near(riseIncrement(T, 1), T.riseBase * T.riseGrowth));
+    check('each step is growth times the last', near(riseIncrement(T, 3) / riseIncrement(T, 2), T.riseGrowth));
+    check('clamp holds the floor', clampDifficulty(T.min - 50, T) === T.min);
+    check('clamp holds the ceiling', clampDifficulty(T.max + 50, T) === T.max);
+    check('clamp passes a value in band', clampDifficulty(200, T) === 200);
 
-    // The reason each wave gives, for the telemetry.
-    check('reason leak', scoreWaveDetailed(outcome(2, 0.5), T, false).reason === 'leak');
-    check('reason hardhold', scoreWaveDetailed(outcome(0, 0.5), T, true).reason === 'hardhold');
-    check('reason early', scoreWaveDetailed(outcome(0, 0), T, false).reason === 'early');
-    check('reason near', scoreWaveDetailed(outcome(0, 1), T, false).reason === 'near');
-    check('reason drift', scoreWaveDetailed(outcome(0, 0.5), T, false).reason === 'drift');
+    // Step cadence: first at firstStepWave, then every stepEveryWaves.
+    const e = new AdaptiveDifficultyEngine(T);
+    check('no step before the first step wave', !e.isRiseStepWave(T.firstStepWave - 1));
+    check('first step at the first step wave', e.isRiseStepWave(T.firstStepWave));
+    check('no step one wave after the first', !e.isRiseStepWave(T.firstStepWave + 1));
+    check('step every stepEveryWaves', e.isRiseStepWave(T.firstStepWave + T.stepEveryWaves));
 
-    // applyPoints: a rise needs fewer points than a drop, the value stays in the band, points carry.
-    check('one rise threshold raises a step', applyPoints(200, T.riseThreshold, T).value === 200 + T.step);
-    check('the same easing does not yet drop (drops are slower)',
-        applyPoints(200, -T.riseThreshold, T).value === 200);
-    check('a full drop threshold drops a step', applyPoints(200, -T.dropThreshold, T).value === 200 - T.step);
-    check('rising is capped at max', applyPoints(T.max, T.riseThreshold * 10, T).value === T.max);
-    check('dropping is floored at min', applyPoints(T.min, -T.dropThreshold * 10, T).value === T.min);
-    check('leftover points carry', applyPoints(200, T.riseThreshold + 2, T).carry === 2);
+    // Exponential rise.
+    check('starts at the base', e.hpDifficultyForLane(0) === T.start);
+    const before: number = e.globalDifficulty();
+    e.applyRiseStep();
+    check('a rise step raises the global', e.globalDifficulty() > before);
+    check('the first rise is the base increment', near(e.globalDifficulty(), T.start + riseIncrement(T, 0)));
 
-    // effectivePlayerDifficulty: the offset is held to the window, the result to the band.
-    check('a small offset applies', effectivePlayerDifficulty(200, T.window - 10, T) === 200 + (T.window - 10));
-    check('a big offset clamps to the window', effectivePlayerDifficulty(200, 999, T) === 200 + T.window);
-    check('the result stays in the band', effectivePlayerDifficulty(T.max, T.window, T) === T.max);
+    // A leak eases only that lane, and leaves others alone.
+    e.registerLeak(0);
+    check('a leak eases that lane',
+        e.hpDifficultyForLane(0) === clampDifficulty(e.globalDifficulty() - T.decreasePerLeak, T));
+    check('a leak leaves other lanes alone', e.hpDifficultyForLane(1) === clampDifficulty(e.globalDifficulty(), T));
+
+    // The band holds at both edges.
+    const capped: AdaptiveDifficultyEngine = new AdaptiveDifficultyEngine(T);
+    for (let i: number = 0; i < 100; i++) {
+        capped.applyRiseStep();
+    }
+    check('the global never exceeds max', capped.globalDifficulty() === T.max);
+    const floored: AdaptiveDifficultyEngine = new AdaptiveDifficultyEngine(T);
+    for (let i: number = 0; i < 100; i++) {
+        floored.registerLeak(2);
+    }
+    check('a lane never drops below min', floored.hpDifficultyForLane(2) === T.min);
+
+    // Abilities are derived from the global difficulty.
+    check('no bonus abilities at the base', new AdaptiveDifficultyEngine(T).abilityLevelForWave() === 0);
+    check('abilities climb with the global', capped.abilityLevelForWave() === Math.min(T.maxAbilityLevel, 3));
 }

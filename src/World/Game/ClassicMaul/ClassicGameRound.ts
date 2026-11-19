@@ -63,7 +63,6 @@ export class ClassicGameRound extends AbstractGameRound {
         if (!this.isWaveInProgress) {
             return;
         }
-        this.foldAdaptiveWave();
         if (this.currentWave === this.game.worldMap.waveCreeps.length) {
             this.BonusRoundsOver();
         } else {

@@ -5,10 +5,9 @@ import { PlayerSpawns } from '../../Entity/PlayerSpawns';
 import { CreepAbility } from '../../Entity/CreepAbilities/specs/CreepAbility';
 import { SpawnedCreeps } from '../../Entity/SpawnedCreeps';
 import {Trigger} from "w3ts";
-import {CREEP_TYPE, SendMessage, Util} from "../../../lib/translators";
+import {CREEP_TYPE, DecodeFourCC, SendMessage, Util} from "../../../lib/translators";
 import * as settings from '../../GlobalSettings';
 import {SyncTrace} from '../../../lib/SyncTrace';
-import {Fold} from '../AdaptiveDifficultyEngine';
 
 export abstract class AbstractGameRound {
 
@@ -96,11 +95,19 @@ export abstract class AbstractGameRound {
         SyncTrace.note('wave', `${this._currentWave} type=${wave.GetTypeID()}`);
         this.game.playerSync.sendGlobal('wave', `${this._currentWave}`);
         SendMessage(`Level ${this._currentWave} - ${wave.GetName()}`);
-        // Debug: with the adaptive difficulty on, show the team's current global % and ability level
-        // going into the wave, so the adjustment can be watched. Flat difficulties are constant.
-        if (this.game.debugMode && this.game.adaptiveDifficulty) {
-            const engine = this.game.adaptiveDifficulty;
-            SendMessage(`|cFF888888[adaptive] wave ${this._currentWave}: ${engine.globalDifficulty()}% global, ${engine.abilityLevelForWave()} abilities|r`);
+        // Wave N is spawning, so wave N-1 has completed: fire the bot's optional rate-at-wave trigger.
+        this.game.checkRateAtWave(this._currentWave - 1);
+        // Adaptive difficulty (when on): apply the exponential rise step on a step wave BEFORE this
+        // wave's creeps spawn (so they use the risen difficulty), then capture the per-wave snapshot.
+        const engine = this.game.adaptiveDifficulty;
+        if (engine) {
+            if (engine.isRiseStepWave(this._currentWave)) {
+                engine.applyRiseStep();
+            }
+            this.broadcastAdaptiveSnapshot(wave);
+            if (this.game.debugMode) {
+                SendMessage(`|cFF888888[adaptive] wave ${this._currentWave}: ${engine.globalDifficulty()}% global, step ${engine.currentStep()}, ${engine.abilityLevelForWave()} abilities|r`);
+            }
         }
 
         let spawnAmount: number = 10;
@@ -147,71 +154,54 @@ export abstract class AbstractGameRound {
 
 
     /**
-     * Folds the wave that just ended into the adaptive difficulty (when it is on): scores each lane's
-     * leaks this wave and updates the scoreboard's difficulty to the new team global. Called from each
-     * mode's round-end before the wave number advances, so the wave just run is the one scored. A
-     * no-op for flat difficulties.
+     * Captures the adaptive state for a host bot each wave (only in adaptive games): the global
+     * difficulty, the rise step, each player's effective difficulty and leak-ease, and each player's
+     * economy (gold/lumber/towers/value/kills - captured for analysis, never a live input, since the
+     * economy is transferable). Broadcast-only (no handler), each line well under 200 chars.
      */
-    protected foldAdaptiveWave(): void {
+    private broadcastAdaptiveSnapshot(wave: WaveCreep): void {
         const engine = this.game.adaptiveDifficulty;
         if (!engine) {
             return;
         }
-        const wave: WaveCreep = this.game.worldMap.waveCreeps[this._currentWave - 1];
-        const type: CREEP_TYPE = wave.getCreepType();
-        const hardWave: boolean =
-            type === CREEP_TYPE.AIR || type === CREEP_TYPE.BOSS || type === CREEP_TYPE.CHAMPION;
-        const endedWave: number = this._currentWave;
-        const lanes: number[] = [];
-        for (const player of this.game.players.values()) {
-            lanes.push(player.lane);
-        }
-        const fold: Fold = engine.endWave(lanes, hardWave);
-
-        // Trace the resulting state on every client, so the desync harness can diff the whole
-        // feedback loop directly - any divergence shows up here, at the wave it happened.
-        let trace: string = `wave=${endedWave} hard=${hardWave} global=${fold.global} ability=${fold.abilityLevel}`;
-        for (const laneFold of fold.lanes) {
-            trace += ` l${laneFold.lane}=${laneFold.difficulty}`;
-        }
-        SyncTrace.note('adaptive', trace);
-
-        this.broadcastAdaptiveTelemetry(endedWave, type, fold);
-
-        if (this.game.scoreBoard) {
-            MultiboardSetItemValueBJ(this.game.scoreBoard.board, 2, 3, `Adaptive ${fold.global}%`);
-        }
-    }
-
-    /**
-     * Telemetry for a host bot, so adaptive can be tuned from real games: the headline trajectory the
-     * record keys on, then per fold the full global state, each lane's fold (leaks, the reason, the
-     * points and the resulting difficulty) and each player's economy - to tell "difficulty too high"
-     * apart from "built badly". All broadcast-only (no handler), only in adaptive games; each line
-     * stays well under 200 chars. deepestFraction is a constant 500 (per mille) until the v2 signal.
-     */
-    private broadcastAdaptiveTelemetry(endedWave: number, type: CREEP_TYPE, fold: Fold): void {
         const sync = this.game.playerSync;
-        // Headline trajectory (the game record's difficulty_path keys on this one).
-        sync.sendGlobal('difficulty', `${endedWave}:${fold.global}:${fold.abilityLevel}`);
+        const w: number = this._currentWave;
+        const type: CREEP_TYPE = wave.getCreepType();
         const typeTag: string = type === CREEP_TYPE.AIR ? 'air'
             : type === CREEP_TYPE.BOSS ? 'boss' : type === CREEP_TYPE.CHAMPION ? 'champ' : 'norm';
+        // Headline trajectory (the game record's difficulty_path keys on this one).
+        sync.sendGlobal('difficulty', `${w}:${engine.globalDifficulty()}:${engine.abilityLevelForWave()}`);
         sync.sendGlobal('adapt-global',
-            `${endedWave}:${fold.global}:${fold.abilityLevel}:${fold.globalCarry}:${typeTag}:${fold.teamLeaks}:${this.game.gameLives}`);
+            `${w}:${engine.globalDifficulty()}:${engine.currentStep()}:${engine.abilityLevelForWave()}:${typeTag}:${this.game.gameLives}`);
+        let trace: string = `wave=${w} global=${engine.globalDifficulty()} step=${engine.currentStep()}`;
         for (const player of this.game.players.values()) {
-            const laneFold = fold.lanes.find(entry => entry.lane === player.lane);
-            if (laneFold) {
-                sync.sendGlobal('adapt-lane',
-                    `${endedWave}:${player.id}:${laneFold.leaks}:${Math.round(laneFold.deepestFraction * 1000)}:${laneFold.reason}:${laneFold.score}:${laneFold.offset}:${laneFold.offsetCarry}:${laneFold.difficulty}`);
-            }
+            sync.sendGlobal('adapt-lane',
+                `${w}:${player.id}:${engine.hpDifficultyForLane(player.lane)}:${engine.leakEaseForLane(player.lane)}:${Math.round(engine.overkillSumForLane(player.lane))}:${engine.overkillCountForLane(player.lane)}:${Math.round(engine.hpPoolForLane(player.lane))}:${engine.deepestReachedForLane(player.lane)}`);
             let towerValue: number = 0;
+            const towerCounts: Map<number, number> = new Map<number, number>();
             for (const tower of player.towersArray) {
                 towerValue += tower.towerValue;
+                const typeId: number = tower.GetTypeID();
+                towerCounts.set(typeId, (towerCounts.get(typeId) ?? 0) + 1);
             }
             const lumber: number = GetPlayerState(player.handle, PLAYER_STATE_RESOURCE_LUMBER);
             sync.sendGlobal('adapt-econ',
-                `${endedWave}:${player.id}:${player.getGold()}:${lumber}:${player.towersArray.length}:${towerValue}`);
+                `${w}:${player.id}:${player.getGold()}:${lumber}:${player.towersArray.length}:${towerValue}:${player.kills}`);
+            // Tower mix: each tower type and its count, so v2 can study composition (rawcode*count,…).
+            let mix: string = '';
+            for (const [typeId, count] of towerCounts) {
+                mix += (mix === '' ? '' : ',') + DecodeFourCC(typeId) + '*' + count;
+            }
+            sync.sendGlobal('adapt-towers', `${w}:${player.id}:${mix}`);
+            trace += ` l${player.lane}=${engine.hpDifficultyForLane(player.lane)}`;
         }
+        // Every client computes identical difficulties; the harness diffs this to catch any divergence.
+        SyncTrace.note('adaptive', trace);
+        if (this.game.scoreBoard) {
+            MultiboardSetItemValueBJ(this.game.scoreBoard.board, 2, 3, `Adaptive ${engine.globalDifficulty()}%`);
+        }
+        // The capture tallies (overkill, HP pool) covered the window up to this snapshot; reset them.
+        engine.resetWindow();
     }
 
     public abstract GameTimeUpdateEvent(): void;

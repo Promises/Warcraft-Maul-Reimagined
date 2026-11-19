@@ -17,10 +17,27 @@ import {Unit} from "w3ts";
 import {SendMessage, Util} from "../../lib/translators";
 import {GameTowerDef} from "./Races/HybridRandom.types";
 import {SyncTrace} from '../../lib/SyncTrace';
+import {BLITZ_RANDOM_BLACKLIST, GAME_MODES} from '../GlobalSettings';
+import {DraftView} from './Ui/HybridDraft/DraftPanel';
+
+/** The nine hybrid tier pools in order, for iterating the draft. */
+const HYBRID_TIERS: GameTowerDef[][] = [
+    HybridTierOne, HybridTierTwo, HybridTierThree, HybridTierFour, HybridTierFive,
+    HybridTierSix, HybridTierSeven, HybridTierEight, HybridTierNine,
+];
+const HYBRID_OPTIONS_PER_TIER = 2;
+
+/** One player's in-progress draft: the rolled options per tier and which is chosen in each. */
+interface HybridDraftState {
+    options: GameTowerDef[][];
+    choice: number[];
+}
 
 export class RacePicking {
     private game: WarcraftMaul;
     public HybridPool: Map<string, GameTowerDef> = new Map<string, GameTowerDef>();
+    // Per player, populated identically on every client by the synced roll (see rollHybridDraft).
+    private readonly drafts: Map<number, HybridDraftState> = new Map<number, HybridDraftState>();
 
     constructor(game: WarcraftMaul) {
         this.game = game;
@@ -60,10 +77,12 @@ export class RacePicking {
             }
         } else if (raceItem === FourCC('I00X')) { // Hybrid Random
             // Only as the player's race: not on top of a chosen or random one, but after a repick
-            // (which leaves none), whatever was picked before it. There is no repick from it.
+            // (which leaves none), whatever was picked before it. Re-buying it re-rolls the draft
+            // (costs a lumber); the 50-gold bonus is paid only on the first hybrid.
             if (!player.hasPrimaryRace() && !player.hasHardcoreRandomed) {
-                this.HybridRandomRace(player);
-                player.giveGold(50);
+                if (this.HybridRandomRace(player)) {
+                    player.giveGold(50);
+                }
             } else {
                 player.giveLumber(1);
                 player.sendMessage('You can\'t hybrid random after using normal / hardcore random / selection!');
@@ -120,21 +139,19 @@ export class RacePicking {
     }
 
     private RandomRace(player: Defender): Race | undefined {
-        const randomNumber = Util.RandomInt(0, this.game.worldMap.races.length - 1);
-        if (this.game.worldMap.races.length - player.races.length <= this.game.worldMap.disabledRaces) {
+        // Pick from the races actually available: enabled, not already held, and - in Blitz - not on
+        // the Blitz random blacklist. Building the pool up front (rather than re-rolling) means the
+        // blacklist can never loop, and an exhausted pool gives lumber instead.
+        const blitz: boolean = this.game.diffVote.mode === GAME_MODES.BLITZ;
+        const pickable: Race[] = this.game.worldMap.races.filter(race =>
+            race.enabled
+            && !player.hasRace(race)
+            && !(blitz && BLITZ_RANDOM_BLACKLIST.indexOf(race.itemid) >= 0));
+        if (pickable.length === 0) {
             player.giveLumber(1);
             return;
         }
-        const randomedRace = this.game.worldMap.races[randomNumber];
-
-        if (!randomedRace.enabled) {
-            return this.RandomRace(player);
-        }
-
-        if (player.hasRace(randomedRace)) {
-            return this.RandomRace(player);
-        }
-
+        const randomedRace: Race = pickable[Util.RandomInt(0, pickable.length - 1)];
         player.races.push(randomedRace);
         SyncTrace.note('rolled', `p${player.id} race=${randomedRace.name}`);
         this.game.playerSync.sendGlobal('race', `${player.id}:${randomedRace.itemid}`);
@@ -142,38 +159,87 @@ export class RacePicking {
         return randomedRace;
     }
 
-    private randomChoice(myarr: any[], blacklist: any[] = []): any {
-        // The game's generator: a hybrid random rolled with math.random gave every client a
-        // different set of towers, which is a desync as soon as one of them is built
-        let choice = myarr[GetRandomInt(0, myarr.length - 1)];
-        if (blacklist.indexOf(choice) >= 0) {
-            choice = this.randomChoice(myarr, blacklist);
-        }
+    /**
+     * Starts (or re-rolls) a hybrid draft: rolls the options and opens the draft panel. The player picks
+     * one tower per tier there and confirms (finalizeHybrid). Re-buying Hybrid Random re-rolls the draft
+     * with fresh options - that costs a lumber (the item), but only the FIRST hybrid returns true, so the
+     * caller pays the 50-gold bonus once and rerolling is not a gold tap.
+     */
+    private HybridRandomRace(player: Defender): boolean {
+        const firstHybrid = !player.hasHybridRandomed && !this.drafts.has(player.id);
 
-        return choice;
+        // Roll the options with the synced native generator so every client gets the same draft -
+        // a set that differs is a desync the moment one of those towers is built. Towers already
+        // rolled are avoided so no tower shows up twice across the whole draft; the filter is
+        // deterministic, so this stays in step.
+        const options = this.rollDraftOptions((pool, taken) => this.rollDistinct(pool, taken));
+        const state: HybridDraftState = {options, choice: options.map(() => 0)};
+        this.drafts.set(player.id, state);
+        SyncTrace.note('hybrid-draft',
+            `p${player.id} ${options.map(tier => tier.map(tower => tower.id).join('/')).join(',')}`);
+
+        // The draft defers hasHybridRandomed to confirm, so the race picker's own close test (which
+        // keys on that) no longer fires - close it here as the draft takes over the screen.
+        this.game.raceSelectPanel.close(player);
+        this.game.draftPanel.show(player, this.buildDraftView(state));
+        return firstHybrid;
     }
 
-    private HybridRandomRace(player: Defender) {
-        const t1 = this.randomChoice(HybridTierOne, player.hybridTowers);
-        const t2 = this.randomChoice(HybridTierTwo, player.hybridTowers);
-        const t3 = this.randomChoice(HybridTierThree, player.hybridTowers);
-        const t4 = this.randomChoice(HybridTierFour, player.hybridTowers);
-        const t5 = this.randomChoice(HybridTierFive, player.hybridTowers);
-        const t6 = this.randomChoice(HybridTierSix, player.hybridTowers);
-        const t7 = this.randomChoice(HybridTierSeven, player.hybridTowers);
-        const t8 = this.randomChoice(HybridTierEight, player.hybridTowers);
-        const t9 = this.randomChoice(HybridTierNine, player.hybridTowers);
-        player.hybridTowers = [];
-        player.hybridTowers.push(t1);
-        player.hybridTowers.push(t2);
-        player.hybridTowers.push(t3);
-        player.hybridTowers.push(t4);
-        player.hybridTowers.push(t5);
-        player.hybridTowers.push(t6);
-        player.hybridTowers.push(t7);
-        player.hybridTowers.push(t8);
-        player.hybridTowers.push(t9);
+    /** Picks option `option` for tier `row` of the acting player's draft; runs on every client (synced click). */
+    public onDraftSelect(player: Defender, row: number, option: number): void {
+        const state = this.drafts.get(player.id);
+        if (state === undefined || row < 0 || row >= state.choice.length
+            || option < 0 || option >= state.options[row].length) {
+            return;
+        }
+        state.choice[row] = option;
+        // Only the local owner's view re-renders; show() is gated to the local player.
+        this.game.draftPanel.show(player, this.buildDraftView(state));
+    }
 
+    /** Confirms the acting player's draft and builds it; runs on every client (synced click). */
+    public onDraftConfirm(player: Defender): void {
+        const state = this.drafts.get(player.id);
+        if (state === undefined) {
+            return;
+        }
+        player.hybridTowers = state.choice.map((chosen, tier) => state.options[tier][chosen]);
+        this.drafts.delete(player.id);
+        this.game.draftPanel.hide(player);
+        this.finalizeHybrid(player);
+    }
+
+    /** Cancels any in-progress draft and hides the panel, for a repick or game reset. */
+    public cancelDraft(player: Defender): void {
+        this.drafts.delete(player.id);
+        this.game.draftPanel.hide(player);
+    }
+
+    /** The draft's chosen towers as the local player's view. */
+    private buildDraftView(state: HybridDraftState): DraftView {
+        return {
+            title: '|cffB0F442Hybrid Draft|r  -  pick one tower per tier',
+            previewHeader: '|cfffcd312Your build|r',
+            optionsHeader: '|cfffcd312Choose one per tier|r',
+            confirm: 'Confirm build',
+            rows: state.options.map((tierOptions, tier) => ({
+                label: `|cffffcc00${tier + 1}|r`,
+                chosen: state.choice[tier],
+                options: tierOptions.map(tower => ({
+                    icon: tower.icon ?? '',
+                    title: tower.name,
+                    body: tower.toolTipExtended,
+                    goldCost: tower.goldCost,
+                })),
+            })),
+        };
+    }
+
+    /**
+     * Commits the chosen hybrid build: creates the builder, allows its towers, and reports the build.
+     * Runs on every client (onDraftConfirm is a synced click), so the handles it makes stay in step.
+     */
+    private finalizeHybrid(player: Defender): void {
         if (!player.hasHybridRandomed) {
             player.hybridBuilder = Unit.create(player, FourCC('e00I'), player.getCenterX(), player.getCenterY(), 0);
             // The native build menu would show the placeholder towers; building goes through
@@ -181,19 +247,15 @@ export class RacePicking {
             if (player.hybridBuilder) {
                 BlzUnitHideAbility(player.hybridBuilder.handle, HYBRID_BUILD_ABILITY, true);
             }
-            // player.races.push(player.hybridBuilder);
-
         }
 
         player.hasHybridRandomed = true;
-        // The rolls every client has to agree on: a hybrid set that differs is a desync the
-        // moment one of those towers is built
+        // The build every client has to agree on: a hybrid set that differs is a desync the
+        // moment one of those towers is built.
         SyncTrace.note('hybrid', `p${player.id} ${player.hybridTowers.map(tower => tower.name).join(',')}`);
-        // Hybrid random has no single race: report the hybrid item plus the 9 rolled tower ids, so a
+        // Hybrid random has no single race: report the hybrid item plus the 9 chosen tower ids, so a
         // host bot can resolve this player's build:<tier> placements to the actual towers.
         this.game.playerSync.sendGlobal('race', `${player.id}:I00X:${player.hybridTowers.map(tower => tower.id).join(',')}`);
-
-        // print(player.hybridBuilder?.name)
 
         for (let playerNum = 0; playerNum < 13; playerNum++) {
             for (let tier = 0; tier < 9; tier++) {
@@ -201,92 +263,53 @@ export class RacePicking {
             }
         }
 
-        // Object.keys(HybridSpells).forEach((hybridSpell) => {
-        //     const spell = HybridSpells[hybridSpell as any]
-        //     const tower = player.hybridTowers[parseInt(hybridSpell, 10)-1];
-        //
-        //     const ability = player.hybridBuilder?.getAbility(FourCC(spell.newId));
-        //     player.hybridBuilder?.setAbilityLevel(FourCC(spell.newId),tower.level);
-        //     if(tower.icon) {
-        //         BlzSetAbilityIcon(BlzGetAbilityId(ability!), tower.icon);
-        //     }
-        // })
-        // print(player.hybridBuilder?.addAbility(FourCC('Ax02')))
-        // print(player.hybridBuilder?.addAbility(FourCC('Ax01')))
-        // print(player.hybridBuilder?.addAbility(FourCC('A02D')))
-        // print(player.hybridBuilder?.addAbility(FourCC('Avul')))
-        // print(player.hybridBuilder?.getAbility(FourCC('Ax01')))
-        // print(player.hybridBuilder?.getAbility(FourCC('Ax01')))
-        // print(BlzGetUnitStringField(player.hybridBuilder!.handle, ConvertUnitStringField(FourCC('ubui'))!))
-
-        // for (const tower of HybridTierOne) {
-        //     if (tower.id !== t1) {
-        //         player.setTechMaxAllowed(FourCC(tower.id), 0)
-        //     } else {
-        //         player.setTechMaxAllowed(FourCC(tower.id), -1)
-        //     }
-        // }
-        // for (const tower of HybridTierTwo) {
-        //     if (tower.id !== t2) {
-        //         player.setTechMaxAllowed(FourCC(tower.id), 0)
-        //     } else {
-        //         player.setTechMaxAllowed(FourCC(tower.id), -1)
-        //     }
-        // }
-        // for (const tower of HybridTierThree) {
-        //     if (tower.id !== t3) {
-        //         player.setTechMaxAllowed(FourCC(tower.id), 0)
-        //     } else {
-        //         player.setTechMaxAllowed(FourCC(tower.id), -1)
-        //     }
-        // }
-        // for (const tower of HybridTierFour) {
-        //     if (tower.id !== t4) {
-        //         player.setTechMaxAllowed(FourCC(tower.id), 0)
-        //     } else {
-        //         player.setTechMaxAllowed(FourCC(tower.id), -1)
-        //     }
-        // }
-        // for (const tower of HybridTierFive) {
-        //     if (tower.id !== t5) {
-        //         player.setTechMaxAllowed(FourCC(tower.id), 0)
-        //     } else {
-        //         player.setTechMaxAllowed(FourCC(tower.id), -1)
-        //     }
-        // }
-        // for (const tower of HybridTierSix) {
-        //     if (tower.id !== t6) {
-        //         player.setTechMaxAllowed(FourCC(tower.id), 0)
-        //     } else {
-        //         player.setTechMaxAllowed(FourCC(tower.id), -1)
-        //     }
-        // }
-        // for (const tower of HybridTierSeven) {
-        //     if (tower.id !== t7) {
-        //         player.setTechMaxAllowed(FourCC(tower.id), 0)
-        //     } else {
-        //         player.setTechMaxAllowed(FourCC(tower.id), -1)
-        //     }
-        // }
-        // for (const tower of HybridTierEight) {
-        //     if (tower.id !== t8) {
-        //         player.setTechMaxAllowed(FourCC(tower.id), 0)
-        //     } else {
-        //         player.setTechMaxAllowed(FourCC(tower.id), -1)
-        //     }
-        // }
-        // for (const tower of HybridTierNine) {
-        //     if (tower.id !== t9) {
-        //         player.setTechMaxAllowed(FourCC(tower.id), 0)
-        //     } else {
-        //         player.setTechMaxAllowed(FourCC(tower.id), -1)
-        //     }
-        // }
         this.game.hybridBuildPanel.refresh(player);
         this.game.actionBar.showHybridBuild(player);
         SendMessage(player.getNameWithColour() + ' has |cFFB0F442hy|r|cFF8CF442b|r|cFF42F4C5r|r|cFF42F4F1id|r randomed!');
+    }
 
+    /** Picks one from a pool, avoiding those already taken when possible; synced and never loops. */
+    /**
+     * Rolls the nine tiers' options with `pick`, pushing each result onto `taken` so no tower repeats
+     * across the draft. Shared by the live roll (synced RNG) and the debug fixed roll (deterministic).
+     */
+    private rollDraftOptions(pick: (pool: GameTowerDef[], taken: GameTowerDef[]) => GameTowerDef): GameTowerDef[][] {
+        const taken: GameTowerDef[] = [];
+        const options: GameTowerDef[][] = [];
+        for (const pool of HYBRID_TIERS) {
+            const tierOptions: GameTowerDef[] = [];
+            for (let o = 0; o < HYBRID_OPTIONS_PER_TIER; o++) {
+                const rolled = pick(pool, taken);
+                taken.push(rolled);
+                tierOptions.push(rolled);
+            }
+            options.push(tierOptions);
+        }
+        return options;
+    }
 
+    /**
+     * Debug only: opens a hybrid draft with a deterministic, reproducible set - the first distinct tower
+     * for each slot, no RNG - so UI-fidelity captures of the draft panel and the build menu it leads to
+     * match across runs and machines (real client vs wc3-sim). Drive it on with -draftpick/-draftok.
+     */
+    public startFixedDraft(player: Defender): void {
+        const options = this.rollDraftOptions((pool, taken) =>
+            pool.filter(tower => taken.indexOf(tower) < 0)[0] ?? pool[0]);
+        const state: HybridDraftState = {options, choice: options.map(() => 0)};
+        this.drafts.set(player.id, state);
+        // Emit the same readiness trace as the live roll, so a harness can key on the event instead
+        // of sleeping; render-neutral, debug-only.
+        SyncTrace.note('hybrid-draft',
+            `p${player.id} ${options.map(tier => tier.map(tower => tower.id).join('/')).join(',')}`);
+        this.game.raceSelectPanel.close(player);
+        this.game.draftPanel.show(player, this.buildDraftView(state));
+    }
+
+    private rollDistinct(pool: GameTowerDef[], taken: GameTowerDef[]): GameTowerDef {
+        const available = pool.filter(tower => taken.indexOf(tower) < 0);
+        const source = available.length > 0 ? available : pool;
+        return source[GetRandomInt(0, source.length - 1)];
     }
 
     private CreateHybridPool(): void {

@@ -41,13 +41,22 @@
 - [x] Range check mode (`-range` / action bar button): a toggle (action bar button and/or chat command, per player, local) that draws the attack range around the currently selected tower while enabled. Selection events already exist per player (`Defender.SelectUnit`); range from `BlzGetUnitWeaponRealField(ATTACK_RANGE)`; render as a local-only image/effect ring like the maze grid.
 
 ## Features
+- [x] Mid-game rate UI (non-obtrusive, left side): a second presentation of the rate survey for
+  when the bot asks players to rate mid-game (`rate-at:wave:n` / `rate-now`, wave in progress). The
+  centre panel stays for the end-of-game prompt; the mid-game one is a compact top-left widget
+  (RateLeftPanel), overall-rating only by default (detail rows hostbot-driven), non-focus-stealing.
+  Shipped in Beta14.1: top-left anchor, stars scaled to the inner width, one-line Not now/Submit
+  buttons; routed off showMidGame (rate-now / rate-at wave). Built and verified in wc3-sim via the
+  `-rate real`/`-rate realmid` debug hooks (end-game path + done-flag "at most once" all confirmed).
+  Open polish (optional): title wording ("Rate so far?"), categories layout if a bot sets them in the
+  narrow panel. (operator, 2026-11-09)
 - [ ] Race guides in the picker's information pane (src/World/Game/Races/RaceGuides.ts, by item id):
   written for the three random picks, every Beginner race and the Elementalists, from the
   object data and the tower classes only (never a tooltip, no play advice: the how-to-play part is
   left to people who play the race); Intermediate and Advanced races still show only their tier. About 19 lines of 40 characters fit; test_race_guides (wc3-slop-lan
   measure.py) takes a screenshot of each guide. A race guide (how to play each race) is planned
-  after. Open question: a second Hybrid Random pays +50 gold again (RacePicking.ts gives it on
-  every hybrid pick, for a lumber) - intended? (2026-10-10)
+  after. Resolved (2026-11-08): re-buying Hybrid Random now re-rolls the draft and the +50 gold is paid
+  only on the FIRST hybrid (RacePicking.HybridRandomRace returns firstHybrid); rerolls cost a lumber only.
 - [x] The Black Beast of Arrrghhh (Caerbannog, n05E): its second aura, A081, makes creeps within
   1,000 15% faster (Uau1 +0.15), where the race's other Unholy Auras slow. Intended: its tooltip
   calls it "Run Away". The guide says so (2026-10-10).

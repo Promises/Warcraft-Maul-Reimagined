@@ -54,6 +54,7 @@ export class BlitzGameRound extends AbstractGameRound {
         this.roundEndTrigger.enabled = false;
     }
 
+
     private SpawnNextWave(): boolean {
 
         const nextWave: number = this.currentWave + 1;
@@ -111,9 +112,6 @@ export class BlitzGameRound extends AbstractGameRound {
 
     private AllIsDead(): void {
 
-        // Blitz spawns waves back-to-back and only pauses for all-dead every fifth wave, so the
-        // adaptive difficulty folds here, once per round, over the leaks accumulated since the last.
-        this.foldAdaptiveWave();
         if (this.currentWave === this.game.worldMap.waveCreeps.length) {
             this.BonusRoundsOver();
         } else {

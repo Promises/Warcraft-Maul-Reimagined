@@ -419,6 +419,7 @@ export class Defender extends AbstractPlayer {
             this.escapeTrigger.addAction(() => {
                 this.game.hybridBuildPanel.close(this);
                 this.game.raceSelectPanel.close(this);
+                this.game.ratePanel.escape(this);
             });
             this.registerBuildHotkeys();
         });
@@ -607,6 +608,7 @@ export class Defender extends AbstractPlayer {
         this.setGold(this._lane === COLOUR.GRAY ? 150 : 100);
         this.setLumber(1);
         this.forgetRacePicks();
+        this.game.racePicking.cancelDraft(this);
         this._hasHybridRandomed = false;
         this._hasHardcoreRandomed = false;
         this._repickCounter = 0;
