@@ -11,10 +11,16 @@ interface Quest {
 
 export const Quests: Quest[] = [
     {
+        title: `5.0.0 - 18`,
+        icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
+        stype: 0,
+        body: `Updates:\n- A new adaptive difficulty: instead of a fixed multiplier it starts gentle and adjusts to how the team is doing - leak and it eases, keep clearing and it climbs, so you settle near your own edge. Each player pulls only a little around the team's level (nobody stuck on trivial or impossible), and the creep abilities ramp on their own.\n- Blitz is now always adaptive: the mode vote offers Classic and Blitz (Adaptive), and the host settings add Adaptive as a Blitz difficulty. Classic keeps its fixed difficulties (Normal to Extreme).\n- Fixed: creeps could roll nearly every ability when a game started before a difficulty was set.\nUpdates:\n- Hybrid Random is now a draft: it rolls two towers for each of the nine tiers and you pick one per tier, hovering to read each. Your build fills in the middle as you choose; Confirm locks it in and opens your build menu.\n- Elementalist is no longer offered by Random in Blitz.`,
+    },
+    {
         title: `5.0.0 - 17`,
         icon: `ReplaceableTextures\\CommandButtons\\BTNAmbush.blp`,
         stype: 0,
-        body: `Updates:\n- Fixed: killing a creep shows your gold again - each player sees the share they earned float up from the creep.\n- The scoreboard title is green in Classic mode and red in Blitz.\nUpdates:\n- A new adaptive difficulty: instead of a fixed multiplier it starts gentle and adjusts to how the team is doing - leak and it eases, keep clearing and it climbs, so you settle near your own edge. Each player pulls only a little around the team's level (nobody stuck on trivial or impossible), and the creep abilities ramp on their own.\n- Blitz is now always adaptive: the mode vote offers Classic and Blitz (Adaptive), and the host settings add Adaptive as a Blitz difficulty. Classic keeps its fixed difficulties (Normal to Extreme).\n- Fixed: creeps could roll nearly every ability when a game started before a difficulty was set.`,
+        body: `Updates:\n- Fixed: killing a creep shows your gold again - each player sees the share they earned float up from the creep.\n- The scoreboard title is green in Classic mode and red in Blitz.`,
     },
     {
         title: `5.0.0 - 16`,
