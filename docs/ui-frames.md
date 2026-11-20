@@ -15,12 +15,22 @@ the game data lives on `/Volumes/media/shared/Warcraft 3`). Sizes are in screen 
 Only definitions at the top level of an FDF can be instantiated; children (`ButtonText`,
 backdrops named inside a button) are reached with `BlzFrameGetChild` / `Frame.getChild`.
 
-Loaded by the game in a match, no TOC needed: `EscMenuTemplates.fdf` (and the ESC panels),
-`ScriptDialog.fdf`, `QuestDialog.fdf`, `ConsoleUI.fdf`, `UpperButtonBar.fdf`, the info
-panels, timer/alliance/chat dialogs. **Not** loaded in a match: everything under `Glue\`
-(`StandardTemplates`, `BattleNetTemplates`, `ScoreScreen`, menus) - our
-`uiImport\Templates.toc` and `war3mapImported\ui\templates.toc` include the two template
-files, which is why `StandardButtonTemplate` works for the action bar.
+What a match loads (measured on the real 3.0.1 client - seat wc3-frames, conformance batch 403):
+the game instantiates every template from the FDF files listed in its own `framedef.toc`, and that
+list **includes the `Glue\` template files** (`StandardTemplates`, `BattleNetTemplates`, ...), so
+those are creatable in a match without a TOC of ours. (`ScriptDialog.fdf`, `QuestDialog.fdf`,
+`ConsoleUI.fdf`, `UpperButtonBar.fdf` are in `framedef.toc` and load too.) What makes **nothing** are
+templates reached only through another FDF's `IncludeFile`, not listed in `framedef.toc`: all 24 of
+`EscMenuTemplates.fdf` (`EscMenuButtonTemplate` included), the `InfoPanel*` files, and
+`BattleNetChannelList`. Creating a glue *screen* in a match - not just a template - takes the client
+down shortly after.
+
+**The rule to rely on: load what you use through your own TOC** (`BlzLoadTOCFile`); never depend on
+the game's preload. Maul does exactly this - `uiImport\Templates.toc` and
+`war3mapImported\ui\templates.toc` load `EscMenuTemplates.fdf`, `StandardTemplates.fdf` and the rest
+it uses - so `EscMenuButtonTemplate` and `StandardButtonTemplate` (the action bar) are always there
+for it. (Corrects an earlier claim here that `Glue\` is not loaded in a match and that
+`EscMenuTemplates` is - both were wrong.)
 
 ## Base frame types (what `BlzCreateFrameByType` takes)
 
@@ -73,7 +83,7 @@ the map is an End Game button with different text.
 
 Top-level, instantiable definitions. `<-` = inherits.
 
-### `UI\FrameDef\UI\EscMenuTemplates.fdf` (in-game look: parchment; loaded in a match)
+### `UI\FrameDef\UI\EscMenuTemplates.fdf` (in-game look: parchment; NOT auto-loaded in a match - reached only via IncludeFile, so load it through your own TOC)
 
 | Template | Type | Size | Note |
 |---|---|---|---|
@@ -151,5 +161,6 @@ Top-level, instantiable definitions. `<-` = inherits.
    the text do.
 4. Frame events fire on every client with `GetTriggerPlayer()` = the clicker; gate view changes
    to the local player and sync anything that changes the game (see `PlayerSync`).
-5. Templates of a family only exist once that family's FDF is loaded; ESC-menu ones are always
-   there in a match, glue ones only through our TOCs.
+5. A template only exists once its FDF is loaded. A match auto-loads the files in `framedef.toc`
+   (the `Glue\` templates included) but NOT those reached only via `IncludeFile` (`EscMenuTemplates`
+   among them); the rule to rely on is to load what you use through your own TOC (`BlzLoadTOCFile`).
