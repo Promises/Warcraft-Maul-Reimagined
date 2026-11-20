@@ -164,3 +164,8 @@ Top-level, instantiable definitions. `<-` = inherits.
 5. A template only exists once its FDF is loaded. A match auto-loads the files in `framedef.toc`
    (the `Glue\` templates included) but NOT those reached only via `IncludeFile` (`EscMenuTemplates`
    among them); the rule to rely on is to load what you use through your own TOC (`BlzLoadTOCFile`).
+6. Never destroy (`BlzDestroyFrame`) a clickable frame a player might be clicking - e.g. from a timer
+   or another player's action. A destroy landing between a click and its network turn (~0.05-0.2 s)
+   crashes the clicking player's client (the event still fires, with `BlzGetTriggerFrame()` nil).
+   Hide it or reuse it instead - a hidden frame's event fires normally. Maul has no `BlzDestroyFrame`;
+   keep it that way. (Measured on 3.0.1, seat wc3-frames, batch 412.)
