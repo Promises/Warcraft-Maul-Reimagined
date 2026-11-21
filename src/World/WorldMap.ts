@@ -38,6 +38,9 @@ export class WorldMap {
     public antiBlock?: AntiBlock;
     public antiJuggleRelease?: AntiJuggleRelease;
     private gameTimeTrigger: Trigger;
+    // Set once the end-of-game defeat has fired, so the per-second timer defeats everyone exactly
+    // once (CustomDefeatBJ leaks a dialog/button/trigger per player, see UpdateGameTime).
+    private defeatHandled: boolean = false;
     public gameRoundHandler?: AbstractGameRound;
     public gameTurn: GameTurn;
 
@@ -344,12 +347,19 @@ export class WorldMap {
 
     private UpdateGameTime(): void {
         if (this.game.gameEnded) {
+            // Once defeat has fired, stop: otherwise the end timer keeps ticking negative and
+            // DefeatAllPlayers runs every second, leaking a defeat dialog per player forever
+            // (anyone, e.g. a host bot observer, who stays after the end). Defeat exactly once.
+            if (this.defeatHandled) {
+                return;
+            }
             this.game.gameEndTimer -= 1;
             if (this.game.scoreBoard) {
                 MultiboardSetItemValueBJ(this.game.scoreBoard.board, 1, 1, 'End Time');
                 MultiboardSetItemValueBJ(this.game.scoreBoard.board, 2, 1, this.game.PrettifyGameTime(this.game.gameEndTimer));
             }
             if (this.game.gameEndTimer <= 0) {
+                this.defeatHandled = true;
                 this.game.DefeatAllPlayers();
             }
         } else {
